@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core Plug-in
+Bundle-SymbolicName: com.itsolut.mantis.core
+Bundle-Version: 1.4.0
+Bundle-Vendor: ITSOLUT
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.mylar.context.core,
+ org.eclipse.mylar.tasks.core,
+ org.eclipse.search
+Eclipse-LazyStart: true
+Export-Package: com.itsolut.mantis.core,
+ com.itsolut.mantis.core.exception,
+ com.itsolut.mantis.core.model,
+ com.itsolut.mantis.core.util
+Bundle-Activator: com.itsolut.mantis.core.MantisCorePlugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ClassPath: .,
+ lib/activation.jar,
+ lib/axis.jar,
+ lib/axis-ant.jar,
+ lib/commons-discovery-0.2.jar,
+ lib/commons-logging-1.0.4.jar,
+ lib/jaxrpc.jar,
+ lib/saaj.jar,
+ lib/wsdl4j-1.5.1.jar
