@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Connector: Mantis"
-      version="2.0.0.v20070707-1845"
+      version="2.0.0.v20070717-2101"
       provider-name="ITSOLUT">
 
    <description>
@@ -209,7 +209,7 @@ litigation.
    </license>
 
    <url>
-      <update label="Digital Dreams Update Site" url="http://www.digital-d.at/eclipse/update"/>
+      <update label="Mylyn-Mantis Update Site" url="http://mylyn-mantis.sourceforge.net/eclipse/update"/>
    </url>
 
    <requires>
