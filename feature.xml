@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Connector: Mantis"
-      version="2.0.0.v20070717-2101"
+      version="2.0.0.v20070720-1650"
       provider-name="ITSOLUT">
 
    <description>
