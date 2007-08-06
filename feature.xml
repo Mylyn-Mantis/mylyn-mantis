@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Connector: Mantis"
-      version="2.0.0.v20070805-1300"
+      version="2.0.0.v20070806-1300"
       provider-name="ITSOLUT">
 
    <description>
@@ -230,14 +230,28 @@ litigation.
          id="com.itsolut.mantis.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.0.v20070806-1300"
          unpack="false"/>
 
    <plugin
          id="com.itsolut.mantis.ui"
          download-size="0"
          install-size="0"
+         version="2.0.0.v20070806-1300"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.httpclient"
+         download-size="0"
+         install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.codec"
+         download-size="0"
+         install-size="0"
+         version="1.2.0.v200706111724"
          unpack="false"/>
 
 </feature>
