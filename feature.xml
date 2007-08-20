@@ -6,7 +6,7 @@
       provider-name="ITSOLUT">
 
    <description>
-      Trac client integrated with Eclipse and Mylar
+      Mantis client integrated with Eclipse and Mylar
    </description>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -253,5 +253,43 @@ litigation.
          install-size="0"
          version="1.2.0.v200706111724"
          unpack="false"/>
+
+   <plugin
+         id="org.apache.axis"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.apache.commons.discovery"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.apache.commons.logging"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.wsdl15"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.xml.rpc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="javax.xml.soap"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
