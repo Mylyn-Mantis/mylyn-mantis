@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Connector: Mantis"
-      version="2.0.0.v20071029-2020"
+      version="2.0.0.v20071110-1000"
       provider-name="ITSOLUT">
 
    <description>
@@ -214,16 +214,22 @@ litigation.
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.mylyn"/>
-      <import plugin="org.eclipse.mylyn.context.core"/>
-      <import plugin="org.eclipse.mylyn.tasks.core"/>
-      <import plugin="org.eclipse.mylyn.monitor.core"/>
       <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.mylyn.tasks.ui"/>
       <import feature="org.eclipse.mylyn_feature" version="2.0.0.v20070627-1400" match="greaterOrEqual"/>
+      <import plugin="javax.xml.rpc" version="1.1.0" match="compatible"/>
+      <import plugin="javax.xml.soap" version="1.2.0" match="compatible"/>
+      <import plugin="javax.wsdl15" version="1.5.1" match="compatible"/>
+      <import plugin="org.apache.ant" version="1.6.5" match="compatible"/>
+      <import plugin="org.apache.commons.logging" version="1.0.4" match="compatible"/>
+      <import plugin="org.eclipse.mylyn" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.context.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.tasks.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.monitor.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.web.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.tasks.ui" version="2.0.0" match="compatible"/>
    </requires>
 
    <plugin
