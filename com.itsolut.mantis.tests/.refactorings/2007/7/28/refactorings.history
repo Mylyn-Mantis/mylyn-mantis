@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<session version="1.0">
+<refactoring comment="Rename method 'org.eclipse.mylyn.trac.tests.TracTaskTest.testGetMylarPriority()' to 'testGetMylynPriority'&#13;&#10;- Original project: 'org.eclipse.mylyn.trac.tests'&#13;&#10;- Original element: 'org.eclipse.mylyn.trac.tests.TracTaskTest.testGetMylarPriority()'&#13;&#10;- Renamed element: 'org.eclipse.mylyn.trac.tests.TracTaskTest.testGetMylynPriority()'&#13;&#10;- Update references to refactored element" delegate="false" deprecate="false" description="Rename method 'testGetMylarPriority'" flags="589830" id="org.eclipse.jdt.ui.rename.method" input="/src&lt;org.eclipse.mylyn.trac.tests{TracTaskTest.java[TracTaskTest~testGetMylarPriority" name="testGetMylynPriority" references="true" stamp="1184026364941" version="1.0"/>
+</session>
