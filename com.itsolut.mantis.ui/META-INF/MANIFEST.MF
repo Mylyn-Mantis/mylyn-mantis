@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ui Plug-in
+Bundle-SymbolicName: com.itsolut.mantis.ui;singleton:=true
+Bundle-Version: 2.0.0.v200804211112
+Bundle-Activator: com.itsolut.mantis.ui.MantisUIPlugin
+Bundle-Vendor: ITSOLUT
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.forms,
+ org.eclipse.jface.text,
+ org.eclipse.core.runtime,
+ org.eclipse.mylyn;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.mylyn.context.core;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.mylyn.tasks.ui;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.mylyn.tasks.core;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.mylyn.monitor.core;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.search,
+ com.itsolut.mantis.core,
+ org.eclipse.jface.text
+Eclipse-LazyStart: true
+Export-Package: com.itsolut.mantis.ui,
+ com.itsolut.mantis.ui.editor,
+ com.itsolut.mantis.ui.wizard
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
