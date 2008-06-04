@@ -14,11 +14,11 @@ package com.itsolut.mantis.ui;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
-import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
 import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
 import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractTaskListFactory;
+import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.w3c.dom.Element;
 
 import com.itsolut.mantis.core.MantisRepositoryQuery;
@@ -26,28 +26,29 @@ import com.itsolut.mantis.core.MantisTask;
 
 /**
  * @author Steffen Pingel
+ * @author Dave Carver
  */
 public class MantisTaskListFactory extends AbstractTaskListFactory {
 
 	private static final String KEY_SEVERITY = "severity";
 	
-	private static final String KEY_TRAC = "Mantis";
+	private static final String KEY_MANTIS = "Mantis";
 
-	private static final String KEY_TRAC_TASK = KEY_TRAC + KEY_TASK;
+	private static final String KEY_MANTIS_TASK = KEY_MANTIS + KEY_TASK;
 
-	private static final String KEY_TRAC_QUERY = KEY_TRAC + KEY_QUERY;
+	private static final String KEY_MANTIS_QUERY = KEY_MANTIS + KEY_QUERY;
 
 	// category related methods
 	
 	@Override
 	public String getTaskElementName() {
-		return KEY_TRAC_TASK;
+		return KEY_MANTIS_TASK;
 	}
 
 	@Override
 	public Set<String> getQueryElementNames() {
 		Set<String> names = new HashSet<String>();
-		names.add(KEY_TRAC_QUERY);
+		names.add(KEY_MANTIS_QUERY);
 		return names;
 	}
 
@@ -65,7 +66,7 @@ public class MantisTaskListFactory extends AbstractTaskListFactory {
 
 	@Override
 	public String getQueryElementName(IRepositoryQuery query) {
-		return query instanceof MantisRepositoryQuery ? KEY_TRAC_QUERY : "";
+		return query instanceof MantisRepositoryQuery ? KEY_MANTIS_QUERY : "";
 	}
 
 	@Override

@@ -117,7 +117,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 				updateUsers(project);
 			} catch (MantisException e) {
 				MantisCorePlugin.log(e);
-				//StatusHandler.log(e, "Error getting users for Project " + project);
+				StatusHandler.log(MantisCorePlugin.toStatus(e));
 			}
 		}
 			

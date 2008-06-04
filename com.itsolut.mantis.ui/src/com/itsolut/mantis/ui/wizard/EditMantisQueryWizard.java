@@ -13,14 +13,11 @@ package com.itsolut.mantis.ui.wizard;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractLegacyRepositoryConnector;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.internal.tasks.ui.deprecated.AbstractRepositoryQueryWizard;
-import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 
 /**
  * @author Steffen Pingel
+ * @author Dave Carver
  */
 public class EditMantisQueryWizard extends AbstractRepositoryQueryWizard {
 
@@ -47,15 +44,15 @@ public class EditMantisQueryWizard extends AbstractRepositoryQueryWizard {
 
 //	@Override
 //	public boolean performFinish() {
-//		RepositoryQuery q = queryPage.getQuery();
+//		AbstractRepositoryQuery q = queryPage.getQuery();
 //		if (q != null) {
-//			TasksUiInternal.getTaskList().deleteQuery(q);
-//			TasksUiInternal.getTaskList().addQuery(q);
+//			TasksUiPlugin.getTaskListManager().getTaskList().deleteQuery(query);
+//			TasksUiPlugin.getTaskListManager().getTaskList().addQuery(q);
 //
-//			AbstractLegacyRepositoryConnector connector = (AbstractLegacyRepositoryConnector)TasksUiPlugin.getRepositoryManager().getRepositoryConnector(
-//					repository.getConnectorKind());
+//			AbstractRepositoryConnector connector = TasksUiPlugin.getRepositoryManager().getRepositoryConnector(
+//					repository.getKind());
 //			if (connector != null) {
-//				TasksUiInternal.synchronizeQuery(connector, q, null, true);
+//				TasksUiPlugin.getSynchronizationManager().synchronize(connector, q, null);
 //			}
 //		}
 //

@@ -287,6 +287,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 			for(IssueHeaderData ihd : ihds){
 				// only read the attributes that are important for the tasklist 
 				MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
+				
+				ticket.putBuiltinValue(Key.PROJECT, project.getName());
 				ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
 				ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
 				
