@@ -26,14 +26,22 @@
       <repository
             addAutomatically="false"
             anonymous="true"
-            label="Mantis Connector"
+            label="Mantis Connector 1.0a5"
             repositoryKind="mantis"
             urlRepository="http://your.domain.com/mc/mantisconnect.php"
             version="MC_1_0a5"/>
+      <repository
+            addAutomatically="false"
+            anonymous="false"
+            label="Mantis Connector 1.1.0 or greater"
+            repositoryKind="mantis"
+            urlRepository="http://your.domain.com/api/soap/mantisconnect.php"
+            version="MC_1_0a5">
+      </repository>
    </extension> 
    <extension
          point="org.eclipse.mylyn.tasks.ui.editors">
-      <editorFactory class="com.itsolut.mantis.ui.editor.MantisTaskEditorFactory"/>
+      <editorFactory class="com.itsolut.mantis.ui.editor.MantisTaskEditorPageFactory"/>
    </extension>
    <extension
        point="org.eclipse.mylyn.tasks.ui.projectLinkProviders">

@@ -26,7 +26,8 @@ Export-Package: com.itsolut.mantis.ui,
  com.itsolut.mantis.ui.editor,
  com.itsolut.mantis.ui.wizard
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.eclipse.mylyn.internal.tasks.core,
+Import-Package: org.eclipse.mylyn.internal.provisional.commons.ui,
+ org.eclipse.mylyn.internal.tasks.core,
  org.eclipse.mylyn.internal.tasks.core.deprecated,
  org.eclipse.mylyn.internal.tasks.ui,
  org.eclipse.mylyn.tasks.core,

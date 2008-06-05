@@ -23,6 +23,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.internal.tasks.ui.deprecated.AbstractNewRepositoryTaskEditor;
 import org.eclipse.mylyn.internal.tasks.ui.search.SearchHitCollector;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.ui.forms.editor.FormEditor;
 
 import com.itsolut.mantis.core.IMantisClient;
@@ -35,7 +36,7 @@ import com.itsolut.mantis.core.model.MantisSearchFilter.CompareOperator;
  * @author Steffen Pingel
  * @author Chris Hane
  */
-public class NewMantisTaskEditor extends AbstractNewRepositoryTaskEditor {
+public class NewMantisTaskEditor extends AbstractTaskEditorPage {
 
 	protected static final String LABEL_SECTION_STEPS = "Steps To Reproduce";
 	protected TextViewer stepsToReproduceViewer;

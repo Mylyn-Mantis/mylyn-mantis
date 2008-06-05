@@ -27,6 +27,8 @@ import com.itsolut.mantis.core.MantisTask;
 /**
  * @author Steffen Pingel
  * @author Dave Carver
+ * 
+ * @deprecated
  */
 public class MantisTaskListFactory extends AbstractTaskListFactory {
 
