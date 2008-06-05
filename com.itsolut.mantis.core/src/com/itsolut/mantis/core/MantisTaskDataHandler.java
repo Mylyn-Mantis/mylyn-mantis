@@ -11,8 +11,6 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,18 +21,18 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryOperation;
-import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.internal.tasks.core.TaskComment;
+import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisAttachment;
@@ -130,18 +128,23 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			
 		}
 
-//		MantisComment[] comments = ticket.getComments();
-//		if (comments != null) {
-//			for (int i = 0; i < comments.length; i++) {
-//				TaskComment taskComment = new TaskComment(factory, data.getComments().size() + 1);
-//				taskComment.setAttributeValue(RepositoryTaskAttribute.USER_OWNER, comments[i].getReporter());
-//				taskComment.setAttributeValue(RepositoryTaskAttribute.COMMENT_AUTHOR, comments[i].getReporter()); 
-//				taskComment.setAttributeValue(RepositoryTaskAttribute.COMMENT_DATE, comments[i].getDateSubmitted().toString());
-//				taskComment.setAttributeValue(RepositoryTaskAttribute.DATE_MODIFIED, comments[i].getLastModified().toString());
-//				taskComment.setAttributeValue(RepositoryTaskAttribute.COMMENT_TEXT, comments[i].getText());
-//				data.addComment(taskComment);
-//			}
-//		}
+		MantisComment[] comments = ticket.getComments();
+		if (comments != null) {
+			for (int i = 0; i < comments.length; i++) {
+			    TaskAttribute attributeComment = data.getRoot().createAttribute(TaskAttribute.PREFIX_COMMENT);
+				TaskCommentMapper taskComment = TaskCommentMapper.createFrom(attributeComment);
+				taskComment.setCommentId(Integer.toString(i + 1));
+				IRepositoryPerson author = data.getAttributeMapper().getTaskRepository().createPerson(comments[i].getReporter());
+				taskComment.setAuthor(author);
+				if (comments[i].getLastModified() != null) {
+					taskComment.setCreationDate(comments[i].getLastModified());
+				} else {
+					taskComment.setCreationDate(comments[i].getDateSubmitted());
+				}
+				taskComment.setText(comments[i].getText());
+				taskComment.applyTo(attributeComment);
+			}
+		}
 
 		MantisAttachment[] attachments = ticket.getAttachments();
 		if (attachments != null) {
@@ -344,49 +347,62 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 //	    return new HashSet<String>(taskAttribute.getValues());
 //	}
 //	
-//	public RepositoryTaskData createTaskDataFromTicket(IMantisClient client, TaskRepository repository,
-//			MantisTicket ticket, IProgressMonitor monitor) throws CoreException {
-//		RepositoryTaskData taskData = new RepositoryTaskData(attributeFactory, MantisCorePlugin.REPOSITORY_KIND,
-//				repository.getRepositoryUrl(), ticket.getId() + "");
-//		try {
-//			if (!MantisRepositoryConnector.hasRichEditor(repository)) {
-//				updateTaskDataFromTicket(taskData, ticket, client);
-//				taskData.setPartial(true);
-//			} else {
-//				createDefaultAttributes(attributeFactory, taskData, client, true);
-//				updateTaskData(repository, attributeFactory, taskData, client, ticket);
-//			}
-//			return taskData;
-//		} catch (OperationCanceledException e) {
-//			throw e;
-//		} catch (Exception e) {
-//			// TODO catch TracException
-//			throw new CoreException(MantisCorePlugin.toStatus(e));
-//		}
-//	}
-//	
-//	/**
-//	 * Updates attributes of <code>taskData</code> from <code>ticket</code>.
-//	 */
-//	public void updateTaskDataFromTicket(RepositoryTaskData taskData, MantisTicket ticket, IMantisClient client) {
-//		DefaultTaskSchema schema = new DefaultTaskSchema(taskData);
-//		if (ticket.getValue(Key.SUMMARY) != null) {
-//			schema.setSummary(ticket.getValue(Key.SUMMARY));
-//		}
-//
-//		if (MantisTask.isCompleted(ticket.getValue(Key.STATUS))) {
-//			schema.setCompletionDate(ticket.getLastChanged());
-//		} else {
-//			schema.setCompletionDate(null);
-//		}
-//
-//		String priority = ticket.getValue(Key.PRIORITY);
-//		MantisPriority[] mantisPriorities = client.getPriorities();
-//		PriorityLevel priorityLevel = MantisTask.getMylynPriority(priority);
-//		schema.setPriority(MantisTask.getMylynPriority(priority));
-//
-//		if (ticket.getCreated() != null) {
-//			schema.setCreationDate(ticket.getCreated());
-//		}
-//	}
+
+	/**
+	 * Given a Mantis Ticket create the necessary TaskData object
+	 * @param IMantisClient client
+	 * @param TaskRepository repository
+	 * @param MantisTicket ticket
+	 * @param IProgressMontiro monitor
+	 * 
+	 * @since 3.0
+	 */
+	public TaskData createTaskDataFromTicket(IMantisClient client, TaskRepository repository,
+			MantisTicket ticket, IProgressMonitor monitor) throws CoreException {
+		TaskData taskData = new TaskData(getAttributeMapper(repository), MantisCorePlugin.REPOSITORY_KIND,
+				repository.getRepositoryUrl(), ticket.getId() + "");
+		try {
+			if (!MantisRepositoryConnector.hasRichEditor(repository)) {
+				updateTaskDataFromTicket(taskData, ticket, client);
+				taskData.setPartial(true);
+			} else {
+				createDefaultAttributes(getAttributeMapper(repository), taskData, client, true);
+				updateTaskData(repository, getAttributeMapper(repository), taskData, client, ticket);
+			}
+			return taskData;
+		} catch (OperationCanceledException e) {
+			throw e;
+		} catch (Exception e) {
+			// TODO catch TracException
+			throw new CoreException(MantisCorePlugin.toStatus(e));
+		}
+	}
+	
+	/**
+	 * Updates attributes of <code>taskData</code> from <code>ticket</code>.
+	 */
+	public void updateTaskDataFromTicket(TaskData taskData, MantisTicket ticket, IMantisClient client) {
+	
+		TaskAttribute attributeSummary = taskData.getRoot().getAttribute(TaskAttribute.SUMMARY);
+		if (ticket.getValue(Key.SUMMARY) != null) {
+			attributeSummary.setValue(ticket.getValue(Key.SUMMARY));
+		}
+
+		TaskAttribute attributeCompletionDate = taskData.getRoot().getAttribute(TaskAttribute.DATE_COMPLETION);
+
+		if (MantisTask.isCompleted(ticket.getValue(Key.STATUS))) {
+			attributeCompletionDate.setValue(ticket.getLastChanged().toString());
+		} else {
+			attributeCompletionDate.setValue(null);
+		}
+
+		String priority = ticket.getValue(Key.PRIORITY);
+		TaskAttribute attributePriority = taskData.getRoot().getAttribute(TaskAttribute.PRIORITY);
+		attributePriority.setValue(MantisTask.getMylynPriority(priority).toString());
+
+		TaskAttribute attributeCreationDate = taskData.getRoot().getAttribute(TaskAttribute.DATE_CREATION);
+		if (ticket.getCreated() != null) {
+			attributeCreationDate.setValue(ticket.getCreated().toString());
+		}
+	}
 }

@@ -8,6 +8,17 @@
  * Contributors:
  *     Mylar project committers - initial API and implementation
  *******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2007, 2008 - 2007 IT Solutions, Inc. and others
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Chris Hane - adapted Trac implementation for Mantis
+ *     David Carver - STAR - Migrated to Mylyn 3.0
+ *******************************************************************************/
 
 package com.itsolut.mantis.core;
 
@@ -46,47 +57,41 @@ public class MantisClientManager implements IRepositoryListener {
 	}
 
 	public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MalformedURLException {
-		IMantisClient repository = clientByUrl.get(taskRepository.getUrl());
+		IMantisClient repository = clientByUrl.get(taskRepository.getRepositoryUrl());
 		if (repository == null) {
-			repository = MantisClientFactory.createClient(taskRepository.getUrl(), 
+		
+			repository = MantisClientFactory.createClient(taskRepository.getRepositoryUrl(), 
 					                                     Version.fromVersion(taskRepository.getVersion()), 
-					                                     taskRepository.getUserName(), 
-					                                     taskRepository.getPassword(), 
+					                                     taskRepository.getUserName(),
+					                                     taskRepository.getPassword(),
 					                                     taskRepository.getProxy());
-			clientByUrl.put(taskRepository.getUrl(), repository);
+			clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
 
-			MantisClientData data = clientDataByUrl.get(taskRepository.getUrl());
+			MantisClientData data = clientDataByUrl.get(taskRepository.getRepositoryUrl());
 			if (data == null) {
 				data = new MantisClientData();
-				clientDataByUrl.put(taskRepository.getUrl(), data);
+				clientDataByUrl.put(taskRepository.getRepositoryUrl(), data);
 			}
 			repository.setData(data);
 		}
 		return repository;
 	}
 
-	public void repositoriesRead() {
-		// ignore
-	}
-
 	public synchronized void repositoryAdded(TaskRepository repository) {
 		// make sure there is no stale client still in the cache, bug #149939
-		clientByUrl.remove(repository.getUrl());
-		clientDataByUrl.remove(repository.getUrl());
+		clientByUrl.remove(repository.getRepositoryUrl());
+		clientDataByUrl.remove(repository.getRepositoryUrl());
 	}
 
 	public synchronized void repositoryRemoved(TaskRepository repository) {
-		clientByUrl.remove(repository.getUrl());
-		clientDataByUrl.remove(repository.getUrl());
+		clientByUrl.remove(repository.getRepositoryUrl());
+		clientDataByUrl.remove(repository.getRepositoryUrl());
 	}
 
 	public synchronized void repositorySettingsChanged(TaskRepository repository) {
-		clientByUrl.remove(repository.getUrl());
-		// if url is changed a stale data object will be left in
-		// clientDataByUrl, bug #149939
+		clientByUrl.remove(repository.getRepositoryUrl());
 	}
 
-	@SuppressWarnings("unchecked")
 	public void readCache() {
 		if (cacheFile == null || !cacheFile.exists()) {
 			return;
@@ -144,7 +149,6 @@ public class MantisClientManager implements IRepositoryListener {
 	}
 
 	public void repositoryUrlChanged(TaskRepository repository, String oldUrl) {
-		// TODO Auto-generated method stub
 		
 	}
 

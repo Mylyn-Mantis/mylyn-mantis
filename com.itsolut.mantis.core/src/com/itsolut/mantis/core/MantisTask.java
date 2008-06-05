@@ -9,7 +9,7 @@
  *     Mylar project committers - initial API and implementation
  *******************************************************************************/
 /*******************************************************************************
- * Copyright (c) 2007 - 2007 IT Solutions, Inc.
+ * Copyright (c) 2007, 2008 IT Solutions, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@
  * 
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
+ *     David Carver - STAR - Migrated to Mylyn 3.0
  *******************************************************************************/
 
 package com.itsolut.mantis.core;
@@ -28,6 +29,8 @@ import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 /**
  * @author Steffen Pingel
  * @author Chris Hane
+ * 
+ * @since 2.0
  */
 public class MantisTask extends AbstractTask implements ITask {
 
