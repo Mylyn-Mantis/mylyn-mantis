@@ -32,6 +32,9 @@ import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractAttributeFactory
 import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
 import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryTaskData;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,7 +61,7 @@ public class NewMantisTaskPage extends WizardPage {
 
 	private TaskRepository taskRepository;
 
-	private RepositoryTaskData taskData;
+	private TaskData taskData;
 	public Combo projectCombo;
 
 	public NewMantisTaskPage(TaskRepository taskRepository) {
@@ -93,7 +96,8 @@ public class NewMantisTaskPage extends WizardPage {
 				public void widgetSelected(SelectionEvent e) {
 					if(projectCombo.getSelectionIndex()>0){
 						
-						taskData.setAttributeValue(Key.PROJECT.getKey(), projectCombo.getText());
+						TaskAttribute attribute = taskData.getRoot().getAttribute(Key.PROJECT.getKey());
+						attribute.setValue(projectCombo.getText());
 						MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUiPlugin.getRepositoryManager()
 						                                                                               .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 						try{
@@ -159,27 +163,22 @@ public class NewMantisTaskPage extends WizardPage {
 			}
 		}
 
-		MantisTaskDataHandler offlineHandler = (MantisTaskDataHandler) connector.getLegacyTaskDataHandler();
-		AbstractAttributeFactory attributeFactory = offlineHandler.getAttributeFactory(taskRepository.getUrl(), taskRepository.getConnectorKind(), AbstractTask.DEFAULT_TASK_KIND);
-		this.taskData = new RepositoryTaskData(attributeFactory, 
-				                               MantisCorePlugin.REPOSITORY_KIND,
-				                               taskRepository.getUrl(),
-				                               TasksUiPlugin.getDefault().getNextNewRepositoryTaskId(), 
-				                               AbstractTask.DEFAULT_TASK_KIND);
-		
-		this.taskData.setNew(true);
+		MantisTaskDataHandler offlineHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
+		TaskAttributeMapper attributeMapper = offlineHandler.getAttributeMapper(taskRepository);
+		taskData = new TaskData(attributeMapper, MantisCorePlugin.REPOSITORY_KIND, taskRepository.getRepositoryUrl(), TasksUiPlugin.getDefault().getNextNewRepositoryTaskId());
 		
 		//default setting
-		taskData.setAttributeValue(Key.PROJECT.getKey(), projectCombo.getText());
+		taskData.getRoot().getAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
 		
 		try {
-			MantisTaskDataHandler.createDefaultAttributes(taskData.getAttributeFactory(), taskData, client, false);
+			
+			MantisTaskDataHandler.createDefaultAttributes(taskData.getAttributeMapper(), taskData, client, false);
 		} catch (CoreException e) {
 			MantisUIPlugin.handleMantisException(e.getCause());
 		}
 	}
 
-	public RepositoryTaskData getRepositoryTaskData() {
+	public TaskData getRepositoryTaskData() {
 		return taskData;
 	}
 
