@@ -5,16 +5,16 @@ Bundle-SymbolicName: com.itsolut.mantis.core
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: ITSOLUT
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.search,
  org.eclipse.mylyn;bundle-version="[3.0.0,4.0.0)",
+ org.eclipse.mylyn.commons.core;bundle-version="[3.0.0,4.0.0)",
  org.eclipse.mylyn.context.core;bundle-version="[3.0.0,4.0.0)",
  org.eclipse.mylyn.tasks.core;bundle-version="[3.0.0,4.0.0)",
  org.eclipse.mylyn.monitor.core;bundle-version="[3.0.0,4.0.0)",
- org.eclipse.search,
  org.eclipse.mylyn.web.core;bundle-version="[3.0.0,4.0.0)",
- org.eclipse.mylyn.commons.core;bundle-version="[3.0.0,4.0.0)",
+ org.apache.axis;bundle-version="1.4.0";visibility:=reexport,
  org.apache.commons.httpclient,
  org.apache.commons.codec,
- org.apache.axis,
  org.apache.commons.discovery,
  org.apache.commons.logging,
  javax.xml.rpc,
@@ -41,7 +41,8 @@ Export-Package:
  javax.mail.event,
  javax.mail.internet,
  javax.mail.search,
- javax.mail.util
+ javax.mail.util,
+ javax.xml.soap
 Bundle-Activator: com.itsolut.mantis.core.MantisCorePlugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .,
