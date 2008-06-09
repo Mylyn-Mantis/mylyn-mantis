@@ -38,11 +38,11 @@ public class MantisTaskTest extends TestCase {
 	 * @author David Carver
 	 */
 	public void testGetMylynPriority() {
-		assertEquals("P1", MantisTask.getMylynPriority("immediate"));
-		assertEquals("P2", MantisTask.getMylynPriority("urgent"));
-		assertEquals("P2", MantisTask.getMylynPriority("high"));
-		assertEquals("P3", MantisTask.getMylynPriority("normal"));
-		assertEquals("P4", MantisTask.getMylynPriority("low"));
+		assertEquals("P1", MantisTask.getMylynPriority("immediate").toString());
+		assertEquals("P2", MantisTask.getMylynPriority("urgent").toString());
+		assertEquals("P2", MantisTask.getMylynPriority("high").toString());
+		assertEquals("P3", MantisTask.getMylynPriority("normal").toString());
+		assertEquals("P4", MantisTask.getMylynPriority("low").toString());
 	}
 	
 	/**

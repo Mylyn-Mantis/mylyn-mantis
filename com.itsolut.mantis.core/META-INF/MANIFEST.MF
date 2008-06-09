@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.apache.commons.logging,
  javax.xml.rpc,
  javax.xml.soap,
- javax.wsdl;bundle-version="1.5.1"
+ javax.wsdl;bundle-version="1.5.1",
+ org.eclipse.mylyn.commons.net;bundle-version="[3.0.0,4.0.0)"
 Eclipse-LazyStart: true
 Export-Package: 
  com.itsolut.mantis.binding,

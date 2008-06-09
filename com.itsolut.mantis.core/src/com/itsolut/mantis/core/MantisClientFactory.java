@@ -25,6 +25,8 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 
+import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+
 import com.itsolut.mantis.core.IMantisClient.Version;
 
 
@@ -34,6 +36,7 @@ import com.itsolut.mantis.core.IMantisClient.Version;
  */
 public class MantisClientFactory {
 
+	
 	public static IMantisClient createClient(String location, Version version, String username, String password,
 			Proxy proxy) throws MalformedURLException {
 		URL url = new URL(location);

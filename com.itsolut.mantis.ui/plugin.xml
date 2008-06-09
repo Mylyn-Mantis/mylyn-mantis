@@ -8,18 +8,12 @@
       <connectorCore
             class="com.itsolut.mantis.core.MantisRepositoryConnector"
             id="com.itsolut.mantis.tasklist.repositories"
-            name="Mantis Connector"
-            type="mantis"/>
+            name="Mantis Connector"/>
       <connectorUi
             brandingIcon="icons/eview16/mantis-icon.gif"
             class="com.itsolut.mantis.ui.MantisRepositoryUi"
             id="Manits Repository UI"
             overlayIcon="icons/eview16/overlay-mantis.gif"/>
-      <taskListFactory
-            class="com.itsolut.mantis.ui.MantisTaskListFactory"
-            id="com.itsolut.mantis.tasklist.TaskListFactory"
-            name="Mantis Tasklist">
-      </taskListFactory>
    </extension>
    <extension
          point="org.eclipse.mylyn.tasks.core.templates">
@@ -39,9 +33,12 @@
             version="MC_1_0a5">
       </repository>
    </extension> 
-   <extension
+     <extension
          point="org.eclipse.mylyn.tasks.ui.editors">
-      <editorFactory class="com.itsolut.mantis.ui.editor.MantisTaskEditorPageFactory"/>
+      <pageFactory
+            class="com.itsolut.mantis.ui.editor.MantisTaskEditorPageFactory"
+            id="com.itsolut.mantis.ui.pageFactory">
+      </pageFactory>            
    </extension>
    <extension
        point="org.eclipse.mylyn.tasks.ui.projectLinkProviders">

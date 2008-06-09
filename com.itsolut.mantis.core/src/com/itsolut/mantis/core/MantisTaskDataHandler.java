@@ -115,23 +115,23 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			                          IMantisClient client, MantisTicket ticket) throws CoreException {
 		
 		if (ticket.getCreated() != null) {
-			data.getRoot().getAttribute(MantisAttributeMapper.Attribute.DATE_SUBMITTED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getCreated()) + "");
+			getAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getCreated()) + "");
 		}
 		
 		if (ticket.getLastChanged() != null) {
-			data.getRoot().getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getLastChanged()) + "");
+			getAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getLastChanged()) + "");
 		}
 
 		Map<String, String> valueByKey = ticket.getValues();
 		for (String key : valueByKey.keySet()) {
-			data.getRoot().getAttribute(key).setValue(valueByKey.get(key));
+			getAttribute(data, key).setValue(valueByKey.get(key));
 			
 		}
 
 		MantisComment[] comments = ticket.getComments();
 		if (comments != null) {
 			for (int i = 0; i < comments.length; i++) {
-			    TaskAttribute attributeComment = data.getRoot().createAttribute(TaskAttribute.PREFIX_COMMENT);
+			    TaskAttribute attributeComment = getAttribute(data, TaskAttribute.PREFIX_COMMENT);
 				TaskCommentMapper taskComment = TaskCommentMapper.createFrom(attributeComment);
 				taskComment.setCommentId(Integer.toString(i + 1));
 				IRepositoryPerson author = data.getAttributeMapper().getTaskRepository().createPerson(comments[i].getReporter());
@@ -168,8 +168,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		
 		// add operations
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.OPERATION);
-        TaskOperation.applyTo(operationAttribute, "leave", "Leave as " + data.getRoot().getAttribute(TaskAttribute.STATUS).getValue());
-		
+        
+        TaskOperation.applyTo(operationAttribute, "leave", "Leave as " + ticket.getValue(MantisTicket.Key.STATUS));
 		// Assign To Operation
 		String[] users = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
 		
@@ -222,7 +222,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		
 		try {
 			// categories
-			TaskAttribute attr = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.CATEGORY.getMantisKey());
+			TaskAttribute attr = getAttribute(data, MantisAttributeMapper.Attribute.CATEGORY.getMantisKey());
 			attr.clearOptions();
 			boolean first = MantisUtils.isEmpty(attr.getValue());
 			for(MantisProjectCategory mp : client.getProjectCategories(data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getMantisKey()).getValue())){
@@ -235,15 +235,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			
 			
 			// versions
-			TaskAttribute repInVerAttr = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.VERSION.getMantisKey());
+			TaskAttribute repInVerAttr = getAttribute(data, MantisAttributeMapper.Attribute.VERSION.getMantisKey());
 			repInVerAttr.clearOptions();
 			repInVerAttr.putOption("none", ""); // empty option
 
-			TaskAttribute fixInVerAttr = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.FIXED_IN.getMantisKey());
+			TaskAttribute fixInVerAttr = getAttribute( data, MantisAttributeMapper.Attribute.FIXED_IN.getMantisKey());
 			fixInVerAttr.clearOptions();
 			fixInVerAttr.putOption("none", "");// Add empty option
 
-			for (MantisVersion v : client.getVersions(data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getMantisKey()).getValue())) {
+			for (MantisVersion v : client.getVersions(getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getMantisKey()).getValue())) {
 
 				/*
 				 * Only display released versions for the reported in field,
@@ -268,7 +268,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	
 	private static TaskAttribute createAttribute(TaskAttributeMapper attributeMapper, TaskData data, 
 			                                               MantisAttributeMapper.Attribute attribute, Object[] values, boolean allowEmtpy) {
-		TaskAttribute attr = data.getRoot().getMappedAttribute(attribute.getTaskKey());
+//		TaskAttribute attr = data.getRoot().getMappedAttribute(attribute.getTaskKey());
+		TaskAttribute attr = data.getRoot().createMappedAttribute(attribute.getTaskKey());
 		if (values != null && values.length > 0) {
 			if (allowEmtpy) {
 				attr.putOption("", "");
@@ -277,13 +278,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				attr.putOption(values[i].toString(), values[i].toString());
 			}
 		}
-		data.getRoot().deepAddCopy(attr);
 		return attr;
 	}
 	
 	private static TaskAttribute createAttribute(TaskAttributeMapper attributeMapper, TaskData data, MantisAttributeMapper.Attribute attribute) {
 		TaskAttribute attr =  data.getRoot().createAttribute(attribute.getMantisKey());
-		data.getRoot().deepAddCopy(attr);
 		return attr;
 	}
 
@@ -292,6 +291,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		TaskAttribute rta = createAttribute(attributeMapper, data, attribute, values, false);
 		rta.setValue(defaultValue);
 		return rta;
+	}
+	
+	private static TaskAttribute getAttribute(TaskData data, String key) {
+		TaskAttribute attribute = data.getRoot().getAttribute(key);
+		if (attribute == null) {
+			attribute = data.getRoot().createAttribute(key);
+		}
+		return attribute;
 	}
 
 	private static TaskAttribute createAttribute(TaskAttributeMapper attributeMapper, 
@@ -306,7 +313,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	private static TaskAttribute createAttributeHidden(TaskAttributeMapper attributeMapper, 
 			                                               TaskData data, MantisAttributeMapper.Attribute attribute, Object[] values) {
 		TaskAttribute attr = createAttribute(attributeMapper, data, attribute, values);
-		data.getRoot().deepAddCopy(attr);
 		return attr;
 	}
 	

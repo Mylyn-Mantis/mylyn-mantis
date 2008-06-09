@@ -46,28 +46,28 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 	private static Map<String, String> mantisKeyByTaskKey = new HashMap<String, String>();
 	
 	public enum Attribute {
-		ID(Key.ID, "<used by search engine>", null, true),
-		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:", null, true, false),
+		ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
+		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:", IMantisConstants.METADATA_ADDITIONAL_INFO, true, false),
 		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED, true, false),
-		CATEGORY(Key.CATEOGRY, "Category:", null, false, true),
+		CATEGORY(Key.CATEOGRY, "Category:", IMantisConstants.METADATA_CATEGORY, false, true),
 		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.DATE_CREATION, true, true),
 		DESCRIPTION(Key.DESCRIPTION, "Description2:", TaskAttribute.DESCRIPTION, true, false),
-		ETA(Key.ETA, "ETA:", null), 
+		ETA(Key.ETA, "ETA:", IMantisConstants.METADATA_ETA), 
 		LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.DATE_MODIFICATION, true, true),
 		PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.PRIORITY),
-		PROJECT(Key.PROJECT, "Project:", null, true, false),
-		PROJECTION(Key.PROJECTION, "Projection:", null),
-		RELATIONSHIPS(Key.RELATIONSHIPS,  "Relationships:", null, true, false),
+		PROJECT(Key.PROJECT, "Project:", IMantisConstants.METADATA_PROJECT, true, false),
+		PROJECTION(Key.PROJECTION, "Projection:", IMantisConstants.METADATA_PROJECTION, false, false),
+		RELATIONSHIPS(Key.RELATIONSHIPS,  "Relationships:", IMantisConstants.METADATA_RELATIONSHIPS, true, false),
 		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true, false),
-		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", null),
+		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", IMantisConstants.METADATA_REPRODUCABILITY),
 		RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.RESOLUTION, false, false),
-		SEVERITY(Key.SEVERITY, "Severity:", null),
+		SEVERITY(Key.SEVERITY, "Severity:", IMantisConstants.METADATA_SEVERITY, true, true),
 		STATUS(Key.STATUS, "Status:", TaskAttribute.STATUS, false, false),
-		STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", null, true, false),
+		STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", IMantisConstants.METADATA_STEPS_TO_REPRODUCE, true, false),
 		SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.SUMMARY, true),
-		VERSION(Key.VERSION, "Version:", null),
-		FIXED_IN(Key.FIXED_IN, "Fixed In:", null),
-		VIEW_STATE(Key.VIEW_STATE, "View State:", null);
+		VERSION(Key.VERSION, "Version:", IMantisConstants.METADATA_VERSION),
+		FIXED_IN(Key.FIXED_IN, "Fixed In:", IMantisConstants.METADATA_FIXED_IN),
+		VIEW_STATE(Key.VIEW_STATE, "View State:", IMantisConstants.METADATA_VIEW_STATE);
 		
 		private final boolean isHidden;
 		

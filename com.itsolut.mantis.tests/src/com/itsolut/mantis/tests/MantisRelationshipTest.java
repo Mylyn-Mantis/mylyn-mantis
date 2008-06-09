@@ -8,7 +8,6 @@
 
 package com.itsolut.mantis.tests;
 
-import java.math.BigInteger;
 
 import com.itsolut.mantis.core.model.MantisRelationship;
 

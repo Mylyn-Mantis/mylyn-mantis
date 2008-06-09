@@ -32,8 +32,10 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 import com.itsolut.mantis.core.IMantisClient.Version;
 
@@ -49,6 +51,9 @@ public class MantisClientManager implements IRepositoryListener {
 	private Map<String, MantisClientData> clientDataByUrl = new HashMap<String, MantisClientData>();
 	
 	private File cacheFile;
+	
+	private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationFactory();
+
 
 	public MantisClientManager(File cacheFile) {
 		this.cacheFile = cacheFile;
@@ -62,9 +67,9 @@ public class MantisClientManager implements IRepositoryListener {
 		
 			repository = MantisClientFactory.createClient(taskRepository.getRepositoryUrl(), 
 					                                     Version.fromVersion(taskRepository.getVersion()), 
-					                                     taskRepository.getUserName(),
-					                                     taskRepository.getPassword(),
-					                                     taskRepository.getProxy());
+					                                     taskRepository.getCredentials(AuthenticationType.REPOSITORY).getUserName(),
+					                                     taskRepository.getCredentials(AuthenticationType.REPOSITORY).getPassword(),
+					                                     null);
 			clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
 
 			MantisClientData data = clientDataByUrl.get(taskRepository.getRepositoryUrl());

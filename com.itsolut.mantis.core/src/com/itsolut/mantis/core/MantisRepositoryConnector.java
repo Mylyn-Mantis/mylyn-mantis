@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
+import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
 import org.eclipse.mylyn.internal.tasks.core.RepositoryTaskHandleUtil;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
@@ -43,6 +45,7 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
@@ -65,9 +68,11 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
 	private MantisClientManager clientManager;
 
-	private MantisTaskDataHandler offlineTaskHandler = new MantisTaskDataHandler(this);
+	private MantisTaskDataHandler offlineTaskHandler = new MantisTaskDataHandler(
+			this);
 
-	private MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(this);
+	private MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(
+			this);
 
 	public MantisRepositoryConnector() {
 		MantisCorePlugin.getDefault().setConnector(this);
@@ -107,20 +112,22 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			return null;
 		}
 		int index = url.lastIndexOf(IMantisClient.TICKET_URL);
-		return index == -1 ? null : url.substring(index + IMantisClient.TICKET_URL.length());
+		return index == -1 ? null : url.substring(index
+				+ IMantisClient.TICKET_URL.length());
 	}
 
 	@Override
 	public String getTaskUrl(String repositoryUrl, String taskId) {
-		
-		return new StringBuilder(MantisTask.getRepositoryBaseUrl(repositoryUrl)).append(IMantisClient.URL_SHOW_BUG).append(taskId).toString();		
+
+		return new StringBuilder(MantisTask.getRepositoryBaseUrl(repositoryUrl))
+				.append(IMantisClient.URL_SHOW_BUG).append(taskId).toString();
 	}
 
 	@Override
 	public AbstractTaskAttachmentHandler getTaskAttachmentHandler() {
 		return this.attachmentHandler;
 	}
-	
+
 	@Override
 	public AbstractTaskDataHandler getTaskDataHandler() {
 		return offlineTaskHandler;
@@ -137,119 +144,99 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			client = getClientManager().getRepository(repository);
 			if (query instanceof MantisRepositoryQuery) {
 				updateAttributes(repository, monitor);
-				client.search(((MantisRepositoryQuery) query).getMantisSearch(), tickets);
+				client.search(
+						((MantisRepositoryQuery) query).getMantisSearch(),
+						tickets);
 			}
 
 			for (MantisTicket ticket : tickets) {
-				TaskData taskData =  offlineTaskHandler.createTaskDataFromTicket(client, repository, ticket,
-						monitor);
+				TaskData taskData = offlineTaskHandler
+						.createTaskDataFromTicket(client, repository, ticket,
+								monitor);
 				resultCollector.accept(taskData);
 			}
 		} catch (Throwable e) {
 			MantisCorePlugin.log(e);
-			return MantisCorePlugin.toStatus(e);			
+			return MantisCorePlugin.toStatus(e);
 		}
 
 		return Status.OK_STATUS;
-		
+
 	}
-	
-	protected void updateAttributes(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
+
+	protected void updateAttributes(TaskRepository repository,
+			IProgressMonitor monitor) throws CoreException {
 		try {
 			IMantisClient client = getClientManager().getRepository(repository);
 			client.updateAttributes(monitor, true);
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
-			throw new CoreException(RepositoryStatus.createStatus(repository.getRepositoryUrl(), IStatus.WARNING,
+			throw new CoreException(RepositoryStatus.createStatus(repository
+					.getRepositoryUrl(), IStatus.WARNING,
 					MantisCorePlugin.PLUGIN_ID, "Could not update attributes"));
 		}
 	}
-	
-	
-
-	
-//	@Override
-//	public ITask createTaskFromExistingId(
-//			TaskRepository repository, String taskId, IProgressMonitor monitor) throws CoreException {
-//		
-//		ITask task = super.createTaskFromExistingId(repository, taskId, monitor);
-//		int bugId = -1;
-//		try {
-//			bugId = Integer.parseInt(taskId);
-//		} catch (NumberFormatException e) {
-//			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
-//						"Invalid ticket id: " + taskId, e));
-//		}
-//		
-//		MantisTask task;
-//		ITask existingTask = taskList.getTask(repository.getUrl(), taskId);
-//		if (existingTask instanceof MantisTask) {
-//			task = (MantisTask) existingTask;
-//		} else {
-//			RepositoryTaskData taskData = offlineTaskHandler.downloadTaskData(repository, bugId);
-//				task = new MantisTask(repository.getUrl(), taskId, getTicketDescription(taskData), true);
-//				task.setTaskData(taskData);
-//				taskList.addTask(task);
-//		}
-//		return task;
-//		
-//	}
 
 	public synchronized MantisClientManager getClientManager() {
 		if (clientManager == null) {
 			File cacheFile = null;
 			if (MantisCorePlugin.getDefault().getRepostioryAttributeCachePath() != null) {
-				cacheFile = MantisCorePlugin.getDefault().getRepostioryAttributeCachePath().toFile();
+				cacheFile = MantisCorePlugin.getDefault()
+						.getRepostioryAttributeCachePath().toFile();
 			}
 			clientManager = new MantisClientManager(cacheFile);
 		}
 		return clientManager;
 	}
 
-//	public MantisTask createTask(String repositoryUrl, String taskId, String summary) {
-//		MantisTask task;
-//		ITask existingTask = taskList.getTask(repositoryUrl, taskId);
-//		if (existingTask instanceof MantisTask) {
-//			task = (MantisTask) existingTask;
-//		} else {
-//			task = new MantisTask(repositoryUrl, taskId, summary);
-//			taskList.addTask(task);
-//		}
-//		return task;
-//	}
+	// public MantisTask createTask(String repositoryUrl, String taskId, String
+	// summary) {
+	// MantisTask task;
+	// ITask existingTask = taskList.getTask(repositoryUrl, taskId);
+	// if (existingTask instanceof MantisTask) {
+	// task = (MantisTask) existingTask;
+	// } else {
+	// task = new MantisTask(repositoryUrl, taskId, summary);
+	// taskList.addTask(task);
+	// }
+	// return task;
+	// }
 
 	/**
 	 * Updates fields of <code>task</code> from <code>ticket</code>.
 	 */
-//	public void updateTaskDetails(MantisTask task, MantisTicket ticket, boolean notify) {
-//		if(ticket.getValue(Key.SUMMARY) != null) {
-//			task.setSummary(getTicketDescription(ticket));			
-//		}
-//		
-//		task.setCompleted(MantisTask.isCompleted(ticket.getValue(Key.STATUS)));
-//		task.setPriority(MantisTask.getMylynPriority(ticket.getValue(Key.PRIORITY)).toString());
-		
-//		if (ticket.getValue(Key.TYPE) != null) {
-//			Kind kind = MantisTask.Kind.fromType(ticket.getValue(Key.TYPE));
-//			task.setKind((kind != null) ? kind.toString() : ticket.getValue(Key.TYPE));
-//		}
-//		if (ticket.getCreated() != null) {
-//			task.setCreationDate(ticket.getCreated());
-//		}
-//
-//		if (notify) {
-//			// TODO: Check whatever to pass true or false
-//			taskList.notify();
-//			//taskList.notifyTaskChanged(task, true);
-//		}
-//	}
-
+	// public void updateTaskDetails(MantisTask task, MantisTicket ticket,
+	// boolean notify) {
+	// if(ticket.getValue(Key.SUMMARY) != null) {
+	// task.setSummary(getTicketDescription(ticket));
+	// }
+	//		
+	// task.setCompleted(MantisTask.isCompleted(ticket.getValue(Key.STATUS)));
+	//task.setPriority(MantisTask.getMylynPriority(ticket.getValue(Key.PRIORITY)
+	// ).toString());
+	// if (ticket.getValue(Key.TYPE) != null) {
+	// Kind kind = MantisTask.Kind.fromType(ticket.getValue(Key.TYPE));
+	// task.setKind((kind != null) ? kind.toString() :
+	// ticket.getValue(Key.TYPE));
+	// }
+	// if (ticket.getCreated() != null) {
+	// task.setCreationDate(ticket.getCreated());
+	// }
+	//
+	// if (notify) {
+	// // TODO: Check whatever to pass true or false
+	// taskList.notify();
+	// //taskList.notifyTaskChanged(task, true);
+	// }
+	// }
 	public static String getTicketDescription(MantisTicket ticket) {
 		return ticket.getValue(Key.SUMMARY);
 	}
 
 	public static String getTicketDescription(TaskData taskData) {
-		return taskData.getRoot().getMappedAttribute(MantisAttributeFactory.Attribute.DESCRIPTION.toString()).toString(); 
+		return taskData.getRoot().getMappedAttribute(
+				MantisAttributeFactory.Attribute.DESCRIPTION.toString())
+				.toString();
 	}
 
 	public static boolean hasChangedSince(TaskRepository repository) {
@@ -260,11 +247,13 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		return Version.MC_1_0a5.name().equals(repository.getVersion());
 	}
 
-	public static boolean hasRichEditor(TaskRepository repository, AbstractTask task) {
+	public static boolean hasRichEditor(TaskRepository repository,
+			AbstractTask task) {
 		return hasRichEditor(repository);
 	}
 
-	public static boolean hasAttachmentSupport(TaskRepository repository, ITask task) {
+	public static boolean hasAttachmentSupport(TaskRepository repository,
+			ITask task) {
 		return true;
 	}
 
@@ -274,12 +263,13 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		}
 	}
 
-	
 	public static String getDisplayUsername(TaskRepository repository) {
-		if (!repository.hasCredentials()) {
+		AuthenticationCredentials credentials = repository
+				.getCredentials(AuthenticationType.REPOSITORY);
+		if (credentials == null) {
 			return IMantisClient.DEFAULT_USERNAME;
 		}
-		return repository.getUserName();
+		return credentials.getUserName();
 	}
 
 	@Override
@@ -287,123 +277,131 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		return "#";
 	}
 
-//	public static MantisTicket getMantisTicket(TaskRepository repository, RepositoryTaskData data) throws InvalidTicketException {
-//		MantisTicket ticket = new MantisTicket(Integer.parseInt(data.getId()));
-//	
-//		List<TaskAttribute> attributes = data.getAttributes();
-//		for (RepositoryTaskAttribute attribute : attributes) {
-//			if (MantisAttributeFactory.isInternalAttribute(attribute.getId())) {
-//				// ignore
-//			} else if (!attribute.isReadOnly()) {
-//				ticket.putValue(attribute.getId(), attribute.getValue());
-//			}
-//		}
-//		
-//		// handle operations
-//		RepositoryOperation operation = data.getSelectedOperation();
-//		if (operation != null) {
-//			String action = operation.getKnobName();
-//			if ("assign_to".equals(action)) {
-//				ticket.putBuiltinValue(Key.ASSIGNED_TO, operation.getOptionSelection());
-//				ticket.putBuiltinValue(Key.STATUS, "assigned");
-//			}else if( "resolve_as".equals(action)) {
-//				ticket.putBuiltinValue(Key.RESOLUTION, operation.getOptionSelection());
-//				ticket.putBuiltinValue(Key.STATUS, "resolved");
-//			}
-//		}
-//	
-//		return ticket;
-//	}
-	
-	//TODO: not changed for Mantis yet...
+	// public static MantisTicket getMantisTicket(TaskRepository repository,
+	// RepositoryTaskData data) throws InvalidTicketException {
+	// MantisTicket ticket = new MantisTicket(Integer.parseInt(data.getId()));
+	//	
+	// List<TaskAttribute> attributes = data.getAttributes();
+	// for (RepositoryTaskAttribute attribute : attributes) {
+	// if (MantisAttributeFactory.isInternalAttribute(attribute.getId())) {
+	// // ignore
+	// } else if (!attribute.isReadOnly()) {
+	// ticket.putValue(attribute.getId(), attribute.getValue());
+	// }
+	// }
+	//		
+	// // handle operations
+	// RepositoryOperation operation = data.getSelectedOperation();
+	// if (operation != null) {
+	// String action = operation.getKnobName();
+	// if ("assign_to".equals(action)) {
+	// ticket.putBuiltinValue(Key.ASSIGNED_TO, operation.getOptionSelection());
+	// ticket.putBuiltinValue(Key.STATUS, "assigned");
+	// }else if( "resolve_as".equals(action)) {
+	// ticket.putBuiltinValue(Key.RESOLUTION, operation.getOptionSelection());
+	// ticket.putBuiltinValue(Key.STATUS, "resolved");
+	// }
+	// }
+	//	
+	// return ticket;
+	// }
 
+	// TODO: not changed for Mantis yet...
 
-	
-//	@Override
-//	public boolean markStaleTasks(TaskRepository repository,
-//			Set<AbstractTask> tasks, IProgressMonitor monitor)
-//			throws CoreException {
-//		// TODO Auto-generated method stub
-//		try {
-//			monitor.beginTask("Getting changed tasks", IProgressMonitor.UNKNOWN);
-//			
-//			if (!MantisRepositoryConnector.hasChangedSince(repository)) {
-//				// always run the queries for web mode
-//				return true;
-//			}
-//						
-//			if (repository.getSynchronizationTimeStamp() == null) {
-//				for (AbstractTask task : tasks) {
-//					task.setStale(true);
-//				}
-//				return true;
-//			}
-//
-//			Date since = new Date(0);
-//			try {
-//				since = MantisUtils.parseDate(Integer.parseInt(repository.getSynchronizationTimeStamp()));
-//			} catch (NumberFormatException e) {
-//				MantisCorePlugin.log(e);
-//			}
-//
-//			try {
-//				
-//				// Run the queries to get the list of tasks currently meeting the query
-//				// criteria.  The result returned are only the ids that have changed.
-//				// Next checkt to see if any of these ids matches the ones in the
-//				// task list.  If so, then set it to stale.
-//				// The prior implementation retireved each id individually, and checked it's
-//				// date, this caused unnecessary SOAP traffic during synchronization.
-//	
-//                for (IRepositoryQuery query : taskList.getQueries()) {
-//                    List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since);
-//                    if (taskIds != null && taskIds.size() > 0) {
-//            			for (Integer taskId : taskIds) {
-//            				for (AbstractTask task : tasks) {
-//            				   if (getTicketId(task.getTaskId()) == taskId.intValue()) {
-//            						task.setStale(true);
-//            					}
-//            				}
-//        				}
-//                    }
-//				}
-//
-//				return true;
-//			} catch (Exception e) {
-//				MantisCorePlugin.log(e);
-//				throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
-//						"Could not determine changed tasks", e));
-//			}
-//		} finally {
-//			monitor.done();
-//		}
-//	}
-	
-	
-	
+	// @Override
+	// public boolean markStaleTasks(TaskRepository repository,
+	// Set<AbstractTask> tasks, IProgressMonitor monitor)
+	// throws CoreException {
+	// // TODO Auto-generated method stub
+	// try {
+	// monitor.beginTask("Getting changed tasks", IProgressMonitor.UNKNOWN);
+	//			
+	// if (!MantisRepositoryConnector.hasChangedSince(repository)) {
+	// // always run the queries for web mode
+	// return true;
+	// }
+	//						
+	// if (repository.getSynchronizationTimeStamp() == null) {
+	// for (AbstractTask task : tasks) {
+	// task.setStale(true);
+	// }
+	// return true;
+	// }
+	//
+	// Date since = new Date(0);
+	// try {
+	// since = MantisUtils.parseDate(Integer.parseInt(repository.
+	// getSynchronizationTimeStamp()));
+	// } catch (NumberFormatException e) {
+	// MantisCorePlugin.log(e);
+	// }
+	//
+	// try {
+	//				
+	// // Run the queries to get the list of tasks currently meeting the query
+	// // criteria. The result returned are only the ids that have changed.
+	// // Next checkt to see if any of these ids matches the ones in the
+	// // task list. If so, then set it to stale.
+	// // The prior implementation retireved each id individually, and checked
+	// it's
+	// // date, this caused unnecessary SOAP traffic during synchronization.
+	//	
+	// for (IRepositoryQuery query : taskList.getQueries()) {
+	// List<Integer> taskIds = this.getChangedTasksByQuery(query, repository,
+	// since);
+	// if (taskIds != null && taskIds.size() > 0) {
+	// for (Integer taskId : taskIds) {
+	// for (AbstractTask task : tasks) {
+	// if (getTicketId(task.getTaskId()) == taskId.intValue()) {
+	// task.setStale(true);
+	// }
+	// }
+	// }
+	// }
+	// }
+	//
+	// return true;
+	// } catch (Exception e) {
+	// MantisCorePlugin.log(e);
+	// throw new CoreException(new Status(IStatus.ERROR,
+	// MantisCorePlugin.PLUGIN_ID, IStatus.OK,
+	// "Could not determine changed tasks", e));
+	// }
+	// } finally {
+	// monitor.done();
+	// }
+	// }
+
 	public static int getTicketId(String taskId) throws CoreException {
 		try {
 			return Integer.parseInt(taskId);
 		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
+			throw new CoreException(new Status(IStatus.ERROR,
+					MantisCorePlugin.PLUGIN_ID, IStatus.OK,
 					"Invalid ticket id: " + taskId, e));
 		}
 	}
-	
-	// For the repositories, perform the queries to get the latest information about the 
-	// tasks.  This allows the connector to get a limited list of items instead of every
-	// item in the repository.   Next check to see if the tasks have changed since the
-	// last synchronization.  If so, add their ids to a List.
-	private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since) {
+
+	// For the repositories, perform the queries to get the latest information
+	// about the
+	// tasks. This allows the connector to get a limited list of items instead
+	// of every
+	// item in the repository. Next check to see if the tasks have changed since
+	// the
+	// last synchronization. If so, add their ids to a List.
+	private List<Integer> getChangedTasksByQuery(IRepositoryQuery query,
+			TaskRepository repository, Date since) {
 
 		final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
-        List<Integer> changedTickets = new ArrayList<Integer>(); 
-		
+		List<Integer> changedTickets = new ArrayList<Integer>();
+
 		IMantisClient client;
 		try {
 			client = getClientManager().getRepository(repository);
 			if (query instanceof MantisRepositoryQuery) {
-				client.search(((MantisRepositoryQuery) query).getMantisSearch(), tickets);
+				client.search(
+						((MantisRepositoryQuery) query).getMantisSearch(),
+						tickets);
 			}
 
 			for (MantisTicket ticket : tickets) {
@@ -414,7 +412,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			}
 		} catch (Throwable e) {
 			MantisCorePlugin.log(e);
-			return null;			
+			return null;
 		}
 		return changedTickets;
 	}
@@ -425,24 +423,35 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		try {
 			updateAttributes(repository, monitor);
 		} catch (Exception e) {
-			throw new CoreException(RepositoryStatus.createStatus(repository.getRepositoryUrl(), IStatus.WARNING,
+			throw new CoreException(RepositoryStatus.createStatus(repository
+					.getRepositoryUrl(), IStatus.WARNING,
 					MantisCorePlugin.PLUGIN_ID, "Could not update attributes"));
 		}
-		
+
 	}
 
 	@Override
-	public TaskData getTaskData(TaskRepository taskRepository, String taskId,
+	public TaskData getTaskData(TaskRepository repository, String taskId,
 			IProgressMonitor monitor) throws CoreException {
-		// TODO Auto-generated method stub
-		return null;
+		return offlineTaskHandler.getTaskData(repository, taskId, monitor);
 	}
 
 	@Override
 	public boolean hasTaskChanged(TaskRepository taskRepository, ITask task,
 			TaskData taskData) {
-		// TODO Auto-generated method stub
-		return false;
+		if (taskData.isPartial()) {
+			return false;
+		}
+		String lastKnownMod = task.getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getTaskKey());
+		if (lastKnownMod != null) {
+			TaskAttribute attrModification = taskData.getRoot()
+					.getMappedAttribute(TaskAttribute.DATE_MODIFICATION);
+			if (attrModification != null) {
+				return !lastKnownMod.equals(attrModification.getValue());
+			}
+
+		}
+		return true;
 	}
 
 	@Override
@@ -450,16 +459,25 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			TaskData taskData) {
 		TaskMapper scheme = new TaskMapper(taskData);
 		scheme.applyTo(task);
-		
-		if(task instanceof MantisTask) {
-			MantisTask mtask = (MantisTask)task;
-			
+
+		if (task instanceof MantisTask) {
+			MantisTask mtask = (MantisTask) task;
+
 			mtask.setSummary(getTicketDescription(taskData));
-			mtask.setOwner(taskData.getRoot().getMappedAttribute(MantisAttributeFactory.Attribute.ASSIGNED_TO.toString()).toString());
-			mtask.setCompletionDate(new Date(taskData.getRoot().getAttribute(TaskAttribute.STATUS).getValue()));
-			mtask.setUrl(MantisTask.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.URL_SHOW_BUG + taskData.getTaskId());
-			mtask.setPriority(MantisTask.getMylynPriority(taskData.getRoot().getAttribute(Attribute.PRIORITY.getMantisKey()).getValue()).toString());
-			mtask.setSeverity(taskData.getRoot().getAttribute(Attribute.SEVERITY.getMantisKey()).getValue());
+			mtask.setOwner(taskData.getRoot().getMappedAttribute(
+					MantisAttributeFactory.Attribute.ASSIGNED_TO.toString())
+					.toString());
+			mtask.setCompletionDate(new Date(taskData.getRoot().getAttribute(
+					TaskAttribute.STATUS).getValue()));
+			mtask.setUrl(MantisTask.getRepositoryBaseUrl(repository
+					.getRepositoryUrl())
+					+ IMantisClient.URL_SHOW_BUG + taskData.getTaskId());
+			mtask.setPriority(MantisTask.getMylynPriority(
+					taskData.getRoot().getAttribute(
+							Attribute.PRIORITY.getMantisKey()).getValue())
+					.toString());
+			mtask.setSeverity(taskData.getRoot().getAttribute(
+					Attribute.SEVERITY.getMantisKey()).getValue());
 		}
-	}	
+	}
 }

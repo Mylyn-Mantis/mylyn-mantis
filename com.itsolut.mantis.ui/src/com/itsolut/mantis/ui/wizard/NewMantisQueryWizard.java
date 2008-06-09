@@ -1,4 +1,14 @@
 /*******************************************************************************
+ * Copyright (c) 2008 - Standards for Technology in Automotive Retail and others
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     David Carver - Initial API and implementation.
+ *******************************************************************************/
+/*******************************************************************************
  * Copyright (c) 2006 - 2006 Mylar eclipse.org project and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,14 +24,15 @@ package com.itsolut.mantis.ui.wizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractLegacyRepositoryConnector;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 /**
  * @author Steffen Pingel
+ * @author David Carver
  */
 public class NewMantisQueryWizard extends Wizard {
 
@@ -55,8 +66,8 @@ public class NewMantisQueryWizard extends Wizard {
 	public boolean performFinish() {
 		RepositoryQuery query = queryPage.getQuery();
 		if (query != null) {
-			TasksUiPlugin.getTaskListManager().getTaskList().addQuery(query);
-			AbstractLegacyRepositoryConnector connector = (AbstractLegacyRepositoryConnector) TasksUiPlugin.getRepositoryManager().getRepositoryConnector(
+			TasksUiPlugin.getTaskList().addQuery(query);
+			AbstractRepositoryConnector connector = (AbstractRepositoryConnector) TasksUiPlugin.getRepositoryManager().getRepositoryConnector(
 					repository.getConnectorKind());
 			if (connector != null) {
 				TasksUiPlugin.getSynchronizationScheduler().synchronize(repository);
