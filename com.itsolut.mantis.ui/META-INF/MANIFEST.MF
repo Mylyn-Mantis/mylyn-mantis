@@ -24,6 +24,7 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: true
 Export-Package: com.itsolut.mantis.ui,
  com.itsolut.mantis.ui.editor,
+ com.itsolut.mantis.ui.tasklist,
  com.itsolut.mantis.ui.wizard
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.mylyn.internal.provisional.commons.ui,

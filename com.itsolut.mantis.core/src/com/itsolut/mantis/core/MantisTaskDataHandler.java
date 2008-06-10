@@ -124,8 +124,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 		Map<String, String> valueByKey = ticket.getValues();
 		for (String key : valueByKey.keySet()) {
-			getAttribute(data, key).setValue(valueByKey.get(key));
-			
+			if (valueByKey.get(key) != null) {
+				getAttribute(data, key).setValue(valueByKey.get(key));
+			}
 		}
 
 		MantisComment[] comments = ticket.getComments();

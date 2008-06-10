@@ -18,7 +18,7 @@
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
  *******************************************************************************/
-package com.itsolut.mantis.ui.wizard;
+package com.itsolut.mantis.ui.tasklist;
 
 import java.net.MalformedURLException;
 
@@ -267,7 +267,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
 	@Override
 	public void applyTo(IRepositoryQuery query) {
-		throw new UnsupportedOperationException();		
+		query.setSummary(this.getQueryTitle());
+		query.setUrl(this.getQueryUrl(repository.getRepositoryUrl()));
 	}
 
 	@Override

@@ -264,12 +264,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 	}
 
 	public static String getDisplayUsername(TaskRepository repository) {
-		AuthenticationCredentials credentials = repository
-				.getCredentials(AuthenticationType.REPOSITORY);
-		if (credentials == null) {
+		if (!repository.hasCredentials()) {
 			return IMantisClient.DEFAULT_USERNAME;
 		}
-		return credentials.getUserName();
+		return repository.getUserName();
 	}
 
 	@Override

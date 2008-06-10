@@ -19,7 +19,7 @@
  *     Chris Hane - adapted Trac implementation for Mantis
  *******************************************************************************/
 
-package com.itsolut.mantis.ui.wizard;
+package com.itsolut.mantis.ui.tasklist;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -78,12 +78,20 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 	public MantisRepositorySettingsPage(String title, String description,
 			TaskRepository taskRepository) {
 		super(title, description, taskRepository);
-		setNeedsAnonymousLogin(false);
+		setNeedsAnonymousLogin(true);
 		setNeedsEncoding(false);
 		setNeedsTimeZone(false);
-		
+		setNeedsValidation(true);
+		setNeedsAdvanced(true);
+		setNeedsHttpAuth(false);
 	}
 
+	
+	@Override
+	public boolean isPageComplete() {
+		// TODO Auto-generated method stub
+		return super.isPageComplete();
+	}
 	
 	@Override
 	protected void createAdditionalControls(final Composite parent) {
@@ -171,88 +179,24 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 			setVersion(version.name());
 		}
 	}
-
+	
 	@Override
 	protected void validateSettings() {
-
-		try {
-			final String serverUrl = repository.getRepositoryUrl();
-			final Version version = getMantisVersion();
-			final String username = getUserName();
-			final String password = getPassword();
-			// TODO is there a way to get the proxy without duplicating code and
-			// creating a task repository?
-
-			if (version == null) {
-				MessageDialog.openInformation(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Repository Connector Version is required.");
-				return;
-			}
-
-			if (username.length() == 0 || password.length() == 0) {
-				MessageDialog.openInformation(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Authentication credentials are needed.");
-				return;
-			}
-			
-			final Proxy proxy = createTaskRepository().getProxy();
-			
-			getWizard().getContainer().run(true, false, new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					monitor.beginTask("Validating server settings", IProgressMonitor.UNKNOWN);
-					
-					try {
-						IMantisClient client = MantisClientFactory.createClient(serverUrl, version, username, password, proxy);
-						client.validate();
-
-					} catch (Exception e) {
-						MantisUIPlugin.handleMantisException(e);
-					} finally {
-						monitor.done();
-					}
-				}
-			});
-
-			if (username.length() > 0) {
-				MessageDialog.openInformation(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Authentication credentials are valid.");
-			} else {
-				MessageDialog.openInformation(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Repository is valid.");
-			}
-			
-		} catch (InvocationTargetException e) {
-			if (e.getCause() instanceof MalformedURLException) {
-				MessageDialog.openWarning(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Repository url is invalid.");
-				
-			} else if (e.getCause() instanceof MantisLoginException) {
-				MessageDialog.openWarning(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, "Unable to authenticate with repository. Login credentials invalid.");
-				
-			} else if (e.getCause() instanceof MantisException) {
-				String message = "No O repository found at url";
-				if (e.getCause().getMessage() != null) {
-					message += ": " + e.getCause().getMessage();
-				}
-				MessageDialog.openWarning(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, message);
-				
-			} else {
-				MessageDialog.openWarning(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, MESSAGE_FAILURE_UNKNOWN);
-				
-			}
-		} catch (InterruptedException e) {
-			MessageDialog.openWarning(null, MantisUIPlugin.TITLE_MESSAGE_DIALOG, MESSAGE_FAILURE_UNKNOWN);
-		}
-		
-		super.getWizard().getContainer().updateButtons();
+		// TODO Auto-generated method stub
+		super.validateSettings();
 	}
+	
 
 	@Override
 	protected Validator getValidator(TaskRepository repository) {
 		// TODO Auto-generated method stub
-		return null;
+		return new MantisValidator(repository, Version.MC_1_0a5, getUserName(), getPassword());
 	}
 
 
 	@Override
 	public String getConnectorKind() {
-		// TODO Auto-generated method stub
-		return MantisCorePlugin.getDefault().REPOSITORY_KIND;
+		return MantisCorePlugin.REPOSITORY_KIND;
 	}
 	
 	// public for testing
@@ -285,7 +229,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 				throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR,
 						MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
 			} catch (MantisException e) {
-				String message = "No Trac repository found at url";
+				String message = "No Mantis repository found at url";
 				if (e.getMessage() != null) {
 					message += ": " + e.getMessage();
 				}
@@ -297,15 +241,9 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 		public void validate(IProgressMonitor monitor) throws MalformedURLException, MantisException {
 			AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
 
-			if (version != null) {
 				IMantisClient client = MantisClientFactory.createClient(location.getUrl(), version, userName, this.password, null);
 				client.validate();
-				//client.validate(monitor);
-			} else {
-					setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO,
-							MantisUIPlugin.PLUGIN_ID,
-							"Authentication credentials are valid. Note: Insufficient permissions for XML-RPC access, falling back to web access."));
-			}
+				setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
 		}
 	}
 	

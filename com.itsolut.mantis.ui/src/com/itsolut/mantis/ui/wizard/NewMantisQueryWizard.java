@@ -29,12 +29,17 @@ import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
+import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
+
+import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
 
 /**
  * @author Steffen Pingel
  * @author David Carver
+ * @deprecated
  */
-public class NewMantisQueryWizard extends Wizard {
+@Deprecated
+public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
 	private static final String TITLE = "New Mantis Query";
 
@@ -43,6 +48,7 @@ public class NewMantisQueryWizard extends Wizard {
 	private MantisCustomQueryPage queryPage;
 
 	public NewMantisQueryWizard(TaskRepository repository) {
+		super(repository);
 		this.repository = repository;
 
 		setNeedsProgressMonitor(true);

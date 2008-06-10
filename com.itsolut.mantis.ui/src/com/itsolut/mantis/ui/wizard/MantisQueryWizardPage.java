@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyEvent;
@@ -48,8 +49,9 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
 
 /**
  * @author Steffen Pingel
+ * @author dcarver
  */
-public class MantisQueryWizardPage extends WizardPage {
+public class MantisQueryWizardPage extends AbstractRepositoryQueryPage {
 
 	private static final String TITLE = "New Mantis Query";
 
@@ -70,20 +72,29 @@ public class MantisQueryWizardPage extends WizardPage {
 
 	private List<SearchField> searchFields;
 
-	public MantisQueryWizardPage(TaskRepository repository, IRepositoryQuery query) {
-		super(TITLE);
-
-		this.repository = repository;
-		this.query = (MantisRepositoryQuery) query;
-
-		setTitle(TITLE);
+	
+	public MantisQueryWizardPage(String title, TaskRepository taskRepository,
+			IRepositoryQuery query) {
+		super(title, taskRepository, query);
 		setDescription(DESCRIPTION);
 	}
 
-	public MantisQueryWizardPage(TaskRepository repository) {
-		this(repository, null);
+	public MantisQueryWizardPage(String title, TaskRepository taskRepository) {
+		super(title, taskRepository);
+		setDescription(DESCRIPTION);
 	}
 
+	@Override
+	public void applyTo(IRepositoryQuery query) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getQueryTitle() {
+		return TITLE_QUERY_TITLE;
+	}
+	
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData());
@@ -109,7 +120,7 @@ public class MantisQueryWizardPage extends WizardPage {
 
 		setControl(composite);
 	}
-
+	
 	private void restoreSearchFilterFromQuery(MantisRepositoryQuery query) {
 		MantisSearch search = query.getMantisSearch();
 		List<MantisSearchFilter> filters = search.getFilters();
@@ -201,7 +212,7 @@ public class MantisQueryWizardPage extends WizardPage {
 			}
 		});
 	}
-
+	
 	@Override
 	public boolean isPageComplete() {
 		if (titleText != null && titleText.getText().length() > 0) {
@@ -209,7 +220,7 @@ public class MantisQueryWizardPage extends WizardPage {
 		}
 		return false;
 	}
-
+	
 	private void showSearchField(SearchField field, MantisSearchFilter filter) {
 		assert filter == null || !visibleSearchFields.contains(field);
 
@@ -220,6 +231,11 @@ public class MantisQueryWizardPage extends WizardPage {
 			field.addControl(scrollComposite);
 		}
 		updateScrollPane();
+	}
+	
+	@Override
+	public IRepositoryQuery getQuery() {
+		return new MantisRepositoryQuery(repository.getRepositoryUrl(), getQueryUrl(repository.getRepositoryUrl()), titleText.getText());
 	}
 
 	public String getQueryUrl(String repsitoryUrl) {
@@ -234,15 +250,11 @@ public class MantisQueryWizardPage extends WizardPage {
 		sb.append(search.toUrl());
 		return sb.toString();
 	}
-
-	public MantisRepositoryQuery getQuery() {
-		return new MantisRepositoryQuery(repository.getUrl(), getQueryUrl(repository.getUrl()), titleText.getText());
-	}
-
+	
 	private void hideSearchField(SearchField field) {
 		visibleSearchFields.remove(field);
 	}
-
+	
 	private void updateScrollPane() {
 		scrollComposite.setSize(scrollComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrollComposite.layout();

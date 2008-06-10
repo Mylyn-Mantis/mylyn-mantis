@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 /*******************************************************************************
- * Copyright (c) 2007 - 2007 IT Solutions, Inc.
+ * Copyright (c) 2007, 2008 - IT Solutions, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@
  * 
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
+ *     David Carver - STAR - Mylyn 3.0 migration.
  *******************************************************************************/
 
 package com.itsolut.mantis.ui;
@@ -37,13 +38,15 @@ import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
+import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryQuery;
 import com.itsolut.mantis.core.MantisTask;
+import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
+import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.EditMantisQueryWizard;
-import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
-import com.itsolut.mantis.ui.wizard.MantisRepositorySettingsPage;
+import com.itsolut.mantis.ui.wizard.MantisQueryWizardPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
 import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
 
@@ -51,20 +54,50 @@ import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
  * @author Mik Kersten
  * @author Steffen Pingel
  * @author Chris Hane
+ * @author dcarver
  */
 public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 
 	private static final Pattern HYPERLINK_PATTERN = Pattern.compile(
 			"bug (\\d+)", Pattern.CASE_INSENSITIVE);
 
+	@Override
+	public String getConnectorKind() {
+		return MantisCorePlugin.REPOSITORY_KIND;
+	}
 
+	
+	@Override
+	public IWizard getNewTaskWizard(TaskRepository taskRepository,
+			ITaskMapping selection) {
+		return new NewMantisTaskWizard(taskRepository, selection);
+	}
+
+	@Override
+	public IWizard getQueryWizard(TaskRepository repository,
+			IRepositoryQuery queryToEdit) {
+
+		return new NewMantisQueryWizard(repository);
+	}
+
+	@Override
+	public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
+		return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository);
+	}
+
+	@Override
+	public boolean hasSearchPage() {
+		return true;
+	}
+	
 	@Override
 	public ITaskSearchPage getSearchPage(TaskRepository repository,
 			IStructuredSelection selection) {
 		return new MantisCustomQueryPage(repository);
 	}
 
-	@Override
+	
+	 @Override
 	public List<ITask> getLegendItems() {
 		List<ITask> legendItems = new ArrayList<ITask>();
 
@@ -87,7 +120,9 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 		return legendItems;
 	}
 
-	@Override
+	 
+	 
+	 @Override
 	public ImageDescriptor getTaskKindOverlay(ITask task) {
 		if (task instanceof MantisTask) {
 			MantisTask mantisTask = (MantisTask) task;
@@ -110,7 +145,9 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 		}
 		return super.getTaskKindOverlay(task);
 	}
-
+	 
+ 
+	//
 	@Override
 	public IHyperlink[] findHyperlinks(TaskRepository repository, String text,
 			int lineOffset, int regionOffset) {
@@ -136,43 +173,13 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 				.toArray(new IHyperlink[links.size()]);
 
 	}
-
-	@Override
-	public boolean hasSearchPage() {
-		return true;
-	}
-
-	@Override
-	public String getConnectorKind() {
-		return MantisCorePlugin.REPOSITORY_KIND;
-	}
-
+	
 	private boolean isInRegion(int lineOffset, Matcher m) {
 		return (lineOffset >= m.start() && lineOffset <= m.end());
 	}
-
+	
 	private IRegion determineRegion(int regionOffset, Matcher m) {
 		return new Region(regionOffset + m.start(), m.end() - m.start());
-	}
-
-	@Override
-	public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping taskMapping) {
-		// TODO Auto-generated method stub
-		return new NewMantisTaskWizard(repository, taskMapping);
-	}
-
-	@Override
-	public IWizard getQueryWizard(TaskRepository repository, IRepositoryQuery query) {
-		if (query instanceof MantisRepositoryQuery) {
-			return new EditMantisQueryWizard(repository, query);
-		} else {
-			return new NewMantisQueryWizard(repository);
-		}
-	}
-
-	@Override
-	public ITaskRepositoryPage getSettingsPage(TaskRepository arg0) {
-		return new MantisRepositorySettingsPage("Mantis", "Mantis", arg0);
 	}
 
 }

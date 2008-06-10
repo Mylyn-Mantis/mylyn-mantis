@@ -15,10 +15,14 @@ import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.internal.tasks.ui.deprecated.AbstractRepositoryQueryWizard;
 
+import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
+
 /**
  * @author Steffen Pingel
  * @author Dave Carver
+ * @deprecated
  */
+@Deprecated
 public class EditMantisQueryWizard extends AbstractRepositoryQueryWizard {
 
 //	private MantisCustomQueryPage queryPage;

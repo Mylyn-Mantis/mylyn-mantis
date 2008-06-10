@@ -67,8 +67,8 @@ public class MantisClientManager implements IRepositoryListener {
 		
 			repository = MantisClientFactory.createClient(taskRepository.getRepositoryUrl(), 
 					                                     Version.fromVersion(taskRepository.getVersion()), 
-					                                     taskRepository.getCredentials(AuthenticationType.REPOSITORY).getUserName(),
-					                                     taskRepository.getCredentials(AuthenticationType.REPOSITORY).getPassword(),
+					                                     taskRepository.getUserName(),
+					                                     taskRepository.getPassword(),
 					                                     null);
 			clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
 

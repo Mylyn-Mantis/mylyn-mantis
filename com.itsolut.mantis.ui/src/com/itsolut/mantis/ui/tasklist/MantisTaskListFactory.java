@@ -9,7 +9,7 @@
  *     Mylar project committers - initial API and implementation
  *******************************************************************************/
 
-package com.itsolut.mantis.ui;
+package com.itsolut.mantis.ui.tasklist;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +29,9 @@ import com.itsolut.mantis.core.MantisTask;
  * @author Dave Carver
  * 
  * @deprecated
+ * @see 
  */
+@Deprecated
 public class MantisTaskListFactory extends AbstractTaskListFactory {
 
 	private static final String KEY_SEVERITY = "severity";

@@ -14,6 +14,12 @@
             class="com.itsolut.mantis.ui.MantisRepositoryUi"
             id="Manits Repository UI"
             overlayIcon="icons/eview16/overlay-mantis.gif"/>
+	  <taskListMigrator 
+            class="com.itsolut.mantis.ui.tasklist.MantisTaskListMigrator"/>
+      <taskListFactory
+            class="com.itsolut.mantis.ui.tasklist.MantisTaskListFactory"
+            id="com.itsolut.mantis.ui.tasklist.MantisTaskList"
+            name="Mantis Externalizer"/>
    </extension>
    <extension
          point="org.eclipse.mylyn.tasks.core.templates">
