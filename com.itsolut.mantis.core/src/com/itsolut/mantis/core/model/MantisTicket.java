@@ -64,7 +64,8 @@ public class MantisTicket {
 		SUMMARY("summary"),
 		VERSION("version"), 
 		VIEW_STATE("view_state"), 
-		FIXED_IN("fixed_in");
+		FIXED_IN("fixed_in"),
+		NEW_COMMENT("new_comment");
 
 		public static Key fromKey(String name) {
 			for (Key key : Key.values()) {

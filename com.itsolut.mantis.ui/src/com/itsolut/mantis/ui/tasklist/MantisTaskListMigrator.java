@@ -61,8 +61,8 @@ public class MantisTaskListMigrator extends AbstractTaskListMigrator {
 	@Override
 	public void migrateTask(ITask task, Element element) {
 		if (element.hasAttribute(KEY_SEVERITY)) {
-			task.setAttribute(MantisAttributeMapper.Attribute.STATUS.getMantisKey(),
-					element.getAttribute(MantisAttributeMapper.Attribute.STATUS.getMantisKey()));
+			task.setAttribute(MantisAttributeMapper.Attribute.STATUS.getKey(),
+					element.getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()));
 		}
 //		if (element.hasAttribute(KEY_PRODUCT)) {
 //			task.setAttribute(BugzillaAttribute.PRODUCT.getKey(),

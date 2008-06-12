@@ -23,8 +23,8 @@ import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
- * Provides a mapping from Mylyn task keys to Mantis ticket keys. 
- *
+ * Provides a mapping from Mylyn task keys to Mantis ticket keys.
+ * 
  * @author Chris Hane 2.0
  * @author David Carver
  * 
@@ -32,111 +32,130 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisAttributeMapper extends TaskAttributeMapper {
 
-	public MantisAttributeMapper(TaskRepository taskRepository) {
-		super(taskRepository);
-		// TODO Auto-generated constructor stub
-	}
-
 	private static final long serialVersionUID = 5333211422546115138L;
 
 	private static Map<String, Attribute> attributeByMantisKey = new HashMap<String, Attribute>();
 
 	private static Map<String, String> mantisKeyByTaskKey = new HashMap<String, String>();
-	
+
 	public enum Attribute {
-		ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
-		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:", IMantisConstants.METADATA_ADDITIONAL_INFO, true, false),
-		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED, true, false),
-		CATEGORY(Key.CATEOGRY, "Category:", IMantisConstants.METADATA_CATEGORY, false, true),
-		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.DATE_CREATION, true, true),
-		DESCRIPTION(Key.DESCRIPTION, "Description2:", TaskAttribute.DESCRIPTION, true, false),
-		ETA(Key.ETA, "ETA:", IMantisConstants.METADATA_ETA), 
-		LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.DATE_MODIFICATION, true, true),
-		PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.PRIORITY),
-		PROJECT(Key.PROJECT, "Project:", IMantisConstants.METADATA_PROJECT, true, false),
-		PROJECTION(Key.PROJECTION, "Projection:", IMantisConstants.METADATA_PROJECTION, false, false),
-		RELATIONSHIPS(Key.RELATIONSHIPS,  "Relationships:", IMantisConstants.METADATA_RELATIONSHIPS, true, false),
-		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true, false),
-		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", IMantisConstants.METADATA_REPRODUCABILITY),
-		RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.RESOLUTION, false, false),
-		SEVERITY(Key.SEVERITY, "Severity:", IMantisConstants.METADATA_SEVERITY, true, true),
-		STATUS(Key.STATUS, "Status:", TaskAttribute.STATUS, false, false),
-		STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", IMantisConstants.METADATA_STEPS_TO_REPRODUCE, true, false),
-		SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.SUMMARY, true),
-		VERSION(Key.VERSION, "Version:", IMantisConstants.METADATA_VERSION),
-		FIXED_IN(Key.FIXED_IN, "Fixed In:", IMantisConstants.METADATA_FIXED_IN),
-		VIEW_STATE(Key.VIEW_STATE, "View State:", IMantisConstants.METADATA_VIEW_STATE);
-		
+		ID(Key.ID, "<used by search engine>",
+				IMantisConstants.METADATA_SEARCH_ID, true), ADDITIONAL_INFO(
+				Key.ADDITIONAL_INFO, "Additional Information:",
+				TaskAttribute.TYPE_LONG_RICH_TEXT, true, false), ASSIGNED_TO(
+				Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED,
+				true, false), CATEGORY(Key.CATEOGRY, "Category:",
+				TaskAttribute.TYPE_SINGLE_SELECT, false, true), DATE_SUBMITTED(
+				Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.DATE_CREATION,
+				true, true), DESCRIPTION(Key.DESCRIPTION, "Description:",
+				TaskAttribute.DESCRIPTION, true, false), ETA(Key.ETA, "ETA:",
+				TaskAttribute.TYPE_SHORT_TEXT, false, false), LAST_UPDATED(
+				Key.LAST_UPDATED, "Last Modification:",
+				TaskAttribute.DATE_MODIFICATION, true, true), PRIORITY(
+				Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT,
+				false, false), PROJECT(Key.PROJECT, "Project:",
+				TaskAttribute.TYPE_SHORT_TEXT, false, true), PROJECTION(
+				Key.PROJECTION, "Projection:",
+				IMantisConstants.METADATA_PROJECTION, true, false), RELATIONSHIPS(
+				Key.RELATIONSHIPS, "Relationships:",
+				TaskAttribute.TYPE_SHORT_TEXT, false, false), REPORTER(
+				Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true,
+				false), REPRODUCIBILITY(Key.REPRODUCIBILITY,
+				"Reproducibility:", TaskAttribute.TYPE_LONG_RICH_TEXT, true,
+				false), RESOLUTION(Key.RESOLUTION, "Resolution:",
+				TaskAttribute.TYPE_SINGLE_SELECT, false, false), SEVERITY(
+				Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT,
+				false, false), STATUS(Key.STATUS, "Status:",
+				TaskAttribute.TYPE_SINGLE_SELECT, false, false), STEPS_TO_REPRODUCE(
+				Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:",
+				TaskAttribute.TYPE_COMMENT, true, false), SUMMARY(Key.SUMMARY,
+				"Summary:", TaskAttribute.SUMMARY, true, false), VERSION(
+				Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT,
+				false, false), FIXED_IN(Key.FIXED_IN, "Fixed In:",
+				TaskAttribute.TYPE_SINGLE_SELECT, false, false), VIEW_STATE(
+				Key.VIEW_STATE, "View State:",
+				IMantisConstants.METADATA_VIEW_STATE, true, true), NEW_COMMENT(
+				Key.NEW_COMMENT, "new_comment",
+				TaskAttribute.TYPE_LONG_RICH_TEXT, true, false);
+
 		private final boolean isHidden;
-		
+
 		private final boolean isReadOnly;
-		
+
 		private final String mantisKey;
-		
+
 		private final String prettyName;
 
-		private final String taskKey;
+		private final String type;
 
-		Attribute(Key key, String prettyName, String taskKey, boolean hidden, boolean readonly) {		
+		Attribute(Key key, String prettyName, String type, boolean hidden,
+				boolean readonly) {
 			this.mantisKey = key.getKey();
-			this.taskKey = taskKey;
+			this.type = type;
 			this.prettyName = prettyName;
 			this.isHidden = hidden;
 			this.isReadOnly = readonly;
-			
-			attributeByMantisKey.put(mantisKey, this);
-			if (taskKey != null) {
-				mantisKeyByTaskKey.put(taskKey, mantisKey);
-			}
 		}
 
-		Attribute(Key key, String prettyName, String taskKey, boolean hidden) {		
+		Attribute(Key key, String prettyName, String taskKey, boolean hidden) {
 			this(key, prettyName, taskKey, hidden, false);
 		}
-		
-		Attribute(Key key, String prettyName, String taskKey) {		
+
+		Attribute(Key key, String prettyName, String taskKey) {
 			this(key, prettyName, taskKey, false, false);
 		}
 
-		public String getTaskKey() {
-			return taskKey;
-		}
-
-		public String getMantisKey() {
+		public String getKey() {
 			return mantisKey;
 		}
 
 		public boolean isHidden() {
 			return isHidden;
-		}	
-		
+		}
+
 		public boolean isReadOnly() {
 			return isReadOnly;
 		}
-		
+
+		public String getKind() {
+			return isHidden() ? null : TaskAttribute.KIND_DEFAULT;
+		}
+
+		public String getType() {
+			return this.type;
+		}
+
 		@Override
 		public String toString() {
 			return prettyName;
 		}
 	}
 
+	public MantisAttributeMapper(TaskRepository taskRepository) {
+		super(taskRepository);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public String mapToRepositoryKey(TaskAttribute parent, String key) {
-		String mantisKey = mantisKeyByTaskKey.get(key);
-		return (mantisKey != null) ? mantisKey : key;
+		if (key.equals(TaskAttribute.COMMENT_NEW)) {
+			return Attribute.NEW_COMMENT.getKey().toString();
+		}
+		return super.mapToRepositoryKey(parent, key).toString();
 	}
-	
-	@Override
+
 	public Date getDateValue(TaskAttribute attribute) {
 		try {
-		String mappedKey = mapToRepositoryKey(attribute, attribute.getId());
-		if (mappedKey.equals(Attribute.DATE_SUBMITTED.getMantisKey()) || mappedKey.equals(Attribute.LAST_UPDATED.getMantisKey())) {
-			return MantisUtils.parseDate(Integer.valueOf(attribute.getValue()));
+			String mappedKey = mapToRepositoryKey(attribute, attribute.getId());
+			if (mappedKey.equals(Attribute.DATE_SUBMITTED.getKey())
+					|| mappedKey.equals(Attribute.LAST_UPDATED.getKey())) {
+				return MantisUtils.parseDate(Integer.valueOf(attribute
+						.getValue()));
+			}
+		} catch (Exception e) {
+			MantisCorePlugin.log(e);
 		}
-	} catch (Exception e) {
-		MantisCorePlugin.log(e);
+		return null;
 	}
-	return null;
-	}
-	
+
 }

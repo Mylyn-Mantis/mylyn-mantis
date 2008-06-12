@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
-import org.eclipse.mylyn.internal.tasks.core.TaskComment;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
@@ -37,7 +35,6 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisAttachment;
 import com.itsolut.mantis.core.model.MantisComment;
-import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProjectCategory;
 import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisResolution;
@@ -115,11 +112,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			                          IMantisClient client, MantisTicket ticket) throws CoreException {
 		
 		if (ticket.getCreated() != null) {
-			getAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getCreated()) + "");
+			getAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED.getKey()).setValue(MantisUtils.toMantisTime(ticket.getCreated()) + "");
 		}
 		
 		if (ticket.getLastChanged() != null) {
-			getAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED.getMantisKey()).setValue(MantisUtils.toMantisTime(ticket.getLastChanged()) + "");
+			getAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED.getKey()).setValue(MantisUtils.toMantisTime(ticket.getLastChanged()) + "");
 		}
 
 		Map<String, String> valueByKey = ticket.getValues();
@@ -165,7 +162,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		MantisRelationship[] relationsShips = ticket.getRelationships();
         for (MantisRelationship mantisRelationship : relationsShips)
             if (mantisRelationship.getType().equals(MantisRelationship.RelationType.PARENT))
-            	data.getRoot().createAttribute(MantisAttributeMapper.Attribute.RELATIONSHIPS.getMantisKey()).addValue(String.valueOf(mantisRelationship.getTargetId()));
+            	data.getRoot().createAttribute(MantisAttributeMapper.Attribute.RELATIONSHIPS.getKey()).addValue(String.valueOf(mantisRelationship.getTargetId()));
 		
 		// add operations
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.OPERATION);
@@ -189,11 +186,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		operationResolveAs.setValue("fixed");
 		TaskOperation.applyTo(operationResolveAs, "resolve_as", "Resolve As");
 	}
+	
+
 
 	public static void createDefaultAttributes(TaskAttributeMapper attributeMapper, TaskData data,
 			IMantisClient client, boolean existingTask) throws CoreException {
 		if (existingTask) {
 		}
+		
+		
 
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.RESOLUTION, client.getTicketResolutions(), client.getTicketResolutions()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.STATUS, client.getTicketStatus(), client.getTicketStatus()[0].getName());
@@ -203,13 +204,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ETA, client.getETA(), client.getETA()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.REPRODUCIBILITY, client.getReproducibility(), client.getReproducibility()[0].getName());
 		
-		createAttributeHidden(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECT, null);
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECT, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.CATEGORY, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.VERSION, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.FIXED_IN, null);
 
-		//createAttributeHidden(attributeMapper, data, MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE, null);
-		//createAttributeHidden(attributeMapper, data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO, null);
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE, null);
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO, null);
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
+
 		
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.VIEW_STATE, client.getViewState(), client.getViewState()[0].getName());
 		
@@ -223,10 +226,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		
 		try {
 			// categories
-			TaskAttribute attr = getAttribute(data, MantisAttributeMapper.Attribute.CATEGORY.getMantisKey());
+			TaskAttribute attr = getAttribute(data, MantisAttributeMapper.Attribute.CATEGORY.getKey());
 			attr.clearOptions();
 			boolean first = MantisUtils.isEmpty(attr.getValue());
-			for(MantisProjectCategory mp : client.getProjectCategories(data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getMantisKey()).getValue())){
+			for(MantisProjectCategory mp : client.getProjectCategories(data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey()).getValue())){
 				if(first) {
 					attr.setValue(mp.toString());
 					first=false;
@@ -236,15 +239,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			
 			
 			// versions
-			TaskAttribute repInVerAttr = getAttribute(data, MantisAttributeMapper.Attribute.VERSION.getMantisKey());
+			TaskAttribute repInVerAttr = getAttribute(data, MantisAttributeMapper.Attribute.VERSION.getKey());
 			repInVerAttr.clearOptions();
 			repInVerAttr.putOption("none", ""); // empty option
 
-			TaskAttribute fixInVerAttr = getAttribute( data, MantisAttributeMapper.Attribute.FIXED_IN.getMantisKey());
+			TaskAttribute fixInVerAttr = getAttribute( data, MantisAttributeMapper.Attribute.FIXED_IN.getKey());
 			fixInVerAttr.clearOptions();
 			fixInVerAttr.putOption("none", "");// Add empty option
 
-			for (MantisVersion v : client.getVersions(getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getMantisKey()).getValue())) {
+			for (MantisVersion v : client.getVersions(getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey()).getValue())) {
 
 				/*
 				 * Only display released versions for the reported in field,
@@ -269,8 +272,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	
 	private static TaskAttribute createAttribute(TaskAttributeMapper attributeMapper, TaskData data, 
 			                                               MantisAttributeMapper.Attribute attribute, Object[] values, boolean allowEmtpy) {
-//		TaskAttribute attr = data.getRoot().getMappedAttribute(attribute.getTaskKey());
-		TaskAttribute attr = data.getRoot().createMappedAttribute(attribute.getTaskKey());
+		TaskAttribute attr = data.getRoot().createAttribute(attribute.getKey());
+		attr.getMetaData().setReadOnly(attribute.isReadOnly())
+        .setLabel(attribute.toString())
+        .setKind(attribute.getKind())
+        .setType(attribute.getType());
 		if (values != null && values.length > 0) {
 			if (allowEmtpy) {
 				attr.putOption("", "");
@@ -283,7 +289,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	}
 	
 	private static TaskAttribute createAttribute(TaskAttributeMapper attributeMapper, TaskData data, MantisAttributeMapper.Attribute attribute) {
-		TaskAttribute attr =  data.getRoot().createAttribute(attribute.getMantisKey());
+		TaskAttribute attr =  data.getRoot().createAttribute(attribute.getKey());
+		attr.getMetaData().setReadOnly(attribute.isReadOnly())
+		                  .setLabel(attribute.toString())
+		                  .setKind(attribute.getKind())
+		                  .setType(attribute.getType());
 		return attr;
 	}
 
@@ -307,15 +317,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		return createAttribute(attributeMapper, data, attribute, values, false);
 	}
 
-	/**
-	 * 
-	 * @deprecated
-	 */
-	private static TaskAttribute createAttributeHidden(TaskAttributeMapper attributeMapper, 
-			                                               TaskData data, MantisAttributeMapper.Attribute attribute, Object[] values) {
-		TaskAttribute attr = createAttribute(attributeMapper, data, attribute, values);
-		return attr;
-	}
 	
 
 	//

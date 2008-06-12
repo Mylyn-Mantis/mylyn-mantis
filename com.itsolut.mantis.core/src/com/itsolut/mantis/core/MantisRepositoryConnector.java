@@ -294,7 +294,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		if (taskData.isPartial()) {
 			return false;
 		}
-		String lastKnownMod = task.getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getTaskKey());
+		String lastKnownMod = task.getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getKey());
 		if (lastKnownMod != null) {
 			TaskAttribute attrModification = taskData.getRoot()
 					.getMappedAttribute(TaskAttribute.DATE_MODIFICATION);
