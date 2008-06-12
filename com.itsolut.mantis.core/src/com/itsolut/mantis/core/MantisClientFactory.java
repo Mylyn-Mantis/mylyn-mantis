@@ -25,8 +25,6 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 
-import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
-
 import com.itsolut.mantis.core.IMantisClient.Version;
 
 

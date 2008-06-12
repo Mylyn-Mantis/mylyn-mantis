@@ -22,11 +22,12 @@ package com.itsolut.mantis.ui.editor;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.internal.tasks.ui.search.SearchHitCollector;
+import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisRepositoryQuery;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
 import com.itsolut.mantis.core.model.MantisSearchFilter.CompareOperator;
@@ -52,24 +53,26 @@ public class NewMantisTaskEditor extends AbstractTaskEditorPage {
 		super(editor, connectorKind);
 	}
 
-
-	public SearchHitCollector getDuplicateSearchCollector(String searchString) {
-		MantisSearchFilter filter = new MantisSearchFilter("description");
-		filter.setOperator(CompareOperator.CONTAINS);
-		filter.addValue(searchString);
-
-		MantisSearch search = new MantisSearch();
-		search.addFilter(filter);
-
-		// TODO copied from MantisCustomQueryPage.getQueryUrl()
-		StringBuilder sb = new StringBuilder();
-		sb.append(getTaskRepository().getRepositoryUrl());
-		sb.append(IMantisClient.QUERY_URL);
-		sb.append(search.toUrl());
-
-		MantisRepositoryQuery query = new MantisRepositoryQuery(getTaskRepository().getRepositoryUrl(), sb.toString(), "<Duplicate Search>");
-
-		SearchHitCollector collector = new SearchHitCollector(TasksUiPlugin.getTaskList(), getTaskRepository(), query );
-		return collector;
-	}
+//	public SearchHitCollector getDuplicateSearchCollector(String searchString) {
+//		MantisSearchFilter filter = new MantisSearchFilter("description");
+//		filter.setOperator(CompareOperator.CONTAINS);
+//		filter.addValue(searchString);
+//
+//		MantisSearch search = new MantisSearch();
+//		search.addFilter(filter);
+//
+//		// TODO copied from MantisCustomQueryPage.getQueryUrl()
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(getTaskRepository().getRepositoryUrl());
+//		sb.append(IMantisClient.QUERY_URL);
+//		sb.append(search.toUrl());
+//
+//		IRepositoryQuery query 
+//		   = TasksUi.getRepositoryModel().createRepositoryQuery(getTaskRepository());
+//		query.setUrl(sb.toString());
+//		query.setSummary("<Duplicate Search>");
+//
+//		SearchHitCollector collector = new SearchHitCollector(TasksUiPlugin.getTaskList(), getTaskRepository(), query );
+//		return collector;
+//	}
 }

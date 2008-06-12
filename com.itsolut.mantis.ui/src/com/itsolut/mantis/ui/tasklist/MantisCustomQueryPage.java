@@ -24,7 +24,7 @@ import java.net.MalformedURLException;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -41,12 +41,12 @@ import org.eclipse.swt.widgets.Text;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.core.MantisRepositoryQuery;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
+import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * Mantis search page. Provides a form similar to the one the Bugzilla connector
@@ -65,7 +65,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
 	private static final String TITLE_QUERY_TITLE = "Query Title:";
 
-	private MantisRepositoryQuery query;
+	private IRepositoryQuery query;
 
 	private Text titleText;
 	
@@ -79,7 +79,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 		super(TITLE, repository, query);
 
 		this.repository = repository;
-		this.query = (MantisRepositoryQuery) query;
+		this.query = query;
 
 		setTitle(TITLE);
 		setDescription(DESCRIPTION);
@@ -103,7 +103,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 		projectCombo.add("Select Project for new Issue");
 		
 		try {
-			MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUiPlugin.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+			MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 			IMantisClient client = connector.getClientManager().getRepository(repository);
 			
 			for(MantisProject pd : client.getProjects()){
@@ -116,7 +116,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 					try {
 						filterCombo.remove(1, filterCombo.getItemCount()-1);
 						if(projectCombo.getSelectionIndex()>0){
-							MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUiPlugin.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+							MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 							IMantisClient client = connector.getClientManager().getRepository(repository);
 							for(MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText())){
 								filterCombo.add(pd.getName());
@@ -164,13 +164,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 		return false;
 	}
 
-	private void restoreSearchFilterFromQuery(MantisRepositoryQuery query) throws MalformedURLException, MantisException {
-		for(MantisSearchFilter filter : query.getMantisSearch().getFilters()){
+	private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException, MantisException {
+		for(MantisSearchFilter filter : MantisUtils.getMantisSearch(query).getFilters()){
 			if("project".equals(filter.getFieldName())){
 				projectCombo.setText(filter.getValues().get(0));
 				
 			} else if("filter".equals(filter.getFieldName())){
-				MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUiPlugin.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+				MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 				IMantisClient client = connector.getClientManager().getRepository(repository);
 				for(MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText())){
 					filterCombo.add(pd.getName());
@@ -254,15 +254,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 		sb.append(IMantisClient.QUERY_URL);
 		sb.append(search.toUrl());
 		return sb.toString();
-	}
-
-	@Override
-	public MantisRepositoryQuery getQuery() {
-		return new MantisRepositoryQuery(repository.getUrl(), getQueryUrl(repository.getUrl()), getTitleText());
-	}
-
-	private String getTitleText() {
-		return (titleText != null) ? titleText.getText() : "<search>";
 	}
 
 	@Override

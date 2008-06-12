@@ -15,8 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractAttributeFactory;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryTaskAttribute;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
@@ -121,58 +119,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 			return prettyName;
 		}
 	}
-
-//	static {
-//		// make sure hash maps get initialized when class is loaded
-//		Attribute.values();
-//	}
-//
-//	@Override
-//	public boolean isHidden(String key) {
-//		Attribute attribute = attributeByMantisKey.get(key);
-//		return (attribute != null) ? attribute.isHidden() : isInternalAttribute(key);
-//	}
-//
-//	@Override
-//	public String getName(String key) {
-//		Attribute attribute = attributeByMantisKey.get(key);
-//		// TODO if attribute == null it is probably a custom field: need 
-//		// to query custom field information from repoository
-//		return (attribute != null) ? attribute.toString() : key;
-//	}
-//
-//	@Override
-//	public boolean isReadOnly(String key) {
-//		Attribute attribute = attributeByMantisKey.get(key);
-//		return (attribute != null) ? attribute.isReadOnly() : false;
-//	}
-//
-//	@Override
-//	public String mapCommonAttributeKey(String key) {
-//		String mantisKey = mantisKeyByTaskKey.get(key);
-//		return (mantisKey != null) ? mantisKey : key;
-//	}
-//
-//	static boolean isInternalAttribute(String id) {
-//		return RepositoryTaskAttribute.REMOVE_CC.equals(id) || RepositoryTaskAttribute.NEW_CC.equals(id) || RepositoryTaskAttribute.ADD_SELF_CC.equals(id) || RepositoryTaskAttribute.COMMENT_NEW.equals(id);
-//	}
-//
-//	@Override
-//	public Date getDateForAttributeType(String attributeKey, String dateString) {
-//		if (dateString == null || dateString.length() == 0) {
-//			return null;
-//		}
-//
-//		try {
-//			String mappedKey = mapCommonAttributeKey(attributeKey);
-//			if (mappedKey.equals(Attribute.DATE_SUBMITTED.getMantisKey()) || mappedKey.equals(Attribute.LAST_UPDATED.getMantisKey())) {
-//				return MantisUtils.parseDate(Integer.valueOf(dateString));
-//			}
-//		} catch (Exception e) {
-//			MantisCorePlugin.log(e);
-//		}
-//		return null;
-//	}
 
 	@Override
 	public String mapToRepositoryKey(TaskAttribute parent, String key) {

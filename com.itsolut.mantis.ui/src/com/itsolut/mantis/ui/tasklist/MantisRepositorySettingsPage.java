@@ -21,25 +21,19 @@
 
 package com.itsolut.mantis.ui.tasklist;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
-import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
-import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage.Validator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -53,7 +47,6 @@ import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.IMantisClient.Version;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.exception.MantisLoginException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 
 /**
@@ -77,13 +70,13 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 	
 	public MantisRepositorySettingsPage(String title, String description,
 			TaskRepository taskRepository) {
-		super(title, description, taskRepository);
+		super(TITLE, DESCRIPTION, taskRepository);
 		setNeedsAnonymousLogin(true);
 		setNeedsEncoding(false);
 		setNeedsTimeZone(false);
 		setNeedsValidation(true);
 		setNeedsAdvanced(true);
-		setNeedsHttpAuth(false);
+		setNeedsHttpAuth(true);
 	}
 
 	

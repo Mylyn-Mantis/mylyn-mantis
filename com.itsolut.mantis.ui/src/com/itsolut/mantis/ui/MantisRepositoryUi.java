@@ -35,18 +35,14 @@ import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
+import org.eclipse.mylyn.tasks.ui.LegendElement;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
-import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryQuery;
-import com.itsolut.mantis.core.MantisTask;
 import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
-import com.itsolut.mantis.ui.wizard.EditMantisQueryWizard;
-import com.itsolut.mantis.ui.wizard.MantisQueryWizardPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
 import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
 
@@ -97,50 +93,33 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 	}
 
 	
-	 @Override
-	public List<ITask> getLegendItems() {
-		List<ITask> legendItems = new ArrayList<ITask>();
-
-		MantisTask blocker = new MantisTask("", "block", "Block");
-		blocker.setSeverity("block");
-		legendItems.add(blocker);
-
-		MantisTask major = new MantisTask("", "major", "Major, crash");
-		major.setSeverity("major");
-		legendItems.add(major);
-
-		MantisTask enhancement = new MantisTask("", "feature", "Feature");
-		enhancement.setSeverity("feature");
-		legendItems.add(enhancement);
-
-		MantisTask trivial = new MantisTask("", "trivial", "Trivial, Minor");
-		trivial.setSeverity("trivial");
-		legendItems.add(trivial);
-
+	@Override
+	public List<LegendElement> getLegendElements() {
+		List<LegendElement> legendItems = new ArrayList<LegendElement>();
+		legendItems.add(LegendElement.createTask("block", MantisImages.OVERLAY_CRITICAL));
+		legendItems.add(LegendElement.createTask("major", MantisImages.OVERLAY_MAJOR));
+		legendItems.add(LegendElement.createTask("feature", MantisImages.OVERLAY_ENHANCEMENT));
+		legendItems.add(LegendElement.createTask("trivial", MantisImages.OVERLAY_MINOR));
 		return legendItems;
+		
 	}
-
-	 
+ 
 	 
 	 @Override
 	public ImageDescriptor getTaskKindOverlay(ITask task) {
-		if (task instanceof MantisTask) {
-			MantisTask mantisTask = (MantisTask) task;
-			String severity = mantisTask.getSeverity();
-
-			if (severity != null) {
-				if ("block".equals(severity)) {
-					return MantisImages.OVERLAY_CRITICAL;
-				} else if ("major".equals(severity) || "crash".equals(severity)) {
-					return MantisImages.OVERLAY_MAJOR;
-				} else if ("feature".equals(severity)) {
-					return MantisImages.OVERLAY_ENHANCEMENT;
-				} else if ("trivial".equals(severity)
-						|| "minor".equals(severity)) {
-					return MantisImages.OVERLAY_MINOR;
-				} else {
-					return null;
-				}
+		String severity = task.getTaskKind();
+		if (severity != null) {
+			if ("block".equals(severity)) {
+				return MantisImages.OVERLAY_CRITICAL;
+			} else if ("major".equals(severity) || "crash".equals(severity)) {
+				return MantisImages.OVERLAY_MAJOR;
+			} else if ("feature".equals(severity)) {
+				return MantisImages.OVERLAY_ENHANCEMENT;
+			} else if ("trivial".equals(severity)
+					|| "minor".equals(severity)) {
+				return MantisImages.OVERLAY_MINOR;
+			} else {
+				return null;
 			}
 		}
 		return super.getTaskKindOverlay(task);

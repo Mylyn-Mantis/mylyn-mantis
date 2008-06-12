@@ -253,16 +253,6 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 		return null;
 	}
 	
-//	private MantisAttachment parseAttachment(Object[] entry) {
-//		MantisAttachment attachment = new MantisAttachment((String) entry[0]);
-//		attachment.setDescription((String) entry[1]);
-//		attachment.setSize((Integer) entry[2]);
-//		attachment.setCreated(MantisUtils.parseDate((Integer) entry[3]));
-//		attachment.setAuthor((String) entry[4]);
-//		return attachment;
-//	}
-
-	@SuppressWarnings("unchecked")
 	public void search(MantisSearch query, List<MantisTicket> tickets) throws MantisException {
 		try {
 			

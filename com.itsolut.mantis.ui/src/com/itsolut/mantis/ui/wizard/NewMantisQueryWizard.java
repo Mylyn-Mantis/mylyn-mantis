@@ -21,14 +21,19 @@
 
 package com.itsolut.mantis.ui.wizard;
 
-import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
+import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
+import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
 import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
@@ -36,9 +41,7 @@ import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
 /**
  * @author Steffen Pingel
  * @author David Carver
- * @deprecated
  */
-@Deprecated
 public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
 	private static final String TITLE = "New Mantis Query";
@@ -70,16 +73,27 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
 	@Override
 	public boolean performFinish() {
-		RepositoryQuery query = queryPage.getQuery();
-		if (query != null) {
-			TasksUiPlugin.getTaskList().addQuery(query);
-			AbstractRepositoryConnector connector = (AbstractRepositoryConnector) TasksUiPlugin.getRepositoryManager().getRepositoryConnector(
-					repository.getConnectorKind());
-			if (connector != null) {
-				TasksUiPlugin.getSynchronizationScheduler().synchronize(repository);
-			}
+		IWizardPage currentPage = queryPage; //getContainer().getCurrentPage();
+		if (!(currentPage instanceof AbstractRepositoryQueryPage)) {
+			StatusHandler.fail(new Status(IStatus.ERROR, TasksUiPlugin.ID_PLUGIN,
+					"Current wizard page does not extends AbstractRepositoryQueryPage"));
+			return false;
 		}
+
+		AbstractRepositoryQueryPage page = (AbstractRepositoryQueryPage) currentPage;
+		IRepositoryQuery query = page.getQuery();
+		if (query != null) {
+			page.applyTo(query);
+			if (query instanceof RepositoryQuery) {
+				TasksUiPlugin.getTaskList().notifyElementChanged((RepositoryQuery) query);
+			}
+		} else {
+			query = page.createQuery();
+			TasksUiInternal.getTaskList().addQuery((RepositoryQuery) query);
+		}
+		AbstractRepositoryConnector connector = TasksUi.getRepositoryManager().getRepositoryConnector(
+				getTaskRepository().getConnectorKind());
+		TasksUiInternal.synchronizeQuery(connector, (RepositoryQuery) query, null, true);
 		return true;
 	}
-
 }

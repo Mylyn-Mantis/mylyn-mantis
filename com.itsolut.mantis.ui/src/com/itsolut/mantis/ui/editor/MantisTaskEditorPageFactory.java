@@ -25,17 +25,12 @@ import org.eclipse.ui.forms.editor.FormPage;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.core.MantisTask;
 
 /**
  * @author Steffen Pingel
  */
 public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 	
-	public MantisTaskEditorPageFactory() {
-		super();
-	}
-
 	@Override
 	public boolean canCreatePageFor(TaskEditorInput input) {
 		if (input.getTask().getConnectorKind().equals(MantisCorePlugin.REPOSITORY_KIND)
@@ -59,16 +54,7 @@ public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 	@Override
 	public String getPageText() {
 		// TODO Auto-generated method stub
-		return null;
-	}
-	
-
-	public String getTitle() {
 		return "Mantis";
 	}
-
-	public boolean providesOutline() {
-		return true;
-	}
-
+	
 }

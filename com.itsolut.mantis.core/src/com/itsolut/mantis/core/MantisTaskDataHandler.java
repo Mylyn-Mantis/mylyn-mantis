@@ -152,7 +152,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			for (int i = 0; i < attachments.length; i++) {
 			    TaskAttribute attachmentAttribute = attributeMapper.createTaskAttachment(data);
 				TaskAttachmentMapper taskAttachment = TaskAttachmentMapper.createFrom(attributeMapper.createTaskAttachment(data));
-				taskAttachment.setUrl(MantisTask.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachments[i].getId());
+				taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachments[i].getId());
 				taskAttachment.setDescription("");
 				taskAttachment.setFileName(attachments[i].getFilename());
 				taskAttachment.setCreationDate(attachments[i].getCreated());
@@ -397,7 +397,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 		TaskAttribute attributeCompletionDate = taskData.getRoot().getAttribute(TaskAttribute.DATE_COMPLETION);
 
-		if (MantisTask.isCompleted(ticket.getValue(Key.STATUS))) {
+		if (MantisUtils.isCompleted(ticket.getValue(Key.STATUS))) {
 			attributeCompletionDate.setValue(ticket.getLastChanged().toString());
 		} else {
 			attributeCompletionDate.setValue(null);
@@ -405,7 +405,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 		String priority = ticket.getValue(Key.PRIORITY);
 		TaskAttribute attributePriority = taskData.getRoot().getAttribute(TaskAttribute.PRIORITY);
-		attributePriority.setValue(MantisTask.getMylynPriority(priority).toString());
+		attributePriority.setValue(MantisPriorityLevel.getMylynPriority(priority).toString());
 
 		TaskAttribute attributeCreationDate = taskData.getRoot().getAttribute(TaskAttribute.DATE_CREATION);
 		if (ticket.getCreated() != null) {

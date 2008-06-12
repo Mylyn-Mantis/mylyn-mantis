@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
@@ -41,10 +42,10 @@ import org.eclipse.swt.widgets.Text;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryQuery;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
 import com.itsolut.mantis.core.model.MantisSearchFilter.CompareOperator;
+import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 
 /**
@@ -61,7 +62,7 @@ public class MantisQueryWizardPage extends AbstractRepositoryQueryPage {
 
 	private TaskRepository repository;
 
-	private MantisRepositoryQuery query;
+	private IRepositoryQuery query;
 
 	private Text titleText;
 
@@ -121,8 +122,8 @@ public class MantisQueryWizardPage extends AbstractRepositoryQueryPage {
 		setControl(composite);
 	}
 	
-	private void restoreSearchFilterFromQuery(MantisRepositoryQuery query) {
-		MantisSearch search = query.getMantisSearch();
+	private void restoreSearchFilterFromQuery(IRepositoryQuery query) {
+		MantisSearch search = MantisUtils.getMantisSearch(query);
 		List<MantisSearchFilter> filters = search.getFilters();
 		for (MantisSearchFilter filter : filters) {
 			SearchField field = getSearchField(filter.getFieldName());
@@ -233,10 +234,6 @@ public class MantisQueryWizardPage extends AbstractRepositoryQueryPage {
 		updateScrollPane();
 	}
 	
-	@Override
-	public IRepositoryQuery getQuery() {
-		return new MantisRepositoryQuery(repository.getRepositoryUrl(), getQueryUrl(repository.getRepositoryUrl()), titleText.getText());
-	}
 
 	public String getQueryUrl(String repsitoryUrl) {
 		MantisSearch search = new MantisSearch();
