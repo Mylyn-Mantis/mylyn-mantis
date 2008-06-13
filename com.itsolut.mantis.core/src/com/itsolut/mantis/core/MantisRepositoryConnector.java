@@ -315,6 +315,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		TaskMapper scheme = getTaskMapper(taskData);
 		scheme.applyTo(task);
 
+		
 //		task.setSummary(getTicketDescription(taskData));
 //		task.setOwner(taskData.getRoot().getMappedAttribute(
 //				MantisAttributeMapper.Attribute.ASSIGNED_TO.toString())

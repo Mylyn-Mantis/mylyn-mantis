@@ -126,43 +126,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			}
 		}
 
-		MantisComment[] comments = ticket.getComments();
-		if (comments != null) {
-			for (int i = 0; i < comments.length; i++) {
-			    TaskAttribute attributeComment = getAttribute(data, TaskAttribute.PREFIX_COMMENT);
-				TaskCommentMapper taskComment = TaskCommentMapper.createFrom(attributeComment);
-				taskComment.setCommentId(Integer.toString(i + 1));
-				IRepositoryPerson author = data.getAttributeMapper().getTaskRepository().createPerson(comments[i].getReporter());
-				taskComment.setAuthor(author);
-				if (comments[i].getLastModified() != null) {
-					taskComment.setCreationDate(comments[i].getLastModified());
-				} else {
-					taskComment.setCreationDate(comments[i].getDateSubmitted());
-				}
-				taskComment.setText(comments[i].getText());
-				taskComment.applyTo(attributeComment);
-			}
-		}
-
-		MantisAttachment[] attachments = ticket.getAttachments();
-		if (attachments != null) {
-			for (int i = 0; i < attachments.length; i++) {
-			    TaskAttribute attachmentAttribute = attributeMapper.createTaskAttachment(data);
-				TaskAttachmentMapper taskAttachment = TaskAttachmentMapper.createFrom(attributeMapper.createTaskAttachment(data));
-				taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachments[i].getId());
-				taskAttachment.setDescription("");
-				taskAttachment.setFileName(attachments[i].getFilename());
-				taskAttachment.setCreationDate(attachments[i].getCreated());
-				taskAttachment.setAttachmentId(Integer.toString(attachments[i].getId()));
-				taskAttachment.applyTo(attachmentAttribute);
-			}
-		}
-		
-		// relationships - support only child issues
-		MantisRelationship[] relationsShips = ticket.getRelationships();
-        for (MantisRelationship mantisRelationship : relationsShips)
-            if (mantisRelationship.getType().equals(MantisRelationship.RelationType.PARENT))
-            	data.getRoot().createAttribute(MantisAttributeMapper.Attribute.RELATIONSHIPS.getKey()).addValue(String.valueOf(mantisRelationship.getTargetId()));
+		addComments(data, ticket);
+		addAttachments(repository, attributeMapper, data, ticket);
+		addRelationships(data, ticket);
 		
 		// add operations
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.OPERATION);
@@ -185,6 +151,51 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		operationResolveAs.setValue("fixed");
 		TaskOperation.applyTo(operationResolveAs, "resolve_as", "Resolve As");
+	}
+
+	private static void addRelationships(TaskData data, MantisTicket ticket) {
+		// relationships - support only child issues
+		MantisRelationship[] relationsShips = ticket.getRelationships();
+        for (MantisRelationship mantisRelationship : relationsShips)
+            if (mantisRelationship.getType().equals(MantisRelationship.RelationType.PARENT))
+            	data.getRoot().createAttribute(MantisAttributeMapper.Attribute.RELATIONSHIPS.getKey()).addValue(String.valueOf(mantisRelationship.getTargetId()));
+	}
+
+	private static void addAttachments(TaskRepository repository,
+			TaskAttributeMapper attributeMapper, TaskData data,
+			MantisTicket ticket) {
+		MantisAttachment[] attachments = ticket.getAttachments();
+		if (attachments != null) {
+			for (int i = 0; i < attachments.length; i++) {
+			    TaskAttribute attachmentAttribute = attributeMapper.createTaskAttachment(data);
+				TaskAttachmentMapper taskAttachment = TaskAttachmentMapper.createFrom(attributeMapper.createTaskAttachment(data));
+				taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachments[i].getId());
+				taskAttachment.setDescription("");
+				taskAttachment.setFileName(attachments[i].getFilename());
+				taskAttachment.setCreationDate(attachments[i].getCreated());
+				taskAttachment.setAttachmentId(Integer.toString(attachments[i].getId()));
+				taskAttachment.applyTo(attachmentAttribute);
+			}
+		}
+	}
+
+	private static void addComments(TaskData data, MantisTicket ticket) {
+		int i = 1;
+		if (ticket.getComments() == null) {
+			return;
+		}
+		for (MantisComment comment : ticket.getComments()) {
+			TaskAttribute attribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_COMMENT + i);
+			TaskCommentMapper taskComment = TaskCommentMapper.createFrom(attribute);
+			taskComment.setAuthor(data.getAttributeMapper().getTaskRepository().createPerson(comment.getReporter()));
+			taskComment.setNumber(i);
+			String commentText = comment.getText();
+			taskComment.setText(commentText);
+			taskComment.setCreationDate(comment.getDateSubmitted());
+			taskComment.applyTo(attribute);
+			i++;
+		}
+		
 	}
 	
 

@@ -72,7 +72,10 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		VIEW_STATE(Key.VIEW_STATE, "View State:", IMantisConstants.METADATA_VIEW_STATE, true, true),
-		NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false);
+		NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+		ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
+		ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false);
+
 
 		private final boolean isHidden;
 
@@ -152,6 +155,22 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		
 		if (key.equals(TaskAttribute.DATE_CREATION)) {
 			return Attribute.DATE_SUBMITTED.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.ATTACHMENT_ID)) {
+			return Attribute.ATTACHID.getKey().toString(); 
+		}
+		
+		if (key.equals(TaskAttribute.USER_ASSIGNED)) {
+			return Attribute.ASSIGNED_TO.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.TASK_KEY)) {
+			return Attribute.ID.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.USER_REPORTER)) {
+			return Attribute.REPORTER.getKey().toString();
 		}
 		
 		return super.mapToRepositoryKey(parent, key).toString();

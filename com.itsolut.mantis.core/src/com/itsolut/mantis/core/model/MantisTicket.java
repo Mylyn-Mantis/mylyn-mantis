@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**
@@ -65,7 +67,10 @@ public class MantisTicket {
 		VERSION("version"), 
 		VIEW_STATE("view_state"), 
 		FIXED_IN("fixed_in"),
-		NEW_COMMENT("new_comment");
+		NEW_COMMENT("new_comment"),
+		ATTACHID("attachid"),
+		ATTACHMENT("attachment");
+
 
 		public static Key fromKey(String name) {
 			for (Key key : Key.values()) {

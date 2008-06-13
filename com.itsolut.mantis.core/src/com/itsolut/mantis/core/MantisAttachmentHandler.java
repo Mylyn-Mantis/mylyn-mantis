@@ -54,7 +54,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 	private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment) throws CoreException {
 		String id = attachment.getAttachmentId();
 		if (id == null) {
-			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachment download from " + repository.getUrl() + " failed, missing attachment filename.", null));
+			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
 		}
 		
 		try {
@@ -62,7 +62,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 			return client.getAttachmentData(Integer.parseInt(id));
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
-			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment download from " +repository.getUrl() + " failed, please see details.", e ));
+			throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e ));
 		}
 	}
 
