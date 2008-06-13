@@ -69,7 +69,7 @@ public class MantisComment {
 
 	@Override
 	public String toString() {
-		return "[" + text + "] " + reporter ;
+		return "[" + text + "] " + reporter + " - " + dateSubmitted ;
 	}
 
 
