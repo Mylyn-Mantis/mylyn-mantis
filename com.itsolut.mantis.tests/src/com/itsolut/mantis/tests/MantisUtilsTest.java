@@ -10,13 +10,14 @@ package com.itsolut.mantis.tests;
 
 import junit.framework.TestCase;
 
-import com.itsolut.mantis.core.MantisTask;
+import com.itsolut.mantis.core.util.MantisUtils;
+import com.itsolut.mantis.core.MantisPriorityLevel;
 
 /**
  * @author Steffen Pingel
  * @author David Carver
  */
-public class MantisTaskTest extends TestCase {
+public class MantisUtilsTest extends TestCase {
 
 	/**
 	 * Check for the values that indicate a task is completed.  This
@@ -26,10 +27,10 @@ public class MantisTaskTest extends TestCase {
 	 * @author David Carver
 	 */
 	public void testIsCompleted() {
-		assertTrue(MantisTask.isCompleted("closed"));
-		assertTrue(MantisTask.isCompleted("resolved"));
-		assertFalse(MantisTask.isCompleted("Closed"));
-		assertFalse(MantisTask.isCompleted("Resolved"));
+		assertTrue(MantisUtils.isCompleted("closed"));
+		assertTrue(MantisUtils.isCompleted("resolved"));
+		assertFalse(MantisUtils.isCompleted("Closed"));
+		assertFalse(MantisUtils.isCompleted("Resolved"));
 	}
 
 	/**
@@ -38,11 +39,11 @@ public class MantisTaskTest extends TestCase {
 	 * @author David Carver
 	 */
 	public void testGetMylynPriority() {
-		assertEquals("P1", MantisTask.getMylynPriority("immediate").toString());
-		assertEquals("P2", MantisTask.getMylynPriority("urgent").toString());
-		assertEquals("P2", MantisTask.getMylynPriority("high").toString());
-		assertEquals("P3", MantisTask.getMylynPriority("normal").toString());
-		assertEquals("P4", MantisTask.getMylynPriority("low").toString());
+		assertEquals("P1", MantisPriorityLevel.getMylynPriority("immediate").toString());
+		assertEquals("P2", MantisPriorityLevel.getMylynPriority("urgent").toString());
+		assertEquals("P2", MantisPriorityLevel.getMylynPriority("high").toString());
+		assertEquals("P3", MantisPriorityLevel.getMylynPriority("normal").toString());
+		assertEquals("P4", MantisPriorityLevel.getMylynPriority("low").toString());
 	}
 	
 	/**
@@ -52,6 +53,6 @@ public class MantisTaskTest extends TestCase {
 	public void testGetRepositoryBaseUrl() {
 		String baseUrl = "http://mylyn-mantis.sourceforge.net/Mantis/mc/mantisconnect.php";
 		
-		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/", MantisTask.getRepositoryBaseUrl(baseUrl));
+		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/", MantisUtils.getRepositoryBaseUrl(baseUrl));
 	}
 }

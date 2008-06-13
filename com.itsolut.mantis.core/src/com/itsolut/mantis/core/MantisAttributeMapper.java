@@ -38,45 +38,41 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
 	private static Map<String, String> mantisKeyByTaskKey = new HashMap<String, String>();
 
+	/**
+	 * Attribute controls how information is displayed in the Attributes column and in the Text editor.
+	 * 
+	 * Items that are marked hidden will not be shown in the Attributes drop down.  The format of the enum is
+	 * 
+	 * mantis key, Display Name, Attribute Type, Hidden, Read Only.
+	 * 
+	 * In Mylyn 3.0, the Type controls what type of ui control is used for that attribute.
+	 * @author dcarver
+	 *
+	 */
 	public enum Attribute {
-		ID(Key.ID, "<used by search engine>",
-				IMantisConstants.METADATA_SEARCH_ID, true), ADDITIONAL_INFO(
-				Key.ADDITIONAL_INFO, "Additional Information:",
-				TaskAttribute.TYPE_LONG_RICH_TEXT, true, false), ASSIGNED_TO(
-				Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED,
-				true, false), CATEGORY(Key.CATEOGRY, "Category:",
-				TaskAttribute.TYPE_SINGLE_SELECT, false, true), DATE_SUBMITTED(
-				Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.DATE_CREATION,
-				true, true), DESCRIPTION(Key.DESCRIPTION, "Description:",
-				TaskAttribute.DESCRIPTION, true, false), ETA(Key.ETA, "ETA:",
-				TaskAttribute.TYPE_SHORT_TEXT, false, false), LAST_UPDATED(
-				Key.LAST_UPDATED, "Last Modification:",
-				TaskAttribute.DATE_MODIFICATION, true, true), PRIORITY(
-				Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT,
-				false, false), PROJECT(Key.PROJECT, "Project:",
-				TaskAttribute.TYPE_SHORT_TEXT, false, true), PROJECTION(
-				Key.PROJECTION, "Projection:",
-				IMantisConstants.METADATA_PROJECTION, true, false), RELATIONSHIPS(
-				Key.RELATIONSHIPS, "Relationships:",
-				TaskAttribute.TYPE_SHORT_TEXT, false, false), REPORTER(
-				Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true,
-				false), REPRODUCIBILITY(Key.REPRODUCIBILITY,
-				"Reproducibility:", TaskAttribute.TYPE_LONG_RICH_TEXT, true,
-				false), RESOLUTION(Key.RESOLUTION, "Resolution:",
-				TaskAttribute.TYPE_SINGLE_SELECT, false, false), SEVERITY(
-				Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT,
-				false, false), STATUS(Key.STATUS, "Status:",
-				TaskAttribute.TYPE_SINGLE_SELECT, false, false), STEPS_TO_REPRODUCE(
-				Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:",
-				TaskAttribute.TYPE_COMMENT, true, false), SUMMARY(Key.SUMMARY,
-				"Summary:", TaskAttribute.SUMMARY, true, false), VERSION(
-				Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT,
-				false, false), FIXED_IN(Key.FIXED_IN, "Fixed In:",
-				TaskAttribute.TYPE_SINGLE_SELECT, false, false), VIEW_STATE(
-				Key.VIEW_STATE, "View State:",
-				IMantisConstants.METADATA_VIEW_STATE, true, true), NEW_COMMENT(
-				Key.NEW_COMMENT, "new_comment",
-				TaskAttribute.TYPE_LONG_RICH_TEXT, true, false);
+		ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
+		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED, true, false),
+		CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, false, true),
+		DESCRIPTION(Key.DESCRIPTION, "Description:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+		ETA(Key.ETA, "ETA:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
+		LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, false, true),
+		PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SHORT_TEXT, false, true),
+		PROJECTION(Key.PROJECTION, "Projection:", IMantisConstants.METADATA_PROJECTION, true, false),
+		RELATIONSHIPS(Key.RELATIONSHIPS, "Relationships:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
+		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true, false),
+		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		STATUS(Key.STATUS, "Status:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+		SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
+		VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		VIEW_STATE(Key.VIEW_STATE, "View State:", IMantisConstants.METADATA_VIEW_STATE, true, true),
+		NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false);
 
 		private final boolean isHidden;
 
@@ -141,6 +137,23 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		if (key.equals(TaskAttribute.COMMENT_NEW)) {
 			return Attribute.NEW_COMMENT.getKey().toString();
 		}
+		
+		if (key.equals(TaskAttribute.DESCRIPTION)) {
+			return Attribute.DESCRIPTION.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.DATE_MODIFICATION)) {
+			return Attribute.LAST_UPDATED.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.SUMMARY)) {
+			return Attribute.SUMMARY.getKey().toString();
+		}
+		
+		if (key.equals(TaskAttribute.DATE_CREATION)) {
+			return Attribute.DATE_SUBMITTED.getKey().toString();
+		}
+		
 		return super.mapToRepositoryKey(parent, key).toString();
 	}
 

@@ -22,7 +22,6 @@ import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisAttachmentHandler;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.core.MantisTask;
 import com.itsolut.mantis.core.IMantisClient.Version;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
@@ -34,6 +33,7 @@ import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
 import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryTaskData;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.commons.net.AuthenticationType;
 
 
 /**

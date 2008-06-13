@@ -194,21 +194,25 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		if (existingTask) {
 		}
 		
+		// The order here is important as it controls how it appears in the Editor.
 		
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECT, null);
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.RESOLUTION, client.getTicketResolutions(), client.getTicketResolutions()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.STATUS, client.getTicketStatus(), client.getTicketStatus()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PRIORITY, client.getPriorities(), client.getPriorities()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.SEVERITY, client.getSeverities(), client.getSeverities()[0].getName());
-		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECTION, client.getProjection(), client.getProjection()[0].getName());
-		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ETA, client.getETA(), client.getETA()[0].getName());
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.REPRODUCIBILITY, client.getReproducibility(), client.getReproducibility()[0].getName());
-		
-		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECT, null);
-		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.CATEGORY, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.VERSION, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.FIXED_IN, null);
 
+
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.PROJECTION, client.getProjection(), client.getProjection()[0].getName());
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ETA, client.getETA(), client.getETA()[0].getName());
+		
+		
+		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.DESCRIPTION);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO, null);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
@@ -219,7 +223,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.ASSIGNED_TO);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.REPORTER);
 		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.SUMMARY);
-		createAttribute(attributeMapper, data, MantisAttributeMapper.Attribute.DESCRIPTION);
 	}
 
 	public static void createProjectSpecificAttributes(TaskData data, IMantisClient client) {

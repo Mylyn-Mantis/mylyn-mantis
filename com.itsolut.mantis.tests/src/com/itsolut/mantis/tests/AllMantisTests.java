@@ -24,8 +24,7 @@ public class AllMantisTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(MantisAxisClientTest.class);
 		suite.addTestSuite(MantisTaskDataHandlerTest.class);
-		suite.addTestSuite(MantisQueryTest.class);
-		suite.addTestSuite(MantisTaskTest.class);
+		suite.addTestSuite(MantisUtilsTest.class);
 		suite.addTestSuite(MantisRepositoryConnectorTest.class);
 		suite.addTestSuite(MantisRelationshipTest.class);
 		//$JUnit-END$

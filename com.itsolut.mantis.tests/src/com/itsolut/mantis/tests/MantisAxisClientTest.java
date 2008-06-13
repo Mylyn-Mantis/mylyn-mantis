@@ -34,6 +34,7 @@ public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 
 		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
 				IMantisClient.Version.MC_1_0a5, username, password, null);
+		assertNotNull("Mantis Client failed to be created.", mantisClient);
 
 		mantisClient.updateAttributes(new NullProgressMonitor(), true);
 	}
@@ -45,6 +46,7 @@ public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 
 		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
 				IMantisClient.Version.MC_1_0a5, username, password, null);
+		assertNotNull("Mantis Client failed to be created.", mantisClient);
 
 		mantisClient.validate();
 
@@ -58,6 +60,7 @@ public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 
 		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
 				IMantisClient.Version.MC_1_0a5, username, password, null);
+		assertNotNull("Mantis Client failed to be created", mantisClient);
 
 		try {
 			mantisClient.validate();
