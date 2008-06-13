@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -50,6 +49,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 
 	private final MantisRepositoryConnector connector;
+	
+	private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
+	
+	private static final String CONTEXT_ATTACHMENT_DESCRIPTION = "mylyn/context/zip";
+
+	private static final String CONTEXT_ATTACHMENT_DESCRIPTION_LEGACY = "mylar/context/zip";
+
+	private static final String CONTEXT_ATTACHMENT_FILENAME_LEGACY = "mylar-context.zip";
+	
 
 	public MantisTaskDataHandler(MantisRepositoryConnector connector) {
 		this.connector = connector;
@@ -164,18 +172,29 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	private static void addAttachments(TaskRepository repository,
 			TaskAttributeMapper attributeMapper, TaskData data,
 			MantisTicket ticket) {
-		MantisAttachment[] attachments = ticket.getAttachments();
-		if (attachments != null) {
-			for (int i = 0; i < attachments.length; i++) {
-			    TaskAttribute attachmentAttribute = attributeMapper.createTaskAttachment(data);
-				TaskAttachmentMapper taskAttachment = TaskAttachmentMapper.createFrom(attributeMapper.createTaskAttachment(data));
-				taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachments[i].getId());
-				taskAttachment.setDescription("");
-				taskAttachment.setFileName(attachments[i].getFilename());
-				taskAttachment.setCreationDate(attachments[i].getCreated());
-				taskAttachment.setAttachmentId(Integer.toString(attachments[i].getId()));
-				taskAttachment.applyTo(attachmentAttribute);
+		
+		int i = 1;
+		if (ticket.getAttachments() == null) {
+			return;
+		}
+		
+		for (MantisAttachment attachment : ticket.getAttachments()) {
+			TaskAttribute attribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_ATTACHMENT + i);
+			TaskAttachmentMapper taskAttachment = TaskAttachmentMapper.createFrom(attribute);
+			taskAttachment.setFileName(attachment.getFilename());
+			if (CONTEXT_ATTACHMENT_FILENAME.equals(attachment.getFilename())) {
+				taskAttachment.setDescription(CONTEXT_ATTACHMENT_DESCRIPTION);
+			} else if (CONTEXT_ATTACHMENT_FILENAME_LEGACY.equals(attachment.getFilename())) {
+				taskAttachment.setDescription(CONTEXT_ATTACHMENT_DESCRIPTION_LEGACY);
+			} else {
+				taskAttachment.setDescription(attachment.getFilename());
 			}
+			taskAttachment.setLength(Long.parseLong(Integer.toString(attachment.getSize())));
+			taskAttachment.setCreationDate(attachment.getCreated());
+			taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository.getRepositoryUrl()) + IMantisClient.TICKET_ATTACHMENT_URL + attachment.getId());
+			taskAttachment.setAttachmentId(Integer.toString(attachment.getId()));
+			taskAttachment.applyTo(attribute);
+			i++;
 		}
 	}
 
@@ -195,7 +214,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			taskComment.applyTo(attribute);
 			i++;
 		}
-		
 	}
 	
 
