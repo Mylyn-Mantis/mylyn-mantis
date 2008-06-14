@@ -39,6 +39,7 @@ import org.eclipse.mylyn.tasks.ui.LegendElement;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
+import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;

@@ -1,5 +1,6 @@
 package com.itsolut.mantis.ui.editor;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -11,22 +12,15 @@ import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
-	protected static final String LABEL_SECTION_STEPS = "Steps To Reproduce";
-	protected static final int STEPS_TO_REPRODUCE_HEIGHT = 150;
-	protected TextViewer stepsToReproduceViewer;
 
-	protected static final String LABEL_SECTION_ADDITIONAL = "Additional Information";
-	protected static final int ADDITIONAL_INFO_HEIGHT = 150;
-	protected TextViewer additionalViewer;
 
-	protected static final int DESCRIPTION_HEIGHT = 150;
-	private static final int DESCRIPTION_WIDTH = 79 * 7; // 500;
-
-	public static final String ID_MANTIS_PART_ATTRIBUTES = "com.itsolut.mantis.tasks.ui.editors.parts.attributes";
+	public static final String ID_MANTIS_PART_STEPSTOREPRODUCE = "com.itsolut.mantis.tasks.ui.editors.parts.stepstoreproduce";
+	public static final String ID_MANTIS_PART_ADDITIONALINFO = "com.itsolut.mantis.tasks.ui.editors.parts.additionalinfo";
 
 	private TaskData taskData;
 
@@ -43,7 +37,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 	protected Set<TaskEditorPartDescriptor> createPartDescriptors() {
 		Set<TaskEditorPartDescriptor> descriptors = super
 				.createPartDescriptors();
-
+		
 		// remove unnecessary default editor parts
 		for (TaskEditorPartDescriptor taskEditorPartDescriptor : descriptors) {
 			if (taskEditorPartDescriptor.getId().equals(ID_PART_PEOPLE)) {
@@ -52,23 +46,50 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			}
 		}
 
-//		// Add Mantis Attribute
-//		TaskData data;
-//		try {
-//			data = TasksUi.getTaskDataManager().getTaskData(getTask());
-//			if (data != null) {
-//				descriptors.add(new TaskEditorPartDescriptor(
-//						ID_MANTIS_PART_ATTRIBUTES) {
-//					@Override
-//					public AbstractTaskEditorPart createPart() {
-//						return new MantisAttributeEditorPart();
-//					}
-//				}.setPath(PATH_ATTRIBUTES));
-//			}
-//		} catch (CoreException e) {
-//			
-//		}
+		descriptors = insertPart(descriptors,
+				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
+			@Override
+			public AbstractTaskEditorPart createPart() {
+				MantisStepsToReproducePart part = new MantisStepsToReproducePart();
+				part.setExpandVertically(true);
+				return part;
+			}
+		}.setPath(PATH_COMMENTS),
+		     ID_PART_DESCRIPTION);
+		
+		descriptors = insertPart(descriptors,
+				new TaskEditorPartDescriptor(ID_MANTIS_PART_ADDITIONALINFO) {
+			@Override
+			public AbstractTaskEditorPart createPart() {
+				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart();
+				part.setExpandVertically(true);
+				return part;
+			}
+		}.setPath(PATH_COMMENTS),
+			ID_MANTIS_PART_STEPSTOREPRODUCE);
+		
 		return descriptors;
+		
+// 	    // Add Mantis Attribute
+//		descriptors.add(new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
+//			@Override
+//			public AbstractTaskEditorPart createPart() {
+//				return new MantisStepsToReproducePart();
+//			}
+//		}.setPath(PATH_COMMENTS));
+//		return descriptors;
+	}
+	
+	protected Set<TaskEditorPartDescriptor> insertPart(Set<TaskEditorPartDescriptor> originalDescriptors, TaskEditorPartDescriptor newDescriptor, String insertAfterId ) {
+		Set<TaskEditorPartDescriptor> newDescriptors = new LinkedHashSet<TaskEditorPartDescriptor>();
+		for (TaskEditorPartDescriptor taskEditorPartDescriptor : originalDescriptors) {
+			newDescriptors.add(taskEditorPartDescriptor);
+			if (taskEditorPartDescriptor.getId().equals(insertAfterId)) {
+				newDescriptors.add(newDescriptor);
+			}
+		}
+		
+		return newDescriptors;
 	}
 
 }
