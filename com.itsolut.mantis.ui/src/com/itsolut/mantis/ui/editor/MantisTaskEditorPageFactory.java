@@ -53,8 +53,12 @@ public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 
 	@Override
 	public String getPageText() {
-		// TODO Auto-generated method stub
 		return "Mantis";
+	}
+	
+	@Override
+	public int getPriority() {
+		return PRIORITY_TASK;
 	}
 	
 }
