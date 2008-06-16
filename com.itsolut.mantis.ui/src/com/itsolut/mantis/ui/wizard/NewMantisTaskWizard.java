@@ -31,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Steffen Pingel
  */
-public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
+public class NewMantisTaskWizard extends NewTaskWizard {
 
 	public NewMantisTaskWizard(TaskRepository taskRepository,
 			ITaskMapping taskSelection) {

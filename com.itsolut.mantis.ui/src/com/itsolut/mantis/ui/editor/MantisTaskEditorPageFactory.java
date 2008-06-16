@@ -11,6 +11,7 @@ import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.tasks.ui.ITasksUiConstants;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.ui.TasksUiUtil;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPageFactory;
@@ -59,6 +60,14 @@ public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 	@Override
 	public int getPriority() {
 		return PRIORITY_TASK;
+	}
+	
+	@Override
+	public String[] getConflictingIds(TaskEditorInput input) {
+		if (!input.getTask().getConnectorKind().equals(MantisCorePlugin.REPOSITORY_KIND)) {
+			return new String[] { ITasksUiConstants.ID_PAGE_PLANNING };
+		}
+		return null;
 	}
 	
 }

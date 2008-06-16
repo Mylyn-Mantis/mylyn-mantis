@@ -168,7 +168,7 @@ public class NewMantisTaskPage extends WizardPage {
 		taskData = new TaskData(attributeMapper, MantisCorePlugin.REPOSITORY_KIND, taskRepository.getRepositoryUrl(), TasksUiPlugin.getDefault().getNextNewRepositoryTaskId());
 		
 		//default setting
-		taskData.getRoot().getAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
+		taskData.getRoot().createAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
 		
 		try {
 			
