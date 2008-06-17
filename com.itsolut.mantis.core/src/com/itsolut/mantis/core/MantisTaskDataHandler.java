@@ -142,10 +142,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			IMantisClient client = connector.getClientManager().getRepository(repository);
 			client.updateAttributes(new NullProgressMonitor(), false);
 			MantisTicket ticket = client.getTicket(id);
-			createDefaultAttributes(data, client, true);
-			updateTaskData(repository, attributeMapper, data, client, ticket);
-			createProjectSpecificAttributes(data, client);
-			return data;
+//			createDefaultAttributes(data, client, true);
+//			updateTaskData(repository, attributeMapper, data, client, ticket);
+//			createProjectSpecificAttributes(data, client);
+			return createTaskDataFromTicket(client, repository, ticket, new NullProgressMonitor());
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
 			throw new CoreException(new Status(IStatus.ERROR,
@@ -500,13 +500,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				MantisCorePlugin.REPOSITORY_KIND,
 				repository.getRepositoryUrl(), ticket.getId() + "");
 		try {
+			createDefaultAttributes(taskData, client, true);
+			updateTaskData(repository, getAttributeMapper(repository),
+					taskData, client, ticket);
+			createProjectSpecificAttributes(taskData, client);
+			
 			if (!MantisRepositoryConnector.hasRichEditor(repository)) {
-				updateTaskDataFromTicket(taskData, ticket, client);
+				//updateTaskDataFromTicket(taskData, ticket, client);
 				taskData.setPartial(true);
-			} else {
-				createDefaultAttributes(taskData, client, true);
-				updateTaskData(repository, getAttributeMapper(repository),
-						taskData, client, ticket);
 			}
 			return taskData;
 		} catch (OperationCanceledException e) {
