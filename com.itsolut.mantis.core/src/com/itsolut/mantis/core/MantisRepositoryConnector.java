@@ -38,6 +38,7 @@ import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
+import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
@@ -284,22 +285,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 		return offlineTaskHandler.getTaskData(repository, taskId, monitor);
 	}
 
+	// Based off of Trac Implementation.
 	@Override
 	public boolean hasTaskChanged(TaskRepository taskRepository, ITask task,
 			TaskData taskData) {
+		TaskMapper mapper = getTaskMapper(taskData);
 		if (taskData.isPartial()) {
-			return false;
+			return mapper.hasChanges(task);
 		}
-		String lastKnownMod = task
-				.getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED
-						.getKey());
-		if (lastKnownMod != null) {
-			TaskAttribute attrModification = taskData.getRoot()
-					.getMappedAttribute(TaskAttribute.DATE_MODIFICATION);
-			if (attrModification != null) {
-				return !lastKnownMod.equals(attrModification.getValue());
-			}
-
+		
+		Date repositoryDate = mapper.getModificationDate();
+		Date taskModDate = task.getModificationDate();
+		
+		if (repositoryDate != null &&
+			repositoryDate.equals(taskModDate)) {
+			return false;
 		}
 		return true;
 	}
@@ -347,22 +347,34 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 	}
 
 	@Override
+	public ITaskMapping getTaskMapping(TaskData taskData) {
+		return getTaskMapper(taskData);
+	}
+	
+	@Override
 	public void preSynchronization(ISynchronizationSession event,
 			IProgressMonitor monitor) throws CoreException {
-		TaskRepository repository = event.getTaskRepository();
+		
+		if (!event.isFullSynchronization()) {
+			return;
+		}
+		
+		// No Tasks, don't contact the repository
 		if (event.getTasks().isEmpty()) {
 			return;
 		}
 
 //		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Getting changed tasks", IProgressMonitor.UNKNOWN);
+		TaskRepository repository = event.getTaskRepository();
 
 		if (!MantisRepositoryConnector.hasChangedSince(repository)) {
 			// always run the queries for web mode
 			return;
 		}
 
-		if (repository.getSynchronizationTimeStamp() == null) {
+		if (repository.getSynchronizationTimeStamp() == null ||
+			repository.getSynchronizationTimeStamp().length() == 0) {
 			for (ITask task : event.getTasks()) {
 				event.markStale(task);
 			}
@@ -388,7 +400,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			// checked it's
 			// date, this caused unnecessary SOAP traffic during
 			// synchronization.
-
+			event.setNeedsPerformQueries(false);
+			
 			for (IRepositoryQuery query : TasksUiInternal.getTaskList()
 					.getQueries()) {
 				if (query.getConnectorKind().equals(
@@ -400,6 +413,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 							for (ITask task : event.getTasks()) {
 								if (getTicketId(task.getTaskId()) == taskId
 										.intValue()) {
+									event.setNeedsPerformQueries(true);
 									event.markStale(task);
 								}
 							}
@@ -420,22 +434,25 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			IProgressMonitor monitor) throws CoreException {
 			try {
 				monitor.beginTask("", 1);
-				if (event.isFullSynchronization() && event.getStatus() == null) {
-					event.getTaskRepository().setSynchronizationTimeStamp(getSynchronizationTimestamp(event));
+				if (event.isFullSynchronization()) {
+					Date date = getSynchronizationTimestamp(event);
+					if (date != null) {
+						event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
+					}
 				}
 			} finally {
 				monitor.done();
 			}
 	}
 
-	private String getSynchronizationTimestamp(ISynchronizationSession event) {
+	private Date getSynchronizationTimestamp(ISynchronizationSession event) {
 		Date mostRecent = new Date(0);
-		String mostRecentTimeStamp = event.getTaskRepository().getSynchronizationTimeStamp();
+		Date mostRecentTimeStamp = MantisUtils.parseDate(Long.parseLong(event.getTaskRepository().getSynchronizationTimeStamp()));
 		for (ITask task : event.getChangedTasks()) {
 			Date taskModifiedDate = task.getModificationDate();
 			if (taskModifiedDate != null && taskModifiedDate.after(mostRecent)) {
 				mostRecent = taskModifiedDate;
-				mostRecentTimeStamp = task.getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getKey());
+				mostRecentTimeStamp = task.getModificationDate();
 			}
 		}
 		return mostRecentTimeStamp;
