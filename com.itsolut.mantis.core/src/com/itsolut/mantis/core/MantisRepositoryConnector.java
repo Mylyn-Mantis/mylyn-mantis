@@ -373,6 +373,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			return;
 		}
 
+		String timestamp = repository.getSynchronizationTimeStamp();
 		if (repository.getSynchronizationTimeStamp() == null ||
 			repository.getSynchronizationTimeStamp().length() == 0) {
 			for (ITask task : event.getTasks()) {
@@ -383,10 +384,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
 		Date since = new Date(0);
 		try {
-			since = MantisUtils.parseDate(Integer.parseInt(repository
-					.getSynchronizationTimeStamp()));
+			if (repository.getSynchronizationTimeStamp().length() > 0) {
+				since = MantisUtils.parseDate(Integer.parseInt(repository
+						.getSynchronizationTimeStamp()));
+			}
 		} catch (NumberFormatException e) {
-			MantisCorePlugin.log(e);
+			//MantisCorePlugin.log(e);
 		}
 
 		try {
@@ -435,11 +438,18 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			try {
 				monitor.beginTask("", 1);
 				if (event.isFullSynchronization()) {
-					Date date = getSynchronizationTimestamp(event);
+					Date date = this.getSynchronizationTimestamp(event);
 					if (date != null) {
+						event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
+					} else {
+						date = new Date();
 						event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
 					}
 				}
+			} catch (Exception ex) {
+				MantisCorePlugin.toStatus(ex);
+				Date date = new Date();
+				event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
 			} finally {
 				monitor.done();
 			}
@@ -447,7 +457,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
 	private Date getSynchronizationTimestamp(ISynchronizationSession event) {
 		Date mostRecent = new Date(0);
-		Date mostRecentTimeStamp = MantisUtils.parseDate(Long.parseLong(event.getTaskRepository().getSynchronizationTimeStamp()));
+		Date mostRecentTimeStamp = null;
+		if (event.getTaskRepository().getSynchronizationTimeStamp() == null) {
+			mostRecentTimeStamp = mostRecent;
+		} else {
+			mostRecentTimeStamp = MantisUtils.parseDate(Long.parseLong(event.getTaskRepository().getSynchronizationTimeStamp()));
+		}
 		for (ITask task : event.getChangedTasks()) {
 			Date taskModifiedDate = task.getModificationDate();
 			if (taskModifiedDate != null && taskModifiedDate.after(mostRecent)) {
