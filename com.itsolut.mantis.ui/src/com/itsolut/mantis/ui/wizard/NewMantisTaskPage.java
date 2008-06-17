@@ -172,7 +172,7 @@ public class NewMantisTaskPage extends WizardPage {
 		
 		try {
 			
-			MantisTaskDataHandler.createDefaultAttributes(taskData.getAttributeMapper(), taskData, client, false);
+			MantisTaskDataHandler.createDefaultAttributes(taskData, client, false);
 		} catch (CoreException e) {
 			MantisUIPlugin.handleMantisException(e.getCause());
 		}

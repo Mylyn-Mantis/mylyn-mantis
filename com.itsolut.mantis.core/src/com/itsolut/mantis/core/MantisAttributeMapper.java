@@ -52,17 +52,17 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 	public enum Attribute {
 		ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
 		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
-		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.USER_ASSIGNED, true, false),
+		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, false, true),
+		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, true, true),
 		DESCRIPTION(Key.DESCRIPTION, "Description:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
 		ETA(Key.ETA, "ETA:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
-		LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, false, true),
+		LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, true, true),
 		PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-		PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SHORT_TEXT, false, true),
-		PROJECTION(Key.PROJECTION, "Projection:", IMantisConstants.METADATA_PROJECTION, true, false),
+		PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
+		PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
 		RELATIONSHIPS(Key.RELATIONSHIPS, "Relationships:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
-		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.USER_REPORTER, true, false),
+		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -71,7 +71,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
 		VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-		VIEW_STATE(Key.VIEW_STATE, "View State:", IMantisConstants.METADATA_VIEW_STATE, true, true),
+		VIEW_STATE(Key.VIEW_STATE, "View State:", TaskAttribute.TYPE_SHORT_TEXT, true, true),
 		NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
 		ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
 		ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false);
@@ -173,21 +173,32 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 			return Attribute.REPORTER.getKey().toString();
 		}
 		
+		if (key.equals(TaskAttribute.PERSON_NAME)) {
+			return Attribute.REPORTER.getKey().toString();
+		}
+		
 		return super.mapToRepositoryKey(parent, key).toString();
 	}
 
 	public Date getDateValue(TaskAttribute attribute) {
-		try {
-			String mappedKey = mapToRepositoryKey(attribute, attribute.getId());
-			if (mappedKey.equals(Attribute.DATE_SUBMITTED.getKey())
-					|| mappedKey.equals(Attribute.LAST_UPDATED.getKey())) {
-				return MantisUtils.parseDate(Integer.valueOf(attribute
-						.getValue()));
-			}
-		} catch (Exception e) {
-			MantisCorePlugin.log(e);
-		}
+//		try {
+//			String mappedKey = mapToRepositoryKey(attribute, attribute.getId());
+//			if (mappedKey.equals(Attribute.DATE_SUBMITTED.getKey())
+//					|| mappedKey.equals(Attribute.LAST_UPDATED.getKey())) {
+//				return MantisUtils.parseDate(Long.valueOf(attribute
+//						.getValue()));
+//			}
+//		} catch (Exception e) {
+//			MantisCorePlugin.log(e);
+//		}
+		if (attribute.getValue().length() > 0)
+			return MantisUtils.parseDate(Long.valueOf(attribute.getValue()));
 		return null;
+	}
+	
+	@Override
+	public void setDateValue(TaskAttribute attribute, Date date) {
+		attribute.setValue(MantisUtils.toMantisTime(date) + "");
 	}
 
 }

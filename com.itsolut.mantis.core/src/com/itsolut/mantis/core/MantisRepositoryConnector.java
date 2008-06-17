@@ -61,6 +61,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
 	private final static String CLIENT_LABEL = "Mantis (supports connector 0.0.5 or 1.1.0a4 or greater only)";
+	public static final String TASK_KEY_SUPPORTS_SUBTASKS = "SupportsSubtasks";
 
 	private MantisClientManager clientManager;
 
@@ -309,6 +310,14 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
 		TaskMapper scheme = getTaskMapper(taskData);
 		scheme.applyTo(task);
+		if (MantisUtils.isCompleted(scheme.getStatus())) {
+			task.setCompletionDate(scheme.getModificationDate());
+		} else {
+			task.setCompletionDate(null);
+		}
+		task.setUrl(repository.getRepositoryUrl() + IMantisClient.TICKET_URL + taskData.getTaskId());
+		task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(true));
+		
 	}
 
 	public TaskMapper getTaskMapper(TaskData taskData) {
