@@ -80,6 +80,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 					repository);
 			client.updateAttributes(monitor, false);
 			createDefaultAttributes(data, client, false);
+			TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
+			projectAttribute.setValue(initializationData.getProduct());
+			createProjectSpecificAttributes(data, client);
 			return true;
 		} catch (OperationCanceledException e) {
 			throw e;
@@ -122,7 +125,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 	
 	public MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws InvalidTicketException {
-		MantisTicket ticket = new MantisTicket(Integer.parseInt(data.getTaskId()));
+		MantisTicket ticket;
+		if (data.getTaskId() == null || data.getTaskId().length() == 0) {
+		    ticket = new MantisTicket();	
+		} else {
+			ticket = new MantisTicket(Integer.parseInt(data.getTaskId()));
+		}
+			
 	
 		Collection<TaskAttribute> attributes = data.getRoot().getAttributes().values();
 		
