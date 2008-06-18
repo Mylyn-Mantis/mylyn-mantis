@@ -52,7 +52,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 	public enum Attribute {
 		ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
 		ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
-		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
 		CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, true, true),
 		DESCRIPTION(Key.DESCRIPTION, "Description:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
@@ -62,7 +62,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
 		PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
 		RELATIONSHIPS(Key.RELATIONSHIPS, "Relationships:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
-		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
+		REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
 		REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
 		SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -170,10 +170,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 		}
 		
 		if (key.equals(TaskAttribute.USER_REPORTER)) {
-			return Attribute.REPORTER.getKey().toString();
-		}
-		
-		if (key.equals(TaskAttribute.PERSON_NAME)) {
 			return Attribute.REPORTER.getKey().toString();
 		}
 		

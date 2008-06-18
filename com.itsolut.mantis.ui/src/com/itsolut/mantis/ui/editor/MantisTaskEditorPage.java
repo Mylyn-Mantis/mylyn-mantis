@@ -38,14 +38,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		Set<TaskEditorPartDescriptor> descriptors = super
 				.createPartDescriptors();
 		
-		// remove unnecessary default editor parts
-		for (TaskEditorPartDescriptor taskEditorPartDescriptor : descriptors) {
-			if (taskEditorPartDescriptor.getId().equals(ID_PART_PEOPLE)) {
-				descriptors.remove(taskEditorPartDescriptor);
-				break;
-			}
-		}
-
 		descriptors = insertPart(descriptors,
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override

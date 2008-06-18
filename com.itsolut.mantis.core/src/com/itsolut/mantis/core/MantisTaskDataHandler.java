@@ -11,6 +11,7 @@
 
 package com.itsolut.mantis.core;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 
+import com.itsolut.mantis.core.exception.InvalidTicketException;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisAttachment;
 import com.itsolut.mantis.core.model.MantisComment;
@@ -70,10 +72,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 	}
 
 	@Override
-	public boolean initializeTaskData(TaskRepository repository, TaskData data, ITaskMapping initializationData,
-			IProgressMonitor monitor) throws CoreException {
+	public boolean initializeTaskData(TaskRepository repository, TaskData data,
+			ITaskMapping initializationData, IProgressMonitor monitor)
+			throws CoreException {
 		try {
-			IMantisClient client = connector.getClientManager().getRepository(repository);
+			IMantisClient client = connector.getClientManager().getRepository(
+					repository);
 			client.updateAttributes(monitor, false);
 			createDefaultAttributes(data, client, false);
 			return true;
@@ -89,22 +93,26 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			TaskData taskData, Set<TaskAttribute> oldAttributes,
 			IProgressMonitor monitor) throws CoreException {
 		try {
-			IMantisClient client = connector.getClientManager().getRepository(repository);
-			MantisTicket ticket =   client.getTicket(Integer.parseInt(taskData.getTaskId()));
+			IMantisClient client = connector.getClientManager().getRepository(
+					repository);
+			MantisTicket ticket = getMantisTicket(repository, taskData);
+
 			
-//			IMantisClient server = ((MantisRepositoryConnector) connector)
-//					.getClientManager().getRepository(repository);
 			if (taskData.isNew()) {
 				int id = client.createTicket(ticket);
-				return new RepositoryResponse(ResponseKind.TASK_UPDATED, id + "");
+				return new RepositoryResponse(ResponseKind.TASK_UPDATED, id
+						+ "");
 			} else {
 				String newComment = "";
-				TaskAttribute newCommentAttribute = taskData.getRoot().getMappedAttribute(TaskAttribute.COMMENT_NEW);
+				TaskAttribute newCommentAttribute = taskData.getRoot()
+						.getMappedAttribute(TaskAttribute.COMMENT_NEW);
 				if (newCommentAttribute != null) {
 					newComment = newCommentAttribute.getValue();
 				}
 				client.updateTicket(ticket, newComment);
-				return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId() + "");
+				return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket
+						.getId()
+						+ "");
 			}
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
@@ -112,6 +120,44 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		}
 	}
 
+	
+	public MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws InvalidTicketException {
+		MantisTicket ticket = new MantisTicket(Integer.parseInt(data.getTaskId()));
+	
+		Collection<TaskAttribute> attributes = data.getRoot().getAttributes().values();
+		
+		for (TaskAttribute attribute : attributes) {
+//			if (MantisAttributeMapper..isInternalAttribute(attribute.getId())) {
+//				// ignore
+//			} else if (!attribute.isReadOnly()) {
+			if (attribute.getId().equals("project")) {
+				ticket.putValue(attribute.getId(), attribute.getValue());
+			}
+			if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly()) {
+				
+			} else {
+				ticket.putValue(attribute.getId(), attribute.getValue());
+			}
+			
+//			}
+		}
+		
+//		// handle operations
+//		TaskOperation operation = data.getRoot().get.getSelectedOperation();
+//		if (operation != null) {
+//			String action = operation.getKnobName();
+//			if ("assign_to".equals(action)) {
+//				ticket.putBuiltinValue(Key.ASSIGNED_TO, operation.getOptionSelection());
+//				ticket.putBuiltinValue(Key.STATUS, "assigned");
+//			}else if( "resolve_as".equals(action)) {
+//				ticket.putBuiltinValue(Key.RESOLUTION, operation.getOptionSelection());
+//				ticket.putBuiltinValue(Key.STATUS, "resolved");
+//			}
+//		}
+	
+		return ticket;
+	}
+	
 	public TaskData getTaskData(TaskRepository repository, String taskId,
 			IProgressMonitor monitor) throws CoreException {
 		try {
@@ -132,18 +178,21 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		}
 
 		TaskAttributeMapper attributeMapper = getAttributeMapper(repository);
-		TaskData data = new TaskData(attributeMapper, connector.getConnectorKind(), repository.getRepositoryUrl(), Integer
+		TaskData data = new TaskData(attributeMapper, connector
+				.getConnectorKind(), repository.getRepositoryUrl(), Integer
 				.toString(id));
-		
 
 		try {
-			IMantisClient client = connector.getClientManager().getRepository(repository);
+			IMantisClient client = connector.getClientManager().getRepository(
+					repository);
 			client.updateAttributes(new NullProgressMonitor(), false);
 			MantisTicket ticket = client.getTicket(id);
-//			createDefaultAttributes(data, client, true);
-//			updateTaskData(repository, attributeMapper, data, client, ticket);
-//			createProjectSpecificAttributes(data, client);
-			return createTaskDataFromTicket(client, repository, ticket, new NullProgressMonitor());
+			// createDefaultAttributes(data, client, true);
+			// updateTaskData(repository, attributeMapper, data, client,
+			// ticket);
+			// createProjectSpecificAttributes(data, client);
+			return createTaskDataFromTicket(client, repository, ticket,
+					new NullProgressMonitor());
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
 			throw new CoreException(new Status(IStatus.ERROR,
@@ -158,10 +207,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			IMantisClient client, MantisTicket ticket) throws CoreException {
 
 		if (ticket.getCreated() != null) {
-			data.getRoot().getAttribute(MantisAttributeMapper.Attribute.DATE_SUBMITTED.getKey()).setValue(
-					MantisUtils.toMantisTime(ticket.getCreated()) + "");
+			data.getRoot().getAttribute(
+					MantisAttributeMapper.Attribute.DATE_SUBMITTED.getKey())
+					.setValue(
+							MantisUtils.toMantisTime(ticket.getCreated()) + "");
 		}
-		
+
 		Date lastChanged = ticket.getLastChanged();
 
 		Map<String, String> valueByKey = ticket.getValues();
@@ -174,41 +225,44 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		addComments(data, ticket);
 		addAttachments(repository, data, ticket);
 		addRelationships(data, ticket);
-		//addOperations(data, client, ticket);
-		addOperation(data, ticket, "leave", "Leave");
-		//addOperation(data, ticket, "assign_to", "Assign To:");
+		// addOperations(data, client, ticket);
+		addOperation(data, ticket, "leave", "Keep current status");
+		// addOperation(data, ticket, "assign_to", "Assign To:");
 		addOperation(data, ticket, "resolve", "Resolve as ");
-		
-		
-		
-		if (lastChanged != null) {
-			data.getRoot().getAttribute(MantisAttributeMapper.Attribute.LAST_UPDATED.getKey()).setValue(
-					MantisUtils.toMantisTime(lastChanged) + "");
-		}
-		
-	}
 
-		// TODO Reuse Labels from BugzillaServerFacade
-		private static void addOperation(TaskData data, MantisTicket ticket, String action, String label) {
-			if (label != null) {
-				TaskAttribute attribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + action);
-				TaskOperation.applyTo(attribute, action, label);
-				if ("resolve".equals(action)) {
-					attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, MantisAttributeMapper.Attribute.RESOLUTION.getKey());
-				}
+		if (lastChanged != null) {
+			data.getRoot().getAttribute(
+					MantisAttributeMapper.Attribute.LAST_UPDATED.getKey())
+					.setValue(MantisUtils.toMantisTime(lastChanged) + "");
+		}
+
+	}
+	
+	
+	// TODO Reuse Labels from BugzillaServerFacade
+	private static void addOperation(TaskData data, MantisTicket ticket,
+			String action, String label) {
+		if (label != null) {
+			TaskAttribute attribute = data.getRoot().createAttribute(
+					TaskAttribute.PREFIX_OPERATION + action);
+			TaskOperation.applyTo(attribute, action, label);
+			if ("resolve".equals(action)) {
+				attribute.getMetaData().putValue(
+						TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID,
+						MantisAttributeMapper.Attribute.RESOLUTION.getKey());
 			}
 		}
-		
+	}
 
-		// Resolve As Operation
-//		MantisResolution[] options = client.getTicketResolutions();
-//		TaskAttribute operationResolveAs = data.getRoot().createAttribute(
-//				TaskAttribute.OPERATION);
-//		for (MantisResolution op : options) {
-//			operationResolveAs.putOption(op.getName(), op.getName());
-//		}
-//		operationResolveAs.setValue("fixed");
-//		TaskOperation.applyTo(operationResolveAs, "resolve_as", "Resolve As");
+	// Resolve As Operation
+	// MantisResolution[] options = client.getTicketResolutions();
+	// TaskAttribute operationResolveAs = data.getRoot().createAttribute(
+	// TaskAttribute.OPERATION);
+	// for (MantisResolution op : options) {
+	// operationResolveAs.putOption(op.getName(), op.getName());
+	// }
+	// operationResolveAs.setValue("fixed");
+	// TaskOperation.applyTo(operationResolveAs, "resolve_as", "Resolve As");
 
 	private static void addRelationships(TaskData data, MantisTicket ticket) {
 		// relationships - support only child issues
@@ -224,8 +278,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 												.getTargetId()));
 	}
 
-	private static void addAttachments(TaskRepository repository, TaskData data,
-			MantisTicket ticket) {
+	private static void addAttachments(TaskRepository repository,
+			TaskData data, MantisTicket ticket) {
 
 		int i = 1;
 		if (ticket.getAttachments() == null) {
@@ -272,11 +326,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 					.createFrom(attribute);
 			String report = comment.getReporter();
 			if (report == null) {
-				taskComment.setAuthor(data.getAttributeMapper().getTaskRepository()
-						.createPerson("unknown"));
-				
+				taskComment.setAuthor(data.getAttributeMapper()
+						.getTaskRepository().createPerson("unknown"));
+
 			} else {
-				taskComment.setAuthor(data.getAttributeMapper().getTaskRepository()
+				taskComment.setAuthor(data.getAttributeMapper()
+						.getTaskRepository()
 						.createPerson(comment.getReporter()));
 			}
 			taskComment.setNumber(i);
@@ -287,9 +342,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			i++;
 		}
 	}
+	
+	public static void createDefaultAttributes(TaskData data, IMantisClient client, boolean existingTask) throws CoreException {
+		createDefaultAttributes(data, client, null, existingTask);
+	}
 
 	public static void createDefaultAttributes(TaskData data,
-			IMantisClient client, boolean existingTask) throws CoreException {
+			IMantisClient client, MantisTicket ticket, boolean existingTask) throws CoreException {
 		if (existingTask) {
 		}
 
@@ -299,41 +358,52 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		createAttribute(data, MantisAttributeMapper.Attribute.PROJECT, null);
 		createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
-		createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION, client
-						.getTicketResolutions(),
-				client.getTicketResolutions()[0].getName());
-		createAttribute(data, MantisAttributeMapper.Attribute.STATUS, client
-						.getTicketStatus(), client.getTicketStatus()[0]
+		createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
+				client.getTicketResolutions(), client.getTicketResolutions()[0]
 						.getName());
+		createAttribute(data, MantisAttributeMapper.Attribute.STATUS, client
+				.getTicketStatus(), client.getTicketStatus()[0].getName());
 		createAttribute(data, MantisAttributeMapper.Attribute.PRIORITY, client
-						.getPriorities(), client.getPriorities()[0].getName());
+				.getPriorities(), client.getPriorities()[0].getName());
 		createAttribute(data, MantisAttributeMapper.Attribute.SEVERITY, client
-						.getSeverities(), client.getSeverities()[0].getName());
-		createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY, client
-						.getReproducibility(), client.getReproducibility()[0]
+				.getSeverities(), client.getSeverities()[0].getName());
+		createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY,
+				client.getReproducibility(), client.getReproducibility()[0]
 						.getName());
 		createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
 		createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
 
-		createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION, client.getProjection(), client.getProjection()[0].getName());
-		createAttribute(data, MantisAttributeMapper.Attribute.ETA, client.getETA(), client.getETA()[0].getName());
+		createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
+				client.getProjection(), client.getProjection()[0].getName());
+		createAttribute(data, MantisAttributeMapper.Attribute.ETA, client
+				.getETA(), client.getETA()[0].getName());
 
 		createAttribute(data, MantisAttributeMapper.Attribute.DESCRIPTION);
-		createAttribute(data, MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE, null);
-		createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO, null);
+		createAttribute(data,
+				MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE);
+		createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO);
 		createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
 
-		createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE, client.getViewState(), client.getViewState()[0].getName());
+		createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
+				client.getViewState(), client.getViewState()[0].getName());
 
-		createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO);
-		createAttribute(data, MantisAttributeMapper.Attribute.REPORTER);
+		String[] projectUsers = null;
+		if (ticket != null) {
+			projectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
+		}
+		
+		createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectUsers);
+		if (existingTask) {
+			createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, projectUsers);
+		}
 		createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
 		createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
 		createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
-		
+
 		// operations
-		data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData().setType(TaskAttribute.TYPE_OPERATION);
-		
+		data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
+				.setType(TaskAttribute.TYPE_OPERATION);
+
 	}
 
 	public static void createProjectSpecificAttributes(TaskData data,
@@ -501,13 +571,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				MantisCorePlugin.REPOSITORY_KIND,
 				repository.getRepositoryUrl(), ticket.getId() + "");
 		try {
-			createDefaultAttributes(taskData, client, true);
+			createDefaultAttributes(taskData, client, ticket, true);
 			updateTaskData(repository, getAttributeMapper(repository),
 					taskData, client, ticket);
 			createProjectSpecificAttributes(taskData, client);
-			
+
 			if (!MantisRepositoryConnector.hasRichEditor(repository)) {
-				//updateTaskDataFromTicket(taskData, ticket, client);
+				// updateTaskDataFromTicket(taskData, ticket, client);
 				taskData.setPartial(true);
 			}
 			return taskData;

@@ -705,7 +705,11 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 			
 			String[] users = new String[accounts.length];
 			for(int i = 0; i < accounts.length; i++) {
-				users[i] = accounts[i].getName();
+//				if (accounts[i].getReal_name() != null) {
+//					users[i] = accounts[i].getReal_name();
+//				} else {
+					users[i] = accounts[i].getName();
+//				}
 			}
 		
 			userData.usersPerProject.put(project, users);
