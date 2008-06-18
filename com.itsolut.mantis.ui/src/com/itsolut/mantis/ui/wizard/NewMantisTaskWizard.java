@@ -17,6 +17,7 @@ import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
+import org.eclipse.mylyn.tasks.core.TaskMapping;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUiUtil;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorInput;
@@ -31,13 +32,14 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Steffen Pingel
  */
-public class NewMantisTaskWizard extends NewTaskWizard {
+public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 
 	public NewMantisTaskWizard(TaskRepository taskRepository,
 			ITaskMapping taskSelection) {
 		super(taskRepository, taskSelection);
+		
+		this.taskRepository = taskRepository;
 
-		newTaskPage = new NewMantisTaskPage(taskRepository);
 		
 		setWindowTitle("New Repository Task");
 		setDefaultPageImageDescriptor(TasksUiImages.BANNER_REPOSITORY);
@@ -55,9 +57,22 @@ public class NewMantisTaskWizard extends NewTaskWizard {
 
 	@Override
 	public void addPages() {
+		newTaskPage = new NewMantisTaskPage(this.taskRepository);
 		addPage(newTaskPage);
 	}
+	
 
+	@Override
+	protected ITaskMapping getInitializationData() {
+		final String project = newTaskPage.getSelectedProject();
+		return new TaskMapping() {
+			@Override
+			public String getProduct() {
+				return project;
+			}
+		};
+	}
+	
 //	@Override
 //	public boolean performFinish() {
 //		TaskEditorInput editorInput = new TaskEditorInput(taskRepository, (ITask)this.newTaskPage.getRepositoryTaskData());

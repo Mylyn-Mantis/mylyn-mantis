@@ -70,12 +70,12 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 	
 	@Override
 	public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping selection) {
-//		if (MantisRepositoryConnector.hasRichEditor(repository)) {
-//			return new NewMantisTaskWizard(repository, selection);
-//		} else {
+		if (MantisRepositoryConnector.hasRichEditor(repository)) {
+			return new NewMantisTaskWizard(repository, selection);
+		} else {
 			return new NewWebTaskWizard(repository, repository.getRepositoryUrl() + IMantisClient.NEW_TICKET_URL,
 					selection);
-//		}
+		}
 	}
 
 

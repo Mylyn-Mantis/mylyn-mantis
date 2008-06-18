@@ -28,9 +28,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.AbstractAttributeFactory;
-import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryTaskData;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
@@ -41,6 +38,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -66,14 +64,14 @@ public class NewMantisTaskPage extends WizardPage {
 
 	public NewMantisTaskPage(TaskRepository taskRepository) {
 		super("New Task");
-
 		setTitle("Mantis - New Issue");
 		setDescription("Select the tickets project.");
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.itsolut.mantis.ui",
+		"icons/wizban/mantis_logo_button.gif"));
 
 		this.taskRepository = taskRepository;
 	}
-
-	public void createControl(Composite parent) {
+		public void createControl(Composite parent) {
 //		Text text = new Text(parent, SWT.WRAP);
 //		text.setEditable(false);
 //		setControl(text);
@@ -180,6 +178,10 @@ public class NewMantisTaskPage extends WizardPage {
 
 	public TaskData getRepositoryTaskData() {
 		return taskData;
+	}
+	
+	public String getSelectedProject() {
+		return (String) projectCombo.getText();
 	}
 
 }
