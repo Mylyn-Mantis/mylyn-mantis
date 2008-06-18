@@ -89,15 +89,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			TaskData taskData, Set<TaskAttribute> oldAttributes,
 			IProgressMonitor monitor) throws CoreException {
 		try {
-			IMantisClient client = connector.getClientManager().getRepository(
-					repository);
-			
+			IMantisClient client = connector.getClientManager().getRepository(repository);
 			MantisTicket ticket =   client.getTicket(Integer.parseInt(taskData.getTaskId()));
 			
-			IMantisClient server = ((MantisRepositoryConnector) connector)
-					.getClientManager().getRepository(repository);
+//			IMantisClient server = ((MantisRepositoryConnector) connector)
+//					.getClientManager().getRepository(repository);
 			if (taskData.isNew()) {
-				int id = server.createTicket(ticket);
+				int id = client.createTicket(ticket);
 				return new RepositoryResponse(ResponseKind.TASK_UPDATED, id + "");
 			} else {
 				String newComment = "";
@@ -105,8 +103,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				if (newCommentAttribute != null) {
 					newComment = newCommentAttribute.getValue();
 				}
-				server.updateTicket(ticket, newComment);
-				return null;
+				client.updateTicket(ticket, newComment);
+				return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId() + "");
 			}
 		} catch (Exception e) {
 			MantisCorePlugin.log(e);
@@ -177,7 +175,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 		addAttachments(repository, data, ticket);
 		addRelationships(data, ticket);
 		//addOperations(data, client, ticket);
-		addOperation(data, ticket, "assign_to", "Assign To:");
+		addOperation(data, ticket, "leave", "Leave");
+		//addOperation(data, ticket, "assign_to", "Assign To:");
+		addOperation(data, ticket, "resolve", "Resolve as ");
+		
 		
 		
 		if (lastChanged != null) {
