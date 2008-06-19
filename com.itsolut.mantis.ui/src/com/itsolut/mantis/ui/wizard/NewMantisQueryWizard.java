@@ -36,7 +36,7 @@ import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
-import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
+import com.itsolut.mantis.ui.MantisUIPlugin;
 
 /**
  * @author Steffen Pingel
@@ -47,8 +47,19 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 	private static final String TITLE = "New Mantis Query";
 
 	private final TaskRepository repository;
+	private IRepositoryQuery query;
 
 	private MantisCustomQueryPage queryPage;
+	
+	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit) {
+		super(repository);
+		this.repository = repository;
+		this.query = queryToEdit;
+		setWindowTitle("Edit Mantis Query");
+		setNeedsProgressMonitor(true);
+		setDefaultPageImageDescriptor(TasksUiImages.BANNER_REPOSITORY);
+		
+	}
 
 	public NewMantisQueryWizard(TaskRepository repository) {
 		super(repository);
@@ -61,7 +72,11 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
 	@Override
 	public void addPages() {
-		queryPage = new MantisCustomQueryPage(repository);
+		if (query != null) {
+			queryPage = new MantisCustomQueryPage(repository, query);
+		} else {
+			queryPage = new MantisCustomQueryPage(repository);
+		}
 		queryPage.setWizard(this);
 		addPage(queryPage);
 	}
@@ -75,7 +90,7 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 	public boolean performFinish() {
 		IWizardPage currentPage = queryPage; //getContainer().getCurrentPage();
 		if (!(currentPage instanceof AbstractRepositoryQueryPage)) {
-			StatusHandler.fail(new Status(IStatus.ERROR, TasksUiPlugin.ID_PLUGIN,
+			StatusHandler.fail(new Status(IStatus.ERROR, MantisUIPlugin.PLUGIN_ID,
 					"Current wizard page does not extends AbstractRepositoryQueryPage"));
 			return false;
 		}
@@ -84,9 +99,7 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 		IRepositoryQuery query = page.getQuery();
 		if (query != null) {
 			page.applyTo(query);
-			if (query instanceof RepositoryQuery) {
-				TasksUiPlugin.getTaskList().notifyElementChanged((RepositoryQuery) query);
-			}
+			TasksUiPlugin.getTaskList().notifyElementChanged((RepositoryQuery) query);
 		} else {
 			query = page.createQuery();
 			TasksUiInternal.getTaskList().addQuery((RepositoryQuery) query);

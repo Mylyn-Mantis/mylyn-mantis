@@ -1,4 +1,4 @@
-package com.itsolut.mantis.ui;
+package com.itsolut.mantis.ui.internal;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

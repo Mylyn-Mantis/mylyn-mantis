@@ -18,7 +18,7 @@
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
  *******************************************************************************/
-package com.itsolut.mantis.ui.tasklist;
+package com.itsolut.mantis.ui.wizard;
 
 import java.net.MalformedURLException;
 

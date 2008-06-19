@@ -1,4 +1,4 @@
-package com.itsolut.mantis.ui;
+package com.itsolut.mantis.ui.internal;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -6,6 +6,8 @@ import java.net.URL;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+
+import com.itsolut.mantis.ui.MantisUIPlugin;
 
 public class MantisImages {
 	private static ImageRegistry imageRegistry;

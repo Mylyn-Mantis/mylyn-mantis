@@ -11,7 +11,7 @@
             name="Mantis Connector"/>
       <connectorUi
             brandingIcon="icons/eview16/mantis-icon.gif"
-            class="com.itsolut.mantis.ui.MantisRepositoryUi"
+            class="com.itsolut.mantis.ui.internal.MantisRepositoryUi"
             id="Manits Repository UI"
             overlayIcon="icons/eview16/overlay-mantis.gif"/>
 	  <taskListMigrator 
@@ -50,7 +50,7 @@
    <extension
        point="org.eclipse.mylyn.tasks.ui.projectLinkProviders">
     <linkProvider
-          class="com.itsolut.mantis.ui.MantisTaskRepositoryLinkProvider"
+          class="com.itsolut.mantis.ui.internal.MantisTaskRepositoryLinkProvider"
           id="com.itsolut.mantis.ui.taskRepositoryLinkProvider"
           name="Mantis Link Provider"
           order="10">

@@ -17,7 +17,7 @@
  *     David Carver - STAR - Mylyn 3.0 migration.
  *******************************************************************************/
 
-package com.itsolut.mantis.ui;
+package com.itsolut.mantis.ui.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +46,8 @@ import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.ui.tasklist.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
+import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
 import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
 
@@ -82,6 +82,9 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 	@Override
 	public IWizard getQueryWizard(TaskRepository repository,
 			IRepositoryQuery queryToEdit) {
+		if (queryToEdit != null) {
+			return new NewMantisQueryWizard(repository, queryToEdit);
+		}
 
 		return new NewMantisQueryWizard(repository);
 	}
