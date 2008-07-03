@@ -62,7 +62,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
         PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
-        RELATIONSHIPS(Key.RELATIONSHIPS, "Relationships:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
         REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -75,7 +74,13 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         VIEW_STATE(Key.VIEW_STATE, "View State:", TaskAttribute.TYPE_SHORT_TEXT, true, true),
         NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
-        ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false);
+        ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
+        // task relations
+        PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
+        CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
+        DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
+        HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
+        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false);
 
 
         private final boolean isHidden;

@@ -25,6 +25,7 @@ package com.itsolut.mantis.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -43,9 +44,11 @@ import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 import com.itsolut.mantis.core.IMantisClient.Version;
@@ -477,5 +480,30 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
         return mostRecentTimeStamp;
     }
+
+    @Override
+    public Collection<TaskRelation> getTaskRelations(TaskData taskData) {
+
+        TaskAttribute parentTasksAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
+
+        TaskAttribute childTasksAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.CHILD_OF.getKey());
+
+        if ( parentTasksAttribute == null && childTasksAttribute == null)
+            return null;
+
+        List<TaskRelation> relations = new ArrayList<TaskRelation>();
+
+        if (parentTasksAttribute != null)
+            for (String taskId : parentTasksAttribute.getValues())
+                relations.add(TaskRelation.subtask(taskId));
+
+        if (childTasksAttribute != null)
+            for (String taskId : childTasksAttribute.getValues())
+                relations.add(TaskRelation.parentTask(taskId));
+
+        return relations;
+
+    }
+
 
 }
