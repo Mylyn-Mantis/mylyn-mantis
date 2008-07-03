@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
@@ -25,9 +24,9 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 	private TaskRepositoryManager manager;
 
-	private String taskId = "12";
+	private final String taskId = "12";
 
-	private String expectedUrl = REPOSITORY_ROOT + "view.php?id=" + taskId;
+	private final String expectedUrl = REPOSITORY_ROOT + "view.php?id=" + taskId;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -50,8 +49,31 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 	public void testGetUrl11x() {
 
+
+
 		assertEquals("Wrong url for Mantis 1.1.x", expectedUrl, connector.getTaskUrl(
 				REPOSITORY_ROOT + "api/soap/mantisconnect.php", taskId));
 	}
+
+	public void testGetTaskIdFromTaskUrl() {
+
+		String taskId = "84";
+
+		String url = REPOSITORY_ROOT + "view.php?id=" + taskId;
+
+		assertEquals("Failed to extract task id", taskId, connector.getTaskIdFromTaskUrl(url));
+
+	}
+
+	public void testGetRepositoryUrlFromTaskUrl() {
+
+		String taskId = "84";
+
+		String url = REPOSITORY_ROOT + "view.php?id=" + taskId;
+
+		assertEquals("Failed to extract the repository path", REPOSITORY_ROOT,
+				connector.getRepositoryUrlFromTaskUrl(url));
+	}
+
 
 }
