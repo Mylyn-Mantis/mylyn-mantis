@@ -8,33 +8,21 @@
 
 package com.itsolut.mantis.tests;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.mylyn.context.tests.support.TestUtil;
-import org.eclipse.mylyn.context.tests.support.TestUtil.Credentials;
-import org.eclipse.mylyn.context.tests.support.TestUtil.PrivilegeLevel;
+import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
+import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
+import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
+
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisAttachmentHandler;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.IMantisClient.Version;
-import com.itsolut.mantis.core.model.MantisTicket;
-import com.itsolut.mantis.core.model.MantisTicket.Key;
-import org.eclipse.mylyn.tasks.core.RepositoryStatus;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
-import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
-import org.eclipse.mylyn.internal.tasks.core.deprecated.RepositoryTaskData;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
-import org.eclipse.mylyn.commons.net.AuthenticationType;
-
 
 /**
  * 
@@ -60,23 +48,25 @@ public class MantisTaskDataHandlerTest extends TestCase {
 		manager.clearRepositories(TasksUiPlugin.getDefault().getRepositoriesFilePath());
 
 		connector = (MantisRepositoryConnector) manager.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-		TasksUiPlugin.getSynchronizationScheduler().synchronize(manager.getDefaultRepository(MantisCorePlugin.REPOSITORY_KIND));
-				
+		TasksUiPlugin.getSynchronizationScheduler().synchronize(
+				manager.getDefaultRepository(MantisCorePlugin.REPOSITORY_KIND));
+
 		taskDataHandler = connector.getTaskDataHandler();
 	}
 
 	protected void init(String url, Version version) {
-		Credentials credentials = new TestUtil.Credentials("reporter", "reporter");
-		
+
+		AuthenticationCredentials creds = new AuthenticationCredentials("reporter", "reporter");
+
 		repository = new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, url);
-		repository.setAuthenticationCredentials(credentials.username, credentials.password);
+		repository.setCredentials(AuthenticationType.REPOSITORY, creds, false);
 		repository.setTimeZoneId(IMantisClient.TIME_ZONE);
 		repository.setCharacterEncoding(IMantisClient.CHARSET);
 		repository.setVersion(version.name());
 
 		manager.addRepository(repository);
 	}
-	
+
 //	public void testGetSubTasks() throws CoreException {
 //		
 //		init(MantisTestConstants.TEST_MANTIS_HTTP_URL, Version.MC_1_0a5);
@@ -89,7 +79,6 @@ public class MantisTaskDataHandlerTest extends TestCase {
 //		
 //		assertEquals("Failed retrieving sub task ids", subTaskids, taskDataHandler.getSubTaskIds(taskData));
 //	}
-
 
 //	private void getChangedSinceLastSync() throws Exception {
 //		
@@ -167,7 +156,7 @@ public class MantisTaskDataHandlerTest extends TestCase {
 //		}
 //		assertEquals("new comment", taskData.getNewComment());
 //	}
-	
+
 //	public void testAttachmentURL() throws CoreException {
 //		
 //		init(MantisTestConstants.TEST_MANTIS_HTTP_URL, Version.MC_1_0a5);
@@ -179,5 +168,5 @@ public class MantisTaskDataHandlerTest extends TestCase {
 //		assertEquals(MantisTestConstants.TEST_MANTIS_WEB_URL + "file_download.php?type=bug&file_id=24", taskData.getAttachments().get(0).getUrl());
 //		
 //	}
-	
+
 }

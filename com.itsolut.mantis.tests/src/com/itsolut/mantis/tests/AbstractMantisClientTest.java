@@ -12,12 +12,8 @@ import java.net.Proxy;
 
 import junit.framework.TestCase;
 
-import org.eclipse.mylyn.context.tests.support.TestUtil;
-import org.eclipse.mylyn.context.tests.support.TestUtil.Credentials;
-import org.eclipse.mylyn.context.tests.support.TestUtil.PrivilegeLevel;
-import com.itsolut.mantis.core.MantisClientFactory;
-
 import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.IMantisClient.Version;
 
 /**
@@ -38,21 +34,14 @@ public abstract class AbstractMantisClientTest extends TestCase {
 
 	public Version version;
 
-	private PrivilegeLevel level;
-
-	public AbstractMantisClientTest(Version version, PrivilegeLevel level) {
-		this.version = version;
-		this.level = level;
-	}
-
 	public AbstractMantisClientTest(Version version) {
-		this(version, PrivilegeLevel.USER);
+
+		this.version = version;
 	}
 
 	public AbstractMantisClientTest() {
-		this(null, PrivilegeLevel.USER);
+		this(null);
 	}
-
 
 	public IMantisClient connect(String url, String username, String password, Proxy proxy) throws Exception {
 		return connect(url, username, password, proxy, version);
