@@ -153,6 +153,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 TaskData taskData = offlineTaskHandler
                 .createTaskDataFromTicket(client, repository, ticket,
                         monitor);
+                // we sent partial data to the task list, for performance reasons
+                taskData.setPartial(true);
                 resultCollector.accept(taskData);
             }
         } catch (Throwable e) {
@@ -335,7 +337,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 if (MantisUtils.isCompleted(getTaskData().getRoot()
                         .getAttribute(
                                 MantisAttributeMapper.Attribute.STATUS
-                                .toString()).getValue())) {
+                                .getKey()).getValue())) {
                     return getModificationDate();
                 } else {
                     return null;
