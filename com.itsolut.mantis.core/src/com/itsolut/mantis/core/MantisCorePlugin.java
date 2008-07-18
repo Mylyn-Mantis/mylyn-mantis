@@ -90,15 +90,15 @@ public class MantisCorePlugin extends Plugin {
 	}
 
 	public static IStatus toStatus(Throwable e) {
-		if (e instanceof MantisLoginException) {
-			return new Status(Status.ERROR, PLUGIN_ID, IStatus.INFO, 
+		if (e instanceof MantisLoginException || "Access Denied".equals(e.getMessage())) {
+			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, 
 					"Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.", null);
 		} else if (e instanceof MantisException) {
-			return new Status(Status.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
+			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
 		} else if (e instanceof ClassCastException) {
-			return new Status(Status.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
+			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
 		} else {
-			return new Status(Status.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
+			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
 		}
 	}
 

@@ -268,10 +268,15 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 			}
 			
 			ObjectRef project = getProject(projectName);
+			FilterData filter = getFilter(projectName, filterName);
 			
-			IssueHeaderData[] ihds = getSOAP().mc_filter_get_issue_headers(username, password, 
+			if ( project == null || filter == null)
+			    throw new MantisException("Unable to create query . Please make sure that the repository credentials and the query parameters are valid.");
+			
+			
+            IssueHeaderData[] ihds = getSOAP().mc_filter_get_issue_headers(username, password, 
 					                                                       project.getId(),   //project
-					                                                       getFilter(projectName, filterName).getId(),  //filter
+					                                                       filter.getId(),  //filter
 					                                                       BigInteger.valueOf(1),   //start page
 					                                                       BigInteger.valueOf(1000)); //# per page
 			for(IssueHeaderData ihd : ihds){
@@ -311,7 +316,6 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 			}
 			
 		} catch (RemoteException e) {
-			MantisCorePlugin.log(e);
 			throw new MantisRemoteException(e);
 		}
 	}

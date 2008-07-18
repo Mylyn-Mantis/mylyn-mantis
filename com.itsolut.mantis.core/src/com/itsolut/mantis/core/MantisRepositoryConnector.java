@@ -158,7 +158,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 resultCollector.accept(taskData);
             }
         } catch (Throwable e) {
-            MantisCorePlugin.log(e);
+//            MantisCorePlugin.log(e);
             return MantisCorePlugin.toStatus(e);
         }
 
