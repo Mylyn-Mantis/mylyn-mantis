@@ -170,7 +170,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             IProgressMonitor monitor) throws CoreException {
         try {
             IMantisClient client = getClientManager().getRepository(repository);
-            client.updateAttributes(monitor, true);
+            client.updateAttributes(monitor, false);
         } catch (Exception e) {
             MantisCorePlugin.log(e);
             throw new CoreException(RepositoryStatus.createStatus(repository
@@ -296,10 +296,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public boolean hasTaskChanged(TaskRepository taskRepository, ITask task,
             TaskData taskData) {
+        
+        // always take into account the modification date since it 
+        // is returned by the search query
         TaskMapper mapper = getTaskMapper(taskData);
-        if (taskData.isPartial()) {
-            return mapper.hasChanges(task);
-        }
 
         Date repositoryDate = mapper.getModificationDate();
         Date taskModDate = task.getModificationDate();
