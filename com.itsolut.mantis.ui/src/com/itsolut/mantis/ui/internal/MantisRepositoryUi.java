@@ -60,7 +60,7 @@ import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
 public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 
 	private static final Pattern HYPERLINK_PATTERN = Pattern.compile(
-			"bug (\\d+)", Pattern.CASE_INSENSITIVE);
+			"(bug|issue|task) #?(\\d+)", Pattern.CASE_INSENSITIVE);
 
 	@Override
 	public String getConnectorKind() {
@@ -155,7 +155,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 			if (links == null)
 				links = new ArrayList<IHyperlink>();
 
-			String id = matcher.group(1);
+			String id = matcher.group(2);
 
 			links.add(new TaskHyperlink(determineRegion(regionOffset, matcher),
 					repository, id));
