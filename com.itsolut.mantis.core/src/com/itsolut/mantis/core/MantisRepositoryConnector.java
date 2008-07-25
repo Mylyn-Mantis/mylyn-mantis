@@ -147,7 +147,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         IMantisClient client;
         try {
             client = getClientManager().getRepository(repository);
-            updateAttributes(repository, monitor);
+            updateAttributes(repository, monitor, false);
             client.search(MantisUtils.getMantisSearch(query), tickets);
             for (MantisTicket ticket : tickets) {
                 TaskData taskData = offlineTaskHandler
@@ -167,10 +167,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     }
 
     protected void updateAttributes(TaskRepository repository,
-            IProgressMonitor monitor) throws CoreException {
+            IProgressMonitor monitor, boolean force) throws CoreException {
         try {
             IMantisClient client = getClientManager().getRepository(repository);
-            client.updateAttributes(monitor, false);
+            client.updateAttributes(monitor, force);
         } catch (Exception e) {
             MantisCorePlugin.log(e);
             throw new CoreException(RepositoryStatus.createStatus(repository
@@ -277,7 +277,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public void updateRepositoryConfiguration(TaskRepository repository,
             IProgressMonitor monitor) throws CoreException {
         try {
-            updateAttributes(repository, monitor);
+            updateAttributes(repository, monitor, true);
         } catch (Exception e) {
             throw new CoreException(RepositoryStatus.createStatus(repository
                     .getRepositoryUrl(), IStatus.WARNING,
