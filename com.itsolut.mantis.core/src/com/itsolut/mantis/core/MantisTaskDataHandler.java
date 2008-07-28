@@ -50,6 +50,69 @@ import com.itsolut.mantis.core.util.MantisUtils;
  * @author Dave Carver
  */
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
+    
+    private static enum OperationType {
+        LEAVE("Leave as ", null, null) {
+
+            @Override
+            public void performPostOperation(TaskData taskData) {
+
+                return;
+            }
+        }, 
+        
+        RESOLVE_AS("Resolve as ", TaskAttribute.TYPE_SINGLE_SELECT,
+                MantisAttributeMapper.Attribute.RESOLUTION) {
+
+                    @Override
+                    public void performPostOperation(TaskData taskData) {
+
+                        taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("resolved");
+                    }
+                }, 
+                
+        ASSIGN_TO("Assign to ", TaskAttribute.TYPE_PERSON,
+                MantisAttributeMapper.Attribute.ASSIGNED_TO) {
+
+                    @Override
+                    public void performPostOperation(TaskData taskData) {
+
+                        taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("assigned");
+                    }
+                };
+
+        private final String                          label;
+
+        private final String                          operationType;
+
+        private final MantisAttributeMapper.Attribute attribute;
+
+        private OperationType(String label, String operationType, MantisAttributeMapper.Attribute attribute) {
+
+            this.label = label;
+            this.operationType = operationType;
+            this.attribute = attribute;
+        }
+
+        public String getLabel() {
+
+            return label;
+        }
+
+        public String getOperationType() {
+
+            return operationType;
+        }
+
+        public MantisAttributeMapper.Attribute getAttribute() {
+
+            return attribute;
+        }
+        
+        public abstract void performPostOperation(TaskData taskData) ;
+            
+
+    }
 
     private final MantisRepositoryConnector connector;
 
@@ -97,6 +160,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         try {
             IMantisClient client = connector.getClientManager().getRepository(
                     repository);
+            
+            processOperation(taskData);
+            
             MantisTicket ticket = getMantisTicket(repository, taskData);
 
 
@@ -105,6 +171,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, id
                         + "");
             } else {
+                
+                
+                
                 String newComment = "";
                 TaskAttribute newCommentAttribute = taskData.getRoot()
                 .getMappedAttribute(TaskAttribute.COMMENT_NEW);
@@ -122,6 +191,23 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
+
+    /**
+     * Apply the effects of the operation (if any) to an existing task data
+     * 
+     * @param taskData
+     */
+    private void processOperation(TaskData taskData) {
+        
+        TaskAttribute attributeOperation = taskData.getRoot().getMappedAttribute(TaskAttribute.OPERATION);
+        
+        if ( attributeOperation == null || "".equals(attributeOperation.getValue()))
+            return; // i.e. no operation
+        
+        OperationType type = OperationType.valueOf(attributeOperation.getValue());
+
+        type.performPostOperation(taskData);
+    }
 
     public MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws InvalidTicketException {
         MantisTicket ticket;
@@ -233,10 +319,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addComments(data, ticket);
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
-        // addOperations(data, client, ticket);
-        addOperation(data, ticket, "leave", "Keep current status");
-        // addOperation(data, ticket, "assign_to", "Assign To:");
-        addOperation(data, ticket, "resolve", "Resolve as ");
+        addOperation(data, ticket, OperationType.LEAVE);
+        addOperation(data, ticket, OperationType.RESOLVE_AS);
+        addOperation(data, ticket, OperationType.ASSIGN_TO);
 
         if (lastChanged != null) {
             data.getRoot().getAttribute(
@@ -247,19 +332,20 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
 
-    // TODO Reuse Labels from BugzillaServerFacade
-    private static void addOperation(TaskData data, MantisTicket ticket,
-            String action, String label) {
-        if (label != null) {
-            TaskAttribute attribute = data.getRoot().createAttribute(
-                    TaskAttribute.PREFIX_OPERATION + action);
-            TaskOperation.applyTo(attribute, action, label);
-            if ("resolve".equals(action)) {
-                attribute.getMetaData().putValue(
-                        TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID,
-                        MantisAttributeMapper.Attribute.RESOLUTION.getKey());
-            }
-        }
+    private static void addOperation(TaskData data, MantisTicket ticket, OperationType operation) {
+        
+        TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
+
+        String label = operation != OperationType.LEAVE ? operation.getLabel() : operation.getLabel() + " " + data.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()).getValue(); 
+        
+        TaskOperation.applyTo(operationAttribute, operation.toString(), label);
+        
+        // simple operation ( e.g. Leave as )
+        if ( operation.getOperationType() == null)
+            return;
+        
+        operationAttribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID,
+                operation.getAttribute().getKey());
     }
 
     // Resolve As Operation
