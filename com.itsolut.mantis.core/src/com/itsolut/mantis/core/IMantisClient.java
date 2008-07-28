@@ -164,7 +164,17 @@ public interface IMantisClient {
 
 	MantisProjection[] getProjection();
 	
+	/**
+	 * @param project
+	 * @return all users which are allocated to this project
+	 */
 	String[] getUsers(String project);
+	
+	/**
+	 * @param project
+	 * @return all users which are allowed to handle tasks in this project
+	 */
+	String[] getDevelopers(String project);
 
 	public MantisProject[] getProjects() throws MantisException;
 

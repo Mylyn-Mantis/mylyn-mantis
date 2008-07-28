@@ -16,5 +16,6 @@ import java.util.Map;
 
 public class MantisUserData {
 	Map<String, String[]> usersPerProject = new HashMap<String, String[]>();
+	Map<String, String[]> developersPerProject = new HashMap<String, String[]>();
 	
 }

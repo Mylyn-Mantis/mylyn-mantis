@@ -124,6 +124,21 @@ public abstract class AbstractMantisClient implements IMantisClient {
 		return userData.usersPerProject.get(project);
 	}
 	
+	public String[] getDevelopers(String project) {
+
+        if (!userData.developersPerProject.containsKey(project)) {
+            try {
+                updateUsers(project);
+            } catch (MantisException e) {
+                MantisCorePlugin.log(e);
+                StatusHandler.log(MantisCorePlugin.toStatus(e));
+            }
+        }
+
+        return userData.developersPerProject.get(project);
+
+    }
+	
 	public abstract MantisProject[] getProjects() throws MantisException;
 
 	public abstract MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;

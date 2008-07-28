@@ -517,14 +517,16 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
                 client.getViewState(), client.getViewState()[0].getName());
 
-        String[] projectUsers = null;
+        String[] allProjectUsers = null;
+        String[] projectDevelopers = null;
         if (ticket != null) {
-            projectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
+            allProjectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
+            projectDevelopers = client.getDevelopers(ticket.getValue(MantisTicket.Key.PROJECT));
         }
 
-        createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectUsers);
+        createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectDevelopers);
         if (existingTask) {
-            createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, projectUsers);
+            createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, allProjectUsers);
         }
         createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
         createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);

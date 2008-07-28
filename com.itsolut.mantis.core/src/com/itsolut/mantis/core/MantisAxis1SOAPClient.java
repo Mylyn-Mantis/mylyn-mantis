@@ -72,7 +72,13 @@ import com.itsolut.mantis.core.util.MantisUtils;
  * @author Chris Hane
  */
 public class MantisAxis1SOAPClient extends AbstractMantisClient {
-	private transient MantisConnectPortType soap;
+
+    private transient MantisConnectPortType soap;
+    
+    private static final String REPORTER_THRESHOLD = "report_bug_threshold";
+
+    private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
+
 
 	public static final String REQUIRED_REVISION = "1.0a5";
 	
@@ -704,19 +710,23 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 		try {
 			ObjectRef projectRef = getProject(project);
 			
-			int accessLevel = Integer.parseInt(getSOAP().mc_config_get_string(username, password, "update_bug_assign_threshold"));
-			AccountData[] accounts = getSOAP().mc_project_get_users(username, password, projectRef.getId(), BigInteger.valueOf(accessLevel));
+			int reporterAccessLevel = Integer.parseInt(getSOAP().mc_config_get_string(username, password, REPORTER_THRESHOLD));
+			int developerAccessLevel = Integer.parseInt(getSOAP().mc_config_get_string(username, password, DEVELOPER_THRESHOLD));
+			
+			AccountData[] accounts = getSOAP().mc_project_get_users(username, password, projectRef.getId(), BigInteger.valueOf(reporterAccessLevel));
+			AccountData[] developerAccounts = getSOAP().mc_project_get_users(username, password, projectRef.getId(), BigInteger.valueOf(developerAccessLevel));
 			
 			String[] users = new String[accounts.length];
-			for(int i = 0; i < accounts.length; i++) {
-//				if (accounts[i].getReal_name() != null) {
-//					users[i] = accounts[i].getReal_name();
-//				} else {
-					users[i] = accounts[i].getName();
-//				}
-			}
-		
+			for(int i = 0; i < accounts.length; i++)
+                users[i] = accounts[i].getName();
+
+			String[] devUsers = new String[developerAccounts.length];
+			
+			for(int i = 0; i < developerAccounts.length; i++)
+			    devUsers[i] = developerAccounts[i].getName();
+			
 			userData.usersPerProject.put(project, users);
+			userData.developersPerProject.put(project, devUsers);
 		} catch (RemoteException e) {
 			MantisCorePlugin.log(e);
 			throw new MantisRemoteException(e);
