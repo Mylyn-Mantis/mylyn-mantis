@@ -3,14 +3,14 @@
 <repository name='file:/home/dcarver/Work/STARWB/com.itsolut.mantis-site/ - artifacts' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
   <properties size='2'>
     <property name='p2.compressed' value='false'/>
-    <property name='p2.timestamp' value='1216977722494'/>
+    <property name='p2.timestamp' value='1217232180939'/>
   </properties>
   <mappings size='3'>
     <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
     <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
     <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
   </mappings>
-  <artifacts size='38'>
+  <artifacts size='41'>
     <artifact classifier='osgi.bundle' id='javax.wsdl' version='1.4.0.v200706111329'>
       <properties size='3'>
         <property name='artifact.size' value='116357'/>
@@ -23,6 +23,12 @@
         <property name='artifact.size' value='39513'/>
         <property name='download.size' value='39513'/>
         <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='com.itsolut.mantis_feature' version='3.0.0.200807281102'>
+      <properties size='2'>
+        <property name='artifact.size' value='5431'/>
+        <property name='download.size' value='5431'/>
       </properties>
     </artifact>
     <artifact classifier='osgi.bundle' id='org.apache.commons.codec' version='1.3.0.v20080530-1600'>
@@ -115,6 +121,13 @@
         <property name='download.contentType' value='application/zip'/>
       </properties>
     </artifact>
+    <artifact classifier='osgi.bundle' id='com.itsolut.mantis.core' version='3.0.0.200807281102'>
+      <properties size='3'>
+        <property name='artifact.size' value='665362'/>
+        <property name='download.size' value='665362'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
     <artifact classifier='osgi.bundle' id='com.itsolut.mantis.ui' version='3.0.0.200806182047'>
       <properties size='3'>
         <property name='artifact.size' value='49959'/>
@@ -140,6 +153,13 @@
       <properties size='3'>
         <property name='artifact.size' value='43919'/>
         <property name='download.size' value='43919'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.itsolut.mantis.ui' version='3.0.0.200807281102'>
+      <properties size='3'>
+        <property name='artifact.size' value='49963'/>
+        <property name='download.size' value='49963'/>
         <property name='download.contentType' value='application/zip'/>
       </properties>
     </artifact>
