@@ -24,6 +24,7 @@
 package com.itsolut.mantis.core;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -42,6 +43,7 @@ import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -52,6 +54,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 import com.itsolut.mantis.core.IMantisClient.Version;
+import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -336,7 +339,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             public Date getCompletionDate() {
                 if (MantisUtils.isCompleted(getTaskData().getRoot()
                         .getAttribute(
-                                MantisAttributeMapper.Attribute.STATUS
+                              	MantisAttributeMapper.Attribute.STATUS
                                 .getKey()).getValue())) {
                     return getModificationDate();
                 } else {
@@ -353,6 +356,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             public void setProduct(String product) {
                 // ignore, set during task data initialization
             }
+            
+            @Override
+        	public PriorityLevel getPriorityLevel() {
+            	try {
+            		IMantisClient client = getClientManager().getRepository(getTaskData().getAttributeMapper().getTaskRepository());
+	        		if (client != null) {
+	        			String priority = getPriority();
+	        			return MantisPriorityLevel.fromPriority(priority);
+	        		}
+	        		return null;
+            	} catch (MalformedURLException mue) {
+            		 MantisCorePlugin.log(mue);
+            		 return null;
+            	}
+        	}
         };
     }
 
@@ -506,6 +524,4 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         return relations;
 
     }
-
-
 }

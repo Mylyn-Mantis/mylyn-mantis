@@ -187,6 +187,14 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
             return Attribute.RESOLUTION.getKey().toString();
         }
 
+        if (key.equals(TaskAttribute.PRIORITY)) {
+            return Attribute.PRIORITY.getKey().toString();
+        }
+
+        if (key.equals(TaskAttribute.TASK_KIND)) {
+            return Attribute.SEVERITY.getKey().toString();
+        }
+
         return super.mapToRepositoryKey(parent, key).toString();
     }
 
