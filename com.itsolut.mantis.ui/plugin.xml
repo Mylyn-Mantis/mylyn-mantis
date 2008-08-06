@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="com.itsolut.mantis.repository"
+         name="Mantis Repository"
+         point="org.eclipse.mylyn.tasks.ui.repositories">
+      <connectorCore
+            class="com.itsolut.mantis.core.MantisRepositoryConnector"
+            id="com.itsolut.mantis.tasklist.repositories"
+            name="Mantis Connector"
+            type="mantis"/>
+      <connectorUi
+            brandingIcon="icons/eview16/mantis-icon.gif"
+            class="com.itsolut.mantis.ui.MantisRepositoryUi"
+            id="Manits Repository UI"
+            overlayIcon="icons/eview16/overlay-mantis.gif"/>
+      <taskListFactory
+            class="com.itsolut.mantis.ui.MantisTaskListFactory"
+            id="com.itsolut.mantis.tasklist.TaskListFactory"
+            name="Mantis Tasklist">
+      </taskListFactory>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.tasks.core.templates">
+      <repository
+            addAutomatically="false"
+            anonymous="true"
+            label="Mantis Connector"
+            repositoryKind="mantis"
+            urlRepository="http://your.domain.com/mc/mantisconnect.php"
+            version="MC_1_0a5"/>
+   </extension> 
+   <extension
+         point="org.eclipse.mylyn.tasks.ui.editors">
+      <editorFactory class="com.itsolut.mantis.ui.editor.MantisTaskEditorFactory"/>
+   </extension>
+   <extension
+       point="org.eclipse.mylyn.tasks.ui.projectLinkProviders">
+    <linkProvider
+          class="com.itsolut.mantis.ui.MantisTaskRepositoryLinkProvider"
+          id="com.itsolut.mantis.ui.taskRepositoryLinkProvider"
+          name="Mantis Link Provider"
+          order="10">
+    </linkProvider>
+ </extension>   
+</plugin>
