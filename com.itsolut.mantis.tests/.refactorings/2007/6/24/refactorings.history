@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring comment="Rename type 'org.eclipse.mylyn.trac.tests.Constants' to 'TracTestConstants'&#10;- Original project: 'org.eclipse.mylyn.trac.tests'&#10;- Original element: 'org.eclipse.mylyn.trac.tests.Constants'&#10;- Renamed element: 'org.eclipse.mylyn.trac.tests.TracTestConstants'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'Constants'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;org.eclipse.mylyn.trac.tests{Constants.java[Constants" matchStrategy="1" name="TracTestConstants" qualified="false" references="true" similarDeclarations="false" stamp="1181691569392" textual="false" version="1.0"/>
+</session>
