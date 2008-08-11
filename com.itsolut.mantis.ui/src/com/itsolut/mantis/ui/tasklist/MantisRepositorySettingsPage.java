@@ -22,8 +22,10 @@
 package com.itsolut.mantis.ui.tasklist;
 
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 
+import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -233,10 +235,11 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
 		public void validate(IProgressMonitor monitor) throws MalformedURLException, MantisException {
 			AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
+			Proxy proxy = location.getProxyForHost(location.getUrl(), IProxyData.HTTP_PROXY_TYPE);
 
-				IMantisClient client = MantisClientFactory.createClient(location.getUrl(), version, userName, this.password, null);
-				client.validate();
-				setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
+			IMantisClient client = MantisClientFactory.createClient(location.getUrl(), version, userName, this.password, proxy);
+			client.validate();
+			setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
 		}
 	}
 	
