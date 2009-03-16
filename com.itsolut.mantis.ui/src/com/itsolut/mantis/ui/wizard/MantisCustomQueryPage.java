@@ -28,6 +28,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -42,6 +43,7 @@ import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
 import com.itsolut.mantis.core.util.MantisUtils;
+import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
  * Mantis search page. Provides a form similar to the one the Bugzilla connector uses.
@@ -77,6 +79,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     protected Combo projectCombo = null;
 
     protected Combo filterCombo = null;
+
+    protected Button updateRepository;
 
     public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query) {
 
@@ -123,8 +127,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                     try {
                         filterCombo.remove(1, filterCombo.getItemCount() - 1);
                         if (projectCombo.getSelectionIndex() > 0) {
-                            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
-                            .getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+                            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+                            .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
                             IMantisClient client = connector.getClientManager().getRepository(repository);
                             for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
                                 filterCombo.add(pd.getName());
@@ -166,6 +170,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                     // set suggestion and select
                     titleText.setText(text);
                     titleText.selectAll();
+                    // notify that we've changed the value
+                    getContainer().updateButtons();
 
                 }
 
@@ -180,6 +186,22 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
             searchLimit = new Text(control, SWT.BORDER);
             searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
+
+            updateRepository = new Button(control, SWT.PUSH);
+            updateRepository.setText("Update Repository Configuration");
+            updateRepository.addSelectionListener(new SelectionListener() {
+
+                public void widgetDefaultSelected(SelectionEvent arg0) {
+
+                    // nothing
+                }
+
+                public void widgetSelected(SelectionEvent arg0) {
+
+                    MantisUIUtil.updateRepositoryConfiguration(getContainer(), getRepository(), true);
+                }
+
+            });
 
             if (query != null) {
                 titleText.setText(query.getSummary());
@@ -275,7 +297,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             returnsw = false;
 
         try {
-            Integer.parseInt(searchLimit.getText());
+            if (searchLimit != null)
+                Integer.parseInt(searchLimit.getText());
         } catch (NumberFormatException e) {
             return false;
         }

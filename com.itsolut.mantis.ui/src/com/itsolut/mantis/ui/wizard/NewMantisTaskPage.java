@@ -21,12 +21,9 @@
 
 package com.itsolut.mantis.ui.wizard;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -44,10 +41,10 @@ import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
-import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.ui.MantisUIPlugin;
+import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
  * Wizard page for creating new Mantis tickets through a rich editor.
@@ -57,129 +54,111 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
  */
 public class NewMantisTaskPage extends WizardPage {
 
-	private TaskRepository taskRepository;
+    private TaskRepository taskRepository;
 
-	private TaskData taskData;
-	public Combo projectCombo;
+    private TaskData taskData;
+    public Combo projectCombo;
 
-	public NewMantisTaskPage(TaskRepository taskRepository) {
-		super("New Task");
-		setTitle("Mantis - New Issue");
-		setDescription("Select the tickets project.");
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.itsolut.mantis.ui",
-		"icons/wizban/mantis_logo_button.gif"));
+    public NewMantisTaskPage(TaskRepository taskRepository) {
+        super("New Task");
+        setTitle("Mantis - New Issue");
+        setDescription("Select the tickets project.");
+        setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.itsolut.mantis.ui",
+        "icons/wizban/mantis_logo_button.gif"));
 
-		this.taskRepository = taskRepository;
-	}
-		public void createControl(Composite parent) {
+        this.taskRepository = taskRepository;
+    }
+    public void createControl(Composite parent) {
 //		Text text = new Text(parent, SWT.WRAP);
 //		text.setEditable(false);
 //		setControl(text);
 //		text.setText("Click Finish");
-//		
-		projectCombo = new Combo(parent, SWT.READ_ONLY);
-		projectCombo.add("Select Project for new Issue");
-		setControl(projectCombo);
+//
+        projectCombo = new Combo(parent, SWT.READ_ONLY);
+        projectCombo.add("Select Project for new Issue");
+        setControl(projectCombo);
 
-		try {
-			MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-			IMantisClient client = connector.getClientManager().getRepository(taskRepository);
-			
-			for(MantisProject pd : client.getProjects()){
-				projectCombo.add(pd.getName());
-			}
-			projectCombo.setText(projectCombo.getItem(0));
-			
-			projectCombo.addSelectionListener(new SelectionListener() {
-				public void widgetSelected(SelectionEvent e) {
-					if(projectCombo.getSelectionIndex()>0){
-						
-						TaskAttribute attribute = taskData.getRoot().getAttribute(Key.PROJECT.getKey());
-						attribute.setValue(projectCombo.getText());
-						MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-						                                                                               .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-						try{
-							MantisTaskDataHandler.createProjectSpecificAttributes(taskData, connector.getClientManager().getRepository(taskRepository));
-						} catch (MalformedURLException ex) {
-							MantisUIPlugin.handleMantisException(ex);
-							return;
-						}
-					}
-					getWizard().getContainer().updateButtons();
-				}
+        try {
+            MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+            IMantisClient client = connector.getClientManager().getRepository(taskRepository);
 
-				public void widgetDefaultSelected(SelectionEvent e) {
-					//nothing
-				}
-			});
-		} catch (Exception e1) {
-			MantisCorePlugin.log(e1);
-		}
-	}
+            for(MantisProject pd : client.getProjects())
+                projectCombo.add(pd.getName());
+            projectCombo.setText(projectCombo.getItem(0));
 
-	@Override
-	public void setVisible(boolean visible) {
-		super.setVisible(visible);
-		updateAttributesFromRepository();
-	}
+            projectCombo.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent e) {
+                    if(projectCombo.getSelectionIndex()>0){
 
-	@Override
-	public boolean isPageComplete() {
-		return taskData != null && projectCombo!=null && projectCombo.getSelectionIndex()!=0;
-	}
+                        TaskAttribute attribute = taskData.getRoot().getAttribute(Key.PROJECT.getKey());
+                        attribute.setValue(projectCombo.getText());
+                        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+                        .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+                        try{
+                            MantisTaskDataHandler.createProjectSpecificAttributes(taskData, connector.getClientManager().getRepository(taskRepository));
+                        } catch (MalformedURLException ex) {
+                            MantisUIPlugin.handleMantisException(ex);
+                            return;
+                        }
+                    }
+                    getWizard().getContainer().updateButtons();
+                }
 
-	private void updateAttributesFromRepository() {
-		
-		MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-				.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-		final IMantisClient client;
-		try {
-			client = connector.getClientManager().getRepository(taskRepository);
-		} catch (MalformedURLException e) {
-			MantisUIPlugin.handleMantisException(e);
-			return;
-		}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    //nothing
+                }
+            });
+        } catch (Exception e1) {
+            MantisCorePlugin.log(e1);
+        }
+    }
 
-		try {
-			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
-						client.updateAttributes(monitor, false);
-					} catch (MantisException e) {
-						throw new InvocationTargetException(e);
-					}
-				}
-			};
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        updateAttributesFromRepository();
+    }
 
-			getContainer().run(true, true, runnable);
-		} catch (InvocationTargetException e) {
-			MantisUIPlugin.handleMantisException(e.getCause());
-			return;
-		} catch (InterruptedException e) {
-			return;
-		}
+    @Override
+    public boolean isPageComplete() {
+        return taskData != null && projectCombo!=null && projectCombo.getSelectionIndex()!=0;
+    }
 
-		MantisTaskDataHandler offlineHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
-		TaskAttributeMapper attributeMapper = offlineHandler.getAttributeMapper(taskRepository);
-		taskData = new TaskData(attributeMapper, MantisCorePlugin.REPOSITORY_KIND, taskRepository.getRepositoryUrl(), "");
-		
-		//default setting
-		taskData.getRoot().createAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
-		
-		try {
-			
-			MantisTaskDataHandler.createDefaultAttributes(taskData, client, false);
-		} catch (CoreException e) {
-			MantisUIPlugin.handleMantisException(e.getCause());
-		}
-	}
+    private void updateAttributesFromRepository() {
 
-	public TaskData getRepositoryTaskData() {
-		return taskData;
-	}
-	
-	public String getSelectedProject() {
-		return (String) projectCombo.getText();
-	}
+        MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, false);
+
+        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(
+                MantisCorePlugin.REPOSITORY_KIND);
+        final IMantisClient client;
+        try {
+            client = connector.getClientManager().getRepository(taskRepository);
+        } catch (MalformedURLException e) {
+            MantisUIPlugin.handleMantisException(e);
+            return;
+        }
+
+        MantisTaskDataHandler offlineHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
+        TaskAttributeMapper attributeMapper = offlineHandler.getAttributeMapper(taskRepository);
+        taskData = new TaskData(attributeMapper, MantisCorePlugin.REPOSITORY_KIND, taskRepository.getRepositoryUrl(), "");
+
+        //default setting
+        taskData.getRoot().createAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
+
+        try {
+
+            MantisTaskDataHandler.createDefaultAttributes(taskData, client, false);
+        } catch (CoreException e) {
+            MantisUIPlugin.handleMantisException(e.getCause());
+        }
+    }
+
+    public TaskData getRepositoryTaskData() {
+        return taskData;
+    }
+
+    public String getSelectedProject() {
+        return projectCombo.getText();
+    }
 
 }
