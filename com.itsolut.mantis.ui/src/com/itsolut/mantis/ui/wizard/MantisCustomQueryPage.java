@@ -64,9 +64,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private static final String TITLE_QUERY_TITLE = "Query Title:";
 
+    private static final String MAX_SEARCH_RESULTS = "Maximum results";
+
     private IRepositoryQuery query;
 
     private Text titleText;
+
+    private Text searchLimit;
 
     private TaskRepository repository = null;
 
@@ -105,7 +109,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         try {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                    .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+            .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
             IMantisClient client = connector.getClientManager().getRepository(repository);
 
             for (MantisProject pd : client.getProjects())
@@ -120,7 +124,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                         filterCombo.remove(1, filterCombo.getItemCount() - 1);
                         if (projectCombo.getSelectionIndex() > 0) {
                             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
-                                    .getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+                            .getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
                             IMantisClient client = connector.getClientManager().getRepository(repository);
                             for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
                                 filterCombo.add(pd.getName());
@@ -171,6 +175,12 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                 }
             });
 
+            Label titleLabel = new Label(control, SWT.NONE);
+            titleLabel.setText(MAX_SEARCH_RESULTS);
+
+            searchLimit = new Text(control, SWT.BORDER);
+            searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
+
             if (query != null) {
                 titleText.setText(query.getSummary());
                 restoreSearchFilterFromQuery(query);
@@ -195,7 +205,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                 projectCombo.setText(filter.getValues().get(0));
             else if ("filter".equals(filter.getFieldName())) {
                 MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                        .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+                .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
                 IMantisClient client = connector.getClientManager().getRepository(repository);
                 for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
                     filterCombo.add(pd.getName());
@@ -264,6 +274,12 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         if (filterCombo != null && filterCombo.getText().contains(SELECT_FILTER_IN_PROJECT))
             returnsw = false;
 
+        try {
+            Integer.parseInt(searchLimit.getText());
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
         return returnsw;
     }
 
@@ -285,6 +301,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     public void applyTo(IRepositoryQuery query) {
 
         query.setSummary(this.getQueryTitle());
+        query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
         query.setUrl(this.getQueryUrl(repository.getRepositoryUrl()));
     }
 

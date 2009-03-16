@@ -327,7 +327,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             IssueHeaderData[] ihds = getSOAP().mc_filter_get_issue_headers(username, password, project.getId(), //project
             filter.getId(), //filter
             BigInteger.valueOf(1), //start page
-            BigInteger.valueOf(1000)); //# per page
+            BigInteger.valueOf(query.getLimit())); //# per page
             for (IssueHeaderData ihd : ihds) {
                 // only read the attributes that are important for the tasklist 
                 MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
