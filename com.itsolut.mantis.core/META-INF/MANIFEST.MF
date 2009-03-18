@@ -55,5 +55,4 @@ Bundle-ClassPath: .,
  lib/mail.jar
 Import-Package: org.eclipse.mylyn.commons.core,
  org.eclipse.mylyn.internal.tasks.core,
- org.eclipse.mylyn.internal.tasks.core.deprecated,
  org.eclipse.mylyn.tasks.core
