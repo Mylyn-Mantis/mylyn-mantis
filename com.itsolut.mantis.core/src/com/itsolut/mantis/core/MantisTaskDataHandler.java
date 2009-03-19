@@ -258,7 +258,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             
             TaskAttribute attribute = data.getRoot().getAttribute(entry.getKey().getKey());
             
-            if ( attribute.getValue().length() == 0)
+            if ( attribute == null || attribute.getValue().length() == 0)
                 continue;
 
             // parse for each attribute
