@@ -29,15 +29,20 @@
             anonymous="true"
             label="Mantis Connector 1.0a5"
             repositoryKind="mantis"
-            urlRepository="http://your.domain.com/mc/mantisconnect.php"
-            version="MC_1_0a5"/>
+            urlRepository="http://your.domain.com/mc/mantisconnect.php"/>
       <repository
             addAutomatically="false"
             anonymous="false"
             label="Mantis Connector 1.1.0 or greater"
             repositoryKind="mantis"
-            urlRepository="http://your.domain.com/api/soap/mantisconnect.php"
-            version="MC_1_0a5">
+            urlRepository="http://your.domain.com/api/soap/mantisconnect.php">
+      </repository>
+      <repository
+            addAutomatically="true"
+            anonymous="true"
+            label="Mylyn-Mantis bug tracker (Use HTTP authentication only)"
+            repositoryKind="mantis"
+            urlRepository="https://apps.sourceforge.net/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
       </repository>
    </extension> 
      <extension
@@ -55,5 +60,5 @@
           name="Mantis Link Provider"
           order="10">
     </linkProvider>
- </extension>   
+ </extension>
 </plugin>
