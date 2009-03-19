@@ -8,7 +8,12 @@ public class MantisRepositoryConfiguration {
     
     public static boolean isDownloadSubTasks(TaskRepository repository) {
 
-        return Boolean.parseBoolean(repository.getProperty(DOWNLOAD_SUBTASKS_PROPERTY));
+        String property = repository.getProperty(DOWNLOAD_SUBTASKS_PROPERTY);
+        
+        if (property == null) // default value
+            return false;
+        
+        return Boolean.parseBoolean(property);
     }
     
     public static void setDownloadSubTasks(TaskRepository repository, boolean downloadSubTasks) {
