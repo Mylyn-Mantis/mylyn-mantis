@@ -71,16 +71,17 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
         // task relations
-        PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
-        CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
-        DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
-        HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false),
-        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, false);
+        // read-only for existing tasks. see https://bugs.eclipse.org/bugs/show_bug.cgi?id=269407
+        PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
+        CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
+        DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
+        HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING), //
+        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING);
 
 
         private final boolean isHidden;
 
-        private final boolean isReadOnly;
+        private final ReadOnly isReadOnly;
 
         private final String mantisKey;
 
@@ -88,13 +89,22 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
         private final String type;
 
+        Attribute(Key key, String prettyName, String type, boolean hidden, ReadOnly readonly) {
+
+            this.mantisKey = key.getKey();
+            this.type = type;
+            this.prettyName = prettyName;
+            this.isHidden = hidden;
+            this.isReadOnly = readonly;
+        }
+
         Attribute(Key key, String prettyName, String type, boolean hidden,
                 boolean readonly) {
             this.mantisKey = key.getKey();
             this.type = type;
             this.prettyName = prettyName;
             this.isHidden = hidden;
-            this.isReadOnly = readonly;
+            this.isReadOnly = readonly ? ReadOnly.ALWAYS_READ_ONLY : ReadOnly.NEVER_READ_ONLY;
         }
 
         Attribute(Key key, String prettyName, String taskKey, boolean hidden) {
@@ -113,8 +123,15 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
             return isHidden;
         }
 
-        public boolean isReadOnly() {
-            return isReadOnly;
+
+        public boolean isReadOnlyForExistingTask() {
+
+            return isReadOnly == ReadOnly.ALWAYS_READ_ONLY || isReadOnly == ReadOnly.READ_ONLY_FOR_EXISTING;
+        }
+
+        public boolean isReadOnlyForNewTask() {
+
+            return isReadOnly == ReadOnly.ALWAYS_READ_ONLY || isReadOnly == ReadOnly.READ_ONLY_FOR_NEW;
         }
 
         public String getKind() {
@@ -131,6 +148,26 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         }
     }
 
+    public enum ReadOnly {
+
+        /**
+         * The attribute is always read only
+         */
+        ALWAYS_READ_ONLY,
+        /**
+         * The attribute is read only for new tasks, but writable for existing ones
+         */
+        READ_ONLY_FOR_NEW,
+        /**
+         * The attribute is read only for existing tasks, but writable for new ones
+         */
+        READ_ONLY_FOR_EXISTING,
+        /**
+         * The attribute is always readonly
+         */
+        NEVER_READ_ONLY;
+    }
+
     public MantisAttributeMapper(TaskRepository taskRepository) {
         super(taskRepository);
         // TODO Auto-generated constructor stub
@@ -138,57 +175,44 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
     @Override
     public String mapToRepositoryKey(TaskAttribute parent, String key) {
-        if (key.equals(TaskAttribute.COMMENT_NEW)) {
+        if (key.equals(TaskAttribute.COMMENT_NEW))
             return Attribute.NEW_COMMENT.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.DESCRIPTION)) {
+        if (key.equals(TaskAttribute.DESCRIPTION))
             return Attribute.DESCRIPTION.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.DATE_MODIFICATION)) {
+        if (key.equals(TaskAttribute.DATE_MODIFICATION))
             return Attribute.LAST_UPDATED.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.SUMMARY)) {
+        if (key.equals(TaskAttribute.SUMMARY))
             return Attribute.SUMMARY.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.DATE_CREATION)) {
+        if (key.equals(TaskAttribute.DATE_CREATION))
             return Attribute.DATE_SUBMITTED.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.ATTACHMENT_ID)) {
+        if (key.equals(TaskAttribute.ATTACHMENT_ID))
             return Attribute.ATTACHID.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.USER_ASSIGNED)) {
+        if (key.equals(TaskAttribute.USER_ASSIGNED))
             return Attribute.ASSIGNED_TO.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.TASK_KEY)) {
+        if (key.equals(TaskAttribute.TASK_KEY))
             return Attribute.ID.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.USER_REPORTER)) {
+        if (key.equals(TaskAttribute.USER_REPORTER))
             return Attribute.REPORTER.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.STATUS)) {
+        if (key.equals(TaskAttribute.STATUS))
             return Attribute.STATUS.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.RESOLUTION)) {
+        if (key.equals(TaskAttribute.RESOLUTION))
             return Attribute.RESOLUTION.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.PRIORITY)) {
+        if (key.equals(TaskAttribute.PRIORITY))
             return Attribute.PRIORITY.getKey().toString();
-        }
 
-        if (key.equals(TaskAttribute.TASK_KIND)) {
+        if (key.equals(TaskAttribute.TASK_KIND))
             return Attribute.SEVERITY.getKey().toString();
-        }
 
         return super.mapToRepositoryKey(parent, key).toString();
     }
