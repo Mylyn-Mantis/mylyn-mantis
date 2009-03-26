@@ -201,5 +201,5 @@ public interface IMantisClient {
 	 */
 	void setData(MantisClientData data);
 	
-	RepositoryVersion getRepositoryVersion();
+	RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException;
 }

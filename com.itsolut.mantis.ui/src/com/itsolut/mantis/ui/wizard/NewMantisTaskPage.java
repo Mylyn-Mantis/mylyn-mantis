@@ -21,9 +21,13 @@
 
 package com.itsolut.mantis.ui.wizard;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -92,11 +96,26 @@ public class NewMantisTaskPage extends WizardPage {
 
                         TaskAttribute attribute = taskData.getRoot().getAttribute(Key.PROJECT.getKey());
                         attribute.setValue(projectCombo.getText());
-                        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+                        final MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
                         .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
                         try{
-                            MantisTaskDataHandler.createProjectSpecificAttributes(taskData, connector.getClientManager().getRepository(taskRepository));
-                        } catch (MalformedURLException ex) {
+                            getContainer().run(false, true, new IRunnableWithProgress() {
+                               
+                                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                                
+                                    try {
+                                        MantisTaskDataHandler.createProjectSpecificAttributes(taskData, connector.getClientManager().getRepository(taskRepository), monitor);
+                                    } catch (MalformedURLException e) {
+                                        throw new InvocationTargetException(e);
+                                    }
+                                    
+                                }
+                            });
+                            
+                        } catch (InvocationTargetException ex) {
+                            MantisUIPlugin.handleMantisException(ex);
+                            return;
+                        } catch (InterruptedException ex) {
                             MantisUIPlugin.handleMantisException(ex);
                             return;
                         }
@@ -146,8 +165,8 @@ public class NewMantisTaskPage extends WizardPage {
         taskData.getRoot().createAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
 
         try {
-
-            MantisTaskDataHandler.createDefaultAttributes(taskData, client, false);
+            // we can use the NPM since the first call of the method already retrieves the configuration if needed
+            MantisTaskDataHandler.createDefaultAttributes(taskData, client, new NullProgressMonitor(), false);
         } catch (CoreException e) {
             MantisUIPlugin.handleMantisException(e.getCause());
         }

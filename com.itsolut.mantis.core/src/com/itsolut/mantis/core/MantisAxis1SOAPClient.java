@@ -27,6 +27,7 @@ import javax.xml.rpc.Stub;
 
 import org.apache.axis.configuration.FileProvider;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -369,7 +370,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         }
     }
 
-    private MantisTicket parseTicket(IssueData issue) throws InvalidTicketException {
+    private MantisTicket parseTicket(IssueData issue) throws MantisException {
 
         MantisTicket ticket = new MantisTicket(issue.getId().intValue());
         ticket.setCreated(issue.getDate_submitted().getTime());
@@ -440,12 +441,12 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         ticket.addComment(comment);
     }
 
-    private void parseRelation(MantisTicket ticket, RelationshipData relationData) {
+    private void parseRelation(MantisTicket ticket, RelationshipData relationData) throws MantisException {
 
         MantisRelationship relationship = new MantisRelationship();
         relationship.setId(relationData.getId().intValue());
         relationship.setTargetId(relationData.getTarget_id().intValue());
-        if ( getRepositoryVersion().isHasProperTaskRelations())
+        if ( getRepositoryVersion(new NullProgressMonitor()).isHasProperTaskRelations())
             relationship.setType(MantisRelationship.RelationType.fromRelationId(relationData.getType().getId()));
         else 
             relationship.setType(MantisRelationship.RelationType.fromRelation(relationData.getType().getName()));
@@ -650,14 +651,14 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     public int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
 
-        IssueData issue = createSOAPIssue(ticket);
+        IssueData issue = createSOAPIssue(ticket, monitor);
 
         BigInteger id;
         try {
             id = getSOAP().mc_issue_add(username, password, issue);
             monitor.worked(1);
             
-            if ( getRepositoryVersion().isHasProperTaskRelations())
+            if ( getRepositoryVersion(monitor).isHasProperTaskRelations())
                 createRelationships(ticket, monitor, id);
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
@@ -691,7 +692,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         return relationshipData;
     }
 
-    private IssueData createSOAPIssue(MantisTicket ticket) throws MantisException {
+    private IssueData createSOAPIssue(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
 
         IssueData issue = new IssueData();
         issue.setSummary(ticket.getValue(Key.SUMMARY));
@@ -710,7 +711,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         issue.setVersion(ticket.getValueAndFilterNone(Key.VERSION));
         issue.setFixed_in_version(ticket.getValueAndFilterNone(Key.FIXED_IN));
-        if ( getRepositoryVersion().isHasProperTaskRelations())
+        if ( getRepositoryVersion(monitor).isHasProperTaskRelations())
             issue.setTarget_version(ticket.getValueAndFilterNone(Key.TARGET_VERSION));
 
         issue.setSteps_to_reproduce(ticket.getValue(Key.STEPS_TO_REPRODUCE));
@@ -755,7 +756,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException {
 
-        IssueData issue = createSOAPIssue(ticket);
+        IssueData issue = createSOAPIssue(ticket, monitor);
         issue.setId(BigInteger.valueOf(ticket.getId()));
 
         //add comment...

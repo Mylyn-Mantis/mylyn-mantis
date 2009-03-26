@@ -147,7 +147,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
      * @see #updateAttributes(IProgressMonitor, boolean) 
      */
 	private boolean hasAttributes() {
-		return (data.lastUpdate != 0);
+		return (data.lastUpdate != 0 && data.getRepositoryVersion() != null);
 	}
 	
 	public void updateAttributes(IProgressMonitor monitor, boolean force) throws MantisException {
@@ -169,7 +169,12 @@ public abstract class AbstractMantisClient implements IMantisClient {
         return location;
     }
 	
-	public RepositoryVersion getRepositoryVersion() {
+	public RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException {
+	    
+	    if (!hasAttributes()) {
+	        updateAttributes(monitor);
+	        data.lastUpdate = System.currentTimeMillis();
+	    }
 	
 	    return data.getRepositoryVersion();
 	}

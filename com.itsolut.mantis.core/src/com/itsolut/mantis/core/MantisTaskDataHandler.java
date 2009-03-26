@@ -153,10 +153,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             IMantisClient client = connector.getClientManager().getRepository(
                     repository);
             client.updateAttributes(monitor, false);
-            createDefaultAttributes(data, client, false);
+            createDefaultAttributes(data, client, monitor, false);
             TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
             projectAttribute.setValue(initializationData.getProduct());
-            createProjectSpecificAttributes(data, client);
+            createProjectSpecificAttributes(data, client, monitor);
             return true;
         } catch (OperationCanceledException e) {
             throw e;
@@ -470,69 +470,73 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public static void createDefaultAttributes(TaskData data, IMantisClient client, boolean existingTask) throws CoreException {
-        createDefaultAttributes(data, client, null, existingTask);
+    public static void createDefaultAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor, boolean existingTask) throws CoreException {
+        createDefaultAttributes(data, client, null, monitor, existingTask);
     }
 
     public static void createDefaultAttributes(TaskData data,
-            IMantisClient client, MantisTicket ticket, boolean existingTask) throws CoreException {
+            IMantisClient client, MantisTicket ticket, IProgressMonitor monitor, boolean existingTask) throws CoreException {
 
         // The order here is important as it controls how it appears in the
         // Editor.
 
-        createAttribute(data, MantisAttributeMapper.Attribute.PROJECT, null);
-        createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
+        try {
+            createAttribute(data, MantisAttributeMapper.Attribute.PROJECT, null);
+            createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
-        createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
-                client.getTicketResolutions(), client.getTicketResolutions()[0]
+            createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
+                    client.getTicketResolutions(), client.getTicketResolutions()[0]
+                                                                                 .getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.STATUS, client
+                    .getTicketStatus(), client.getTicketStatus()[0].getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.PRIORITY, client
+                    .getPriorities(), client.getPriorities()[0].getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.SEVERITY, client
+                    .getSeverities(), client.getSeverities()[0].getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY,
+                    client.getReproducibility(), client.getReproducibility()[0]
                                                                              .getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.STATUS, client
-                .getTicketStatus(), client.getTicketStatus()[0].getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.PRIORITY, client
-                .getPriorities(), client.getPriorities()[0].getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.SEVERITY, client
-                .getSeverities(), client.getSeverities()[0].getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY,
-                client.getReproducibility(), client.getReproducibility()[0]
-                                                                         .getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
-        createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
-        if ( client.getRepositoryVersion().isHasTargetVersionSupport())
-            createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
+            createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
+            createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
+            if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport())
+                createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
 
-        createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
-                client.getProjection(), client.getProjection()[0].getName());
-        createAttribute(data, MantisAttributeMapper.Attribute.ETA, client
-                .getETA(), client.getETA()[0].getName());
-        if ( client.getRepositoryVersion().isHasProperTaskRelations())
-            createTaskRelations(data, client);
+            createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
+                    client.getProjection(), client.getProjection()[0].getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.ETA, client
+                    .getETA(), client.getETA()[0].getName());
+            if ( client.getRepositoryVersion(monitor).isHasProperTaskRelations())
+                createTaskRelations(data, client);
 
-        createAttribute(data, MantisAttributeMapper.Attribute.DESCRIPTION);
-        createAttribute(data,
-                MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE);
-        createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO);
-        createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
+            createAttribute(data, MantisAttributeMapper.Attribute.DESCRIPTION);
+            createAttribute(data,
+                    MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE);
+            createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO);
+            createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
 
-        createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
-                client.getViewState(), client.getViewState()[0].getName());
+            createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
+                    client.getViewState(), client.getViewState()[0].getName());
 
-        String[] allProjectUsers = null;
-        String[] projectDevelopers = null;
-        if (ticket != null) {
-            allProjectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
-            projectDevelopers = client.getDevelopers(ticket.getValue(MantisTicket.Key.PROJECT));
+            String[] allProjectUsers = null;
+            String[] projectDevelopers = null;
+            if (ticket != null) {
+                allProjectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
+                projectDevelopers = client.getDevelopers(ticket.getValue(MantisTicket.Key.PROJECT));
+            }
+
+            createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectDevelopers);
+            if (existingTask)
+                createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, allProjectUsers);
+            createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
+            createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
+            createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
+
+            // operations
+            data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
+            .setType(TaskAttribute.TYPE_OPERATION);
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.toStatus(e));
         }
-
-        createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectDevelopers);
-        if (existingTask)
-            createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, allProjectUsers);
-        createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
-        createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
-        createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
-
-        // operations
-        data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
-        .setType(TaskAttribute.TYPE_OPERATION);
 
     }
 
@@ -545,8 +549,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(data, MantisAttributeMapper.Attribute.RELATED_TO, null);
     }
 
-    public static void createProjectSpecificAttributes(TaskData data,
-            IMantisClient client) {
+    public static void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) {
 
         try {
             // categories
@@ -577,7 +580,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             fixInVerAttr.putOption("none", "");// Add empty option
 
             TaskAttribute targetVersionAttr = null;
-            if ( client.getRepositoryVersion().isHasTargetVersionSupport()) {
+            if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport()) {
                 targetVersionAttr = getAttribute(data,
                         MantisAttributeMapper.Attribute.TARGET_VERSION.getKey());
                 targetVersionAttr.clearOptions();
@@ -595,7 +598,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 if (v.isReleased())
                     repInVerAttr.putOption(v.getName(), v.getName());
                 fixInVerAttr.putOption(v.getName(), v.getName());
-                if ( client.getRepositoryVersion().isHasTargetVersionSupport())
+                if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport())
                     targetVersionAttr.putOption(v.getName(), v.getName());
 
             }
@@ -607,7 +610,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if (MantisUtils.isEmpty(repInVerAttr.getValue()))
                 repInVerAttr.setValue("none");
 
-            if ( client.getRepositoryVersion().isHasTargetVersionSupport() && MantisUtils.isEmpty(targetVersionAttr.getValue()))
+            if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport() && MantisUtils.isEmpty(targetVersionAttr.getValue()))
                 targetVersionAttr.setValue("none");
 
         } catch (MantisException ex) {
@@ -728,10 +731,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 MantisCorePlugin.REPOSITORY_KIND,
                 repository.getRepositoryUrl(), ticket.getId() + "");
         try {
-            createDefaultAttributes(taskData, client, ticket, true);
+            createDefaultAttributes(taskData, client, ticket, monitor, true);
             updateTaskData(repository, getAttributeMapper(repository),
                     taskData, client, ticket);
-            createProjectSpecificAttributes(taskData, client);
+            createProjectSpecificAttributes(taskData, client, monitor);
 
             if (!MantisRepositoryConnector.hasRichEditor(repository))
                 // updateTaskDataFromTicket(taskData, ticket, client);
