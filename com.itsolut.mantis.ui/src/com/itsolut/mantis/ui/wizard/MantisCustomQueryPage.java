@@ -109,34 +109,23 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         createTitleGroup(control);
 
         projectCombo = new Combo(control, SWT.READ_ONLY);
-        projectCombo.add("Select Project for new Issue");
 
         try {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
             .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-            IMantisClient client = connector.getClientManager().getRepository(repository);
+            final IMantisClient client = connector.getClientManager().getRepository(repository);
 
-            for (MantisProject pd : client.getProjects())
-                projectCombo.add(pd.getName());
-            projectCombo.setText(projectCombo.getItem(0));
+            refreshProjectCombo(client, null);
 
             projectCombo.addSelectionListener(new SelectionListener() {
 
                 public void widgetSelected(SelectionEvent e) {
 
                     try {
-                        filterCombo.remove(1, filterCombo.getItemCount() - 1);
-                        if (projectCombo.getSelectionIndex() > 0) {
-                            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                            .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-                            IMantisClient client = connector.getClientManager().getRepository(repository);
-                            for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
-                                filterCombo.add(pd.getName());
-                        }
-                    } catch (Exception e1) {
+                        refreshFilterCombo(client, null);
+                    } catch (MantisException e1) {
                         MantisCorePlugin.log(e1);
                     }
-                    getWizard().getContainer().updateButtons();
                 }
 
                 public void widgetDefaultSelected(SelectionEvent e) {
@@ -198,7 +187,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
                 public void widgetSelected(SelectionEvent arg0) {
 
-                    MantisUIUtil.updateRepositoryConfiguration(getContainer(), getRepository(), true);
+                    try {
+                        MantisUIUtil.updateRepositoryConfiguration(getContainer(), getRepository(), true);
+                        refreshProjectCombo(client, projectCombo.getText());
+                        refreshFilterCombo(client, filterCombo.getText());
+                    } catch (MantisException e) {
+                        MantisCorePlugin.log(e);
+                    }
                 }
 
             });
@@ -213,6 +208,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         setControl(control);
     }
+
+
 
     @Override
     public boolean canFlipToNextPage() {
@@ -332,6 +329,44 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     public String getQueryTitle() {
 
         return (titleText != null) ? titleText.getText() : null;
+    }
+
+      
+    /**
+     * @param client the client
+     * @param valueToSet the value to set for the combo, if not null. If null, the first value will be set.
+     * @throws MantisException error loading the project values
+     */
+    private void refreshProjectCombo(IMantisClient client, String valueToSet) throws MantisException {
+
+        projectCombo.removeAll();
+        projectCombo.add("Select Project for new Issue");
+        for (MantisProject pd : client.getProjects())
+            projectCombo.add(pd.getName());
+        if (valueToSet != null)
+            projectCombo.setText(valueToSet);
+        else
+            projectCombo.setText(projectCombo.getItem(0));
+    }
+    
+    /**
+     * @param client the client client
+     * @param valueToSet the value to set for the combo, if not null. If null, the first value will be set.
+     * @throws MantisException error loading the project filters
+     */
+    private void refreshFilterCombo(IMantisClient client, String valueToSet) throws MantisException {
+
+        filterCombo.remove(1, filterCombo.getItemCount() - 1);
+        
+        if (projectCombo.getSelectionIndex() > 0) {
+            for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
+                filterCombo.add(pd.getName());
+            
+            if (valueToSet != null)
+                filterCombo.setText(valueToSet);
+            
+        }
+        getWizard().getContainer().updateButtons();
     }
 
 }
