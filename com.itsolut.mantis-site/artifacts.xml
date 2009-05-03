@@ -3,14 +3,14 @@
 <repository name='Mylyn Mantis Connector (Mylyn 3.x)' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
   <properties size='2'>
     <property name='p2.compressed' value='false'/>
-    <property name='p2.timestamp' value='1237498664557'/>
+    <property name='p2.timestamp' value='1241370736644'/>
   </properties>
   <mappings size='3'>
     <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
     <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
     <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
   </mappings>
-  <artifacts size='64'>
+  <artifacts size='67'>
     <artifact classifier='org.eclipse.update.feature' id='com.itsolut.mantis_feature' version='3.0.0.200807281102'>
       <properties size='2'>
         <property name='artifact.size' value='5431'/>
@@ -314,6 +314,13 @@
         <property name='download.size' value='5441'/>
       </properties>
     </artifact>
+    <artifact classifier='osgi.bundle' id='com.itsolut.mantis.core' version='3.0.2.200905032011'>
+      <properties size='3'>
+        <property name='artifact.size' value='541935'/>
+        <property name='download.size' value='541935'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
     <artifact classifier='osgi.bundle' id='com.itsolut.mantis.core' version='3.0.0.200807281102'>
       <properties size='3'>
         <property name='artifact.size' value='665362'/>
@@ -354,6 +361,12 @@
         <property name='artifact.size' value='49963'/>
         <property name='download.size' value='49963'/>
         <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='com.itsolut.mantis_feature' version='3.0.2.200905032011'>
+      <properties size='2'>
+        <property name='artifact.size' value='5439'/>
+        <property name='download.size' value='5439'/>
       </properties>
     </artifact>
     <artifact classifier='org.eclipse.update.feature' id='com.itsolut.mantis_feature' version='3.0.0.200807220926'>
@@ -401,6 +414,13 @@
       <properties size='2'>
         <property name='artifact.size' value='5441'/>
         <property name='download.size' value='5441'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.itsolut.mantis.ui' version='3.0.2.200905032011'>
+      <properties size='3'>
+        <property name='artifact.size' value='45378'/>
+        <property name='download.size' value='45378'/>
+        <property name='download.contentType' value='application/zip'/>
       </properties>
     </artifact>
     <artifact classifier='osgi.bundle' id='com.itsolut.mantis.core' version='3.0.0.200807220926'>
