@@ -209,7 +209,7 @@ litigation.
    </license>
 
    <url>
-      <update label="Mylyn-Mantis Update Site" url="http://mylyn-mantis.sourceforge.net/eclipse/dev/update"/>
+      <update label="Mylyn-Mantis Update Site" url="http://mylyn-mantis.sourceforge.net/eclipse/update"/>
    </url>
 
    <requires>
