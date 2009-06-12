@@ -21,5 +21,8 @@
    <feature url="features/com.itsolut.mantis_feature_3.0.2.200906120139.jar" id="com.itsolut.mantis_feature" version="3.0.2.200906120139">
       <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
    </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.2.200906121020.jar" id="com.itsolut.mantis_feature" version="3.0.2.200906121020">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
    <category-def name="Mylyn Mantis Connector (Mylyn 3.x)" label="Mylyn Connector (Mylyn 3.x)"/>
 </site>
