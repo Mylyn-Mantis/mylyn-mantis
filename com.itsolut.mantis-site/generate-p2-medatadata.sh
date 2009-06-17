@@ -16,4 +16,6 @@ java -jar ~/apps/eclipse-3.5/plugins/org.eclipse.equinox.launcher_1.0.200.v20090
 	-append \
 	-compress
 
-cp site.xml $target_dir/
+cp -f site.xml $target_dir/
+
+cp -f $target_dir/{artifacts,content}.jar .
