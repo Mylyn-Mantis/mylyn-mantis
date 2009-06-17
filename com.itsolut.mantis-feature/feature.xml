@@ -6,7 +6,7 @@
       provider-name="ITSOLUT">
 
    <description>
-      Mantis client integrated with Eclipse and Mylar
+      Mylyn connector for Mantis.
    </description>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
