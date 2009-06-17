@@ -279,19 +279,24 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     private boolean validate() {
 
         boolean returnsw = true;
-        if (titleText != null) {
-            if (titleText.getText().length() > 0)
-                returnsw = true;
-            else
-                returnsw = false;
-        } else
-            returnsw = false;
+        
+        if ( titleText == null)
+        	return false;
+        
+        if ( titleText.getText().length() == 0)
+        	return false;
+        
+        if ( projectCombo == null)
+        	return false;
+        
+        if ( projectCombo.getItemCount() <= 1)
+        	return false;
 
         if (projectCombo.getText().contains("Select Project for new Issue"))
-            returnsw = false;
+            return false;
 
         if (filterCombo != null && filterCombo.getText().contains(SELECT_FILTER_IN_PROJECT))
-            returnsw = false;
+            return false;
 
         try {
             if (searchLimit != null)
