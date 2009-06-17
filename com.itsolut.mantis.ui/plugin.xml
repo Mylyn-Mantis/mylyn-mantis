@@ -39,8 +39,8 @@
       </repository>
       <repository
             addAutomatically="true"
-            anonymous="true"
-            label="Mylyn-Mantis bug tracker (Use HTTP authentication only)"
+            anonymous="false"
+            label="Mylyn-Mantis Support (HTTP auth)"
             repositoryKind="mantis"
             urlRepository="https://apps.sourceforge.net/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
       </repository>
