@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Connector: Mantis"
-      version="3.0.2.qualifier"
+      version="3.0.3.qualifier"
       provider-name="ITSOLUT"
       plugin="com.itsolut.mantis">
 
@@ -315,6 +315,13 @@ litigation.
 
    <plugin
          id="javax.servlet"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.itsolut.mantis"
          download-size="0"
          install-size="0"
          version="0.0.0"
