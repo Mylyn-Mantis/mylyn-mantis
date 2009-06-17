@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mantis
+Bundle-SymbolicName: com.itsolut.mantis
+Bundle-Version: 3.0.2.qualifier
+Bundle-Vendor: ITSOLUT
