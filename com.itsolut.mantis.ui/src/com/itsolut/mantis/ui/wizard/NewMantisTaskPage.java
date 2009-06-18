@@ -37,6 +37,8 @@ import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -78,7 +80,15 @@ public class NewMantisTaskPage extends WizardPage {
 //		setControl(text);
 //		text.setText("Click Finish");
 //
-        projectCombo = new Combo(parent, SWT.READ_ONLY);
+    	
+        Composite control = new Composite(parent, SWT.NONE);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+        control.setLayoutData(gd);
+        GridLayout layout = new GridLayout(1, false);
+        control.setLayout(layout);
+
+    	
+        projectCombo = new Combo(control, SWT.READ_ONLY);
         projectCombo.add("Select Project for new Issue");
         setControl(projectCombo);
 
