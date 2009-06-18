@@ -40,7 +40,7 @@
       <repository
             addAutomatically="true"
             anonymous="true"
-            label="Mylyn-Mantis Support (HTTP auth)"
+            label="Mylyn-Mantis Support"
             repositoryKind="mantis"
             urlRepository="https://apps.sourceforge.net/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
       </repository>

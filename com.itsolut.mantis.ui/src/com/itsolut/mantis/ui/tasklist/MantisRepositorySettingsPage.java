@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.tasks.core.RepositoryResponse;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -37,6 +38,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xml.sax.SAXException;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisClientFactory;
@@ -125,7 +127,11 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
     // public for testing
     public class MantisValidator extends Validator {
         
-        private final String repositoryUrl;
+        private static final String OLD_SF_NET_URL = "https://apps.sourceforge.net/mantisbt/";
+
+		private static final String NEW_SF_NET_URL = "https://sourceforge.net/apps/mantisbt/";
+
+		private final String repositoryUrl;
         
         private final TaskRepository taskRepository;
         
@@ -152,13 +158,31 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
             } catch (MalformedURLException e) {
                 throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR, MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
             } catch (MantisException e) {
-                String message = "No Mantis repository found at url";
-                if (e.getMessage() != null) {
-                    message += ": " + e.getMessage();
-                }
+                String message = buildErrorMessage(e);
                 throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR, MantisUIPlugin.PLUGIN_ID, message));
             }
         }
+
+		private String buildErrorMessage(MantisException e) {
+			
+			StringBuilder message = new StringBuilder();
+			
+			if ( isSourceforgeRepoWithoutHttpAuth())
+				message.append("For SF.net hosted apps, please make sure to use HTTP authentication only.").append('\n');
+			
+			if ( repositoryUrl.startsWith(OLD_SF_NET_URL))
+				message.append("SF.net hosted apps have been moved to https://sourceforge.net/apps/mantisbt/").append('\n');
+			
+			message.append("Repository validation failed ");
+			if (e.getMessage() != null)
+				message.append(" :").append(e.getMessage());
+			
+			return message.toString();
+		}
+
+		private boolean isSourceforgeRepoWithoutHttpAuth() {
+			return repositoryUrl.startsWith(NEW_SF_NET_URL) &&  ( httpUserName.length() == 0 || httpPassword.length() == 0);
+		}
         
         public void validate(IProgressMonitor monitor) throws MalformedURLException, MantisException {
 
