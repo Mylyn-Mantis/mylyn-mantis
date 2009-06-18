@@ -554,16 +554,22 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
             for (MantisProject project : projects) {
 
-                FilterData[] filterData = getSOAP().mc_filter_get(username, password, BigInteger.valueOf(project.getValue()));
-                MantisProjectFilter[] data = new MantisProjectFilter[filterData.length];
+                try {
+					FilterData[] filterData = getSOAP().mc_filter_get(username, password, BigInteger.valueOf(project.getValue()));
+					MantisProjectFilter[] data = new MantisProjectFilter[filterData.length];
 
-                for (int x = 0; x < filterData.length; x++) {
-                    data[x] = new MantisProjectFilter(filterData[x].getName(), filterData[x].getId().intValue());
-                }
+					for (int x = 0; x < filterData.length; x++) {
+					    data[x] = new MantisProjectFilter(filterData[x].getName(), filterData[x].getId().intValue());
+					}
 
-                filters.put(project.getName(), data);
+					filters.put(project.getName(), data);
+				} catch (RemoteException e) {
+					MantisCorePlugin.log("Failed retrieving filters for project " + project.getName() + " .", e);
+				} finally {
+					subMonitor.newChild(1);
+				}
                 
-                subMonitor.newChild(1);
+                
             }
 
             if (subMonitor.isCanceled())
