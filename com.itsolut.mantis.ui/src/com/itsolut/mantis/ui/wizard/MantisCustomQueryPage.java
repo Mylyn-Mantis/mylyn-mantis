@@ -217,6 +217,14 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             }
         } catch (Exception e1) {
             MantisCorePlugin.log(e1);
+            
+            // Axis does send very verbose errors which break the layout if displayed directly
+            String sanitizedString = String.valueOf(e1.getMessage());
+
+            if ( sanitizedString.length() > 50)
+            	sanitizedString = sanitizedString.substring(0, 47) + "...";
+            
+            setMessage("Unable to build query page. Please check your repository settings.\nError details: " + sanitizedString, DialogPage.ERROR);
         }
 
         setControl(control);
