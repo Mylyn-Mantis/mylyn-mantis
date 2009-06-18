@@ -17,6 +17,7 @@ package com.itsolut.mantis.ui.wizard;
 
 import java.net.MalformedURLException;
 
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -46,59 +47,61 @@ import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
- * Mantis search page. Provides a form similar to the one the Bugzilla connector uses.
+ * Mantis search page. Provides a form similar to the one the Bugzilla connector
+ * uses.
  * 
  * @author Steffen Pingel
  * @author Chris Hane
  * 
- * Dave Carver - 20070806 [ 1729675 ] Internal errors when project or filter not selected
+ *         Dave Carver - 20070806 [ 1729675 ] Internal errors when project or
+ *         filter not selected
  */
 public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
-    /**
-     * 
-     */
-    private static final String SELECT_FILTER_IN_PROJECT = "Select Filter in Project";
+	private static final String NO_FILTERS_AVAILABLE = "No filters available for this project. Make sure they are created and that you have the right to access them.";
 
-    private static final String TITLE = "Enter query parameters";
+	private static final String SELECT_FILTER_IN_PROJECT = "Select Filter in Project";
 
-    private static final String DESCRIPTION = "Only predefined filters are supported.";
+	private static final String TITLE = "Enter query parameters";
 
-    private static final String TITLE_QUERY_TITLE = "Query Title:";
+	private static final String DESCRIPTION = "Only filters created from the web interface are supported.";
 
-    private static final String MAX_SEARCH_RESULTS = "Maximum results";
+	private static final String TITLE_QUERY_TITLE = "Query Title:";
 
-    private IRepositoryQuery query;
+	private static final String MAX_SEARCH_RESULTS = "Maximum results";
 
-    private Text titleText;
+	private IRepositoryQuery query;
 
-    private Text searchLimit;
+	private Text titleText;
 
-    private TaskRepository repository = null;
+	private Text searchLimit;
 
-    protected Combo projectCombo = null;
+	private TaskRepository repository = null;
 
-    protected Combo filterCombo = null;
+	protected Combo projectCombo = null;
 
-    protected Button updateRepository;
+	protected Combo filterCombo = null;
 
-    public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query) {
+	protected Button updateRepository;
 
-        super(TITLE, repository, query);
+	public MantisCustomQueryPage(TaskRepository repository,
+			IRepositoryQuery query) {
 
-        this.repository = repository;
-        this.query = query;
+		super(TITLE, repository, query);
 
-        setTitle(TITLE);
-        setDescription(DESCRIPTION);
-    }
+		this.repository = repository;
+		this.query = query;
 
-    public MantisCustomQueryPage(TaskRepository repository) {
+		setTitle(TITLE);
+		setDescription(DESCRIPTION);
+	}
 
-        this(repository, null);
-    }
+	public MantisCustomQueryPage(TaskRepository repository) {
 
-    public void createControl(Composite parent) {
+		this(repository, null);
+	}
+
+	public void createControl(Composite parent) {
 
         Composite control = new Composite(parent, SWT.NONE);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -145,7 +148,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                     getWizard().getContainer().updateButtons();
 
                     Combo combo = (Combo) e.getSource();
-
+                    updateDescription(combo);
+                    
                     // skip auto fill-in if we don't have results
                     if (combo.getItemCount() <= 1)
                         return;
@@ -164,7 +168,16 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
                 }
 
-                public void widgetDefaultSelected(SelectionEvent e) {
+                private void updateDescription(Combo combo) {
+                	
+                	if ( combo.getItemCount() > 1)
+						setMessage(null, DialogPage.WARNING);
+                	else if ( projectCombo.getSelectionIndex() != 0)
+                		setMessage(NO_FILTERS_AVAILABLE, DialogPage.WARNING);
+					
+				}
+
+				public void widgetDefaultSelected(SelectionEvent e) {
 
                     // nothing
                 }
@@ -209,169 +222,187 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         setControl(control);
     }
 
+	@Override
+	public boolean canFlipToNextPage() {
 
+		return false;
+	}
 
-    @Override
-    public boolean canFlipToNextPage() {
+	private void restoreSearchFilterFromQuery(IRepositoryQuery query)
+			throws MalformedURLException, MantisException {
 
-        return false;
-    }
+		for (MantisSearchFilter filter : MantisUtils.getMantisSearch(query)
+				.getFilters())
+			if ("project".equals(filter.getFieldName()))
+				projectCombo.setText(filter.getValues().get(0));
+			else if ("filter".equals(filter.getFieldName())) {
+				MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
+						.getRepositoryManager().getRepositoryConnector(
+								MantisCorePlugin.REPOSITORY_KIND);
+				IMantisClient client = connector.getClientManager()
+						.getRepository(repository);
+				for (MantisProjectFilter pd : client
+						.getProjectFilters(projectCombo.getText()))
+					filterCombo.add(pd.getName());
 
-    private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException, MantisException {
+				filterCombo.setText(filter.getValues().get(0));
 
-        for (MantisSearchFilter filter : MantisUtils.getMantisSearch(query).getFilters())
-            if ("project".equals(filter.getFieldName()))
-                projectCombo.setText(filter.getValues().get(0));
-            else if ("filter".equals(filter.getFieldName())) {
-                MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-                IMantisClient client = connector.getClientManager().getRepository(repository);
-                for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
-                    filterCombo.add(pd.getName());
+			}
+	}
 
-                filterCombo.setText(filter.getValues().get(0));
+	private void createTitleGroup(Composite control) {
 
-            }
-    }
+		if (inSearchContainer())
+			return;
 
-    private void createTitleGroup(Composite control) {
+		Label titleLabel = new Label(control, SWT.NONE);
+		titleLabel.setText(TITLE_QUERY_TITLE);
 
-        if (inSearchContainer())
-            return;
+		titleText = new Text(control, SWT.BORDER);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL
+				| GridData.GRAB_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		titleText.setLayoutData(gd);
+		titleText.addKeyListener(new KeyListener() {
 
-        Label titleLabel = new Label(control, SWT.NONE);
-        titleLabel.setText(TITLE_QUERY_TITLE);
+			public void keyPressed(KeyEvent e) {
 
-        titleText = new Text(control, SWT.BORDER);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        titleText.setLayoutData(gd);
-        titleText.addKeyListener(new KeyListener() {
+				// ignore
+			}
 
-            public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 
-                // ignore
-            }
+				getContainer().updateButtons();
+			}
+		});
+	}
 
-            public void keyReleased(KeyEvent e) {
+	public TaskRepository getRepository() {
 
-                getContainer().updateButtons();
-            }
-        });
-    }
+		return repository;
+	}
 
-    public TaskRepository getRepository() {
+	public void setRepository(TaskRepository repository) {
 
-        return repository;
-    }
+		this.repository = repository;
+	}
 
-    public void setRepository(TaskRepository repository) {
+	@Override
+	public boolean isPageComplete() {
 
-        this.repository = repository;
-    }
+		return validate();
+	}
 
-    @Override
-    public boolean isPageComplete() {
+	private boolean validate() {
 
-        return validate();
-    }
+		boolean returnsw = true;
 
-    private boolean validate() {
+		if (titleText == null)
+			return false;
 
-        boolean returnsw = true;
-        
-        if ( titleText == null)
-        	return false;
-        
-        if ( titleText.getText().length() == 0)
-        	return false;
-        
-        if ( projectCombo == null)
-        	return false;
-        
-        if ( projectCombo.getItemCount() <= 1)
-        	return false;
+		if (titleText.getText().length() == 0)
+			return false;
 
-        if (projectCombo.getText().contains("Select Project for new Issue"))
-            return false;
+		if (projectCombo == null)
+			return false;
 
-        if (filterCombo != null && filterCombo.getText().contains(SELECT_FILTER_IN_PROJECT))
-            return false;
+		if (projectCombo.getItemCount() <= 1)
+			return false;
 
-        try {
-            if (searchLimit != null)
-                Integer.parseInt(searchLimit.getText());
-        } catch (NumberFormatException e) {
-            return false;
-        }
+		if (projectCombo.getText().contains("Select Project for new Issue"))
+			return false;
 
-        return returnsw;
-    }
+		if (filterCombo != null
+				&& filterCombo.getText().contains(SELECT_FILTER_IN_PROJECT))
+			return false;
 
-    public String getQueryUrl(String repsitoryUrl) {
+		try {
+			if (searchLimit != null)
+				Integer.parseInt(searchLimit.getText());
+		} catch (NumberFormatException e) {
+			return false;
+		}
 
-        MantisSearch search = new MantisSearch();
+		return returnsw;
+	}
 
-        search.addFilter(new MantisSearchFilter("project", projectCombo.getText()));
-        search.addFilter(new MantisSearchFilter("filter", filterCombo.getText()));
+	public String getQueryUrl(String repsitoryUrl) {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(repsitoryUrl);
-        sb.append(IMantisClient.QUERY_URL);
-        sb.append(search.toUrl());
-        return sb.toString();
-    }
+		MantisSearch search = new MantisSearch();
 
-    @Override
-    public void applyTo(IRepositoryQuery query) {
+		search.addFilter(new MantisSearchFilter("project", projectCombo
+				.getText()));
+		search
+				.addFilter(new MantisSearchFilter("filter", filterCombo
+						.getText()));
 
-        query.setSummary(this.getQueryTitle());
-        query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
-        query.setUrl(this.getQueryUrl(repository.getRepositoryUrl()));
-    }
+		StringBuilder sb = new StringBuilder();
+		sb.append(repsitoryUrl);
+		sb.append(IMantisClient.QUERY_URL);
+		sb.append(search.toUrl());
+		return sb.toString();
+	}
 
-    @Override
-    public String getQueryTitle() {
+	@Override
+	public void applyTo(IRepositoryQuery query) {
 
-        return (titleText != null) ? titleText.getText() : null;
-    }
+		query.setSummary(this.getQueryTitle());
+		query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
+		query.setUrl(this.getQueryUrl(repository.getRepositoryUrl()));
+	}
 
-      
-    /**
-     * @param client the client
-     * @param valueToSet the value to set for the combo, if not null. If null, the first value will be set.
-     * @throws MantisException error loading the project values
-     */
-    private void refreshProjectCombo(IMantisClient client, String valueToSet) throws MantisException {
+	@Override
+	public String getQueryTitle() {
 
-        projectCombo.removeAll();
-        projectCombo.add("Select Project for new Issue");
-        for (MantisProject pd : client.getProjects())
-            projectCombo.add(pd.getName());
-        if (valueToSet != null)
-            projectCombo.setText(valueToSet);
-        else
-            projectCombo.setText(projectCombo.getItem(0));
-    }
-    
-    /**
-     * @param client the client client
-     * @param valueToSet the value to set for the combo, if not null. If null, the first value will be set.
-     * @throws MantisException error loading the project filters
-     */
-    private void refreshFilterCombo(IMantisClient client, String valueToSet) throws MantisException {
+		return (titleText != null) ? titleText.getText() : null;
+	}
 
-        filterCombo.remove(1, filterCombo.getItemCount() - 1);
-        
-        if (projectCombo.getSelectionIndex() > 0) {
-            for (MantisProjectFilter pd : client.getProjectFilters(projectCombo.getText()))
-                filterCombo.add(pd.getName());
-            
-            if (valueToSet != null)
-                filterCombo.setText(valueToSet);
-            
-        }
-        getWizard().getContainer().updateButtons();
-    }
+	/**
+	 * @param client
+	 *            the client
+	 * @param valueToSet
+	 *            the value to set for the combo, if not null. If null, the
+	 *            first value will be set.
+	 * @throws MantisException
+	 *             error loading the project values
+	 */
+	private void refreshProjectCombo(IMantisClient client, String valueToSet)
+			throws MantisException {
+
+		projectCombo.removeAll();
+		projectCombo.add("Select Project for new Issue");
+		for (MantisProject pd : client.getProjects())
+			projectCombo.add(pd.getName());
+		if (valueToSet != null)
+			projectCombo.setText(valueToSet);
+		else
+			projectCombo.setText(projectCombo.getItem(0));
+	}
+
+	/**
+	 * @param client
+	 *            the client client
+	 * @param valueToSet
+	 *            the value to set for the combo, if not null. If null, the
+	 *            first value will be set.
+	 * @throws MantisException
+	 *             error loading the project filters
+	 */
+	private void refreshFilterCombo(IMantisClient client, String valueToSet)
+			throws MantisException {
+
+		filterCombo.remove(1, filterCombo.getItemCount() - 1);
+
+		if (projectCombo.getSelectionIndex() > 0) {
+			for (MantisProjectFilter pd : client.getProjectFilters(projectCombo
+					.getText()))
+				filterCombo.add(pd.getName());
+
+			if (valueToSet != null)
+				filterCombo.setText(valueToSet);
+
+		}
+		getWizard().getContainer().updateButtons();
+	}
 
 }
