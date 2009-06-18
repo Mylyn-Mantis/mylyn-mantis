@@ -7,10 +7,6 @@
 	<property name="base" location="${baseLocation}/.."/>
 	<property name="buildDirectory" location="${java.io.tmpdir}/eclipse.build"/>
 	
-	<property name="J2SE-1.5" location="${sun.boot.class.path}"/>
-	
-	<property name="skipMaps" value="true"/>
-	
 	<import file="${eclipse.pdebuild.scripts}/build.xml"/>
 	
 	<target name="copyProjects">
