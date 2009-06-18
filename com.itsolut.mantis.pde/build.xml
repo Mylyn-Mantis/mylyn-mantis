@@ -17,8 +17,8 @@
 		
 		<echoproperties/>
 		
-		<mkdir dir="${buildDirectory}/features/com.itsolut.mantis_feature"/>
-		<copy todir="${buildDirectory}/features/com.itsolut.mantis_feature">
+		<mkdir dir="${buildDirectory}/features/${topLevelElementId}"/>
+		<copy todir="${buildDirectory}/features/${topLevelElementId}">
 			<fileset dir="../com.itsolut.mantis-feature"/>
 		</copy>
 		
