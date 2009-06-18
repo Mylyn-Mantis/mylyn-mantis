@@ -33,11 +33,14 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		Set<TaskEditorPartDescriptor> descriptors = super
 				.createPartDescriptors();
 		
+		// expand only on edited tasks
+		final boolean expandSupplementaryFields = getModel().getTaskData().getTaskId().length() != 0;
+		
 		descriptors = insertPart(descriptors,
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisStepsToReproducePart part = new MantisStepsToReproducePart();
+				MantisStepsToReproducePart part = new MantisStepsToReproducePart(expandSupplementaryFields);
 				part.setExpandVertically(true);
 				return part;
 			}
@@ -48,7 +51,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_ADDITIONALINFO) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart();
+				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart(expandSupplementaryFields);
 				part.setExpandVertically(true);
 				return part;
 			}
@@ -57,14 +60,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 		return descriptors;
 		
-// 	    // Add Mantis Attribute
-//		descriptors.add(new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
-//			@Override
-//			public AbstractTaskEditorPart createPart() {
-//				return new MantisStepsToReproducePart();
-//			}
-//		}.setPath(PATH_COMMENTS));
-//		return descriptors;
 	}
 	
 	protected Set<TaskEditorPartDescriptor> insertPart(Set<TaskEditorPartDescriptor> originalDescriptors, TaskEditorPartDescriptor newDescriptor, String insertAfterId ) {
