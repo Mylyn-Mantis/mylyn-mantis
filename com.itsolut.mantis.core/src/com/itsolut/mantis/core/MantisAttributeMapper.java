@@ -62,7 +62,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         STATUS(Key.STATUS, "Status:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
-        SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
+        SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.TYPE_SHORT_RICH_TEXT, true, false),
         VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         TARGET_VERSION(Key.TARGET_VERSION, "Target version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
