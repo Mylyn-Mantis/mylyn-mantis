@@ -1,5 +1,6 @@
 package com.itsolut.mantis.ui.editor;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -34,13 +35,16 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				.createPartDescriptors();
 		
 		// expand only on edited tasks
-		final boolean expandSupplementaryFields = getModel().getTaskData().getTaskId().length() != 0;
+		final boolean taskIsSubmitted = getModel().getTaskData().getTaskId().length() != 0;
+		
+		if ( !taskIsSubmitted)
+			removeNewCommentPart(descriptors);
 		
 		descriptors = insertPart(descriptors,
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisStepsToReproducePart part = new MantisStepsToReproducePart(expandSupplementaryFields);
+				MantisStepsToReproducePart part = new MantisStepsToReproducePart(taskIsSubmitted);
 				part.setExpandVertically(true);
 				return part;
 			}
@@ -51,7 +55,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_ADDITIONALINFO) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart(expandSupplementaryFields);
+				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart(taskIsSubmitted);
 				part.setExpandVertically(true);
 				return part;
 			}
@@ -62,6 +66,17 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 	}
 	
+	private void removeNewCommentPart(Set<TaskEditorPartDescriptor> descriptors) {
+		
+		for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
+			TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
+			if (taskEditorPartDescriptor.getId().equals(ID_PART_NEW_COMMENT))
+				it.remove();
+		}
+
+
+	}
+
 	protected Set<TaskEditorPartDescriptor> insertPart(Set<TaskEditorPartDescriptor> originalDescriptors, TaskEditorPartDescriptor newDescriptor, String insertAfterId ) {
 		Set<TaskEditorPartDescriptor> newDescriptors = new LinkedHashSet<TaskEditorPartDescriptor>();
 		for (TaskEditorPartDescriptor taskEditorPartDescriptor : originalDescriptors) {
