@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring comment="Rename type 'org.eclipse.mylar.trac.tests.support.XmlRpcServer.TestFixture' to 'TestData'&#10;- Original element: 'org.eclipse.mylar.trac.tests.support.XmlRpcServer.TestFixture'&#10;- Renamed element: 'org.eclipse.mylar.trac.tests.support.XmlRpcServer.TestData'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'TestFixture'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;org.eclipse.mylar.trac.tests.support{XmlRpcServer.java[XmlRpcServer[TestFixture" matchStrategy="1" name="TestData" qualified="false" references="true" similarDeclarations="false" stamp="1152144576807" textual="false" version="1.0"/>
+</session>

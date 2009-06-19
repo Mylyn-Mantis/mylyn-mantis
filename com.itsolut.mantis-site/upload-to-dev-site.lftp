@@ -1,0 +1,4 @@
+open sftp://rombert,mylyn-mantis@web.sf.net
+cd htdocs/eclipse/update-dev
+mirror -R repo .
+

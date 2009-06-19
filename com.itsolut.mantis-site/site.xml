@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://mylyn-mantis.sourceforge.net/eclipse/update">
+      This is the Eclipse 3.3 and Mylyn Mantis Connector update site.  This connector allows integration with Mylyn and Mantis Bug Tracker within eclipse.   You must be using version 1.0.5a or greater of the Mantis Connector with this plugin.
+   </description>
+   <feature url="features/com.itsolut.mantis_feature_3.0.0.200806182047.jar" id="com.itsolut.mantis_feature" version="3.0.0.200806182047">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.0.200807281102.jar" id="com.itsolut.mantis_feature" version="3.0.0.200807281102">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.0.200808060950.jar" id="com.itsolut.mantis_feature" version="3.0.0.200808060950">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.1.200812171848.jar" id="com.itsolut.mantis_feature" version="3.0.1.200812171848">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.2.200905032011.jar" id="com.itsolut.mantis_feature" version="3.0.2.200905032011">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.2.200906120139.jar" id="com.itsolut.mantis_feature" version="3.0.2.200906120139">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <feature url="features/com.itsolut.mantis_feature_3.0.2.200906121020.jar" id="com.itsolut.mantis_feature" version="3.0.2.200906121020">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
+   </feature>
+   <category-def name="Mylyn Mantis Connector (Mylyn 3.x)" label="Mylyn Connector (Mylyn 3.x)"/>
+</site>
