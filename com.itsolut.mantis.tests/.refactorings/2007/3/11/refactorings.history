@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring comment="Rename type 'org.eclipse.mylar.internal.trac.ui.TracHyperlinkDetectorTest' to 'TracHyperlinkUtilTest'&#10;- Original project: 'org.eclipse.mylar.trac.tests'&#10;- Original element: 'org.eclipse.mylar.internal.trac.ui.TracHyperlinkDetectorTest'&#10;- Renamed element: 'org.eclipse.mylar.internal.trac.ui.TracHyperlinkUtilTest'&#10;- Update references to refactored element&#10;- Update textual occurrences in comments and strings" description="Rename type 'TracHyperlinkDetectorTest'" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;org.eclipse.mylar.internal.trac.ui{TracHyperlinkDetectorTest.java[TracHyperlinkDetectorTest" matchStrategy="1" name="TracHyperlinkUtilTest" qualified="false" references="true" similarDeclarations="false" stamp="1173833391343" textual="false" version="1.0"/>
+</session>
