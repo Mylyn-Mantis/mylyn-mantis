@@ -329,7 +329,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 
         task.setUrl(connector.getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
-        task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(true));
+        
+        boolean supportsSubtasks = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) != null; 
+        
+        task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(supportsSubtasks));
 
     }
 

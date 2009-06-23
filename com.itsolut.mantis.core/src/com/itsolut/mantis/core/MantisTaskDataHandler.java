@@ -11,6 +11,7 @@
 
 package com.itsolut.mantis.core;
 
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumMap;
@@ -23,8 +24,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
+import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -33,12 +36,14 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
+import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisAttachment;
+import com.itsolut.mantis.core.model.MantisAttribute;
 import com.itsolut.mantis.core.model.MantisComment;
 import com.itsolut.mantis.core.model.MantisProjectCategory;
 import com.itsolut.mantis.core.model.MantisRelationship;
@@ -778,5 +783,55 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 TaskAttribute.DATE_CREATION);
         if (ticket.getCreated() != null)
             attributeCreationDate.setValue(ticket.getCreated().toString());
+    }
+    
+    @Override
+    public boolean canInitializeSubTaskData(TaskRepository taskRepository,
+    		ITask task) {
+    	
+    	if ( task == null)
+    		return false;
+    	
+    	return Boolean.parseBoolean(task.getAttribute(MantisRepositoryConnector.TASK_KEY_SUPPORTS_SUBTASKS));
+    }
+    
+    @Override
+    public boolean initializeSubTaskData(TaskRepository repository,
+    		TaskData taskData, TaskData parentTaskData, IProgressMonitor monitor)
+    		throws CoreException {
+		
+    	if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
+			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
+					RepositoryStatus.ERROR_REPOSITORY, "The repository does not support subtasks."));
+
+    	
+        try {
+			IMantisClient client = connector.getClientManager().getRepository(
+			        repository);
+			client.updateAttributes(monitor, false);
+			createDefaultAttributes(taskData, client, monitor, false);
+			
+			TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
+			taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());
+			
+			createProjectSpecificAttributes(taskData, client, monitor);
+			
+			TaskMapper mapper = new TaskMapper(taskData);
+			mapper.merge(new TaskMapper(parentTaskData));
+			mapper.setDescription(""); 
+			mapper.setSummary(""); 
+			
+			TaskAttribute attribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.CHILD_OF.getKey());
+			attribute.setValue(parentTaskData.getTaskId());
+
+			return true;
+		} catch (MalformedURLException e) {
+			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
+					RepositoryStatus.ERROR_REPOSITORY, "Invalid repository configuration."));
+		} catch (MantisException e) {
+			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
+					RepositoryStatus.ERROR_REPOSITORY, "Failed updating attributes."));
+
+		}
     }
 }
