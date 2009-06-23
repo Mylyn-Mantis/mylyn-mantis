@@ -24,6 +24,7 @@ package com.itsolut.mantis.ui.tasklist;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.axis.AxisFault;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -173,9 +174,20 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 			if ( repositoryUrl.startsWith(OLD_SF_NET_URL))
 				message.append("SF.net hosted apps have been moved to https://sourceforge.net/apps/mantisbt/").append('\n');
 			
-			message.append("Repository validation failed ");
-			if (e.getMessage() != null)
-				message.append(" :").append(e.getMessage());
+			message.append("Repository validation failed: ");
+			
+			if ( e.getCause() instanceof AxisFault ) {
+				
+				AxisFault axisFault = (AxisFault) e.getCause();
+				
+				if ( axisFault.getCause() instanceof SAXException)
+					message.append("the repository has returned an invalid XML response : " + String.valueOf(axisFault.getCause().getMessage()) + " .");
+				else if (e.getMessage() != null)
+						message.append(" :").append(e.getMessage()).append('\n');
+
+			} else if (e.getMessage() != null)
+				message.append(" :").append(e.getMessage()).append('\n');
+
 			
 			return message.toString();
 		}
