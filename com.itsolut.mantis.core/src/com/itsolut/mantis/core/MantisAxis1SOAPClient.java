@@ -1,4 +1,5 @@
 /*******************************************************************************
+
  * Copyright (c) 2007 - 2007 IT Solutions, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.Policy;
 
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
@@ -49,6 +51,7 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.core.model.MantisAttachment;
 import com.itsolut.mantis.core.model.MantisComment;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -842,5 +845,40 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         }
         return versions.toArray(new MantisVersion[versions.size()]);
     }
+    
+    public MantisCustomFieldType[] getCustomFieldsTypes(IProgressMonitor monitor) throws MantisException  {
+    	
+    	try {
+    		
+			ObjectRef[] customFieldTypes = getSOAP().mc_enum_custom_field_types(username, password);
+			Policy.advance(monitor, 1);
+			
+			MantisCustomFieldType[] convertedCustomFieldTypes = new MantisCustomFieldType[customFieldTypes.length];
+			
+			for ( int i = 0 ; i < customFieldTypes.length; i++)
+				convertedCustomFieldTypes[i] = parseCustomFieldType(customFieldTypes[i]);
+			
+			return convertedCustomFieldTypes;
+		} catch (RemoteException e) {
+			throw new MantisRemoteException(e);
+		}
+    }
+
+	private MantisCustomFieldType parseCustomFieldType(ObjectRef objectRef) throws MantisException {
+		
+		
+		MantisCustomFieldType parsed = MantisCustomFieldType.getByRemoteId(objectRef.getId().intValue());
+		
+		if ( parsed == null)
+			throw new MantisException("Unable to convert " + toString(objectRef) + " into a " + MantisCustomFieldType.class.getSimpleName() + " .");
+		
+		return parsed;
+	}
+
+	private String toString(ObjectRef objectRef) {
+		
+		return "[ObjectRef: " + objectRef.getId() + " ->" + objectRef.getName() + " ]"; 
+		
+	}
 
 }

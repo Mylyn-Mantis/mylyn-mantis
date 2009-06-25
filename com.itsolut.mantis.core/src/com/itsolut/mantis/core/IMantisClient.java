@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -45,8 +46,13 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * Defines the requirements for classes that provide remote access to 
  * Mantis repositories.
  * 
+ * <p>Clients the should cache the retrieved values to avoid unnecessary remote calls.</p>
+ * 
  * @author Steffen Pingel
  * @author Chris Hane
+ * @author Robert Munteanu
+ * 
+ * @see MantisClientCache
  */
 public interface IMantisClient {
 
@@ -155,6 +161,15 @@ public interface IMantisClient {
 	MantisViewState[] getViewState();
 
 	MantisProjection[] getProjection();
+	
+	/**
+	 * Retrieves the custom field types from the repository.
+	 * 
+	 * <p>Clients should cache these values instead of repeatedly polling.</p>
+	 * 
+	 * @throws MantisException failure in retrieving or converting the data
+	 */
+	MantisCustomFieldType[] getCustomFieldsTypes(IProgressMonitor monitor) throws MantisException;
 	
 	/**
 	 * @param project
