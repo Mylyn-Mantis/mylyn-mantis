@@ -136,7 +136,7 @@ public interface IMantisClient {
 	 * @throws MantisException
 	 *             thrown in case of a connection error
 	 */
-	void validate() throws MantisException;
+	void validate(IProgressMonitor monitor) throws MantisException;
 
 	/**
 	 * Updates cached repository details: milestones, versions etc.

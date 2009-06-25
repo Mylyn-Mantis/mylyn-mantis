@@ -126,17 +126,20 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     }
 
-    public void validate() throws MantisException {
+    public void validate(IProgressMonitor monitor) throws MantisException {
 
         try {
 
             // get and validate remote version
             String remoteVersion = getSOAP().mc_version();
+            Policy.advance(monitor, 1);
+            
             RepositoryVersion.fromVersionString(remoteVersion);
 
             // test to see if the current user has proper access privileges,
             // since mc_version() does not require a valid user
             getSOAP().mc_projects_get_user_accessible(username, password);
+            Policy.advance(monitor, 1);
             
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
