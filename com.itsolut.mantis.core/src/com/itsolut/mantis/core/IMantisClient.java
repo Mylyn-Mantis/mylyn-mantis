@@ -183,7 +183,7 @@ public interface IMantisClient {
 	 */
 	String[] getDevelopers(String project);
 
-	public MantisProject[] getProjects() throws MantisException;
+	public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
 
 	public MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
 
@@ -217,4 +217,7 @@ public interface IMantisClient {
 	void setData(MantisClientData data);
 	
 	RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException;
+	
+	MantisClientCache getCache();
+
 }

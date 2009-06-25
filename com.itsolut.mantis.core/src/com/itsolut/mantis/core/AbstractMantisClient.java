@@ -133,8 +133,6 @@ public abstract class AbstractMantisClient implements IMantisClient {
 
     }
 	
-	public abstract MantisProject[] getProjects() throws MantisException;
-
 	public abstract MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
 
 	public abstract MantisProjectFilter[] getProjectFilters(String projectName) throws MantisException;

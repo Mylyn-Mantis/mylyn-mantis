@@ -6,9 +6,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.commons.net.Policy;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisCustomFieldType;
+import com.itsolut.mantis.core.model.MantisProject;
 
 /**
  * @author Robert Munteanu
@@ -19,6 +21,8 @@ public class MantisClientCache {
 	private IMantisClient client;
 
 	private List<MantisCustomFieldType> customFieldTypes = Collections.emptyList();
+	
+	private List<MantisProject> projects = Collections.emptyList();
 
 	private long lastUpdate;
 
@@ -39,8 +43,21 @@ public class MantisClientCache {
 		
 		return customFieldTypes;
 	}
+	
+	public List<MantisProject> getProjects(IProgressMonitor monitor) {
 
-	private void refreshIfNeeded(IProgressMonitor monitor) throws MantisException{
+		try {
+			refreshIfNeeded(monitor);
+		} catch (MantisException e) {
+			
+			MantisCorePlugin.log(new Status(Status.ERROR,
+                    MantisCorePlugin.PLUGIN_ID, 0, "Failed getting projects", e));
+		}
+		
+		return projects;
+	}
+
+	public void refreshIfNeeded(IProgressMonitor monitor) throws MantisException{
 
 		if (lastUpdate == 0)
 			refresh(monitor);
@@ -48,8 +65,19 @@ public class MantisClientCache {
 	}
 
 	public void refresh(IProgressMonitor monitor) throws MantisException{
+		
+		IProgressMonitor subMonitor = Policy.subMonitorFor(monitor, 2);
 
-		refreshCustomFieldTypes(monitor);
+		refreshCustomFieldTypes(subMonitor);
+		refreshProjects(subMonitor);
+		
+		lastUpdate = System.currentTimeMillis();
+	}
+
+	private void refreshProjects(IProgressMonitor monitor) throws MantisException {
+		
+		projects = Arrays.asList(client.getProjects(monitor));
+		
 	}
 
 	private void refreshCustomFieldTypes(IProgressMonitor monitor) throws MantisException {

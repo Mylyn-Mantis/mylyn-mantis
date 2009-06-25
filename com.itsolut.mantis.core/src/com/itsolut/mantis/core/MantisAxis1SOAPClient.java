@@ -80,6 +80,8 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     private transient MantisConnectPortType soap;
+    
+    private final MantisClientCache clientCache;
 
     private static final String REPORTER_THRESHOLD = "report_bug_threshold";
 
@@ -87,6 +89,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
 	public MantisAxis1SOAPClient(URL url, String username, String password, String httpUsername, String httpPassword, AbstractWebLocation webLocation) {
 		super(url, username, password, webLocation);
+
+		clientCache = new MantisClientCache(this);
 		
 		try {
 			soap = this.getSOAP();
@@ -96,8 +100,14 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 				((Stub)soap)._setProperty(Call.USERNAME_PROPERTY, httpUsername);
 				((Stub)soap)._setProperty(Call.PASSWORD_PROPERTY, httpPassword);
 			}
+			
 		} catch (MantisException e) {
 		}	
+	}
+	
+	public MantisClientCache getCache() {
+		
+		return clientCache;
 	}
 
     protected MantisConnectPortType getSOAP() throws MantisException {
@@ -170,24 +180,22 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     //local cache
     private MantisProject[] projects = null;
 
-    @Override
-    public MantisProject[] getProjects() throws MantisException {
+	public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException {
 
-        if (projects == null) {
-            ProjectData[] pds;
-            try {
-                pds = getSOAP().mc_projects_get_user_accessible(username, password);
-            } catch (RemoteException e) {
-                MantisCorePlugin.log(e);
-                throw new MantisRemoteException(e);
-            }
+		try {
+			ProjectData[] pds = getSOAP().mc_projects_get_user_accessible( username, password);
+			Policy.advance(monitor, 1);
 
-            projects = new MantisProject[countProjects(pds)];
-            addProjects(0, pds, 0);
-        }
+			projects = new MantisProject[countProjects(pds)];
+			addProjects(0, pds, 0);
 
-        return projects;
-    }
+			return projects;
+		} catch (RemoteException e) {
+			MantisCorePlugin.log(e);
+			throw new MantisRemoteException(e);
+		}
+
+	}
 
     private int addProjects(int offset, ProjectData[] pds, int level) {
 
@@ -220,7 +228,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     private ObjectRef getProject(String name) throws MantisException {
 
-        for (MantisProject mp : this.getProjects()) {
+        for (MantisProject mp : getProjects(new NullProgressMonitor())) {
             if (mp.getName().equals(name)) {
                 return new ObjectRef(BigInteger.valueOf(mp.getValue()), mp.getName());
             }
@@ -580,6 +588,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
             if (subMonitor.isCanceled())
                 throw new OperationCanceledException();
+            
+            clientCache.refresh(monitor);
 
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
