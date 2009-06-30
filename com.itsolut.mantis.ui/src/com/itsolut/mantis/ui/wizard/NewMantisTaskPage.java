@@ -23,6 +23,8 @@ package com.itsolut.mantis.ui.wizard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -94,9 +96,21 @@ public class NewMantisTaskPage extends WizardPage {
 
         try {
             MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-            IMantisClient client = connector.getClientManager().getRepository(taskRepository);
+            final IMantisClient client = connector.getClientManager().getRepository(taskRepository);
 
-            for(MantisProject pd : client.getProjects())
+            final List<MantisProject> projects = new ArrayList<MantisProject>();
+            
+            getContainer().run(false, false, new IRunnableWithProgress() {
+				
+				public void run(IProgressMonitor monitor) throws InvocationTargetException,
+						InterruptedException {
+					
+					projects.addAll(client.getCache().getProjects(monitor));
+				}
+			});
+            
+
+            for(MantisProject pd : projects)
                 projectCombo.add(pd.getName());
             projectCombo.setText(projectCombo.getItem(0));
 
@@ -137,6 +151,8 @@ public class NewMantisTaskPage extends WizardPage {
                     //nothing
                 }
             });
+        } catch ( InterruptedException e) {
+        	Thread.currentThread().interrupt();
         } catch (Exception e1) {
             MantisCorePlugin.log(e1);
         }

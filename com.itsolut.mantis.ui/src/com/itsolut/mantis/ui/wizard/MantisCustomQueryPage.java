@@ -15,9 +15,15 @@
 
 package com.itsolut.mantis.ui.wizard;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -117,7 +123,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
             .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
             final IMantisClient client = connector.getClientManager().getRepository(repository);
-
+            
             refreshProjectCombo(client, null);
 
             projectCombo.addSelectionListener(new SelectionListener() {
@@ -374,17 +380,36 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 	 * @throws MantisException
 	 *             error loading the project values
 	 */
-	private void refreshProjectCombo(IMantisClient client, String valueToSet)
+	private void refreshProjectCombo(final IMantisClient client, String valueToSet)
 			throws MantisException {
 
-		projectCombo.removeAll();
-		projectCombo.add("Select Project for new Issue");
-		for (MantisProject pd : client.getProjects())
-			projectCombo.add(pd.getName());
-		if (valueToSet != null)
-			projectCombo.setText(valueToSet);
-		else
-			projectCombo.setText(projectCombo.getItem(0));
+		try {
+			final List<MantisProject> projects = new ArrayList<MantisProject>();
+			
+			getContainer().run(false, false, new IRunnableWithProgress() {
+				
+				public void run(IProgressMonitor monitor) throws InvocationTargetException,
+						InterruptedException {
+					projects.addAll(client.getCache().getProjects(monitor));
+					
+				}
+			});
+
+			projectCombo.removeAll();
+			projectCombo.add("Select Project for new Issue");
+			
+			for (MantisProject pd : projects)
+				projectCombo.add(pd.getName());
+			if (valueToSet != null)
+				projectCombo.setText(valueToSet);
+			else
+				projectCombo.setText(projectCombo.getItem(0));
+		} catch (InvocationTargetException e) {
+			throw new MantisException(e.getCause());
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return;
+		}
 	}
 
 	/**
