@@ -20,11 +20,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
 	private TaskData taskData;
 
-	public MantisTaskEditorPage(TaskEditor editor, String connectorKind) {
-		super(editor, connectorKind);
-		// TODO Auto-generated constructor stub
-	}
-
 	public MantisTaskEditorPage(TaskEditor editor) {
 		super(editor, MantisCorePlugin.REPOSITORY_KIND);
 	}
