@@ -27,6 +27,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -271,7 +272,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             }
         } catch (Throwable e) {
             MantisCorePlugin.log("Failed getting new tasks for query " + query.getSummary() + " . Message : " + e.getMessage() + " ." , e);
-            return null;
+            return Collections.emptyList();
         }
         return changedTickets;
     }
@@ -435,26 +436,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             // synchronization.
             event.setNeedsPerformQueries(false);
             
-            for (IRepositoryQuery query : TasksUiInternal.getTaskList()
-                    .getQueries()) {
+            for (IRepositoryQuery query : TasksUiInternal.getTaskList().getQueries()) {
                 
                 boolean isMantisQuery = MantisCorePlugin.REPOSITORY_KIND.equals(query.getConnectorKind());
                 boolean belongsToThisRepository = query.getRepositoryUrl().equals(repository.getUrl());
                 
                 if (isMantisQuery && belongsToThisRepository) {
-                    List<Integer> taskIds = this.getChangedTasksByQuery(query,
-                            repository, since);
-                    if (taskIds != null && taskIds.size() > 0) {
-                        for (Integer taskId : taskIds) {
-                            for (ITask task : event.getTasks()) {
-                                if (getTicketId(task.getTaskId()) == taskId
-                                        .intValue()) {
-                                    event.setNeedsPerformQueries(true);
-                                    event.markStale(task);
-                                }
-                            }
-                        }
-                    }
+                    List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since);
+                    for (Integer taskId : taskIds) {
+					    for (ITask task : event.getTasks()) {
+					        if (getTicketId(task.getTaskId()) == taskId.intValue()) {
+					            event.setNeedsPerformQueries(true);
+					            event.markStale(task);
+					        }
+					    }
+					}
                 }
             }
         } catch (Exception e) {
