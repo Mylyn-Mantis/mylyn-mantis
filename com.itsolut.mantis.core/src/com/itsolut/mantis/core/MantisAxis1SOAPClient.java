@@ -44,7 +44,6 @@ import com.itsolut.mantis.binding.ObjectRef;
 import com.itsolut.mantis.binding.ProjectData;
 import com.itsolut.mantis.binding.ProjectVersionData;
 import com.itsolut.mantis.binding.RelationshipData;
-import com.itsolut.mantis.core.exception.InvalidTicketException;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.core.model.MantisAttachment;
