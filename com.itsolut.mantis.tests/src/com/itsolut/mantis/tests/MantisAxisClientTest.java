@@ -48,7 +48,7 @@ public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 				username, password, null, null, null);
 		assertNotNull("Mantis Client failed to be created.", mantisClient);
 
-		mantisClient.validate(new NullProgressMonitor());
+		mantisClient.validate();
 
 	}
 	
@@ -63,7 +63,7 @@ public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 		assertNotNull("Mantis Client failed to be created", mantisClient);
 
 		try {
-			mantisClient.validate(new NullProgressMonitor());
+			mantisClient.validate();
 			fail("Expected MantisException");
 		} catch ( MantisException e) {
 			// pass

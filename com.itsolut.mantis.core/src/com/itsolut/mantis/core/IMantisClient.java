@@ -26,7 +26,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -46,13 +45,8 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * Defines the requirements for classes that provide remote access to 
  * Mantis repositories.
  * 
- * <p>Clients the should cache the retrieved values to avoid unnecessary remote calls.</p>
- * 
  * @author Steffen Pingel
  * @author Chris Hane
- * @author Robert Munteanu
- * 
- * @see MantisClientCache
  */
 public interface IMantisClient {
 
@@ -136,7 +130,7 @@ public interface IMantisClient {
 	 * @throws MantisException
 	 *             thrown in case of a connection error
 	 */
-	void validate(IProgressMonitor monitor) throws MantisException;
+	void validate() throws MantisException;
 
 	/**
 	 * Updates cached repository details: milestones, versions etc.
@@ -163,15 +157,6 @@ public interface IMantisClient {
 	MantisProjection[] getProjection();
 	
 	/**
-	 * Retrieves the custom field types from the repository.
-	 * 
-	 * <p>Clients should cache these values instead of repeatedly polling.</p>
-	 * 
-	 * @throws MantisException failure in retrieving or converting the data
-	 */
-	MantisCustomFieldType[] getCustomFieldsTypes(IProgressMonitor monitor) throws MantisException;
-	
-	/**
 	 * @param project
 	 * @return all users which are allocated to this project
 	 */
@@ -183,7 +168,7 @@ public interface IMantisClient {
 	 */
 	String[] getDevelopers(String project);
 
-	public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
+	public MantisProject[] getProjects() throws MantisException;
 
 	public MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
 
@@ -217,7 +202,4 @@ public interface IMantisClient {
 	void setData(MantisClientData data);
 	
 	RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException;
-	
-	MantisClientCache getCache();
-
 }

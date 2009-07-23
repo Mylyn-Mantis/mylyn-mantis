@@ -201,7 +201,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
             AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
             
             IMantisClient client = MantisClientFactory.createClient(location.getUrl(), this.userName, this.password, this.httpUserName, this.httpPassword, location);
-            client.validate(monitor);
+            client.validate();
             setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
         }
     }
