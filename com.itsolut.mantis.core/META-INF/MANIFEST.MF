@@ -54,5 +54,4 @@ Bundle-ClassPath: .,
  lib/saaj.jar,
  lib/mail.jar
 Import-Package: org.eclipse.mylyn.commons.core,
- org.eclipse.mylyn.internal.tasks.core,
  org.eclipse.mylyn.tasks.core
