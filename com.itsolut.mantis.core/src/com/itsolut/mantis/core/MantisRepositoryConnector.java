@@ -253,6 +253,16 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     // item in the repository. Next check to see if the tasks have changed since
     // the
     // last synchronization. If so, add their ids to a List.
+    /**
+     * Gets the changed tasks for a given query
+     * 
+     * For the <tt>repository</tt>, run the <tt>query</tt> to get the latest information
+     * about the tasks. This allows the connector to get a limited list of items instead
+     * of every item in the repository. Next check to see if the tasks have changed since
+     * the last synchronization. If so, add their ids to a List.
+     * 
+     * @return the ids of the changed tasks, or an empty list
+     */
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query,
             TaskRepository repository, Date since) {
 
