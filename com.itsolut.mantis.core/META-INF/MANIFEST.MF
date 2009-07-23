@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.core.runtime,
  javax.wsdl;bundle-version="1.5.1",
  org.eclipse.core.net
 Eclipse-RegisterBuddy: org.apache.axis
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: 
  com.itsolut.mantis.binding,
  com.itsolut.mantis.core,
