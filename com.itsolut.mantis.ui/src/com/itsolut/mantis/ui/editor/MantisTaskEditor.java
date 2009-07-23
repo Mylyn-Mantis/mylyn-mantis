@@ -21,7 +21,6 @@ package com.itsolut.mantis.ui.editor;
 import java.util.Set;
 
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
@@ -41,9 +40,6 @@ public class MantisTaskEditor extends AbstractTaskEditorPage {
 	protected TextViewer additionalViewer;
 	
 	protected static final int DESCRIPTION_HEIGHT = 150;
-	private static final int DESCRIPTION_WIDTH = 79 * 7; // 500;
-	
-	private TaskData taskData;
 	
 	public MantisTaskEditor(TaskEditor editor, String connectorKind) {
 		super(editor, connectorKind);
