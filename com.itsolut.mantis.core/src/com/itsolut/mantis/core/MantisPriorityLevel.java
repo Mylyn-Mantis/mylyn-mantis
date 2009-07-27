@@ -26,9 +26,14 @@ public enum MantisPriorityLevel {
 		}
 	}
 
+	/**
+	 * 
+	 * @param priority the priority as a String, may be null
+	 * @return the PriorityLevel, never null
+	 */
 	public static PriorityLevel fromPriority(String priority) {
 		if (priority == null)
-			return null;
+			return PriorityLevel.P3; // fix for task #72
 		if (priority.equals("immediate"))
 			return PriorityLevel.P1;
 		if (priority.equals("urgent"))
@@ -41,7 +46,9 @@ public enum MantisPriorityLevel {
 			return PriorityLevel.P4;
 		if (priority.equals("none"))
 			return PriorityLevel.P3;
-		return null;
+		
+		// fix for task #72
+		return PriorityLevel.P3;
 	}
 	
 	public static String getMylynPriority(String mantisPriority) {
