@@ -123,7 +123,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             String filename = source.getName();
 
             if (CONTEXT_DESCRIPTION.equals(source.getDescription()))
-                filename = CONTEXT_DESCRIPTION + "-" + dateFormat.format(new Date());
+                filename = CONTEXT_DESCRIPTION + "-" + dateFormat.format(new Date()) + ".zip"; // add zip extension
 
             client.putAttachmentData(id, filename, data);
         } catch (Exception e) {
