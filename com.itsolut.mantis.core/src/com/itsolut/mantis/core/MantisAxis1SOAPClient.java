@@ -26,6 +26,7 @@ import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.Stub;
 
 import org.apache.axis.configuration.FileProvider;
+import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -646,7 +647,14 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     public void putAttachmentData(int ticketID, String filename, byte[] data) throws MantisException {
 
+    	boolean requiresBase64EncodedAttachment = getRepositoryVersion(new NullProgressMonitor()).isRequiresBase64EncodedAttachment();
+    	
         try {
+        	
+        	// TODO - we should determine the encoding
+        	if ( requiresBase64EncodedAttachment)
+        		data = Base64.encode(data).getBytes();
+        	
             getSOAP().mc_issue_attachment_add(username, password, BigInteger.valueOf(ticketID), filename, "bug", data);
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
