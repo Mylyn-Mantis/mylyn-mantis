@@ -15,7 +15,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
+import org.eclipse.mylyn.internal.tasks.core.TaskTask;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 
@@ -28,6 +30,8 @@ import com.itsolut.mantis.core.IMantisClient.Version;
  * 
  */
 public class MantisTaskDataHandlerTest extends TestCase {
+	
+	private String defaultRepositoryUrl = "http://www.mantisbt.org/bugs/api/soap/mantisconnect.php";
 
 	private MantisRepositoryConnector connector;
 
@@ -134,7 +138,29 @@ public class MantisTaskDataHandlerTest extends TestCase {
 		} catch (CoreException e) {
 		}
 	}
+	
+	public void testUnableToCloneNullTask() {
+		
+		assertFalse(taskDataHandler.canInitializeSubTaskData(repository, null));
+	}
+	
+	public void testUnableToCloneTaskWithoutProperKey() {
+		
+		assertFalse(taskDataHandler.canInitializeSubTaskData(repository, newDummyTask()));
+	}
 
+	private ITask newDummyTask() {
+		
+		return new TaskTask(MantisCorePlugin.REPOSITORY_KIND, defaultRepositoryUrl, "1");
+	}
+	
+	public void testAbleToCloneTaskWithProperKey() {
+		
+		ITask task = newDummyTask();
+		task.setAttribute(MantisRepositoryConnector.TASK_KEY_SUPPORTS_SUBTASKS, Boolean.TRUE.toString());
+		assertTrue(taskDataHandler.canInitializeSubTaskData(repository, task));
+	}
+	
 //	public void testPostTaskDataInvalidCredentials() throws Exception {
 //		init(MantisTestConstants.TEST_MANTIS_HTTP_URL, Version.MC_1_0a5);
 //		postTaskDataInvalidCredentials();
