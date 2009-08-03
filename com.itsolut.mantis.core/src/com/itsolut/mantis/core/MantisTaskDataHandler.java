@@ -799,29 +799,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     		TaskData taskData, TaskData parentTaskData, IProgressMonitor monitor)
     		throws CoreException {
 		
-    	if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
-			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
-					RepositoryStatus.ERROR_REPOSITORY, "The repository does not support subtasks."));
-
+    	validateSupportsSubtasks(repository, parentTaskData);
     	
         try {
-			IMantisClient client = connector.getClientManager().getRepository(
-			        repository);
-			client.updateAttributes(monitor, false);
-			createDefaultAttributes(taskData, client, monitor, false);
-			
-			TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
-			taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());
-			
-			createProjectSpecificAttributes(taskData, client, monitor);
-			
-			TaskMapper mapper = new TaskMapper(taskData);
-			mapper.merge(new TaskMapper(parentTaskData));
-			mapper.setDescription(""); 
-			mapper.setSummary(""); 
-			
-			TaskAttribute attribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.CHILD_OF.getKey());
-			attribute.setValue(parentTaskData.getTaskId());
+			createAttributesForTaskData(repository, taskData, parentTaskData, monitor);
+			copyAttributesFromParent(taskData, parentTaskData); 
+			clearTaskRelations(taskData);
+			setChildAttribute(taskData, parentTaskData);
 
 			return true;
 		} catch (MalformedURLException e) {
@@ -832,5 +816,47 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 					RepositoryStatus.ERROR_REPOSITORY, "Failed updating attributes."));
 
 		}
+    }
+
+    private void validateSupportsSubtasks(TaskRepository repository, TaskData parentTaskData) throws CoreException {
+
+        if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
+			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
+					RepositoryStatus.ERROR_REPOSITORY, "The repository does not support subtasks."));
+    }
+    
+    private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,
+            IProgressMonitor monitor) throws MalformedURLException, MantisException, CoreException {
+
+        IMantisClient client = connector.getClientManager().getRepository(
+                repository);
+        client.updateAttributes(monitor, false);
+        createDefaultAttributes(taskData, client, monitor, false);
+        
+        TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
+        taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());
+        
+        createProjectSpecificAttributes(taskData, client, monitor);
+    }
+    
+    private void copyAttributesFromParent(TaskData taskData, TaskData parentTaskData) {
+
+        TaskMapper mapper = new TaskMapper(taskData);
+        mapper.merge(new TaskMapper(parentTaskData));
+        mapper.setDescription(""); 
+        mapper.setSummary("");
+    }
+    
+
+    private void clearTaskRelations(TaskData taskData) {
+
+        for (Key taskRelationKey : MantisAttributeMapper.taskRelationKeys())
+            taskData.getRoot().getAttribute(taskRelationKey.getKey()).clearValues();
+    }
+    
+    private void setChildAttribute(TaskData taskData, TaskData parentTaskData) {
+
+        TaskAttribute attribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.CHILD_OF.getKey());
+        attribute.setValue(parentTaskData.getTaskId());
     }
 }

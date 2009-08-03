@@ -11,7 +11,10 @@
 
 package com.itsolut.mantis.core;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITaskAttachment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -30,8 +33,18 @@ import com.itsolut.mantis.core.util.MantisUtils;
  * @since 3.0
  */
 public class MantisAttributeMapper extends TaskAttributeMapper {
+    
+    private final static Set<Key> _taskRelationKeys = EnumSet.of(Key.PARENT_OF, Key.CHILD_OF, Key.RELATED_TO, Key.HAS_DUPLICATE, Key.DUPLICATE_OF);
 
     private static final long serialVersionUID = 5333211422546115138L;
+    
+    /**
+     * @return an unmodifiable set containing all the {@link Key keys} which are related to task relations.
+     */
+    public static final Set<Key> taskRelationKeys() {
+        
+        return Collections.unmodifiableSet(_taskRelationKeys);
+    }
 
     /**
      * Attribute controls how information is displayed in the Attributes column and in the Text editor.
