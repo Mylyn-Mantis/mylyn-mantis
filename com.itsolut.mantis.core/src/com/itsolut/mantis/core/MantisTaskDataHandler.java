@@ -767,7 +767,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         } catch (OperationCanceledException e) {
             throw e;
         } catch (Exception e) {
-            // TODO catch TracException
             throw new CoreException(MantisCorePlugin.toStatus(e));
         }
     }
@@ -792,10 +791,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             customAttribute.getMetaData().setLabel(customField.getName());
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
             customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
-            customAttribute.getMetaData().setDefaultOption(customField.getDefaultValue());
             
             if ( ticket != null)
                 customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
+            else
+                customAttribute.setValue(customField.getDefaultValue());
             
             if ( customField.getPossibleValues() != null)
                 for ( String possibleValue : customField.getPossibleValues())
