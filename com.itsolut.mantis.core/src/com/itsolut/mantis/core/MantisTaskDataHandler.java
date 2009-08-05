@@ -619,16 +619,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport() && MantisUtils.isEmpty(targetVersionAttr.getValue()))
                 targetVersionAttr.setValue("none");
             
-            List<MantisCustomField> customFields = client.getCustomFieldsForProject(projectAttribute.getValue(), monitor);
-            for ( MantisCustomField customField : customFields ) {
-                
-                TaskAttribute customAttribute = data.getRoot().createAttribute(customField.getName());
-                customAttribute.getMetaData().setReadOnly(true);
-                customAttribute.getMetaData().setLabel(customField.getName());
-                customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
-                customAttribute.getMetaData().setType(TaskAttribute.TYPE_SHORT_TEXT);
-            }
-            
         } catch (MantisException ex) {
             MantisCorePlugin.log(new Status(Status.ERROR,
                     MantisCorePlugin.PLUGIN_ID, 0, ex.getMessage(), ex));
@@ -751,6 +741,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             updateTaskData(repository, getAttributeMapper(repository),
                     taskData, client, ticket);
             createProjectSpecificAttributes(taskData, client, monitor);
+            createCustomFieldAttributes(taskData, client, ticket, monitor);
 
             if (!MantisRepositoryConnector.hasRichEditor(repository))
                 // updateTaskDataFromTicket(taskData, ticket, client);
@@ -762,6 +753,24 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             // TODO catch TracException
             throw new CoreException(MantisCorePlugin.toStatus(e));
         }
+    }
+
+    private void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
+            MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+        
+        TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
+
+
+        List<MantisCustomField> customFields = client.getCustomFieldsForProject(projectAttribute.getValue(), monitor);
+        for ( MantisCustomField customField : customFields ) {
+            TaskAttribute customAttribute = taskData.getRoot().createAttribute(customField.getName());
+            customAttribute.getMetaData().setReadOnly(true);
+            customAttribute.getMetaData().setLabel(customField.getName());
+            customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
+            customAttribute.getMetaData().setType(TaskAttribute.TYPE_SHORT_TEXT);
+            customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
+        }
+        
     }
 
     /**

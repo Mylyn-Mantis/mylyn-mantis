@@ -39,6 +39,7 @@ import org.eclipse.mylyn.commons.net.Policy;
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
 import com.itsolut.mantis.binding.CustomFieldDefinitionData;
+import com.itsolut.mantis.binding.CustomFieldValueForIssueData;
 import com.itsolut.mantis.binding.CustomMantisConnectLocator;
 import com.itsolut.mantis.binding.FilterData;
 import com.itsolut.mantis.binding.IssueData;
@@ -435,6 +436,9 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         if (issue.getRelationships() != null)
             for (RelationshipData rel : issue.getRelationships())
                 parseRelation(ticket, rel);
+        
+        for ( CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields() )
+            ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
 
         return ticket;
     }

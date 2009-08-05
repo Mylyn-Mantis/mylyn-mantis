@@ -123,6 +123,8 @@ public class MantisTicket {
     private List<MantisAttachment> attachments;
 
     private List<MantisRelationship> relationships;
+    
+    private Map<String, String> customFieldValues = new HashMap<String, String>(); 
 
     //	private String[] actions;
     //
@@ -240,6 +242,16 @@ public class MantisTicket {
             throw new InvalidTicketException("Expected string value for custom key '" + keyName + "', got '" + value + "'");
         }
         return true;
+    }
+    
+    public void putCustomFieldValue(String customFieldName, String value) {
+        
+        customFieldValues.put(customFieldName, value);
+    }
+    
+    public String getCustomFieldValue(String customFieldName) {
+        
+        return customFieldValues.get(customFieldName);
     }
 
     public void addComment(MantisComment comment) {
