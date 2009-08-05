@@ -37,7 +37,11 @@ import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -134,9 +138,20 @@ public class NewMantisTaskPage extends WizardPage {
 
 		});
 		
-		updateAttributesFromRepository();
+		updateAttributesFromRepository(false);
 		
 		projectTreeViewer.setInput(getProjects());
+		
+		Button updateButton = new Button(control, SWT.LEFT | SWT.PUSH);
+		updateButton.setText("Update attributes");
+		updateButton.setLayoutData(new GridData());
+		updateButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				updateAttributesFromRepository(true);
+			}
+		});
+		
 		setControl(tree);
     }
 
@@ -161,9 +176,9 @@ public class NewMantisTaskPage extends WizardPage {
 		return getSelectedProject() != null;
     }
 
-    private void updateAttributesFromRepository() {
+    private void updateAttributesFromRepository(boolean force) {
 
-        MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, false);
+        MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, force);
     }
 
     public MantisProject getSelectedProject() {
