@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,6 +45,8 @@ import com.itsolut.mantis.core.exception.InvalidTicketException;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisAttachment;
 import com.itsolut.mantis.core.model.MantisComment;
+import com.itsolut.mantis.core.model.MantisCustomField;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisProjectCategory;
 import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisTicket;
@@ -561,10 +564,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     MantisAttributeMapper.Attribute.CATEGORY.getKey());
             attr.clearOptions();
             boolean first = MantisUtils.isEmpty(attr.getValue());
-            for (MantisProjectCategory mp : client.getProjectCategories(data
-                    .getRoot().getAttribute(
-                            MantisAttributeMapper.Attribute.PROJECT.getKey())
-                            .getValue())) {
+            TaskAttribute projectAttribute = data.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
+            
+            for (MantisProjectCategory mp : client.getProjectCategories(projectAttribute.getValue())) {
                 if (first) {
                     attr.setValue(mp.toString());
                     first = false;
@@ -616,7 +618,17 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport() && MantisUtils.isEmpty(targetVersionAttr.getValue()))
                 targetVersionAttr.setValue("none");
-
+            
+            List<MantisCustomField> customFields = client.getCustomFieldsForProject(projectAttribute.getValue(), monitor);
+            for ( MantisCustomField customField : customFields ) {
+                
+                TaskAttribute customAttribute = data.getRoot().createAttribute(customField.getName());
+                customAttribute.getMetaData().setReadOnly(true);
+                customAttribute.getMetaData().setLabel(customField.getName());
+                customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
+                customAttribute.getMetaData().setType(TaskAttribute.TYPE_SHORT_TEXT);
+            }
+            
         } catch (MantisException ex) {
             MantisCorePlugin.log(new Status(Status.ERROR,
                     MantisCorePlugin.PLUGIN_ID, 0, ex.getMessage(), ex));

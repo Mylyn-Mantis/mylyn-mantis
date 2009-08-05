@@ -29,6 +29,7 @@ import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisCustomField;
 import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
@@ -193,5 +194,19 @@ public abstract class AbstractMantisClient implements IMantisClient {
 		return data.getCustomFieldTypes();
 	}
 	
-	
+	public List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor)
+	        throws MantisException {
+
+	    if ( !hasAttributes()) {
+            updateAttributes(monitor);
+            data.lastUpdate = System.currentTimeMillis();
+        }
+
+	    for ( MantisProject project : getProjects())
+            if ( project.getName().equals(projectName))
+	            return data.getCustomFields(project.getValue());
+	    
+	    throw new MantisException("No custom field project data found for project with name " + projectName + " .");
+	    
+	}
 }
