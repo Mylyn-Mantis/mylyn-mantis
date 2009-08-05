@@ -64,7 +64,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, true, true),
         DESCRIPTION(Key.DESCRIPTION, "Description:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
-        ETA(Key.ETA, "ETA:", TaskAttribute.TYPE_SHORT_TEXT, false, false),
+        ETA(Key.ETA, "ETA:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, true, true),
         PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
