@@ -44,7 +44,7 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 
 	private TaskRepository taskRepository;
 
-	private NewMantisTaskPage newTaskPage;
+	private MantisProjectPage newTaskPage;
 
 
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -52,7 +52,7 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		newTaskPage = new NewMantisTaskPage(this.taskRepository);
+		newTaskPage = new MantisProjectPage(this.taskRepository);
 		addPage(newTaskPage);
 	}
 	

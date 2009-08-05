@@ -54,20 +54,20 @@ import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
- * Wizard page for creating new Mantis tickets through a rich editor.
+ * Wizard page selecting a repository project
  * 
  * @author Steffen Pingel
  * @author Chris Hane
  * @author Robert Munteanu
  */
-public class NewMantisTaskPage extends WizardPage {
+public class MantisProjectPage extends WizardPage {
 
     private TaskRepository taskRepository;
 	private EnhancedFilteredTree tree;
 
-    public NewMantisTaskPage(TaskRepository taskRepository) {
+    public MantisProjectPage(TaskRepository taskRepository) {
         super("New Task");
-        setTitle("Mantis - New Issue");
+        setTitle("Mantis - Select project");
         setDescription("Select the tickets project.");
         setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.itsolut.mantis.ui",
         "icons/wizban/mantis_logo_button.gif"));
