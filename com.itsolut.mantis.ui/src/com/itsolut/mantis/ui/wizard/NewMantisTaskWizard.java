@@ -20,6 +20,8 @@ import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.itsolut.mantis.core.model.MantisProject;
+
 /**
  * Wizard for creating new Mantis tickets through a rich editor..
  * 
@@ -57,11 +59,11 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 
 	@Override
 	protected ITaskMapping getInitializationData() {
-		final String project = newTaskPage.getSelectedProject();
+		final MantisProject project = newTaskPage.getSelectedProject();
 		return new TaskMapping() {
 			@Override
 			public String getProduct() {
-				return project;
+				return project.getName();
 			}
 		};
 	}

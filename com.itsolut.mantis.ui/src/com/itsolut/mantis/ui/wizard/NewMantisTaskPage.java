@@ -21,36 +21,32 @@
 
 package com.itsolut.mantis.ui.wizard;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
@@ -58,12 +54,12 @@ import com.itsolut.mantis.ui.util.MantisUIUtil;
  * 
  * @author Steffen Pingel
  * @author Chris Hane
+ * @author Robert Munteanu
  */
 public class NewMantisTaskPage extends WizardPage {
 
     private TaskRepository taskRepository;
-
-    public Combo projectCombo;
+	private EnhancedFilteredTree tree;
 
     public NewMantisTaskPage(TaskRepository taskRepository) {
         super("New Task");
@@ -76,48 +72,93 @@ public class NewMantisTaskPage extends WizardPage {
     }
     public void createControl(Composite parent) {
 
-        Composite control = new Composite(parent, SWT.NONE);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-        control.setLayoutData(gd);
-        GridLayout layout = new GridLayout(1, false);
-        control.setLayout(layout);
+        Composite control = new Composite(parent, SWT.NULL);
+        control.setLayout(new GridLayout());
 
-    	
-        projectCombo = new Combo(control, SWT.READ_ONLY);
-        projectCombo.add("Select Project for new Issue");
-        setControl(projectCombo);
+		tree = new EnhancedFilteredTree(control, SWT.SINGLE | SWT.BORDER, new PatternFilter());
+        
+		tree.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, true).hint(
+				SWT.DEFAULT, 200).create());
+		
+		TreeViewer projectTreeViewer = tree.getViewer();
+		
+		projectTreeViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if (element instanceof MantisProject) {
+					MantisProject project = (MantisProject) element;
+					return project.getName() ; 
+				}
+				return "";
+			}
+		});
+		
+		projectTreeViewer.setContentProvider(new ITreeContentProvider() {
+
+			public Object[] getChildren(Object parentElement) {
+				if (parentElement instanceof MantisProject[]) {
+					return (MantisProject[]) parentElement;
+				}
+				return null;
+			}
+
+			public Object getParent(Object element) {
+				return null;
+			}
+
+			public boolean hasChildren(Object element) {
+				return false;
+			}
+
+			public Object[] getElements(Object inputElement) {
+				return getChildren(inputElement);
+			}
+
+			public void dispose() {
+			}
+
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+		});
+		
+		projectTreeViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (getSelectedProject() == null) {
+					setErrorMessage("Please select a project.");
+				} else {
+					setErrorMessage(null);
+				}
+				getWizard().getContainer().updateButtons();
+			}
+
+		});
+		
+		updateAttributesFromRepository();
+		
+		projectTreeViewer.setInput(getProjects());
+		setControl(tree);
+    }
+
+
+    private MantisProject[] getProjects() {
 
         try {
-            MantisRepositoryConnector connector = (MantisRepositoryConnector)TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-            IMantisClient client = connector.getClientManager().getRepository(taskRepository);
-
-            for(MantisProject pd : client.getProjects())
-                projectCombo.add(pd.getName());
-            projectCombo.setText(projectCombo.getItem(0));
-
-            projectCombo.addSelectionListener(new SelectionListener() {
-                public void widgetSelected(SelectionEvent e) {
-                    getWizard().getContainer().updateButtons();
-                }
-
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    //nothing
-                }
-            });
-        } catch (Exception e1) {
-            MantisCorePlugin.log(e1);
-        }
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        updateAttributesFromRepository();
-    }
-
-    @Override
+			MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+			.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+			IMantisClient client = connector.getClientManager().getRepository(taskRepository);
+			return client.getProjects();
+		} catch (MalformedURLException e) {
+			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+			return new MantisProject[0];
+		} catch (MantisException e) {
+			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+			return new MantisProject[0];
+		}
+	}
+	@Override
     public boolean isPageComplete() {
-        return projectCombo!=null && projectCombo.getSelectionIndex()!=0;
+		return getSelectedProject() != null;
     }
 
     private void updateAttributesFromRepository() {
@@ -125,8 +166,9 @@ public class NewMantisTaskPage extends WizardPage {
         MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, false);
     }
 
-    public String getSelectedProject() {
-        return projectCombo.getText();
+    public MantisProject getSelectedProject() {
+		IStructuredSelection selection = (IStructuredSelection) tree.getViewer().getSelection();
+		return (MantisProject) selection.getFirstElement();
     }
 
 }
