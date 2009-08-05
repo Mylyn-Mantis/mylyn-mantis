@@ -133,7 +133,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private static final String CONTEXT_ATTACHMENT_FILENAME_LEGACY = "mylar-context.zip";
 
-    private final EnumMap<Attribute, RelationType> attributeToRelationType = new EnumMap<Attribute, RelationType>(Attribute.class);
+    private final Map<Attribute, RelationType> attributeToRelationType = new EnumMap<Attribute, RelationType>(Attribute.class);
 
     {
         attributeToRelationType.put(Attribute.RELATED_TO, RelationType.RELATED);
@@ -143,6 +143,22 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         attributeToRelationType.put(Attribute.CHILD_OF, RelationType.CHILD);
     }
 
+    
+    private final Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
+    
+    {
+        customFieldTypeToTaskType.put(MantisCustomFieldType.CHECKBOX, TaskAttribute.TYPE_BOOLEAN);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.DATE, TaskAttribute.TYPE_DATE);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.EMAIL, TaskAttribute.TYPE_SHORT_TEXT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.ENUM, TaskAttribute.TYPE_SINGLE_SELECT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.FLOAT, TaskAttribute.TYPE_SHORT_TEXT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.LIST , TaskAttribute.TYPE_SINGLE_SELECT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.MULTILIST, TaskAttribute.TYPE_MULTI_SELECT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.NUMERIC, TaskAttribute.TYPE_SHORT_TEXT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.RADIO, TaskAttribute.TYPE_SINGLE_SELECT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.STRING, TaskAttribute.TYPE_SHORT_TEXT);
+    }
+    
     public MantisTaskDataHandler(MantisRepositoryConnector connector) {
         this.connector = connector;
     }
@@ -764,10 +780,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         List<MantisCustomField> customFields = client.getCustomFieldsForProject(projectAttribute.getValue(), monitor);
         for ( MantisCustomField customField : customFields ) {
             TaskAttribute customAttribute = taskData.getRoot().createAttribute(customField.getName());
-            customAttribute.getMetaData().setReadOnly(true);
+            customAttribute.getMetaData().setReadOnly(false);
             customAttribute.getMetaData().setLabel(customField.getName());
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
-            customAttribute.getMetaData().setType(TaskAttribute.TYPE_SHORT_TEXT);
+            customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
             customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
         }
         

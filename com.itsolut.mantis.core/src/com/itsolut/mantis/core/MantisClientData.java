@@ -147,4 +147,14 @@ public class MantisClientData implements Serializable {
        
        return Collections.unmodifiableList(customFields);
    }
+
+    public MantisCustomField getCustomFieldByProjectIdAndFieldName(int projectId, String customFieldName) {
+    
+        List<MantisCustomField> customFields = getCustomFields(projectId);
+        
+        for ( MantisCustomField customField : customFields) 
+            if ( customField.getName().equals(customFieldName))
+                return customField;
+        throw new IllegalArgumentException("No custom field by name " + customFieldName + " for project with id " + projectId + " .");
+    }
 }

@@ -262,4 +262,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
     }
 
+    
+    
 }

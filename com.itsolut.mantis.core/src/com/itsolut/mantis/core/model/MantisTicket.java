@@ -22,6 +22,7 @@
 package com.itsolut.mantis.core.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -239,7 +240,7 @@ public class MantisTicket {
             //		} else if (value instanceof String) {
             //			putCustomValue(keyName, value);
         } else {
-            throw new InvalidTicketException("Expected string value for custom key '" + keyName + "', got '" + value + "'");
+            putCustomFieldValue(keyName, value);
         }
         return true;
     }
@@ -249,10 +250,16 @@ public class MantisTicket {
         customFieldValues.put(customFieldName, value);
     }
     
-    public String getCustomFieldValue(String customFieldName) {
+    public Map<String,String> getCustomFieldValues() {
         
-        return customFieldValues.get(customFieldName);
+        return Collections.unmodifiableMap(customFieldValues);
     }
+    
+    public String getCustomFieldValue(String name) {
+
+        return customFieldValues.get(name);
+    }
+    
 
     public void addComment(MantisComment comment) {
         if (comments == null) {

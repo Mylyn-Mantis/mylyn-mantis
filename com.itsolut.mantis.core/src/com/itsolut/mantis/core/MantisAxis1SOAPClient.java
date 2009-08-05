@@ -436,9 +436,10 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         if (issue.getRelationships() != null)
             for (RelationshipData rel : issue.getRelationships())
                 parseRelation(ticket, rel);
-        
-        for ( CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields() )
-            ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
+
+        for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
+            ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue
+                    .getValue());
 
         return ticket;
     }
@@ -598,6 +599,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private MantisCustomField parseCustomFieldData(CustomFieldDefinitionData customFieldData) {
 
         MantisCustomField customField = new MantisCustomField();
+        customField.setId(customFieldData.getField().getId().intValue());
         customField.setName(customFieldData.getField().getName());
         customField.setType(MantisCustomFieldType.fromMantisConstant(customFieldData.getType()
                 .intValue()));
@@ -632,7 +634,6 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         Policy.advance(monitor, 1);
     }
-    
 
     private void loadProjectFilters(SubMonitor subMonitor, MantisProject project)
             throws MantisException {
@@ -643,19 +644,18 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             MantisProjectFilter[] data = new MantisProjectFilter[filterData.length];
 
             for (int x = 0; x < filterData.length; x++) {
-                data[x] = new MantisProjectFilter(filterData[x].getName(), filterData[x]
-                        .getId().intValue());
+                data[x] = new MantisProjectFilter(filterData[x].getName(), filterData[x].getId()
+                        .intValue());
             }
 
             filters.put(project.getName(), data);
 
             Policy.advance(subMonitor, 1);
         } catch (RemoteException e) {
-            MantisCorePlugin.log("Failed retrieving filters for project "
-                    + project.getName() + " .", e);
+            MantisCorePlugin.log("Failed retrieving filters for project " + project.getName()
+                    + " .", e);
         }
     }
-    
 
     private void loadProjectCustomFields(SubMonitor subMonitor, MantisProject project)
             throws MantisException {
@@ -809,6 +809,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private IssueData createSOAPIssue(MantisTicket ticket, IProgressMonitor monitor)
             throws MantisException {
 
+        ObjectRef project = getProject(ticket.getValue(Key.PROJECT));
+
         IssueData issue = new IssueData();
         issue.setSummary(ticket.getValue(Key.SUMMARY));
         issue.setDescription(ticket.getValue(Key.DESCRIPTION));
@@ -821,7 +823,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         issue.setEta(newRef(data.etas, Key.ETA, ticket));
         issue.setView_state(newRef(data.viewStates, Key.VIEW_STATE, ticket));
 
-        issue.setProject(getProject(ticket.getValue(Key.PROJECT)));
+        issue.setProject(project);
         issue.setCategory(ticket.getValue(Key.CATEOGRY));
 
         issue.setVersion(ticket.getValueAndFilterNone(Key.VERSION));
@@ -839,10 +841,44 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         } else {
             issue.setReporter(createReport(ticket.getValue(Key.REPORTER)));
         }
+
         issue.setHandler(createReport(ticket.getValue(Key.ASSIGNED_TO)));
         issue.setLast_updated(MantisUtils.transform(new Date()));
+
+        setCustomFields(ticket, project, issue);
+
         return issue;
     }
+
+
+    
+    private void setCustomFields(MantisTicket ticket, ObjectRef project, IssueData issue) {
+
+        if ( ticket.getCustomFieldValues().isEmpty())
+            return;
+        
+        List<CustomFieldValueForIssueData> customFieldValues = new ArrayList<CustomFieldValueForIssueData>(
+                ticket.getCustomFieldValues().size());
+
+        for (Map.Entry<String, String> entry : ticket.getCustomFieldValues().entrySet())
+            customFieldValues.add(extractCustomFieldValue(project, entry));
+        
+        issue.setCustom_fields(customFieldValues.toArray(new CustomFieldValueForIssueData[0]));
+    }
+    
+    private CustomFieldValueForIssueData extractCustomFieldValue(ObjectRef project,
+            Map.Entry<String, String> entry) {
+
+        String customFieldName = entry.getKey();
+        MantisCustomField customField = data.getCustomFieldByProjectIdAndFieldName(project.getId()
+                .intValue(), customFieldName);
+        ObjectRef customFieldRef = new ObjectRef(BigInteger.valueOf(customField.getId()),
+                customField.getName());
+        CustomFieldValueForIssueData customFieldValueForIssueData = new CustomFieldValueForIssueData(
+                customFieldRef, entry.getValue());
+        return customFieldValueForIssueData;
+    }
+    
 
     private AccountData createReport(String name) {
 
