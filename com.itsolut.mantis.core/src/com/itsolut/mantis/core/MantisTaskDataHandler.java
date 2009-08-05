@@ -144,7 +144,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     
-    private final Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
+    private final static Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
     
     {
         customFieldTypeToTaskType.put(MantisCustomFieldType.CHECKBOX, TaskAttribute.TYPE_BOOLEAN);
@@ -180,6 +180,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
             projectAttribute.setValue(initializationData.getProduct());
             createProjectSpecificAttributes(data, client, monitor);
+            createCustomFieldAttributes(data, client, null, monitor);
             return true;
         } catch (OperationCanceledException e) {
             throw e;
@@ -771,7 +772,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    private void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
+    /**
+     * @param taskData
+     * @param client
+     * @param ticket the existing ticket, or null
+     * @param monitor
+     * @throws MantisException
+     */
+    public static void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
             MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
         
         TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
@@ -784,7 +792,16 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             customAttribute.getMetaData().setLabel(customField.getName());
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
             customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
-            customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
+            customAttribute.getMetaData().setDefaultOption(customField.getDefaultValue());
+            
+            if ( ticket != null)
+                customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
+            
+            if ( customField.getPossibleValues() != null)
+                for ( String possibleValue : customField.getPossibleValues())
+                    customAttribute.putOption(possibleValue, possibleValue);
+                
+            
         }
         
     }

@@ -437,9 +437,11 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             for (RelationshipData rel : issue.getRelationships())
                 parseRelation(ticket, rel);
 
-        for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
-            ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue
-                    .getValue());
+        
+        if (issue.getCustom_fields() != null)
+            for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
+                ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue
+                        .getValue());
 
         return ticket;
     }
@@ -603,6 +605,9 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         customField.setName(customFieldData.getField().getName());
         customField.setType(MantisCustomFieldType.fromMantisConstant(customFieldData.getType()
                 .intValue()));
+        customField.setDefaultValue(customFieldData.getDefault_value());
+        if ( customFieldData.getPossible_values() != null)
+            customField.setPossibleValues(customFieldData.getPossible_values().split("\\|"));
 
         return customField;
     }
