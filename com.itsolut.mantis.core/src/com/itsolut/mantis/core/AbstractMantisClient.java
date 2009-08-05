@@ -22,12 +22,14 @@
 package com.itsolut.mantis.core;
 
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -158,6 +160,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 	}
 	
 	public abstract void updateAttributes(IProgressMonitor monitor) throws MantisException;
+	
 	protected abstract void updateUsers(String projectId) throws MantisException;
 
 	public void setData(MantisClientData data) {
@@ -177,6 +180,17 @@ public abstract class AbstractMantisClient implements IMantisClient {
 	    }
 	
 	    return data.getRepositoryVersion();
+	}
+	
+	public List<MantisCustomFieldType> getCustomFieldTypes(
+			IProgressMonitor monitor) throws MantisException {
+		
+		if ( !hasAttributes()) {
+			updateAttributes(monitor);
+			data.lastUpdate = System.currentTimeMillis();
+		}
+		
+		return data.getCustomFieldTypes();
 	}
 	
 	

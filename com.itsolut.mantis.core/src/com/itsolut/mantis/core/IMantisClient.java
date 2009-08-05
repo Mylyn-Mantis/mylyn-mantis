@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -202,4 +203,6 @@ public interface IMantisClient {
 	void setData(MantisClientData data);
 	
 	RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException;
+	
+	List<MantisCustomFieldType> getCustomFieldTypes(IProgressMonitor monitor) throws MantisException;
 }

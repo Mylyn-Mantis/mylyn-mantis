@@ -28,10 +28,13 @@ import javax.xml.rpc.Stub;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.Policy;
 
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
@@ -49,6 +52,7 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.core.model.MantisAttachment;
 import com.itsolut.mantis.core.model.MantisComment;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -456,7 +460,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     @Override
     public synchronized void updateAttributes(IProgressMonitor monitor) throws MantisException {
         
-        SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 11);
+        SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 12);
 
         try {
 
@@ -571,15 +575,41 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
                 
                 
             }
-
+            
             if (subMonitor.isCanceled())
                 throw new OperationCanceledException();
+            
+            loadCustomFieldTypes(subMonitor);
+            
+
 
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
             throw new MantisRemoteException(e);
         }
     }
+
+	private void loadCustomFieldTypes(IProgressMonitor monitor) throws RemoteException, MantisException {
+		
+		ObjectRef[] mcEnumCustomFieldTypes = getSOAP().mc_enum_custom_field_types(username, password);
+		
+		List<MantisCustomFieldType> customFieldTypes = new ArrayList<MantisCustomFieldType>(mcEnumCustomFieldTypes.length);
+		
+		for ( ObjectRef objectRef : mcEnumCustomFieldTypes) {
+			
+			MantisCustomFieldType customFieldType = MantisCustomFieldType.fromMantisConstant(objectRef.getId().intValue());
+			if ( customFieldType == null) {
+				MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Unknown custom field type " + objectRef.getId() + " (" + objectRef.getName() + " ). Ignoring."));
+				continue;
+			}
+			
+			customFieldTypes.add(customFieldType);
+		}
+		
+		data.setCustomFieldTypes(customFieldTypes);
+		
+		Policy.advance(monitor, 1);
+	}
 
     private MantisViewState parseViewState(ObjectRef or) {
 

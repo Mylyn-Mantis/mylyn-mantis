@@ -11,8 +11,10 @@
 package com.itsolut.mantis.core;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProjection;
@@ -47,6 +49,8 @@ public class MantisClientData implements Serializable {
 	List<MantisProjection> projections;
 	
 	private RepositoryVersion repositoryVersion;
+	
+	private List<MantisCustomFieldType> customFieldTypes = Collections.emptyList();
 
 	long lastUpdate = 0;
 	
@@ -101,5 +105,13 @@ public class MantisClientData implements Serializable {
         return repositoryVersion;
     }
 	
+    public List<MantisCustomFieldType> getCustomFieldTypes() {
+		return Collections.unmodifiableList(customFieldTypes);
+	}
+    
+    public void setCustomFieldTypes(List<MantisCustomFieldType> customFieldTypes) {
+		this.customFieldTypes = customFieldTypes;
+	}
+    
 
 }
