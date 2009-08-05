@@ -47,6 +47,7 @@ import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.ui.MantisUIPlugin;
@@ -62,7 +63,6 @@ public class NewMantisTaskPage extends WizardPage {
 
     private TaskRepository taskRepository;
 
-    private TaskData taskData;
     public Combo projectCombo;
 
     public NewMantisTaskPage(TaskRepository taskRepository) {
@@ -75,12 +75,7 @@ public class NewMantisTaskPage extends WizardPage {
         this.taskRepository = taskRepository;
     }
     public void createControl(Composite parent) {
-//		Text text = new Text(parent, SWT.WRAP);
-//		text.setEditable(false);
-//		setControl(text);
-//		text.setText("Click Finish");
-//
-    	
+
         Composite control = new Composite(parent, SWT.NONE);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
         control.setLayoutData(gd);
@@ -102,34 +97,6 @@ public class NewMantisTaskPage extends WizardPage {
 
             projectCombo.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent e) {
-                    if(projectCombo.getSelectionIndex()>0){
-
-                        TaskAttribute attribute = taskData.getRoot().getAttribute(Key.PROJECT.getKey());
-                        attribute.setValue(projectCombo.getText());
-                        final MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                        .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-                        try{
-                            getContainer().run(false, true, new IRunnableWithProgress() {
-                               
-                                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                                
-                                    try {
-                                        MantisTaskDataHandler.createProjectSpecificAttributes(taskData, connector.getClientManager().getRepository(taskRepository), monitor);
-                                    } catch (MalformedURLException e) {
-                                        throw new InvocationTargetException(e);
-                                    }
-                                    
-                                }
-                            });
-                            
-                        } catch (InvocationTargetException ex) {
-                            MantisUIPlugin.handleMantisException(ex);
-                            return;
-                        } catch (InterruptedException ex) {
-                            MantisUIPlugin.handleMantisException(ex);
-                            return;
-                        }
-                    }
                     getWizard().getContainer().updateButtons();
                 }
 
@@ -150,40 +117,12 @@ public class NewMantisTaskPage extends WizardPage {
 
     @Override
     public boolean isPageComplete() {
-        return taskData != null && projectCombo!=null && projectCombo.getSelectionIndex()!=0;
+        return projectCombo!=null && projectCombo.getSelectionIndex()!=0;
     }
 
     private void updateAttributesFromRepository() {
 
         MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, false);
-
-        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(
-                MantisCorePlugin.REPOSITORY_KIND);
-        final IMantisClient client;
-        try {
-            client = connector.getClientManager().getRepository(taskRepository);
-        } catch (MalformedURLException e) {
-            MantisUIPlugin.handleMantisException(e);
-            return;
-        }
-
-        MantisTaskDataHandler offlineHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
-        TaskAttributeMapper attributeMapper = offlineHandler.getAttributeMapper(taskRepository);
-        taskData = new TaskData(attributeMapper, MantisCorePlugin.REPOSITORY_KIND, taskRepository.getRepositoryUrl(), "");
-
-        //default setting
-        taskData.getRoot().createAttribute(Key.PROJECT.getKey()).setValue(projectCombo.getText());
-
-        try {
-            // we can use the NPM since the first call of the method already retrieves the configuration if needed
-            MantisTaskDataHandler.createDefaultAttributes(taskData, client, new NullProgressMonitor(), false);
-        } catch (CoreException e) {
-            MantisUIPlugin.handleMantisException(e.getCause());
-        }
-    }
-
-    public TaskData getRepositoryTaskData() {
-        return taskData;
     }
 
     public String getSelectedProject() {
