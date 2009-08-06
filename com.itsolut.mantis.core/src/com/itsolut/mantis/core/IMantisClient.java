@@ -124,7 +124,7 @@ public interface IMantisClient {
 	 * @throws MantisException
 	 *             thrown in case of a connection error
 	 */
-	void search(MantisSearch query, List<MantisTicket> result) throws MantisException;
+	void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException;
 
 	/**
 	 * Validates the repository connection.
@@ -162,28 +162,28 @@ public interface IMantisClient {
 	 * @param project
 	 * @return all users which are allocated to this project
 	 */
-	String[] getUsers(String project);
+	String[] getUsers(String project, IProgressMonitor monitor);
 	
 	/**
 	 * @param project
 	 * @return all users which are allowed to handle tasks in this project
 	 */
-	String[] getDevelopers(String project);
+	String[] getDevelopers(String project, IProgressMonitor monitor);
 
-	public MantisProject[] getProjects() throws MantisException;
+	public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
 	
-	public MantisProject getProjectByName(String projectName) throws MantisException;
+	public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException;
 
-	public MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
+	public MantisProjectCategory[] getProjectCategories(String projectName, IProgressMonitor monitor) throws MantisException;
 
-	public MantisProjectFilter[] getProjectFilters(String projectName) throws MantisException;
+	public MantisProjectFilter[] getProjectFilters(String projectName, IProgressMonitor monitor) throws MantisException;
 
 //	MantisTicketType[] getTicketTypes();
 
 	/**
 	 * @return The versions for a specific project. 
 	 */
-	MantisVersion[] getVersions(String projectName) throws MantisException;
+	MantisVersion[] getVersions(String projectName, IProgressMonitor monitor) throws MantisException;
 
 	byte[] getAttachmentData(int id) throws MantisException;
 

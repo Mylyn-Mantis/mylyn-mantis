@@ -150,7 +150,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             client = getClientManager().getRepository(repository);
             updateAttributes(repository, monitor, false);
-            client.search(MantisUtils.getMantisSearch(query), tickets);
+            client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
             for (MantisTicket ticket : tickets) {
                 TaskData taskData = offlineTaskHandler
                 .createTaskDataFromTicket(client, repository, ticket,
@@ -260,11 +260,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
      * about the tasks. This allows the connector to get a limited list of items instead
      * of every item in the repository. Next check to see if the tasks have changed since
      * the last synchronization. If so, add their ids to a List.
+     * @param monitor 
      * 
      * @return the ids of the changed tasks, or an empty list
      */
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query,
-            TaskRepository repository, Date since) {
+            TaskRepository repository, Date since, IProgressMonitor monitor) {
 
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
@@ -272,7 +273,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         IMantisClient client;
         try {
             client = getClientManager().getRepository(repository);
-            client.search(MantisUtils.getMantisSearch(query), tickets);
+            client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
 
             for (MantisTicket ticket : tickets) {
                 if (ticket.getLastChanged() != null) {
@@ -452,7 +453,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 boolean belongsToThisRepository = query.getRepositoryUrl().equals(repository.getUrl());
                 
                 if (isMantisQuery && belongsToThisRepository) {
-                    List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since);
+                    List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since, monitor);
                     for (Integer taskId : taskIds) {
 					    for (ITask task : event.getTasks()) {
 					        if (getTicketId(task.getTaskId()) == taskId.intValue()) {

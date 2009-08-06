@@ -16,7 +16,14 @@
 package com.itsolut.mantis.ui.wizard;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -29,7 +36,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
+import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -57,6 +66,7 @@ import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
 import com.itsolut.mantis.core.util.MantisUtils;
+import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
@@ -320,30 +330,48 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private void updateAttributesFromRepository(boolean force) {
 
+        MantisUIUtil.updateRepositoryConfiguration(getRunnableContext(), getRepository(), force);
+
+    }
+
+    private IRunnableContext getRunnableContext() {
+
         IRunnableContext container = getContainer();
         
         if ( container == null)
             container = getSearchContainer().getRunnableContext();
-        
-        MantisUIUtil.updateRepositoryConfiguration(container, getRepository(), force);
-
+        return container;
     }
 
     private MantisProject[] getProjects() {
 
+        final List<MantisProject> projects = new ArrayList<MantisProject>();
+        
         try {
-            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
-                    .getRepositoryManager()
-                    .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-            IMantisClient client = connector.getClientManager().getRepository(repository);
-            return client.getProjects();
+            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+            .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+            final IMantisClient client = connector.getClientManager().getRepository(repository);
+            
+            
+            CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
+                
+                public void run(IProgressMonitor monitor) throws CoreException {
+            
+                    try {
+                        projects.addAll(Arrays.asList(client.getProjects(monitor)));
+                    } catch (MantisException e) {
+                        throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID, "Failed getting projects : " + e.getMessage(), e));
+                    }
+                    
+                }
+            });
         } catch (MalformedURLException e) {
-            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
-            return new MantisProject[0];
-        } catch (MantisException e) {
-            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
-            return new MantisProject[0];
+            setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+        } catch (CoreException e) {
+            setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
         }
+        
+        return projects.toArray(new MantisProject[0]);
     }
 
     public MantisProject getSelectedProject() {
@@ -366,10 +394,10 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         for (MantisSearchFilter filter : MantisUtils.getMantisSearch(query).getFilters())
             if ("project".equals(filter.getFieldName())) {
                 tree.getViewer().setSelection(new
-                 StructuredSelection(getMantisClient().getProjectByName(filter.getValues().get(0))));
+                 StructuredSelection(getMantisClient().getProjectByName(filter.getValues().get(0), new NullProgressMonitor())));
             } else if ("filter".equals(filter.getFieldName())) {
                 for (MantisProjectFilter pd : client.getProjectFilters(getSelectedProject()
-                        .getName()))
+                        .getName(), new NullProgressMonitor()))
                     filterCombo.add(pd.getName());
 
                 filterCombo.setText(filter.getValues().get(0));
@@ -495,7 +523,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             if (getSelectedProject() == null)
                 return;
 
-            for (MantisProjectFilter pd : client.getProjectFilters(getSelectedProject().getName()))
+            for (MantisProjectFilter pd : client.getProjectFilters(getSelectedProject().getName(), new NullProgressMonitor()))
                 filterCombo.add(pd.getName());
 
             if (valueToSet != null)

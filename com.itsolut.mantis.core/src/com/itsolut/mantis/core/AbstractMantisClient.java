@@ -34,8 +34,6 @@ import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisETA;
 import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisProjection;
 import com.itsolut.mantis.core.model.MantisReproducibility;
 import com.itsolut.mantis.core.model.MantisResolution;
@@ -146,10 +144,10 @@ public abstract class AbstractMantisClient implements IMantisClient {
 		return (data.projections != null) ? data.projections.toArray(new MantisProjection[0]) : null;
 	}
 	
-	public String[] getUsers(String project) {
+	public String[] getUsers(String project, IProgressMonitor monitor) {
 		if(!userData.usersPerProject.containsKey(project)) {
 			try {
-				updateUsers(project);
+				updateUsers(project, monitor);
 			} catch (MantisException e) {
 				MantisCorePlugin.log(e);
 				StatusHandler.log(MantisCorePlugin.toStatus(e));
@@ -159,11 +157,11 @@ public abstract class AbstractMantisClient implements IMantisClient {
 		return userData.usersPerProject.get(project);
 	}
 	
-	public String[] getDevelopers(String project) {
+	public String[] getDevelopers(String project, IProgressMonitor monitor) {
 
         if (!userData.developersPerProject.containsKey(project)) {
             try {
-                updateUsers(project);
+                updateUsers(project, monitor);
             } catch (MantisException e) {
                 MantisCorePlugin.log(e);
                 StatusHandler.log(MantisCorePlugin.toStatus(e));
@@ -174,20 +172,14 @@ public abstract class AbstractMantisClient implements IMantisClient {
 
     }
 	
-	public abstract MantisProject[] getProjects() throws MantisException;
-	
-	public MantisProject getProjectByName(String projectName) throws MantisException {
+	public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException {
 	    
-	    for ( MantisProject project : getProjects())
+	    for ( MantisProject project : getProjects(monitor))
 	        if ( project.getName().equals(projectName))
 	            return project;
 	    
 	    throw new MantisException("Unable to find project by name " + projectName + " .");
 	};
-
-	public abstract MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
-
-	public abstract MantisProjectFilter[] getProjectFilters(String projectName) throws MantisException;
 
 	/**
      * Returns true, if the repository details are cached. If this method
@@ -209,7 +201,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 	
 	public abstract void updateAttributes(IProgressMonitor monitor) throws MantisException;
 	
-	protected abstract void updateUsers(String projectId) throws MantisException;
+	protected abstract void updateUsers(String projectId, IProgressMonitor monitor) throws MantisException;
 
 	public void setData(MantisClientData data) {
 		this.data = data;
@@ -249,7 +241,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
             data.lastUpdate = System.currentTimeMillis();
         }
 
-	    for ( MantisProject project : getProjects())
+	    for ( MantisProject project : getProjects(monitor))
             if ( project.getName().equals(projectName))
 	            return data.getCustomFields(project.getValue());
 	    

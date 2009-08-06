@@ -544,8 +544,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             String[] allProjectUsers = null;
             String[] projectDevelopers = null;
             if (ticket != null) {
-                allProjectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT));
-                projectDevelopers = client.getDevelopers(ticket.getValue(MantisTicket.Key.PROJECT));
+                allProjectUsers = client.getUsers(ticket.getValue(MantisTicket.Key.PROJECT), monitor);
+                projectDevelopers = client.getDevelopers(ticket.getValue(MantisTicket.Key.PROJECT), monitor);
             }
 
             createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectDevelopers);
@@ -583,7 +583,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             boolean first = MantisUtils.isEmpty(attr.getValue());
             TaskAttribute projectAttribute = data.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
             
-            for (MantisProjectCategory mp : client.getProjectCategories(projectAttribute.getValue())) {
+            for (MantisProjectCategory mp : client.getProjectCategories(projectAttribute.getValue(), monitor)) {
                 if (first) {
                     attr.setValue(mp.toString());
                     first = false;
@@ -612,7 +612,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             for (MantisVersion v : client.getVersions(getAttribute(data,
                     MantisAttributeMapper.Attribute.PROJECT.getKey())
-                    .getValue())) {
+                    .getValue(), monitor)) {
 
                 /*
                  * Only display released versions for the reported in field,

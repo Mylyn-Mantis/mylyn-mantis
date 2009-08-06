@@ -22,7 +22,13 @@
 package com.itsolut.mantis.ui.wizard;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -33,7 +39,10 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
+import org.eclipse.mylyn.internal.provisional.commons.ui.CommonsUiUtil;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
+import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
@@ -51,6 +60,7 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
+import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
@@ -159,18 +169,33 @@ public class MantisProjectPage extends WizardPage {
 
     private MantisProject[] getProjects() {
 
+        final List<MantisProject> projects = new ArrayList<MantisProject>();
+        
         try {
 			MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
 			.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-			IMantisClient client = connector.getClientManager().getRepository(taskRepository);
-			return client.getProjects();
+			final IMantisClient client = connector.getClientManager().getRepository(taskRepository);
+			
+			
+			CommonUiUtil.run(getContainer(), new ICoreRunnable() {
+                
+                public void run(IProgressMonitor monitor) throws CoreException {
+            
+                    try {
+                        projects.addAll(Arrays.asList(client.getProjects(monitor)));
+                    } catch (MantisException e) {
+                        throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID, "Failed getting projects : " + e.getMessage(), e));
+                    }
+                    
+                }
+            });
 		} catch (MalformedURLException e) {
 			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
-			return new MantisProject[0];
-		} catch (MantisException e) {
-			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
-			return new MantisProject[0];
-		}
+		} catch (CoreException e) {
+            setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+        }
+		
+		return projects.toArray(new MantisProject[0]);
 	}
     
 	@Override
