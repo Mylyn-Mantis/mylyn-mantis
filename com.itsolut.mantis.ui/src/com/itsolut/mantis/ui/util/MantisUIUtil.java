@@ -5,10 +5,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
+import org.eclipse.ui.PlatformUI;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -22,7 +24,7 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
  */
 public class MantisUIUtil {
 
-    public static void updateRepositoryConfiguration(IWizardContainer container, TaskRepository repository, final boolean force) {
+    public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository, final boolean force) {
 
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(
                 MantisCorePlugin.REPOSITORY_KIND);
@@ -46,8 +48,11 @@ public class MantisUIUtil {
                     }
                 }
             };
-
-            container.run(true, true, runnable);
+            
+            if ( container != null)
+                container.run(true, true, runnable);
+            else
+                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
         } catch (InvocationTargetException e) {
             MantisUIPlugin.handleMantisException(e.getCause());
             return;
