@@ -792,10 +792,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
             customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
             
-            if ( ticket != null)
-                customAttribute.setValue(ticket.getCustomFieldValue(customField.getName()));
-            else
-                customAttribute.setValue(customField.getDefaultValue());
+            String valueToSet = ticket != null ? ticket.getCustomFieldValue(customField.getName()) : customField.getDefaultValue();
+            if ( valueToSet == null)
+                valueToSet = "";
+            
+            customAttribute.setValue(valueToSet);
             
             if ( customField.getPossibleValues() != null)
                 for ( String possibleValue : customField.getPossibleValues())
