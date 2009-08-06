@@ -89,7 +89,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private static final String REPORTER_THRESHOLD = "report_bug_threshold";
 
     private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
-
+    
     public MantisAxis1SOAPClient(URL url, String username, String password, String httpUsername,
             String httpPassword, AbstractWebLocation webLocation) {
 
@@ -949,15 +949,21 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         try {
             ObjectRef projectRef = getProject(project);
 
-            int reporterAccessLevel = Integer.parseInt(getSOAP().mc_config_get_string(username,
-                    password, REPORTER_THRESHOLD));
-            int developerAccessLevel = Integer.parseInt(getSOAP().mc_config_get_string(username,
-                    password, DEVELOPER_THRESHOLD));
+            int reporterAccessLevel = safeGetIntConfigurationValue(REPORTER_THRESHOLD,
+                    DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue());
+            int developerAccessLevel = safeGetIntConfigurationValue(DEVELOPER_THRESHOLD,
+                    DefaultConstantValues.Threshold.UPDATE_BUG_ASSIGN_THRESHOLD.getValue());
 
             AccountData[] accounts = getSOAP().mc_project_get_users(username, password,
                     projectRef.getId(), BigInteger.valueOf(reporterAccessLevel));
-            AccountData[] developerAccounts = getSOAP().mc_project_get_users(username, password,
-                    projectRef.getId(), BigInteger.valueOf(developerAccessLevel));
+            
+            AccountData[] developerAccounts;
+            
+            if (reporterAccessLevel == developerAccessLevel)
+                developerAccounts = accounts;
+            else
+                developerAccounts = getSOAP().mc_project_get_users(username, password,
+                        projectRef.getId(), BigInteger.valueOf(developerAccessLevel));
 
             String[] users = new String[accounts.length];
             for (int i = 0; i < accounts.length; i++)
@@ -975,6 +981,16 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             throw new MantisRemoteException(e);
         }
     }
+
+	private int safeGetIntConfigurationValue(String optionName, int defaultValue) throws RemoteException,
+			MantisException {
+		try {	
+			return Integer.parseInt(getSOAP().mc_config_get_string(username, password, optionName));
+		} catch (NumberFormatException e) {
+			MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed parsing config option " + optionName + " using default value.", e));
+		}
+		return defaultValue;
+	}
 
     public MantisVersion[] getVersions(String project) throws MantisException {
 

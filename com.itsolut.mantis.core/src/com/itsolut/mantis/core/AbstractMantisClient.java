@@ -48,6 +48,44 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * @author Chris Hane
  */
 public abstract class AbstractMantisClient implements IMantisClient {
+	
+	static interface DefaultConstantValues {
+		
+		public enum Role {
+			
+			REPORTER(25), DEVELOPER(55);
+			
+			private final int value;
+			
+			private Role(int value) {
+				this.value = value;
+			}
+			
+			public int getValue() {
+				return value;
+			}
+		}
+		
+		public enum Threshold {
+			
+			REPORT_BUG_THRESHOLD(Role.REPORTER.getValue()),
+			UPDATE_BUG_ASSIGN_THRESHOLD(Role.DEVELOPER.getValue());
+			
+			private final int value;
+			
+			private Threshold(int value) {
+				this.value = value;
+			}
+			
+			public int getValue() {
+				return value;
+			}
+		}
+	
+		
+	}
+	
+	
 
 	protected String username;
 
