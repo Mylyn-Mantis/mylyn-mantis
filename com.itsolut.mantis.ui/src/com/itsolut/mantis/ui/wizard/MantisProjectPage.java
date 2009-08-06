@@ -172,6 +172,7 @@ public class MantisProjectPage extends WizardPage {
 			return new MantisProject[0];
 		}
 	}
+    
 	@Override
     public boolean isPageComplete() {
 		return getSelectedProject() != null;
