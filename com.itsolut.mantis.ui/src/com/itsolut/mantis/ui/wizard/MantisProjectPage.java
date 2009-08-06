@@ -84,7 +84,7 @@ public class MantisProjectPage extends WizardPage {
 		tree.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, true).hint(
 				SWT.DEFAULT, 200).create());
 		
-		TreeViewer projectTreeViewer = tree.getViewer();
+		final TreeViewer projectTreeViewer = tree.getViewer();
 		
 		projectTreeViewer.setLabelProvider(new LabelProvider() {
 			@Override
@@ -149,6 +149,7 @@ public class MantisProjectPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				updateAttributesFromRepository(true);
+				projectTreeViewer.setInput(getProjects());
 			}
 		});
 		
