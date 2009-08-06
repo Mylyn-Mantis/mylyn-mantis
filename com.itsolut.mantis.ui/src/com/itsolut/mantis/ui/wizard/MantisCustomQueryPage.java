@@ -106,11 +106,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         Composite control = new Composite(parent, SWT.NONE);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
         control.setLayoutData(gd);
-        GridLayout layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(2, false);
         control.setLayout(layout);
 
         createTitleGroup(control);
 
+        Label projectLabel = new Label(control, SWT.NONE);
+        projectLabel.setText("Select project");
         projectCombo = new Combo(control, SWT.READ_ONLY);
 
         try {
@@ -136,6 +138,9 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                     // nothing
                 }
             });
+            
+            Label comboLabel = new Label(control, SWT.NONE);
+            comboLabel.setText("Select filter");
 
             filterCombo = new Combo(control, SWT.READ_ONLY);
             filterCombo.add(SELECT_FILTER_IN_PROJECT);
@@ -188,7 +193,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
             searchLimit = new Text(control, SWT.BORDER);
             searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
-
+            
             updateRepository = new Button(control, SWT.PUSH);
             updateRepository.setText("Update Repository Configuration");
             updateRepository.addSelectionListener(new SelectionListener() {
@@ -267,9 +272,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 		titleLabel.setText(TITLE_QUERY_TITLE);
 
 		titleText = new Text(control, SWT.BORDER);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL
-				| GridData.GRAB_HORIZONTAL);
-		gd.horizontalSpan = 2;
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
 		titleText.setLayoutData(gd);
 		titleText.addKeyListener(new KeyListener() {
 
