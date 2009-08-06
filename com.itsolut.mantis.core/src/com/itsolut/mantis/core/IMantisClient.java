@@ -111,7 +111,7 @@ public interface IMantisClient {
 	 * @throws MantisException
 	 *             thrown in case of a connection error
 	 */
-	MantisTicket getTicket(int id) throws MantisException;
+	MantisTicket getTicket(int id, IProgressMonitor monitor) throws MantisException;
 
 	/**
 	 * Queries tickets from repository. All found tickets are added to

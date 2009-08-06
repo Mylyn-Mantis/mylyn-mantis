@@ -306,13 +306,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 IMantisClient client = connector.getClientManager().getRepository(
                         repository);
                 client.updateAttributes(monitor, false);
-                MantisTicket ticket = client.getTicket(id);
+                MantisTicket ticket = client.getTicket(id, monitor);
                 // createDefaultAttributes(data, client, true);
                 // updateTaskData(repository, attributeMapper, data, client,
                 // ticket);
                 // createProjectSpecificAttributes(data, client);
                 return createTaskDataFromTicket(client, repository, ticket,
-                        new NullProgressMonitor());
+                        monitor);
             } catch (Exception e) {
                 MantisCorePlugin.log(e);
                 throw new CoreException(new Status(IStatus.ERROR,

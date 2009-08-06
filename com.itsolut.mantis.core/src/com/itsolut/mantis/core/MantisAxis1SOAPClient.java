@@ -158,11 +158,12 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     }
 
-    public MantisTicket getTicket(int id) throws MantisException {
+    public MantisTicket getTicket(int id, IProgressMonitor monitor) throws MantisException {
 
         IssueData issue;
         try {
             issue = getSOAP().mc_issue_get(username, password, BigInteger.valueOf(id));
+            Policy.advance(monitor, 1);
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
             throw new MantisRemoteException(e);
