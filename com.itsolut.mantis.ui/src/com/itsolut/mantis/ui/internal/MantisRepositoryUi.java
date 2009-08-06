@@ -19,6 +19,7 @@
 
 package com.itsolut.mantis.ui.internal;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,6 +33,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.ITaskComment;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
@@ -172,4 +174,17 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 		return new Region(regionOffset + m.start(), m.end() - m.start());
 	}
 
+	@Override
+	public String getReplyText(TaskRepository taskRepository, ITask task, ITaskComment taskComment,
+	        boolean includeTask) {
+	
+	      if (taskComment == null) {
+	            return "(In reply to comment #0)";
+	        } else if (includeTask) {
+	            return MessageFormat.format("(In reply to {0} comment #{1})", task.getTaskKey(),
+	                    taskComment.getNumber());
+	        } else {
+	            return MessageFormat.format("(In reply to comment #{0})", taskComment.getNumber());
+	        }
+	}
 }
