@@ -8,6 +8,8 @@
 
 package com.itsolut.mantis.tests;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
+
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisClientFactory;
 
@@ -27,7 +29,7 @@ public class AbstractMantisClientRepositoryTest extends AbstractMantisClientTest
 		String password = "reporter";
 			
 		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password, null, null, null);
-		mantisClient.validate();
+		mantisClient.validate(new NullProgressMonitor());
 	}
 
 }

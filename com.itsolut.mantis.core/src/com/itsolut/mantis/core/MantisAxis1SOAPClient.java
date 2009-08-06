@@ -133,21 +133,27 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     }
 
-    public void validate() throws MantisException {
+    public void validate(IProgressMonitor monitor) throws MantisException {
 
+        monitor.beginTask("Validating", 2);
+        
         try {
-
+            
             // get and validate remote version
             String remoteVersion = getSOAP().mc_version();
             RepositoryVersion.fromVersionString(remoteVersion);
+            Policy.advance(monitor, 1);
 
             // test to see if the current user has proper access privileges,
             // since mc_version() does not require a valid user
             getSOAP().mc_projects_get_user_accessible(username, password);
+            Policy.advance(monitor, 1);
 
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
             throw new MantisRemoteException(e);
+        } finally {
+            monitor.done();
         }
 
     }
@@ -720,20 +726,24 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     // return version;
     // }
 
-    public byte[] getAttachmentData(int attachmentID) throws MantisException {
+    public byte[] getAttachmentData(int attachmentID, IProgressMonitor monitor) throws MantisException {
 
         try {
-            return getSOAP().mc_issue_attachment_get(username, password,
+            byte[] attachment = getSOAP().mc_issue_attachment_get(username, password,
                     BigInteger.valueOf(attachmentID));
+            Policy.advance(monitor, 1);
+            
+            return attachment;
+            
         } catch (RemoteException e) {
             throw new MantisRemoteException(e);
         }
     }
 
-    public void putAttachmentData(int ticketID, String filename, byte[] data)
+    public void putAttachmentData(int ticketID, String filename, byte[] data, IProgressMonitor monitor)
             throws MantisException {
 
-        boolean requiresBase64EncodedAttachment = getRepositoryVersion(new NullProgressMonitor())
+        boolean requiresBase64EncodedAttachment = getRepositoryVersion(monitor)
                 .isRequiresBase64EncodedAttachment();
 
         try {
@@ -744,6 +754,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
             getSOAP().mc_issue_attachment_add(username, password, BigInteger.valueOf(ticketID),
                     filename, "bug", data);
+            Policy.advance(monitor, 1);
+            
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
             throw new MantisRemoteException(e);

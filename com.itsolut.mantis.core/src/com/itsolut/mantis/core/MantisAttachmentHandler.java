@@ -55,7 +55,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
         this.connector = connector;
     }
 
-    private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment) throws CoreException {
+    private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment, IProgressMonitor monitor) throws CoreException {
         String id = attachment.getAttachmentId();
         if (id == null) {
             throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
@@ -63,7 +63,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
-            return client.getAttachmentData(Integer.parseInt(id));
+            return client.getAttachmentData(Integer.parseInt(id), monitor);
         } catch (Exception e) {
             MantisCorePlugin.log(e);
             throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e ));
@@ -73,7 +73,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
     private InputStream getAttachmentAsStream(TaskRepository repository,
             TaskAttachmentMapper attachment, IProgressMonitor monitor)
     throws CoreException {
-        return new ByteArrayInputStream( getAttachmentData(repository, attachment) );
+        return new ByteArrayInputStream( getAttachmentData(repository, attachment, monitor) );
     }
 
     @Override
@@ -131,7 +131,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             }
             
             
-            client.putAttachmentData(id, filename, data);
+            client.putAttachmentData(id, filename, data, monitor);
         } catch (Exception e) {
             MantisCorePlugin.log(e);
             throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e ));

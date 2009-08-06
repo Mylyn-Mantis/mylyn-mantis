@@ -132,7 +132,7 @@ public interface IMantisClient {
 	 * @throws MantisException
 	 *             thrown in case of a connection error
 	 */
-	void validate() throws MantisException;
+	void validate(IProgressMonitor monitor) throws MantisException;
 
 	/**
 	 * Updates cached repository details: milestones, versions etc.
@@ -185,9 +185,9 @@ public interface IMantisClient {
 	 */
 	MantisVersion[] getVersions(String projectName, IProgressMonitor monitor) throws MantisException;
 
-	byte[] getAttachmentData(int id) throws MantisException;
+	byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException;
 
-	void putAttachmentData(int id, String name, byte[] data) throws MantisException;
+	void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException;
 
 	/**
 	 * @param monitor 
