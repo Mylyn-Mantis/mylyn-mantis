@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
@@ -352,14 +353,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException,
             MantisException {
 
+        IMantisClient client = getMantisClient();
+
         for (MantisSearchFilter filter : MantisUtils.getMantisSearch(query).getFilters())
             if ("project".equals(filter.getFieldName())) {
-                // projectCombo.setText(filter.getValues().get(0));
+                tree.getViewer().setSelection(new
+                 StructuredSelection(getMantisClient().getProjectByName(filter.getValues().get(0))));
             } else if ("filter".equals(filter.getFieldName())) {
-                MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
-                        .getRepositoryManager().getRepositoryConnector(
-                                MantisCorePlugin.REPOSITORY_KIND);
-                IMantisClient client = connector.getClientManager().getRepository(repository);
                 for (MantisProjectFilter pd : client.getProjectFilters(getSelectedProject()
                         .getName()))
                     filterCombo.add(pd.getName());

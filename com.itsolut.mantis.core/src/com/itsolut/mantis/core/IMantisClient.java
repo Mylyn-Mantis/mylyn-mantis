@@ -171,6 +171,8 @@ public interface IMantisClient {
 	String[] getDevelopers(String project);
 
 	public MantisProject[] getProjects() throws MantisException;
+	
+	public MantisProject getProjectByName(String projectName) throws MantisException;
 
 	public MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
 

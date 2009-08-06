@@ -137,6 +137,15 @@ public abstract class AbstractMantisClient implements IMantisClient {
     }
 	
 	public abstract MantisProject[] getProjects() throws MantisException;
+	
+	public MantisProject getProjectByName(String projectName) throws MantisException {
+	    
+	    for ( MantisProject project : getProjects())
+	        if ( project.getName().equals(projectName))
+	            return project;
+	    
+	    throw new MantisException("Unable to find project by name " + projectName + " .");
+	};
 
 	public abstract MantisProjectCategory[] getProjectCategories(String projectName) throws MantisException;
 
