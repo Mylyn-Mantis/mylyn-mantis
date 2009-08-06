@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -139,7 +141,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
                 public void widgetSelected(SelectionEvent e) {
 
-                    getWizard().getContainer().updateButtons();
+                    updateButtonsIfNeeded();
 
                     Combo combo = (Combo) e.getSource();
                     updateDescription(combo);
@@ -155,10 +157,11 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                         return;
 
                     // set suggestion and select
-                    titleText.setText(text);
-                    titleText.selectAll();
-                    // notify that we've changed the value
-                    getContainer().updateButtons();
+                    if (getSearchContainer() == null) {
+                        titleText.setText(text);
+                        titleText.selectAll();
+                    }
+                    updateButtonsIfNeeded();
 
                 }
 
@@ -317,7 +320,12 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private void updateAttributesFromRepository(boolean force) {
 
-        MantisUIUtil.updateRepositoryConfiguration(getContainer(), getRepository(), force);
+        IRunnableContext container = getContainer();
+        
+        if ( container == null)
+            container = getSearchContainer().getRunnableContext();
+        
+        MantisUIUtil.updateRepositoryConfiguration(container, getRepository(), force);
 
     }
 
@@ -409,16 +417,28 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         return validate();
     }
+    
+    @Override
+    public void setPageComplete(boolean complete) {
+    
+        super.setPageComplete(complete);
+        
+        if ( getSearchContainer() != null)
+            getSearchContainer().setPerformActionEnabled(complete);
+    }
 
     private boolean validate() {
 
         boolean returnsw = true;
 
-        if (titleText == null)
-            return false;
+        if (getSearchContainer() == null) {
 
-        if (titleText.getText().length() == 0)
-            return false;
+            if (titleText == null)
+                return false;
+
+            if (titleText.getText().length() == 0)
+                return false;
+        }
 
         if (tree == null || getSelectedProject() == null)
             return false;
@@ -432,7 +452,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         } catch (NumberFormatException e) {
             return false;
         }
-
+        
         return returnsw;
     }
 
@@ -490,7 +510,15 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             setErrorMessage("Failed updating attributes " + e.getMessage() + " .");
         }
 
-        getWizard().getContainer().updateButtons();
+        updateButtonsIfNeeded();
+    }
+
+    private void updateButtonsIfNeeded() {
+
+        if ( getContainer() != null)
+            getContainer().updateButtons();
+        
+        setPageComplete(isPageComplete());
     }
 
 }
