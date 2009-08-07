@@ -25,6 +25,7 @@ import javax.xml.rpc.Call;
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.Stub;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +36,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.xml.sax.SAXException;
 
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
@@ -84,7 +86,16 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
+    private static final String OLD_SF_NET_URL = "https://apps.sourceforge.net/mantisbt/";
+
+    private static final String NEW_SF_NET_URL = "https://sourceforge.net/apps/mantisbt/";
+
+    
     private transient MantisConnectPortType soap;
+
+    private String httpUsername;
+
+    private String httpPassword;
 
     private static final String REPORTER_THRESHOLD = "report_bug_threshold";
 
@@ -94,6 +105,9 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             String httpPassword, AbstractWebLocation webLocation) {
 
         super(url, username, password, webLocation);
+        
+        this.httpUsername = httpUsername;
+        this.httpPassword = httpPassword;
 
         try {
             soap = this.getSOAP();
@@ -151,11 +165,44 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         } catch (RemoteException e) {
             MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
+            throw wrap(e);
         } finally {
             monitor.done();
         }
 
+    }
+
+    private MantisRemoteException wrap(RemoteException e) {
+
+        
+        StringBuilder message = new StringBuilder();
+        
+        if ( isSourceforgeRepoWithoutHttpAuth())
+            message.append("For SF.net hosted apps, please make sure to use HTTP authentication only.").append('\n');
+        
+        if ( repositoryUrl.toExternalForm().startsWith(OLD_SF_NET_URL))
+            message.append("SF.net hosted apps have been moved to https://sourceforge.net/apps/mantisbt/").append('\n');
+        
+        message.append("Repository validation failed: ");
+        
+        if ( e instanceof AxisFault ) {
+            
+            AxisFault axisFault = (AxisFault) e;
+            
+            if ( axisFault.getCause() instanceof SAXException)
+                message.append("the repository has returned an invalid XML response : " + String.valueOf(axisFault.getCause().getMessage()) + " .");
+            else if (e.getMessage() != null)
+                    message.append(" :").append(e.getMessage()).append('\n');
+
+        } else if (e.getMessage() != null)
+            message.append(" :").append(e.getMessage()).append('\n');
+        
+        return new MantisRemoteException(message.toString(), e);
+        
+    }
+    
+    private boolean isSourceforgeRepoWithoutHttpAuth() {
+        return repositoryUrl.toExternalForm().startsWith(NEW_SF_NET_URL) &&  ( httpUsername.length() == 0 || httpPassword.length() == 0);
     }
 
     public MantisTicket getTicket(int id, IProgressMonitor monitor) throws MantisException {
