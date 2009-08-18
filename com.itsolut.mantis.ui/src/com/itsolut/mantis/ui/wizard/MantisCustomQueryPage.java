@@ -15,6 +15,8 @@
 
 package com.itsolut.mantis.ui.wizard;
 
+import static com.itsolut.mantis.ui.util.MantisUIUtil.newEnhancedFilteredTree;
+
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +31,10 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
@@ -249,10 +249,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private void createProjectTree(Composite control) {
 
-        tree = new EnhancedFilteredTree(control, SWT.SINGLE | SWT.BORDER, new PatternFilter());
-
-        tree.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, true)
-                .hint(SWT.DEFAULT, 200).create());
+        tree = newEnhancedFilteredTree(control);
 
         TreeViewer projectTreeViewer = tree.getViewer();
 
@@ -268,39 +265,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             }
         });
 
-        projectTreeViewer.setContentProvider(new ITreeContentProvider() {
-
-            public Object[] getChildren(Object parentElement) {
-
-                if (parentElement instanceof MantisProject[]) {
-                    return (MantisProject[]) parentElement;
-                }
-                return null;
-            }
-
-            public Object getParent(Object element) {
-
-                return null;
-            }
-
-            public boolean hasChildren(Object element) {
-
-                return false;
-            }
-
-            public Object[] getElements(Object inputElement) {
-
-                return getChildren(inputElement);
-            }
-
-            public void dispose() {
-
-            }
-
-            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
-            }
-        });
+        projectTreeViewer.setContentProvider(new MantisProjectITreeContentProvider());
 
         projectTreeViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
 
