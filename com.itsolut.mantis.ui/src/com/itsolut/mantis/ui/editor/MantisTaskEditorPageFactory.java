@@ -40,7 +40,6 @@ public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 
 	@Override
 	public Image getPageImage() {
-		// TODO Auto-generated method stub
 		return CommonImages.getImage(TasksUiImages.REPOSITORY);
 	}
 
