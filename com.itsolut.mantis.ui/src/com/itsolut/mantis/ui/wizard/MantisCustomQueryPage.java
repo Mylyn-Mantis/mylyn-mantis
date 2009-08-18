@@ -253,17 +253,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         TreeViewer projectTreeViewer = tree.getViewer();
 
-        projectTreeViewer.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-
-                if (element instanceof MantisProject) {
-                    MantisProject project = (MantisProject) element;
-                    return project.getName();
-                }
-                return "";
-            }
-        });
+        projectTreeViewer.setLabelProvider(new MantisProjectLabelProvider());
 
         projectTreeViewer.setContentProvider(new MantisProjectITreeContentProvider());
 
