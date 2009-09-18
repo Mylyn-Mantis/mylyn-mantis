@@ -20,20 +20,6 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisUtilsTest extends TestCase {
 
 	/**
-	 * Check for the values that indicate a task is completed.  This
-	 * is used by Mylyn to determine if a task is Completed and can be
-	 * filtered.
-	 * 
-	 * @author David Carver
-	 */
-	public void testIsCompleted() {
-		assertTrue(MantisUtils.isCompleted("closed"));
-		assertTrue(MantisUtils.isCompleted("resolved"));
-		assertFalse(MantisUtils.isCompleted("Closed"));
-		assertFalse(MantisUtils.isCompleted("Resolved"));
-	}
-
-	/**
 	 * Return the priorities as stored in Mantis.  Currently works with
 	 * the Priority Enums in the MantisTask class.
 	 * @author David Carver
