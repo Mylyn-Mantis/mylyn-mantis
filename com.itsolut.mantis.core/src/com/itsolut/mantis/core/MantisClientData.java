@@ -61,6 +61,8 @@ public class MantisClientData implements Serializable {
 
     long lastUpdate = 0;
 
+    private int resolvedStatusThreshold = 80; // Mantis default RESOLVED value
+
     public MantisResolution getResolution(int value) {
 
         for (MantisResolution r : resolutions) {
@@ -156,5 +158,16 @@ public class MantisClientData implements Serializable {
             if ( customField.getName().equals(customFieldName))
                 return customField;
         throw new IllegalArgumentException("No custom field by name " + customFieldName + " for project with id " + projectId + " .");
+    }
+
+
+    public void setResolvedStatusThreshold(int resolvedStatusThreshold) {
+        
+        this.resolvedStatusThreshold = resolvedStatusThreshold;
+    }
+    
+    public int getResolvedStatusThreshold() {
+
+        return resolvedStatusThreshold;
     }
 }

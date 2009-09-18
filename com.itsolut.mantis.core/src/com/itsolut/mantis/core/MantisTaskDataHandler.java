@@ -809,9 +809,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     /**
      * Updates attributes of <code>taskData</code> from <code>ticket</code>.
+     * @throws MantisException 
+     * 
+     * @deprecated Possibly not used - double-check
      */
+    @Deprecated
     public void updateTaskDataFromTicket(TaskData taskData,
-            MantisTicket ticket, IMantisClient client) {
+            MantisTicket ticket, IMantisClient client) throws MantisException {
 
         TaskAttribute attributeSummary = taskData.getRoot().getAttribute(
                 TaskAttribute.SUMMARY);
@@ -821,7 +825,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         TaskAttribute attributeCompletionDate = taskData.getRoot()
         .getAttribute(TaskAttribute.DATE_COMPLETION);
 
-        if (MantisUtils.isCompleted(ticket.getValue(Key.STATUS)))
+        if (client.isCompleted(taskData, new NullProgressMonitor()))
             attributeCompletionDate
             .setValue(ticket.getLastChanged().toString());
         else

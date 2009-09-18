@@ -72,11 +72,6 @@ public class MantisUtils {
         return baseUrl;
     }
 
-    public static boolean isCompleted(String status) {
-        return "closed".equals(status) || "resolved".equals(status);
-    }
-
-
     public static String getQueryParameter(IRepositoryQuery query) {
         String url = query.getUrl();
         int i = url.indexOf(IMantisClient.QUERY_URL);

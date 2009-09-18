@@ -24,6 +24,7 @@ package com.itsolut.mantis.core;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisCustomField;
@@ -210,4 +211,20 @@ public interface IMantisClient {
 	List<MantisCustomFieldType> getCustomFieldTypes(IProgressMonitor monitor) throws MantisException;
 	
 	List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor) throws MantisException;
+	
+	/**
+	 * Determines if a task is completed or not.
+	 * 
+	 * <p>The level of the status of the ticket is compared against the <tt>bug_resolved_status_threshold</tt>
+	 * of the Mantis installation.</p>
+	 * 
+	 * <p>This method may require remote calls if either mantis ticket stati or the threshold have not been
+	 * retrieved.</p> 
+	 * 
+	 * @param taskData the task data to read the status from 
+	 * @param progressMonitor 
+	 * @return true if the task is completed, false otherwise
+	 * @throws MantisException Failure in retrieving the required remote data
+	 */
+	boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException;
 }

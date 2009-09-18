@@ -86,9 +86,16 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
+
     private static final String OLD_SF_NET_URL = "https://apps.sourceforge.net/mantisbt/";
 
     private static final String NEW_SF_NET_URL = "https://sourceforge.net/apps/mantisbt/";
+
+    private static final String RESOLVED_STATUS_THRESHOLD = "bug_resolved_status_threshold";
+    
+    private static final String REPORTER_THRESHOLD = "report_bug_threshold";
+
+    private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
 
     
     private transient MantisConnectPortType soap;
@@ -97,9 +104,6 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     private String httpPassword;
 
-    private static final String REPORTER_THRESHOLD = "report_bug_threshold";
-
-    private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
     
     public MantisAxis1SOAPClient(URL url, String username, String password, String httpUsername,
             String httpPassword, AbstractWebLocation webLocation) {
@@ -556,12 +560,16 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             Policy.advance(subMonitor, 1);
 
             // load project-specific data
-            subMonitor.setWorkRemaining(projects.length * 2 + 11);
+            subMonitor.setWorkRemaining(projects.length * 2 + 12);
 
             for (MantisProject project : projects) {
                 loadProjectFilters(subMonitor, project);
                 loadProjectCustomFields(subMonitor, project);
             }
+            
+            String resolvedStatus = getSOAP().mc_config_get_string(username, password, RESOLVED_STATUS_THRESHOLD);
+            data.setResolvedStatusThreshold(Integer.parseInt(resolvedStatus));
+            Policy.advance(subMonitor, 1);
 
             // get and parse repository version
             String versionString = getSOAP().mc_version();

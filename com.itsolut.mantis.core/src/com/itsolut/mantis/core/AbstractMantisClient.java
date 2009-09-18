@@ -25,8 +25,11 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisCustomField;
@@ -247,5 +250,33 @@ public abstract class AbstractMantisClient implements IMantisClient {
 	    
 	    throw new MantisException("No custom field project data found for project with name " + projectName + " .");
 	    
+	}
+
+    public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
+
+	    updateAttributes(progressMonitor, false);
+	    
+	    TaskAttribute status = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
+	    String statusName = status.getValue();
+	    
+	    int statusLevel = -1;
+	    
+	    for ( MantisTicketStatus mantisTicketStatus : getTicketStatus() ) {
+	        if ( mantisTicketStatus.getName().equals(statusName)) {
+	            statusLevel = mantisTicketStatus.getValue();
+	            break;
+	        }
+	    }
+	    
+	    if ( statusLevel == -1) {
+	        MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, "Unable to find the level for the status named " + statusName + " ."));
+	        return false;
+	    }
+	    
+
+	    int resolvedStatusThreshold = data.getResolvedStatusThreshold();
+	    
+	    return statusLevel >= resolvedStatusThreshold;
+	                
 	}
 }

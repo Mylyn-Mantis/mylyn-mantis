@@ -34,6 +34,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
@@ -54,6 +55,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 
+import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -332,11 +334,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         TaskMapper scheme = getTaskMapper(taskData);
         scheme.applyTo(task);
-        if (MantisUtils.isCompleted(scheme.getStatus())) {
-            task.setCompletionDate(scheme.getModificationDate());
-        } else {
-            task.setCompletionDate(null);
+        
+        boolean completed = false;
+        
+        try {
+            IMantisClient client = getClientManager().getRepository(taskData.getAttributeMapper().getTaskRepository());
+            completed = client.isCompleted(taskData, new NullProgressMonitor());
+        } catch (MalformedURLException e) {
+            MantisCorePlugin.log(e);
+        } catch (MantisException e) {
+            MantisCorePlugin.log(e);
         }
+        
+        Date completionDate = completed ? scheme.getModificationDate() : null;
+        
+        task.setCompletionDate(completionDate);
 
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 
@@ -348,18 +360,27 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     }
 
-    public TaskMapper getTaskMapper(TaskData taskData) {
+    public TaskMapper getTaskMapper(final TaskData taskData) {
         return new TaskMapper(taskData) {
+            
             @Override
             public Date getCompletionDate() {
-                if (MantisUtils.isCompleted(getTaskData().getRoot()
-                        .getAttribute(
-                              	MantisAttributeMapper.Attribute.STATUS
-                                .getKey()).getValue())) {
-                    return getModificationDate();
-                } else {
+                
+                try {
+                    IMantisClient client = getClientManager().getRepository(getTaskData().getAttributeMapper().getTaskRepository());
+                    
+                    boolean completed = client.isCompleted(taskData, new NullProgressMonitor());
+                    
+                    if ( completed)
+                        return getModificationDate();
+                    
                     return null;
-                }
+                } catch (MalformedURLException e) {
+                    MantisCorePlugin.log(e);
+                    return null;
+                } catch (MantisException e) {
+                    MantisCorePlugin.log(e);
+                    return null;                }
             }
 
             @Override
