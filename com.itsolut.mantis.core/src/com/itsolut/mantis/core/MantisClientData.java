@@ -59,9 +59,9 @@ public class MantisClientData implements Serializable {
 
     private Map<Integer, List<MantisCustomField>> customFieldsByProjectId = new HashMap<Integer, List<MantisCustomField>>();
 
-    long lastUpdate = 0;
+    private long lastUpdate = 0;
 
-    private int resolvedStatusThreshold = 80; // Mantis default RESOLVED value
+    private int resolvedStatusThreshold = 0;
 
     public MantisResolution getResolution(int value) {
 
@@ -169,5 +169,15 @@ public class MantisClientData implements Serializable {
     public int getResolvedStatusThreshold() {
 
         return resolvedStatusThreshold;
+    }
+    
+    public boolean hasAttributes() {
+        
+        return lastUpdate != 0 && repositoryVersion != null && resolvedStatusThreshold != 0;
+    }
+    
+    public void recordAttributesUpdated() {
+        
+        lastUpdate = System.currentTimeMillis();
     }
 }

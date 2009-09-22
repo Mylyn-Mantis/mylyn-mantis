@@ -192,13 +192,14 @@ public abstract class AbstractMantisClient implements IMantisClient {
      * @see #updateAttributes(IProgressMonitor, boolean) 
      */
 	private boolean hasAttributes() {
-		return (data.lastUpdate != 0 && data.getRepositoryVersion() != null);
+	    
+	    return data.hasAttributes();
 	}
 	
 	public void updateAttributes(IProgressMonitor monitor, boolean force) throws MantisException {
 		if (!hasAttributes() || force) {
 			updateAttributes(monitor);
-			data.lastUpdate = System.currentTimeMillis();
+			data.recordAttributesUpdated();
 		}
 	}
 	
@@ -219,7 +220,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 	    
 	    if (!hasAttributes()) {
 	        updateAttributes(monitor);
-	        data.lastUpdate = System.currentTimeMillis();
+	        data.recordAttributesUpdated();
 	    }
 	
 	    return data.getRepositoryVersion();
@@ -230,7 +231,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 		
 		if ( !hasAttributes()) {
 			updateAttributes(monitor);
-			data.lastUpdate = System.currentTimeMillis();
+			data.recordAttributesUpdated();
 		}
 		
 		return data.getCustomFieldTypes();
@@ -241,7 +242,7 @@ public abstract class AbstractMantisClient implements IMantisClient {
 
 	    if ( !hasAttributes()) {
             updateAttributes(monitor);
-            data.lastUpdate = System.currentTimeMillis();
+            data.recordAttributesUpdated();
         }
 
 	    for ( MantisProject project : getProjects(monitor))
