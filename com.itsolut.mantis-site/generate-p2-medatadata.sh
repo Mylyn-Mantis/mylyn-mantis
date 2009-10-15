@@ -5,7 +5,7 @@ repository=$(pwd)
 target_dir=repo
 eclipse_home=${eclipse_home:-~/apps/eclipse/}
 
-java -jar ${eclipse_home}/plugins/org.eclipse.equinox.launcher_1.0.200.v20090520.jar \
+java -jar ${eclipse_home}/plugins/org.eclipse.equinox.launcher_1.0.201.R35x_v20090715.jar \
 	-application org.eclipse.equinox.p2.publisher.UpdateSitePublisher \
 	-artifactRepository file:$repository/$target_dir \
 	-metadataRepository file:$repository/$target_dir \
