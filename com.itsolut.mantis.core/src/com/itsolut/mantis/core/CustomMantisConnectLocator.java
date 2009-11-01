@@ -1,4 +1,4 @@
-package com.itsolut.mantis.binding;
+package com.itsolut.mantis.core;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -10,6 +10,9 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
+
+import com.itsolut.mantis.binding.MantisConnectLocator;
 
 /**
  * 
@@ -49,11 +52,11 @@ public class CustomMantisConnectLocator extends MantisConnectLocator {
     @Override public Call createCall() throws ServiceException {
 
         Call call = super.createCall();
+
+        call.setProperty(SoapHttpSender.LOCATION, location);
+        call.setProperty(SoapHttpSender.USER_AGENT, "Mylyn-Mantis Connector Apache Axis/1.4");
         
-        // for configuring the call
-        call.setProperty(MantisHttpSender.LOCATION, location);
-        
-        // The Squid proxy server seems to choke unless this is et
+        // The Squid proxy server seems to choke unless this is set
         Map<String, Boolean> headers = new Hashtable<String, Boolean>();
         headers.put(HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED, Boolean.FALSE);
         call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);

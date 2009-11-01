@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.internal.provisional.commons.soap.AbstractSoapClient;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
@@ -48,7 +49,7 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * @author Steffen Pingel
  * @author Chris Hane
  */
-public abstract class AbstractMantisClient implements IMantisClient {
+public abstract class AbstractMantisClient extends AbstractSoapClient implements IMantisClient {
 	
 	static interface DefaultConstantValues {
 		

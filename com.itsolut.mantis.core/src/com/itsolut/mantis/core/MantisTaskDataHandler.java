@@ -318,7 +318,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 throw new CoreException(new Status(IStatus.ERROR,
                         MantisCorePlugin.PLUGIN_ID, 0, "Ticket download from "
                         + repository.getRepositoryUrl() + " for task " + id
-                        + " failed, please see details.", e));
+                        + " failed : " + e.getMessage() + " .", e));
             }
         } catch (NumberFormatException e) {
             throw new CoreException(new Status(Status.ERROR,

@@ -38,6 +38,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 
 /**
  * Caches {@link IMantisClient} objects.
@@ -52,7 +53,7 @@ public class MantisClientManager implements IRepositoryListener {
     
     private File cacheFile;
     
-    private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationFactory();
+    private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationUiFactory();
     
     public MantisClientManager(File cacheFile) {
 
