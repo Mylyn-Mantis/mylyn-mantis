@@ -140,6 +140,7 @@
    <xsd:element name="relationships" type="tns:RelationshipDataArray" minOccurs="0"/>
    <xsd:element name="notes" type="tns:IssueNoteDataArray" minOccurs="0"/>
    <xsd:element name="custom_fields" type="tns:CustomFieldValueForIssueDataArray" minOccurs="0"/>
+   <xsd:element name="due_date" type="xsd:dateTime" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="IssueDataArray">
@@ -185,6 +186,7 @@
    <xsd:element name="file_path" type="xsd:string" minOccurs="0"/>
    <xsd:element name="description" type="xsd:string" minOccurs="0"/>
    <xsd:element name="subprojects" type="tns:ProjectDataArray" minOccurs="0"/>
+   <xsd:element name="inherit_global" type="xsd:boolean" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="ProjectDataArray">
@@ -239,7 +241,6 @@
    <xsd:element name="access_level_rw" type="xsd:integer" minOccurs="0"/>
    <xsd:element name="length_min" type="xsd:integer" minOccurs="0"/>
    <xsd:element name="length_max" type="xsd:integer" minOccurs="0"/>
-   <xsd:element name="advanced" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_report" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_update" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_resolved" type="xsd:boolean" minOccurs="0"/>
@@ -852,7 +853,7 @@
     <output message="tns:mc_config_get_stringResponse"/>
   </operation>
   <operation name="mc_issue_checkin">
-    <documentation>Notifies Mantis of a check-in for the issue with the specified id.</documentation>
+    <documentation>Notifies MantisBT of a check-in for the issue with the specified id.</documentation>
     <input message="tns:mc_issue_checkinRequest"/>
     <output message="tns:mc_issue_checkinResponse"/>
   </operation>
