@@ -70,6 +70,8 @@ public class IssueData  implements java.io.Serializable {
 
     private com.itsolut.mantis.binding.CustomFieldValueForIssueData[] custom_fields;
 
+    private java.util.Calendar due_date;
+
     public IssueData() {
     }
 
@@ -104,7 +106,8 @@ public class IssueData  implements java.io.Serializable {
            com.itsolut.mantis.binding.AttachmentData[] attachments,
            com.itsolut.mantis.binding.RelationshipData[] relationships,
            com.itsolut.mantis.binding.IssueNoteData[] notes,
-           com.itsolut.mantis.binding.CustomFieldValueForIssueData[] custom_fields) {
+           com.itsolut.mantis.binding.CustomFieldValueForIssueData[] custom_fields,
+           java.util.Calendar due_date) {
            this.id = id;
            this.view_state = view_state;
            this.last_updated = last_updated;
@@ -136,6 +139,7 @@ public class IssueData  implements java.io.Serializable {
            this.relationships = relationships;
            this.notes = notes;
            this.custom_fields = custom_fields;
+           this.due_date = due_date;
     }
 
 
@@ -758,6 +762,26 @@ public class IssueData  implements java.io.Serializable {
         this.custom_fields = custom_fields;
     }
 
+
+    /**
+     * Gets the due_date value for this IssueData.
+     * 
+     * @return due_date
+     */
+    public java.util.Calendar getDue_date() {
+        return due_date;
+    }
+
+
+    /**
+     * Sets the due_date value for this IssueData.
+     * 
+     * @param due_date
+     */
+    public void setDue_date(java.util.Calendar due_date) {
+        this.due_date = due_date;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof IssueData)) return false;
@@ -862,7 +886,10 @@ public class IssueData  implements java.io.Serializable {
               java.util.Arrays.equals(this.notes, other.getNotes()))) &&
             ((this.custom_fields==null && other.getCustom_fields()==null) || 
              (this.custom_fields!=null &&
-              java.util.Arrays.equals(this.custom_fields, other.getCustom_fields())));
+              java.util.Arrays.equals(this.custom_fields, other.getCustom_fields()))) &&
+            ((this.due_date==null && other.getDue_date()==null) || 
+             (this.due_date!=null &&
+              this.due_date.equals(other.getDue_date())));
         __equalsCalc = null;
         return _equals;
     }
@@ -998,6 +1025,9 @@ public class IssueData  implements java.io.Serializable {
                     _hashCode += obj.hashCode();
                 }
             }
+        }
+        if (getDue_date() != null) {
+            _hashCode += getDue_date().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -1223,6 +1253,13 @@ public class IssueData  implements java.io.Serializable {
         elemField.setFieldName("custom_fields");
         elemField.setXmlName(new javax.xml.namespace.QName("", "custom_fields"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "CustomFieldValueForIssueData"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("due_date");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "due_date"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

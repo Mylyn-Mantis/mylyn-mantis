@@ -26,6 +26,8 @@ public class ProjectData  implements java.io.Serializable {
 
     private com.itsolut.mantis.binding.ProjectData[] subprojects;
 
+    private java.lang.Boolean inherit_global;
+
     public ProjectData() {
     }
 
@@ -38,7 +40,8 @@ public class ProjectData  implements java.io.Serializable {
            com.itsolut.mantis.binding.ObjectRef access_min,
            java.lang.String file_path,
            java.lang.String description,
-           com.itsolut.mantis.binding.ProjectData[] subprojects) {
+           com.itsolut.mantis.binding.ProjectData[] subprojects,
+           java.lang.Boolean inherit_global) {
            this.id = id;
            this.name = name;
            this.status = status;
@@ -48,6 +51,7 @@ public class ProjectData  implements java.io.Serializable {
            this.file_path = file_path;
            this.description = description;
            this.subprojects = subprojects;
+           this.inherit_global = inherit_global;
     }
 
 
@@ -230,6 +234,26 @@ public class ProjectData  implements java.io.Serializable {
         this.subprojects = subprojects;
     }
 
+
+    /**
+     * Gets the inherit_global value for this ProjectData.
+     * 
+     * @return inherit_global
+     */
+    public java.lang.Boolean getInherit_global() {
+        return inherit_global;
+    }
+
+
+    /**
+     * Sets the inherit_global value for this ProjectData.
+     * 
+     * @param inherit_global
+     */
+    public void setInherit_global(java.lang.Boolean inherit_global) {
+        this.inherit_global = inherit_global;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ProjectData)) return false;
@@ -268,7 +292,10 @@ public class ProjectData  implements java.io.Serializable {
               this.description.equals(other.getDescription()))) &&
             ((this.subprojects==null && other.getSubprojects()==null) || 
              (this.subprojects!=null &&
-              java.util.Arrays.equals(this.subprojects, other.getSubprojects())));
+              java.util.Arrays.equals(this.subprojects, other.getSubprojects()))) &&
+            ((this.inherit_global==null && other.getInherit_global()==null) || 
+             (this.inherit_global!=null &&
+              this.inherit_global.equals(other.getInherit_global())));
         __equalsCalc = null;
         return _equals;
     }
@@ -314,6 +341,9 @@ public class ProjectData  implements java.io.Serializable {
                     _hashCode += obj.hashCode();
                 }
             }
+        }
+        if (getInherit_global() != null) {
+            _hashCode += getInherit_global().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -385,6 +415,13 @@ public class ProjectData  implements java.io.Serializable {
         elemField.setFieldName("subprojects");
         elemField.setXmlName(new javax.xml.namespace.QName("", "subprojects"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "ProjectData"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("inherit_global");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "inherit_global"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

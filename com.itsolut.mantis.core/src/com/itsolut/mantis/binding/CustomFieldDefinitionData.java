@@ -26,8 +26,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
 
     private java.math.BigInteger length_max;
 
-    private java.lang.Boolean advanced;
-
     private java.lang.Boolean display_report;
 
     private java.lang.Boolean display_update;
@@ -57,7 +55,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
            java.math.BigInteger access_level_rw,
            java.math.BigInteger length_min,
            java.math.BigInteger length_max,
-           java.lang.Boolean advanced,
            java.lang.Boolean display_report,
            java.lang.Boolean display_update,
            java.lang.Boolean display_resolved,
@@ -75,7 +72,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
            this.access_level_rw = access_level_rw;
            this.length_min = length_min;
            this.length_max = length_max;
-           this.advanced = advanced;
            this.display_report = display_report;
            this.display_update = display_update;
            this.display_resolved = display_resolved;
@@ -264,26 +260,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
      */
     public void setLength_max(java.math.BigInteger length_max) {
         this.length_max = length_max;
-    }
-
-
-    /**
-     * Gets the advanced value for this CustomFieldDefinitionData.
-     * 
-     * @return advanced
-     */
-    public java.lang.Boolean getAdvanced() {
-        return advanced;
-    }
-
-
-    /**
-     * Sets the advanced value for this CustomFieldDefinitionData.
-     * 
-     * @param advanced
-     */
-    public void setAdvanced(java.lang.Boolean advanced) {
-        this.advanced = advanced;
     }
 
 
@@ -485,9 +461,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
             ((this.length_max==null && other.getLength_max()==null) || 
              (this.length_max!=null &&
               this.length_max.equals(other.getLength_max()))) &&
-            ((this.advanced==null && other.getAdvanced()==null) || 
-             (this.advanced!=null &&
-              this.advanced.equals(other.getAdvanced()))) &&
             ((this.display_report==null && other.getDisplay_report()==null) || 
              (this.display_report!=null &&
               this.display_report.equals(other.getDisplay_report()))) &&
@@ -549,9 +522,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
         }
         if (getLength_max() != null) {
             _hashCode += getLength_max().hashCode();
-        }
-        if (getAdvanced() != null) {
-            _hashCode += getAdvanced().hashCode();
         }
         if (getDisplay_report() != null) {
             _hashCode += getDisplay_report().hashCode();
@@ -647,13 +617,6 @@ public class CustomFieldDefinitionData  implements java.io.Serializable {
         elemField.setFieldName("length_max");
         elemField.setXmlName(new javax.xml.namespace.QName("", "length_max"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
-        elemField.setMinOccurs(0);
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("advanced");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "advanced"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

@@ -260,7 +260,7 @@ public interface MantisConnectPortType extends java.rmi.Remote {
     public java.lang.String mc_config_get_string(java.lang.String username, java.lang.String password, java.lang.String config_var) throws java.rmi.RemoteException;
 
     /**
-     * Notifies Mantis of a check-in for the issue with the specified
+     * Notifies MantisBT of a check-in for the issue with the specified
      * id.
      */
     public boolean mc_issue_checkin(java.lang.String username, java.lang.String password, java.math.BigInteger issue_id, java.lang.String comment, boolean fixed) throws java.rmi.RemoteException;
