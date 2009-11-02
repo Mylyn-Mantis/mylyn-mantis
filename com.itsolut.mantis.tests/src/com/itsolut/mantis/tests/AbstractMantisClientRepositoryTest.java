@@ -28,7 +28,7 @@ public class AbstractMantisClientRepositoryTest extends AbstractMantisClientTest
 		String username = "reporter";
 		String password = "reporter";
 			
-		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password, null, null, null);
+		IMantisClient mantisClient = MantisClientFactory.getDefault().createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password, null, null, null);
 		mantisClient.validate(new NullProgressMonitor());
 	}
 

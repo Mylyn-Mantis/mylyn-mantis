@@ -89,9 +89,9 @@ public abstract class AbstractMantisClient extends AbstractSoapClient implements
 	
 	
 
-	protected String username;
+	private String username;
 
-	protected String password;
+	private String password;
 
 	protected URL repositoryUrl;
 
@@ -115,6 +115,16 @@ public abstract class AbstractMantisClient extends AbstractSoapClient implements
 	protected boolean hasAuthenticationCredentials() {
 		return username != null && username.length() > 0;
 	}
+	
+	protected String getUsername() {
+
+        return username;
+    }
+	
+	protected String getPassword() {
+
+        return password;
+    }
 
 	public MantisPriority[] getPriorities() {
 		return (data.priorities != null) ? data.priorities.toArray(new MantisPriority[0]) : null;

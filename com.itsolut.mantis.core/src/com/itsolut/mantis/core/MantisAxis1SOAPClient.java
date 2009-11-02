@@ -78,7 +78,8 @@ import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
- * Represents a Mantis repository that is accessed through the MantisConnect SOAP Interface.
+ * Represents a Mantis repository that is accessed through the MantisConnect
+ * SOAP Interface.
  * 
  * @author Chris Hane
  */
@@ -120,7 +121,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         } catch (MantisException e) {
         }
     }
-
+    
     protected MantisConnectPortType getSOAP() throws MantisException {
 
         synchronized (this) {
@@ -149,6 +150,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     @Override
     protected boolean doLogin(IProgressMonitor monitor) {
+
         return true;
     }
 
@@ -157,21 +159,22 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         if (!(exception instanceof MantisException))
             return false;
-        
+
         MantisException mantisException = (MantisException) exception;
-        
-        return mantisException.getMessage() != null && 
-            mantisException.getMessage().indexOf("Access denied") != -1;
+
+        return mantisException.getMessage() != null
+                && mantisException.getMessage().indexOf("Access denied") != -1;
 
     }
-    
+
     @Override
     protected <T> T call(IProgressMonitor monitor, Callable<T> runnable) throws MantisException {
+
         try {
             return super.call(monitor, runnable);
         } catch (MantisException e) {
             throw e;
-        } catch ( RemoteException e) {
+        } catch (RemoteException e) {
             throw wrap(e);
         } catch (RuntimeException e) {
             throw e;
@@ -181,14 +184,15 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     protected <T> T callOnce(IProgressMonitor monitor, Callable<T> runnable) throws MantisException {
+
         try {
             return super.callOnce(monitor, runnable);
         } catch (MantisException e) {
             throw e;
-        } catch ( RemoteException e) {
+        } catch (RemoteException e) {
             throw wrap(e);
         } catch (RuntimeException e) {
             throw e;
@@ -204,7 +208,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         monitor.beginTask("Validating", 2);
 
         try {
-            
+
             call(monitor, new Callable<Void>() {
 
                 public Void call() throws MantisException, RemoteException {
@@ -214,14 +218,15 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
                     RepositoryVersion.fromVersionString(remoteVersion);
                     Policy.advance(monitor, 1);
 
-                    // test to see if the current user has proper access privileges,
+                    // test to see if the current user has proper access
+                    // privileges,
                     // since mc_version() does not require a valid user
-                    getSOAP().mc_projects_get_user_accessible(username, password);
+                    getSOAP().mc_projects_get_user_accessible(getUsername(), getPassword());
                     Policy.advance(monitor, 1);
-                    
+
                     return null;
                 }
-                
+
             });
 
         } finally {
@@ -269,15 +274,16 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
                 && (httpUsername.length() == 0 || httpPassword.length() == 0);
     }
 
-    public MantisTicket getTicket(final int id, final IProgressMonitor monitor) throws MantisException {
-        
+    public MantisTicket getTicket(final int id, final IProgressMonitor monitor)
+            throws MantisException {
+
         return call(monitor, new Callable<MantisTicket>() {
 
             public MantisTicket call() throws MantisException, RemoteException {
 
                 IssueData issue;
                 try {
-                    issue = getSOAP().mc_issue_get(username, password, BigInteger.valueOf(id));
+                    issue = getSOAP().mc_issue_get(getUsername(), getPassword(), BigInteger.valueOf(id));
                     Policy.advance(monitor, 1);
                 } catch (RemoteException e) {
                     throw new MantisRemoteException(e);
@@ -291,9 +297,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
                 return ticket;
             }
-            
-        });
 
+        });
 
     }
 
@@ -309,8 +314,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
                 public ProjectData[] call() throws Exception {
 
-                    ProjectData[] ret = getSOAP().mc_projects_get_user_accessible(username,
-                            password);
+                    ProjectData[] ret = getSOAP().mc_projects_get_user_accessible(getUsername(),
+                            getPassword());
                     Policy.advance(monitor, 1);
                     return ret;
                 }
@@ -373,26 +378,36 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private final Map<String, MantisProjectCategory[]> categories = new HashMap<String, MantisProjectCategory[]>(
             3);
 
-    public MantisProjectCategory[] getProjectCategories(String projectName, IProgressMonitor monitor)
-            throws MantisException {
+    public MantisProjectCategory[] getProjectCategories(String projectName,
+            final IProgressMonitor monitor) throws MantisException {
 
-        if (categories.containsKey(projectName)) {
+        if (categories.containsKey(projectName))
             return categories.get(projectName);
-        }
 
-        ObjectRef project = getProject(projectName, monitor);
+        final ObjectRef project = getProject(projectName, monitor);
         String[] list;
         try {
-            list = getSOAP().mc_project_get_categories(username, password, project.getId());
-            Policy.advance(monitor, 1);
-        } catch (Exception e) {
+
+            list = call(monitor, new Callable<String[]>() {
+
+                public String[] call() throws Exception {
+
+                    String[] categories = getSOAP().mc_project_get_categories(getUsername(), getPassword(),
+                            project.getId());
+                    Policy.advance(monitor, 1);
+                    return categories;
+                }
+
+            });
+
+        } catch (MantisException e) {
             MantisCorePlugin.log(e);
             return new MantisProjectCategory[0];
         }
+
         MantisProjectCategory[] data = new MantisProjectCategory[list.length];
-        for (int x = 0; x < list.length; x++) {
+        for (int x = 0; x < list.length; x++)
             data[x] = new MantisProjectCategory(list[x], x);
-        }
         this.categories.put(projectName, data);
         return data;
     }
@@ -400,8 +415,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private final Map<String, MantisProjectFilter[]> filters = new HashMap<String, MantisProjectFilter[]>(
             3);
 
-    public MantisProjectFilter[] getProjectFilters(String projectName, IProgressMonitor monitor)
-            throws MantisException {
+    public MantisProjectFilter[] getProjectFilters(String projectName,
+            final IProgressMonitor monitor) throws MantisException {
 
         // cached value
         if (filters.containsKey(projectName))
@@ -409,7 +424,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         try {
 
-            ObjectRef project = getProject(projectName, monitor);
+            final ObjectRef project = getProject(projectName, monitor);
 
             // somehow we get the wrong value ... debugging
             if (project == null)
@@ -417,8 +432,17 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
                         + " . Currently cached projects : " + Arrays.toString(projects) + " .");
 
             // get from remote
-            FilterData[] list = getSOAP().mc_filter_get(username, password, project.getId());
-            Policy.advance(monitor, 1);
+            FilterData[] list = call(monitor, new Callable<FilterData[]>() {
+
+                public FilterData[] call() throws Exception {
+
+                    FilterData[] filterData = getSOAP().mc_filter_get(getUsername(), getPassword(),
+                            project.getId());
+                    Policy.advance(monitor, 1);
+                    return filterData;
+                }
+
+            });
 
             // convert
             MantisProjectFilter[] data = new MantisProjectFilter[list.length];
@@ -430,11 +454,6 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             this.filters.put(projectName, data);
 
             return data;
-        } catch (RemoteException e) {
-
-            // fail gracefully
-            MantisCorePlugin.log(e);
-            return new MantisProjectFilter[0];
         } catch (MantisException e) {
 
             // fail gracefully
@@ -457,81 +476,81 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         return null;
     }
 
-    public void search(final MantisSearch query, List<MantisTicket> tickets, final IProgressMonitor monitor)
-            throws MantisException {
+    public void search(final MantisSearch query, List<MantisTicket> tickets,
+            final IProgressMonitor monitor) throws MantisException {
 
-            String projectName = null;
-            String filterName = null;
-            for (MantisSearchFilter filter : query.getFilters()) {
-                if ("project".equals(filter.getFieldName())) {
-                    projectName = filter.getValues().get(0);
+        String projectName = null;
+        String filterName = null;
+        for (MantisSearchFilter filter : query.getFilters()) {
+            if ("project".equals(filter.getFieldName())) {
+                projectName = filter.getValues().get(0);
 
-                } else if ("filter".equals(filter.getFieldName())) {
-                    filterName = filter.getValues().get(0);
-                }
+            } else if ("filter".equals(filter.getFieldName())) {
+                filterName = filter.getValues().get(0);
+            }
+        }
+
+        final ObjectRef project = getProject(projectName, monitor);
+        final FilterData filter = getFilter(projectName, filterName, monitor);
+
+        if (project == null || filter == null)
+            throw new MantisException(
+                    "Unable to create query . Please make sure that the repository credentials and the query parameters are valid.");
+
+        IssueHeaderData[] ihds = call(monitor, new Callable<IssueHeaderData[]>() {
+
+            public IssueHeaderData[] call() throws Exception {
+
+                IssueHeaderData[] headers = getSOAP().mc_filter_get_issue_headers(getUsername(),
+                        getPassword(), project.getId(), // project
+                        filter.getId(), // filter
+                        BigInteger.valueOf(1), // start page
+                        BigInteger.valueOf(query.getLimit())); // # per page
+
+                Policy.advance(monitor, 1);
+
+                return headers;
             }
 
-            final ObjectRef project = getProject(projectName, monitor);
-            final FilterData filter = getFilter(projectName, filterName, monitor);
+        });
 
-            if (project == null || filter == null)
-                throw new MantisException(
-                        "Unable to create query . Please make sure that the repository credentials and the query parameters are valid.");
+        for (IssueHeaderData ihd : ihds) {
+            // only read the attributes that are important for the tasklist
+            MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
 
-            IssueHeaderData[] ihds = call(monitor, new Callable<IssueHeaderData[]>() {
+            ticket.putBuiltinValue(Key.PROJECT, project.getName());
+            ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
+            ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
 
-                public IssueHeaderData[] call() throws Exception {
-
-                    IssueHeaderData[] headers =  getSOAP().mc_filter_get_issue_headers(username, password,
-                            project.getId(), // project
-                            filter.getId(), // filter
-                            BigInteger.valueOf(1), // start page
-                            BigInteger.valueOf(query.getLimit())); // # per page
-                    
-                    Policy.advance(monitor, 1);
-                    
-                    return headers;
-                }
-                
-            });
-            
-            for (IssueHeaderData ihd : ihds) {
-                // only read the attributes that are important for the tasklist
-                MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
-
-                ticket.putBuiltinValue(Key.PROJECT, project.getName());
-                ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
-                ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
-
-                MantisResolution resolution = data.getResolution(ihd.getResolution().intValue());
-                if (resolution != null) {
-                    ticket.putBuiltinValue(Key.RESOLUTION, resolution.getName());
-                }
-
-                MantisPriority priority = data.getPriority(ihd.getPriority().intValue());
-                if (priority != null) {
-                    ticket.putBuiltinValue(Key.PRIORITY, priority.getName());
-                }
-
-                MantisSeverity severity = data.getSeverity(ihd.getSeverity().intValue());
-                if (severity != null) {
-                    ticket.putBuiltinValue(Key.SEVERITY, severity.getName());
-                }
-
-                MantisTicketStatus status = data.getStatus(ihd.getStatus().intValue());
-                if (status != null) {
-                    ticket.putBuiltinValue(Key.STATUS, status.getName());
-                }
-                // DC: Added so that it isn't necessary to retrieve all tasks
-                // one at time
-                // to see if they have changed since the last synchronization.
-                // This cuts down on the number of soap requests that need to be
-                // made
-                // to the server.
-                ticket.setLastChanged(ihd.getLast_updated().getTime());
-
-                tickets.add(ticket);
+            MantisResolution resolution = data.getResolution(ihd.getResolution().intValue());
+            if (resolution != null) {
+                ticket.putBuiltinValue(Key.RESOLUTION, resolution.getName());
             }
+
+            MantisPriority priority = data.getPriority(ihd.getPriority().intValue());
+            if (priority != null) {
+                ticket.putBuiltinValue(Key.PRIORITY, priority.getName());
+            }
+
+            MantisSeverity severity = data.getSeverity(ihd.getSeverity().intValue());
+            if (severity != null) {
+                ticket.putBuiltinValue(Key.SEVERITY, severity.getName());
+            }
+
+            MantisTicketStatus status = data.getStatus(ihd.getStatus().intValue());
+            if (status != null) {
+                ticket.putBuiltinValue(Key.STATUS, status.getName());
+            }
+            // DC: Added so that it isn't necessary to retrieve all tasks
+            // one at time
+            // to see if they have changed since the last synchronization.
+            // This cuts down on the number of soap requests that need to be
+            // made
+            // to the server.
+            ticket.setLastChanged(ihd.getLast_updated().getTime());
+
+            tickets.add(ticket);
+        }
     }
 
     private MantisTicket parseTicket(IssueData issue) throws MantisException {
@@ -627,97 +646,99 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     @Override
     public synchronized void updateAttributes(IProgressMonitor monitor) throws MantisException {
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 15);
+        final SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 15);
 
-        try {
+        call(subMonitor, new Callable<Void>() {
 
-            ProjectData[] projectData = getSOAP().mc_projects_get_user_accessible(username,
-                    password);
-            projects = new MantisProject[countProjects(projectData)];
-            addProjects(0, projectData, 0);
-            Policy.advance(subMonitor, 1);
+            public Void call() throws Exception {
 
-            // load project-specific data
-            subMonitor.setWorkRemaining(projects.length * 2 + 12);
+                ProjectData[] projectData = getSOAP().mc_projects_get_user_accessible(getUsername(),
+                        getPassword());
+                projects = new MantisProject[countProjects(projectData)];
+                addProjects(0, projectData, 0);
+                Policy.advance(subMonitor, 1);
 
-            for (MantisProject project : projects) {
-                loadProjectFilters(subMonitor, project);
-                loadProjectCustomFields(subMonitor, project);
+                // load project-specific data
+                subMonitor.setWorkRemaining(projects.length * 2 + 12);
+
+                for (MantisProject project : projects) {
+                    loadProjectFilters(subMonitor, project);
+                    loadProjectCustomFields(subMonitor, project);
+                }
+
+                String resolvedStatus = getSOAP().mc_config_get_string(getUsername(), getPassword(),
+                        RESOLVED_STATUS_THRESHOLD);
+                data.setResolvedStatusThreshold(Integer.parseInt(resolvedStatus));
+                Policy.advance(subMonitor, 1);
+
+                // get and parse repository version
+                String versionString = getSOAP().mc_version();
+                RepositoryVersion version = RepositoryVersion.fromVersionString(versionString);
+                data.setRepositoryVersion(version);
+                Policy.advance(subMonitor, 1);
+
+                ObjectRef[] result = getSOAP().mc_enum_priorities(getUsername(), getPassword());
+                data.priorities = new ArrayList<MantisPriority>(result.length);
+                for (ObjectRef item : result) {
+                    data.priorities.add(parsePriority(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_status(getUsername(), getPassword());
+                data.statuses = new ArrayList<MantisTicketStatus>(result.length);
+                for (ObjectRef item : result) {
+                    data.statuses.add(parseTicketStatus(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_severities(getUsername(), getPassword());
+                data.severities = new ArrayList<MantisSeverity>(result.length);
+                for (ObjectRef item : result) {
+                    data.severities.add(parseSeverity(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_resolutions(getUsername(), getPassword());
+                data.resolutions = new ArrayList<MantisResolution>(result.length);
+                for (ObjectRef item : result) {
+                    data.resolutions.add(parseResolution(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_reproducibilities(getUsername(), getPassword());
+                data.reproducibilities = new ArrayList<MantisReproducibility>(result.length);
+                for (ObjectRef item : result) {
+                    data.reproducibilities.add(parseReproducibility(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_projections(getUsername(), getPassword());
+                data.projections = new ArrayList<MantisProjection>(result.length);
+                for (ObjectRef item : result) {
+                    data.projections.add(parseProjection(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_etas(getUsername(), getPassword());
+                data.etas = new ArrayList<MantisETA>(result.length);
+                for (ObjectRef item : result) {
+                    data.etas.add(parseETA(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                result = getSOAP().mc_enum_view_states(getUsername(), getPassword());
+                data.viewStates = new ArrayList<MantisViewState>(result.length);
+                for (ObjectRef item : result) {
+                    data.viewStates.add(parseViewState(item));
+                }
+                Policy.advance(subMonitor, 1);
+
+                loadCustomFieldTypes(subMonitor);
+
+                return null;
             }
 
-            String resolvedStatus = getSOAP().mc_config_get_string(username, password,
-                    RESOLVED_STATUS_THRESHOLD);
-            data.setResolvedStatusThreshold(Integer.parseInt(resolvedStatus));
-            Policy.advance(subMonitor, 1);
-
-            // get and parse repository version
-            String versionString = getSOAP().mc_version();
-            RepositoryVersion version = RepositoryVersion.fromVersionString(versionString);
-            data.setRepositoryVersion(version);
-            Policy.advance(subMonitor, 1);
-
-            ObjectRef[] result = getSOAP().mc_enum_priorities(username, password);
-            data.priorities = new ArrayList<MantisPriority>(result.length);
-            for (ObjectRef item : result) {
-                data.priorities.add(parsePriority(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_status(username, password);
-            data.statuses = new ArrayList<MantisTicketStatus>(result.length);
-            for (ObjectRef item : result) {
-                data.statuses.add(parseTicketStatus(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_severities(username, password);
-            data.severities = new ArrayList<MantisSeverity>(result.length);
-            for (ObjectRef item : result) {
-                data.severities.add(parseSeverity(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_resolutions(username, password);
-            data.resolutions = new ArrayList<MantisResolution>(result.length);
-            for (ObjectRef item : result) {
-                data.resolutions.add(parseResolution(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_reproducibilities(username, password);
-            data.reproducibilities = new ArrayList<MantisReproducibility>(result.length);
-            for (ObjectRef item : result) {
-                data.reproducibilities.add(parseReproducibility(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_projections(username, password);
-            data.projections = new ArrayList<MantisProjection>(result.length);
-            for (ObjectRef item : result) {
-                data.projections.add(parseProjection(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_etas(username, password);
-            data.etas = new ArrayList<MantisETA>(result.length);
-            for (ObjectRef item : result) {
-                data.etas.add(parseETA(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            result = getSOAP().mc_enum_view_states(username, password);
-            data.viewStates = new ArrayList<MantisViewState>(result.length);
-            for (ObjectRef item : result) {
-                data.viewStates.add(parseViewState(item));
-            }
-            Policy.advance(subMonitor, 1);
-
-            loadCustomFieldTypes(subMonitor);
-
-        } catch (RemoteException e) {
-            MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
-        }
+        });
     }
 
     private MantisCustomField parseCustomFieldData(CustomFieldDefinitionData customFieldData) {
@@ -737,8 +758,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private void loadCustomFieldTypes(IProgressMonitor monitor) throws RemoteException,
             MantisException {
 
-        ObjectRef[] mcEnumCustomFieldTypes = getSOAP().mc_enum_custom_field_types(username,
-                password);
+        ObjectRef[] mcEnumCustomFieldTypes = getSOAP().mc_enum_custom_field_types(getUsername(),
+                getPassword());
         Policy.advance(monitor, 1);
 
         List<MantisCustomFieldType> customFieldTypes = new ArrayList<MantisCustomFieldType>(
@@ -765,7 +786,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             throws MantisException {
 
         try {
-            FilterData[] filterData = getSOAP().mc_filter_get(username, password,
+            FilterData[] filterData = getSOAP().mc_filter_get(getUsername(), getPassword(),
                     BigInteger.valueOf(project.getValue()));
             Policy.advance(subMonitor, 1);
 
@@ -789,7 +810,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
         try {
             CustomFieldDefinitionData[] customFields = getSOAP().mc_project_get_custom_fields(
-                    username, password, BigInteger.valueOf(project.getValue()));
+                    getUsername(), getPassword(), BigInteger.valueOf(project.getValue()));
             Policy.advance(subMonitor, 1);
 
             List<MantisCustomField> projectCustomFields = new ArrayList<MantisCustomField>(
@@ -860,74 +881,97 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     // return version;
     // }
 
-    public byte[] getAttachmentData(int attachmentID, IProgressMonitor monitor)
+    public byte[] getAttachmentData(final int attachmentID, final IProgressMonitor monitor)
             throws MantisException {
 
-        try {
-            byte[] attachment = getSOAP().mc_issue_attachment_get(username, password,
-                    BigInteger.valueOf(attachmentID));
-            Policy.advance(monitor, 1);
+        byte[] attachment = call(monitor, new Callable<byte[]>() {
 
-            return attachment;
+            public byte[] call() throws Exception {
 
-        } catch (RemoteException e) {
-            throw new MantisRemoteException(e);
-        }
+                byte[] response = getSOAP().mc_issue_attachment_get(getUsername(), getPassword(),
+                        BigInteger.valueOf(attachmentID));
+                Policy.advance(monitor, 1);
+                return response;
+            }
+
+        });
+
+        return attachment;
+
     }
 
-    public void putAttachmentData(int ticketID, String filename, byte[] data,
-            IProgressMonitor monitor) throws MantisException {
+    public void putAttachmentData(final int ticketID, final String filename, byte[] data,
+            final IProgressMonitor monitor) throws MantisException {
 
         boolean requiresBase64EncodedAttachment = getRepositoryVersion(monitor)
                 .isRequiresBase64EncodedAttachment();
 
-        try {
+        final byte[] encoded = requiresBase64EncodedAttachment ? Base64.encode(data).getBytes()
+                : data;
 
-            // TODO - we should determine the encoding
-            if (requiresBase64EncodedAttachment)
-                data = Base64.encode(data).getBytes();
+        call(monitor, new Callable<Void>() {
 
-            getSOAP().mc_issue_attachment_add(username, password, BigInteger.valueOf(ticketID),
-                    filename, "bug", data);
-            Policy.advance(monitor, 1);
+            public Void call() throws Exception {
 
-        } catch (RemoteException e) {
-            MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
-        }
+                getSOAP().mc_issue_attachment_add(getUsername(), getPassword(), BigInteger.valueOf(ticketID),
+                        filename, "bug", encoded);
+                Policy.advance(monitor, 1);
+
+                return null;
+            }
+        });
+
     }
 
-    public int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+    public int createTicket(MantisTicket ticket, final IProgressMonitor monitor)
+            throws MantisException {
 
-        IssueData issue = createSOAPIssue(ticket, monitor);
+        final IssueData issue = createSOAPIssue(ticket, monitor);
 
-        BigInteger id;
-        try {
-            id = getSOAP().mc_issue_add(username, password, issue);
-            Policy.advance(monitor, 1);
+        BigInteger id = call(monitor, new Callable<BigInteger>() {
 
-            if (getRepositoryVersion(monitor).isHasProperTaskRelations())
-                createRelationships(ticket, monitor, id);
-        } catch (RemoteException e) {
-            MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
-        }
+            public BigInteger call() throws Exception {
+
+                BigInteger result = getSOAP().mc_issue_add(getUsername(), getPassword(), issue);
+                Policy.advance(monitor, 1);
+
+                return result;
+
+            }
+
+        });
+
+        if (getRepositoryVersion(monitor).isHasProperTaskRelations())
+            createRelationships(ticket, monitor, id);
 
         ticket.setId(id.intValue());
 
         return ticket.getId();
     }
 
-    private void createRelationships(MantisTicket ticket, IProgressMonitor monitor, BigInteger id)
-            throws RemoteException, MantisException {
+    private void createRelationships(MantisTicket ticket, final IProgressMonitor monitor, final BigInteger id)
+            throws MantisException {
 
-        MantisRelationship[] relationships = ticket.getRelationships();
-        for (MantisRelationship relationship : relationships) {
+        final MantisRelationship[] relationships = ticket.getRelationships();
 
-            RelationshipData relationshipData = toRelationshipData(relationship);
-            getSOAP().mc_issue_relationship_add(username, password, id, relationshipData);
-            Policy.advance(monitor, 1);
-        }
+        if (relationships.length == 0)
+            return;
+
+        call(monitor, new Callable<Void>() {
+
+            public Void call() throws Exception {
+
+                for (MantisRelationship relationship : relationships) {
+
+                    RelationshipData relationshipData = toRelationshipData(relationship);
+                    getSOAP().mc_issue_relationship_add(getUsername(), getPassword(), id, relationshipData);
+                    Policy.advance(monitor, 1);
+                }
+
+                return null;
+            }
+        });
+
     }
 
     private RelationshipData toRelationshipData(MantisRelationship relationship) {
@@ -971,7 +1015,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         issue.setStatus(newRef(data.statuses, Key.STATUS, ticket));
 
         if (MantisUtils.isEmpty(ticket.getValue(Key.REPORTER))) {
-            issue.setReporter(createReport(username));
+            issue.setReporter(createReport(getUsername()));
         } else {
             issue.setReporter(createReport(ticket.getValue(Key.REPORTER)));
         }
@@ -1038,59 +1082,81 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor)
+    public void updateTicket(final MantisTicket ticket, final String comment, final IProgressMonitor monitor)
             throws MantisException {
 
-        IssueData issue = createSOAPIssue(ticket, monitor);
+        final IssueData issue = createSOAPIssue(ticket, monitor);
         issue.setId(BigInteger.valueOf(ticket.getId()));
 
         // add comment...
-        IssueNoteData ind = new IssueNoteData();
+        final IssueNoteData ind = new IssueNoteData();
         ind.setDate_submitted(MantisUtils.transform(new Date()));
         ind.setLast_modified(MantisUtils.transform(new Date()));
-        ind.setReporter(createReport(username));
+        ind.setReporter(createReport(getUsername()));
         ind.setText(comment);
-        try {
-            // add comment first because when updating the issue to resolved
-            // comments can't be added
-            if (!MantisUtils.isEmpty(comment)) {
-                BigInteger id = getSOAP().mc_issue_note_add(username, password, issue.getId(), ind);
+
+        call(monitor, new Callable<Void>() {
+
+            public Void call() throws Exception {
+
+                // add comment first because when updating the issue to resolved
+                // comments can't be added
+                if (!MantisUtils.isEmpty(comment)) {
+                    BigInteger id = getSOAP().mc_issue_note_add(getUsername(), getPassword(), issue.getId(),
+                            ind);
+                    Policy.advance(monitor, 1);
+                    ind.setId(id);
+                    parseNote(ticket, ind);
+                }
+
+                getSOAP().mc_issue_update(getUsername(), getPassword(), issue.getId(), issue);
                 Policy.advance(monitor, 1);
-                ind.setId(id);
-                parseNote(ticket, ind);
+
+                return null;
             }
 
-            getSOAP().mc_issue_update(username, password, issue.getId(), issue);
-            Policy.advance(monitor, 1);
-
-        } catch (RemoteException e) {
-            MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
-        }
+        });            
     }
 
-    protected void updateUsers(String project, IProgressMonitor monitor) throws MantisException {
+    protected void updateUsers(String project, final IProgressMonitor monitor) throws MantisException {
 
         try {
-            ObjectRef projectRef = getProject(project, monitor);
+            final ObjectRef projectRef = getProject(project, monitor);
 
-            int reporterAccessLevel = safeGetIntConfigurationValue(REPORTER_THRESHOLD,
+            final int reporterAccessLevel = safeGetIntConfigurationValue(REPORTER_THRESHOLD,
                     DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue(), monitor);
-            int developerAccessLevel = safeGetIntConfigurationValue(DEVELOPER_THRESHOLD,
+            final int developerAccessLevel = safeGetIntConfigurationValue(DEVELOPER_THRESHOLD,
                     DefaultConstantValues.Threshold.UPDATE_BUG_ASSIGN_THRESHOLD.getValue(), monitor);
 
-            AccountData[] accounts = getSOAP().mc_project_get_users(username, password,
-                    projectRef.getId(), BigInteger.valueOf(reporterAccessLevel));
-            Policy.advance(monitor, 1);
+            AccountData[] accounts = call(monitor, new Callable<AccountData[]>() {
+
+                public AccountData[] call() throws Exception {
+                
+                    AccountData[] ret = getSOAP().mc_project_get_users(getUsername(), getPassword(),
+                            projectRef.getId(), BigInteger.valueOf(reporterAccessLevel));
+                    Policy.advance(monitor, 1);
+                    return ret;
+                }
+            });
+                
+                
 
             AccountData[] developerAccounts;
 
             if (reporterAccessLevel == developerAccessLevel)
                 developerAccounts = accounts;
             else {
-                developerAccounts = getSOAP().mc_project_get_users(username, password,
-                        projectRef.getId(), BigInteger.valueOf(developerAccessLevel));
-                Policy.advance(monitor, 1);
+                developerAccounts = call(monitor, new Callable<AccountData[]>() {
+
+                    public AccountData[] call() throws Exception {
+                    
+                        AccountData[] ret = getSOAP().mc_project_get_users(getUsername(), getPassword(),
+                                projectRef.getId(), BigInteger.valueOf(developerAccessLevel));
+                        Policy.advance(monitor, 1);
+                        return ret;
+                    }
+                });
+
             }
 
             String[] users = new String[accounts.length];
@@ -1110,47 +1176,64 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         }
     }
 
-    private int safeGetIntConfigurationValue(String optionName, int defaultValue,
-            IProgressMonitor monitor) throws RemoteException, MantisException {
+    private int safeGetIntConfigurationValue(final String optionName, final int defaultValue,
+            final IProgressMonitor monitor) throws RemoteException, MantisException {
 
-        try {
-            int value = Integer.parseInt(getSOAP().mc_config_get_string(username, password,
-                    optionName));
-            Policy.advance(monitor, 1);
+        return call(monitor, new Callable<Integer>() {
 
-            return value;
-        } catch (NumberFormatException e) {
-            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                    "Failed parsing config option " + optionName + " using default value.", e));
-        }
-        return defaultValue;
+            public Integer call() throws Exception {
+
+                try {
+
+                    int value = Integer.parseInt(getSOAP().mc_config_get_string(getUsername(), getPassword(),
+                            optionName));
+                    Policy.advance(monitor, 1);
+
+                    return value;
+
+                } catch (NumberFormatException e) {
+                    MantisCorePlugin
+                            .log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                                    "Failed parsing config option " + optionName
+                                            + ". Using default value.", e));
+                }
+                return defaultValue;
+            }
+        });
+
+
     }
 
-    public MantisVersion[] getVersions(String project, IProgressMonitor monitor)
+    public MantisVersion[] getVersions(String project, final IProgressMonitor monitor)
             throws MantisException {
 
         List<MantisVersion> versions = new ArrayList<MantisVersion>();
-        try {
-            ObjectRef projectRef = getProject(project, monitor);
+        final ObjectRef projectRef = getProject(project, monitor);
 
-            ProjectVersionData[] data = getSOAP().mc_project_get_versions(username, password,
-                    projectRef.getId());
-            Policy.advance(monitor, 1);
+        ProjectVersionData[] data = call(monitor, new Callable<ProjectVersionData[]>() {
 
-            /* Convert the ProjectVersionData's into MantisVersions */
-            for (ProjectVersionData v : data) {
-                MantisVersion version = new MantisVersion(v.getName());
-                version.setDescription(v.getDescription());
+            public ProjectVersionData[] call() throws Exception {
 
-                Calendar cal = v.getDate_order();
-                version.setTime(cal.getTime());
-                versions.add(version);
+                ProjectVersionData[] ret = getSOAP().mc_project_get_versions(getUsername(), getPassword(),
+                        projectRef.getId());
+                Policy.advance(monitor, 1);
 
-                version.setReleased(v.getReleased());
+                return ret;
+
             }
-        } catch (RemoteException e) {
-            MantisCorePlugin.log(e);
-            throw new MantisRemoteException(e);
+
+        });
+
+        /* Convert the ProjectVersionData's into MantisVersions */
+        for (ProjectVersionData v : data) {
+            MantisVersion version = new MantisVersion(v.getName());
+            version.setDescription(v.getDescription());
+
+            Calendar cal = v.getDate_order();
+            version.setTime(cal.getTime());
+            versions.add(version);
+
+            version.setReleased(v.getReleased());
         }
         return versions.toArray(new MantisVersion[versions.size()]);
     }

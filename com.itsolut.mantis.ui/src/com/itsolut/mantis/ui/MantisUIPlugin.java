@@ -14,10 +14,12 @@ package com.itsolut.mantis.ui;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
 
 /**
@@ -41,7 +43,8 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		
+
+		MantisClientFactory.getDefault().setTaskRepositoryLocationFactory(new TaskRepositoryLocationUiFactory());
 		TasksUi.getRepositoryManager().addListener(MantisCorePlugin.getDefault().getConnector().getClientManager());
 	}
 
