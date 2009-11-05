@@ -62,7 +62,11 @@ public class MantisClientData implements Serializable {
     private long lastUpdate = 0;
 
     private int resolvedStatusThreshold = 0;
+    
+    private int dueDateViewThreshold = 0;
 
+    private int dueDateUpdateThreshold = 0;
+    
     public MantisResolution getResolution(int value) {
 
         for (MantisResolution r : resolutions) {
@@ -179,5 +183,26 @@ public class MantisClientData implements Serializable {
     public void recordAttributesUpdated() {
         
         lastUpdate = System.currentTimeMillis();
+    }
+
+    public void setDueDateViewThreshold(int dueDateViewThreshold) {
+
+        this.dueDateViewThreshold = dueDateViewThreshold;
+        
+    }
+    
+    public int getDueDateViewThreshold() {
+
+        return dueDateViewThreshold;
+    }
+    
+    public void setDueDateUpdateThreshold(int dueDateUpdateThreshold) {
+
+        this.dueDateUpdateThreshold = dueDateUpdateThreshold;
+    }
+    
+    public int getDueDateUpdateThreshold() {
+
+        return dueDateUpdateThreshold;
     }
 }

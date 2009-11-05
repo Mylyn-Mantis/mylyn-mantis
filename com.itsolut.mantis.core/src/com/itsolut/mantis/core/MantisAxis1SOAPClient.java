@@ -95,6 +95,10 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     private static final String REPORTER_THRESHOLD = "report_bug_threshold";
 
     private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
+    
+    private static final String DUE_DATE_VIEW_THRESHOLD = "due_date_view_threshold";
+    
+    private static final String DUE_DATE_UPDATE_THRESHOLD = "due_date_update_threshold";
 
     private transient MantisConnectPortType soap;
 
@@ -367,7 +371,10 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
 
     private ObjectRef getProject(String name, IProgressMonitor monitor) throws MantisException {
 
-        for (MantisProject mp : this.getProjects(monitor)) {
+        if ( this.projects == null)
+            getProjects(monitor);
+        
+        for (MantisProject mp : this.projects) {
             if (mp.getName().equals(name)) {
                 return new ObjectRef(BigInteger.valueOf(mp.getValue()), mp.getName());
             }
@@ -576,6 +583,8 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         ticket.putBuiltinValue(Key.VERSION, issue.getVersion());
         ticket.putBuiltinValue(Key.FIXED_IN, issue.getFixed_in_version());
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
+        if ( getRepositoryVersion(new NullProgressMonitor()).isHasDueDateSupport())
+            ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
@@ -646,7 +655,7 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
     @Override
     public synchronized void updateAttributes(IProgressMonitor monitor) throws MantisException {
 
-        final SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 15);
+        final SubMonitor subMonitor = SubMonitor.convert(monitor, "Updating attributes", 17);
 
         call(subMonitor, new Callable<Void>() {
 
@@ -659,23 +668,25 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
                 Policy.advance(subMonitor, 1);
 
                 // load project-specific data
-                subMonitor.setWorkRemaining(projects.length * 2 + 12);
+                subMonitor.setWorkRemaining(projects.length * 2 + 14);
 
                 for (MantisProject project : projects) {
                     loadProjectFilters(subMonitor, project);
                     loadProjectCustomFields(subMonitor, project);
                 }
-
-                String resolvedStatus = getSOAP().mc_config_get_string(getUsername(), getPassword(),
-                        RESOLVED_STATUS_THRESHOLD);
-                data.setResolvedStatusThreshold(Integer.parseInt(resolvedStatus));
-                Policy.advance(subMonitor, 1);
-
+                
                 // get and parse repository version
                 String versionString = getSOAP().mc_version();
                 RepositoryVersion version = RepositoryVersion.fromVersionString(versionString);
                 data.setRepositoryVersion(version);
                 Policy.advance(subMonitor, 1);
+
+                String resolvedStatus = getSOAP().mc_config_get_string(getUsername(), getPassword(),
+                        RESOLVED_STATUS_THRESHOLD);
+                data.setResolvedStatusThreshold(Integer.parseInt(resolvedStatus));
+                Policy.advance(subMonitor, 1);
+                
+//                updateDueDateAttributes(subMonitor);
 
                 ObjectRef[] result = getSOAP().mc_enum_priorities(getUsername(), getPassword());
                 data.priorities = new ArrayList<MantisPriority>(result.length);
@@ -1009,6 +1020,18 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
         if (getRepositoryVersion(monitor).isHasProperTaskRelations())
             issue.setTarget_version(ticket.getValueAndFilterNone(Key.TARGET_VERSION));
 
+        if ( getRepositoryVersion(monitor).isHasDueDateSupport()) {
+            String dueDate = ticket.getValue(Key.DUE_DATE);
+            if ( dueDate == null) {
+                issue.setDue_date(null);
+            } else {
+                long dueDateMillis = Long.parseLong(dueDate);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(dueDateMillis);
+                issue.setDue_date(calendar);
+            }
+        }
+        
         issue.setSteps_to_reproduce(ticket.getValue(Key.STEPS_TO_REPRODUCE));
         issue.setAdditional_information(ticket.getValue(Key.ADDITIONAL_INFO));
 
@@ -1236,6 +1259,30 @@ public class MantisAxis1SOAPClient extends AbstractMantisClient {
             version.setReleased(v.getReleased());
         }
         return versions.toArray(new MantisVersion[versions.size()]);
+    }
+
+    private void updateDueDateAttributes(final SubMonitor subMonitor) throws MantisException,
+            RemoteException {
+
+        if ( data.getRepositoryVersion().isHasDueDateSupport()) {
+        
+            String dueDateViewThreshold = getSOAP().mc_config_get_string(getUsername(),
+                    getPassword(), DUE_DATE_VIEW_THRESHOLD);
+            if (dueDateViewThreshold != null)
+                data.setDueDateViewThreshold(Integer.parseInt(dueDateViewThreshold));
+            
+            Policy.advance(subMonitor, 1);
+
+            String dueDateUpdateThreshold = getSOAP().mc_config_get_string(getUsername(),
+                    getPassword(), DUE_DATE_UPDATE_THRESHOLD);
+            if (dueDateViewThreshold != null)
+                data.setDueDateUpdateThreshold(Integer.parseInt(dueDateUpdateThreshold));
+            
+            Policy.advance(subMonitor, 1);
+        } else {
+            
+            Policy.advance(subMonitor, 2);
+        }
     }
 
 }

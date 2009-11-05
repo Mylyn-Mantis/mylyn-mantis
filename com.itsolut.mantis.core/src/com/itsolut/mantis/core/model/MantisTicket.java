@@ -66,6 +66,7 @@ public class MantisTicket {
         VIEW_STATE("view_state"),
         FIXED_IN("fixed_in"),
         TARGET_VERSION("target_version"),
+        DUE_DATE("due_date"),
         NEW_COMMENT("new_comment"),
         ATTACHID("attachid"),
         ATTACHMENT("attachment"),
