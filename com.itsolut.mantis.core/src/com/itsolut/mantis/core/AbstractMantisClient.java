@@ -49,7 +49,7 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * @author Steffen Pingel
  * @author Chris Hane
  */
-public abstract class AbstractMantisClient extends AbstractSoapClient implements IMantisClient {
+public abstract class AbstractMantisClient extends AbstractSoapClient {
 	
 	static interface DefaultConstantValues {
 		
@@ -188,14 +188,16 @@ public abstract class AbstractMantisClient extends AbstractSoapClient implements
 	
 	public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException {
 	    
-	    for ( MantisProject project : getProjects(monitor))
+	    for ( MantisProject project :  getProjects(monitor))
 	        if ( project.getName().equals(projectName))
 	            return project;
 	    
 	    throw new MantisException("Unable to find project by name " + projectName + " .");
 	};
 
-	/**
+	protected abstract MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
+
+    /**
      * Returns true, if the repository details are cached. If this method
      * returns true, invoking <tt>updateAttributes(monitor, false)</tt> will
      * return without opening a connection.
@@ -235,17 +237,6 @@ public abstract class AbstractMantisClient extends AbstractSoapClient implements
 	    }
 	
 	    return data.getRepositoryVersion();
-	}
-	
-	public List<MantisCustomFieldType> getCustomFieldTypes(
-			IProgressMonitor monitor) throws MantisException {
-		
-		if ( !hasAttributes()) {
-			updateAttributes(monitor);
-			data.recordAttributesUpdated();
-		}
-		
-		return data.getCustomFieldTypes();
 	}
 	
 	public List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor)

@@ -60,7 +60,7 @@ public class MantisClientFactory {
 
         URL url = new URL(location);
         
-        return new MantisAxis1SOAPClient(url, username, password, httpUsername, httpPassword, webLocation);
+        return new MantisClient(url, username, password, httpUsername, httpPassword, webLocation);
         
     }
 }

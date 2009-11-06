@@ -55,8 +55,6 @@ public class MantisClientData implements Serializable {
 
     private RepositoryVersion repositoryVersion;
 
-    private List<MantisCustomFieldType> customFieldTypes = Collections.emptyList();
-
     private Map<Integer, List<MantisCustomField>> customFieldsByProjectId = new HashMap<Integer, List<MantisCustomField>>();
 
     private long lastUpdate = 0;
@@ -118,19 +116,6 @@ public class MantisClientData implements Serializable {
     public RepositoryVersion getRepositoryVersion() {
 
         return repositoryVersion;
-    }
-
-    public List<MantisCustomFieldType> getCustomFieldTypes() {
-
-        if ( customFieldTypes == null)
-            customFieldTypes = Collections.emptyList();
-        
-        return Collections.unmodifiableList(customFieldTypes);
-    }
-
-    public void setCustomFieldTypes(List<MantisCustomFieldType> customFieldTypes) {
-
-        this.customFieldTypes = customFieldTypes;
     }
 
     public void setCustomFields(int projectId, Collection<? extends MantisCustomField> customFields) {
