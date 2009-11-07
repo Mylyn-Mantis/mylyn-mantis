@@ -214,7 +214,7 @@ public class MantisTicket {
         return getId() != MantisTicket.INVALID_ID;
     }
 
-    public void putBuiltinValue(Key key, String value) throws InvalidTicketException {
+    public void putBuiltinValue(Key key, String value)  {
         valueByKey.put(key, value);
     }
 
@@ -231,7 +231,7 @@ public class MantisTicket {
      * @throws InvalidTicketException
      *             thrown if the type of <code>value</code> is not valid
      */
-    public boolean putValue(String keyName, String value) throws InvalidTicketException {
+    public boolean putValue(String keyName, String value){
         Key key = Key.fromKey(keyName);
         if (key != null) {
             if (key == Key.ID || key == Key.LAST_UPDATED) {
