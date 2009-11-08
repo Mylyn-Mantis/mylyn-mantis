@@ -318,7 +318,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 throw new CoreException(new Status(IStatus.ERROR,
                         MantisCorePlugin.PLUGIN_ID, 0, "Ticket download from "
                         + repository.getRepositoryUrl() + " for task " + id
-                        + " failed : " + e.getMessage() + " .", e));
+                        + " failed, please see details.", e));
             }
         } catch (NumberFormatException e) {
             throw new CoreException(new Status(Status.ERROR,
@@ -524,9 +524,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
             if ( client.getRepositoryVersion(monitor).isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
-            
-            if ( client.getRepositoryVersion(monitor).isHasDueDateSupport())
-                createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
                     client.getProjection(), client.getProjection()[0].getName());

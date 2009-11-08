@@ -37,6 +37,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 /**
  * Caches {@link IMantisClient} objects.
@@ -51,6 +52,8 @@ public class MantisClientManager implements IRepositoryListener {
     
     private File cacheFile;
     
+    private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationFactory();
+    
     public MantisClientManager(File cacheFile) {
 
         this.cacheFile = cacheFile;
@@ -60,47 +63,41 @@ public class MantisClientManager implements IRepositoryListener {
     
     public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MalformedURLException {
 
-        IMantisClient client = clientByUrl.get(taskRepository.getRepositoryUrl());
-        if (client == null)
-            client = newMantisClient(taskRepository);
-        return client;
-    }
-
-    private IMantisClient newMantisClient(TaskRepository taskRepository)
-            throws MalformedURLException {
-
-        IMantisClient repository;
-        AuthenticationCredentials repositoryCredentials = taskRepository.getCredentials(AuthenticationType.REPOSITORY);
-        AuthenticationCredentials repositoryHttpCredentials = taskRepository.getCredentials(AuthenticationType.HTTP);
-        
-        String repositoryUserName = "";
-        String repositoryPassword = "";
-        
-        if (repositoryCredentials != null) {
-        	repositoryUserName = repositoryCredentials.getUserName();
-        	repositoryPassword = repositoryCredentials.getPassword();
+        IMantisClient repository = clientByUrl.get(taskRepository.getRepositoryUrl());
+        if (repository == null) {
+            
+            AuthenticationCredentials repositoryCredentials = taskRepository.getCredentials(AuthenticationType.REPOSITORY);
+            AuthenticationCredentials repositoryHttpCredentials = taskRepository.getCredentials(AuthenticationType.HTTP);
+            
+            String repositoryUserName = "";
+            String repositoryPassword = "";
+            
+            if (repositoryCredentials != null) {
+            	repositoryUserName = repositoryCredentials.getUserName();
+            	repositoryPassword = repositoryCredentials.getPassword();
+            }
+            
+            String httpUserName = "";
+            String httpPassword = "";
+            
+            if (repositoryHttpCredentials != null) {
+                httpUserName = repositoryHttpCredentials.getUserName();
+                httpPassword = repositoryHttpCredentials.getPassword();
+            }
+            
+            AbstractWebLocation location = taskRepositoryLocationFactory.createWebLocation(taskRepository);
+            
+            repository = MantisClientFactory.createClient(taskRepository.getRepositoryUrl(), repositoryUserName, repositoryPassword, httpUserName, httpPassword, location);
+            
+            clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
+            
+            MantisClientData data = clientDataByUrl.get(taskRepository.getRepositoryUrl());
+            if (data == null) {
+                data = new MantisClientData();
+                clientDataByUrl.put(taskRepository.getRepositoryUrl(), data);
+            }
+            repository.setData(data);
         }
-        
-        String httpUserName = "";
-        String httpPassword = "";
-        
-        if (repositoryHttpCredentials != null) {
-            httpUserName = repositoryHttpCredentials.getUserName();
-            httpPassword = repositoryHttpCredentials.getPassword();
-        }
-        
-        AbstractWebLocation location = MantisClientFactory.getDefault().getTaskRepositoryLocationFactory().createWebLocation(taskRepository);
-        
-        repository = MantisClientFactory.getDefault().createClient(taskRepository.getRepositoryUrl(), repositoryUserName, repositoryPassword, httpUserName, httpPassword, location);
-        
-        clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
-        
-        MantisClientData data = clientDataByUrl.get(taskRepository.getRepositoryUrl());
-        if (data == null) {
-            data = new MantisClientData();
-            clientDataByUrl.put(taskRepository.getRepositoryUrl(), data);
-        }
-        repository.setData(data);
         return repository;
     }
     

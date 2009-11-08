@@ -37,7 +37,7 @@ public class MantisRepositoryConnectorTest extends TestCase {
 		manager.clearRepositories(TasksUiPlugin.getDefault().getRepositoriesFilePath());
 
 		connector = (MantisRepositoryConnector) manager.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-		TasksUiPlugin.getSynchronizationScheduler().synchronize(manager.getDefaultRepository(MantisCorePlugin.REPOSITORY_KIND));
+//		TasksUiPlugin.getSynchronizationScheduler().synchronize(manager.getDefaultRepository(MantisCorePlugin.REPOSITORY_KIND));
 
 	}
 

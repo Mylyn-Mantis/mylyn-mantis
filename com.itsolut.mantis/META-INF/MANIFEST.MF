@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mylyn Connector: Mantis
 Bundle-SymbolicName: com.itsolut.mantis
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.0.6.qualifier
 Bundle-Vendor: ITSOLUT
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

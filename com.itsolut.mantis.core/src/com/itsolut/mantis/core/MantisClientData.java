@@ -55,16 +55,14 @@ public class MantisClientData implements Serializable {
 
     private RepositoryVersion repositoryVersion;
 
+    private List<MantisCustomFieldType> customFieldTypes = Collections.emptyList();
+
     private Map<Integer, List<MantisCustomField>> customFieldsByProjectId = new HashMap<Integer, List<MantisCustomField>>();
 
     private long lastUpdate = 0;
 
     private int resolvedStatusThreshold = 0;
-    
-    private int dueDateViewThreshold = 0;
 
-    private int dueDateUpdateThreshold = 0;
-    
     public MantisResolution getResolution(int value) {
 
         for (MantisResolution r : resolutions) {
@@ -118,6 +116,19 @@ public class MantisClientData implements Serializable {
         return repositoryVersion;
     }
 
+    public List<MantisCustomFieldType> getCustomFieldTypes() {
+
+        if ( customFieldTypes == null)
+            customFieldTypes = Collections.emptyList();
+        
+        return Collections.unmodifiableList(customFieldTypes);
+    }
+
+    public void setCustomFieldTypes(List<MantisCustomFieldType> customFieldTypes) {
+
+        this.customFieldTypes = customFieldTypes;
+    }
+
     public void setCustomFields(int projectId, Collection<? extends MantisCustomField> customFields) {
 
         if ( customFieldsByProjectId == null)
@@ -168,26 +179,5 @@ public class MantisClientData implements Serializable {
     public void recordAttributesUpdated() {
         
         lastUpdate = System.currentTimeMillis();
-    }
-
-    public void setDueDateViewThreshold(int dueDateViewThreshold) {
-
-        this.dueDateViewThreshold = dueDateViewThreshold;
-        
-    }
-    
-    public int getDueDateViewThreshold() {
-
-        return dueDateViewThreshold;
-    }
-    
-    public void setDueDateUpdateThreshold(int dueDateUpdateThreshold) {
-
-        this.dueDateUpdateThreshold = dueDateUpdateThreshold;
-    }
-    
-    public int getDueDateUpdateThreshold() {
-
-        return dueDateUpdateThreshold;
     }
 }

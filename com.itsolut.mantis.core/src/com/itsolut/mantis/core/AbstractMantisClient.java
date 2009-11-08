@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
-import org.eclipse.mylyn.internal.provisional.commons.soap.AbstractSoapClient;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
@@ -49,7 +48,7 @@ import com.itsolut.mantis.core.model.MantisViewState;
  * @author Steffen Pingel
  * @author Chris Hane
  */
-public abstract class AbstractMantisClient extends AbstractSoapClient {
+public abstract class AbstractMantisClient implements IMantisClient {
 	
 	static interface DefaultConstantValues {
 		
@@ -89,9 +88,9 @@ public abstract class AbstractMantisClient extends AbstractSoapClient {
 	
 	
 
-	private String username;
+	protected String username;
 
-	private String password;
+	protected String password;
 
 	protected URL repositoryUrl;
 
@@ -115,16 +114,6 @@ public abstract class AbstractMantisClient extends AbstractSoapClient {
 	protected boolean hasAuthenticationCredentials() {
 		return username != null && username.length() > 0;
 	}
-	
-	protected String getUsername() {
-
-        return username;
-    }
-	
-	protected String getPassword() {
-
-        return password;
-    }
 
 	public MantisPriority[] getPriorities() {
 		return (data.priorities != null) ? data.priorities.toArray(new MantisPriority[0]) : null;
@@ -188,16 +177,14 @@ public abstract class AbstractMantisClient extends AbstractSoapClient {
 	
 	public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException {
 	    
-	    for ( MantisProject project :  getProjects(monitor))
+	    for ( MantisProject project : getProjects(monitor))
 	        if ( project.getName().equals(projectName))
 	            return project;
 	    
 	    throw new MantisException("Unable to find project by name " + projectName + " .");
 	};
 
-	protected abstract MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
-
-    /**
+	/**
      * Returns true, if the repository details are cached. If this method
      * returns true, invoking <tt>updateAttributes(monitor, false)</tt> will
      * return without opening a connection.
@@ -237,6 +224,17 @@ public abstract class AbstractMantisClient extends AbstractSoapClient {
 	    }
 	
 	    return data.getRepositoryVersion();
+	}
+	
+	public List<MantisCustomFieldType> getCustomFieldTypes(
+			IProgressMonitor monitor) throws MantisException {
+		
+		if ( !hasAttributes()) {
+			updateAttributes(monitor);
+			data.recordAttributesUpdated();
+		}
+		
+		return data.getCustomFieldTypes();
 	}
 	
 	public List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor)
