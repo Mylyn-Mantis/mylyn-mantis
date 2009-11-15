@@ -2,7 +2,6 @@
 package com.itsolut.mantis.ui.util;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -26,16 +25,17 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
  * @author Robert Munteanu
  * 
  */
+@SuppressWarnings("restriction")
 public class MantisUIUtil {
 
-    public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository, final boolean force) {
+    public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository) {
 
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(
                 MantisCorePlugin.REPOSITORY_KIND);
         final IMantisClient client;
         try {
             client = connector.getClientManager().getRepository(repository);
-        } catch (MalformedURLException e) {
+        } catch (MantisException e) {
             MantisUIPlugin.handleMantisException(e);
             return;
         }
@@ -46,7 +46,7 @@ public class MantisUIUtil {
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                     try {
-                        client.updateAttributes(monitor, force);
+                        client.updateAttributes(monitor);
                     } catch (MantisException e) {
                         throw new InvocationTargetException(e);
                     }

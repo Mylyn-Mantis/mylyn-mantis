@@ -13,7 +13,7 @@ class MantisProjectLabelProvider extends LabelProvider {
     public String getText(Object element) {
     	if (element instanceof MantisProject) {
     		MantisProject project = (MantisProject) element;
-    		return project.getName() ; 
+    		return project.getDisplayName() ; 
     	}
     	return "";
     }

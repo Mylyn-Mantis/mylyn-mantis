@@ -106,7 +106,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
     
     @Override protected Validator getValidator(TaskRepository repository) {
 
-        return new MantisValidator(repository, getUserName(), getPassword(), getHttpAuthUserId(), getHttpAuthPassword());
+        return new MantisValidator(repository);
     }
     
     @Override public void applyTo(TaskRepository repository) {
@@ -130,25 +130,15 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         
         private final TaskRepository taskRepository;
         
-        private final String userName;
-        private final String password;
-        private final String httpUserName;
-        private final String httpPassword;
-        
-        public MantisValidator(TaskRepository taskRepository, String userName, String password, String httpUserName, String httpPassword) {
+        public MantisValidator(TaskRepository taskRepository) {
 
             this.repositoryUrl = taskRepository.getRepositoryUrl();
             this.taskRepository = taskRepository;
-            this.userName = userName;
-            this.password = password;
-            this.httpUserName = httpUserName;
-            this.httpPassword = httpPassword;
         }
         
         @Override public void run(IProgressMonitor monitor) throws CoreException {
 
             try {
-                //validate(Provider.of(monitor));
                 validate(monitor);
             } catch (MalformedURLException e) {
                 throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR, MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
@@ -161,7 +151,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
             AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
             
-            IMantisClient client = MantisClientFactory.getDefault().createClient(location.getUrl(), this.userName, this.password, this.httpUserName, this.httpPassword, location);
+            IMantisClient client = MantisClientFactory.getDefault().createClient(location);
             client.validate(monitor);
             setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
         }

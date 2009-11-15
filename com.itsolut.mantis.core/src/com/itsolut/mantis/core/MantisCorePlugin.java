@@ -38,107 +38,121 @@ import com.itsolut.mantis.core.exception.MantisLoginException;
  */
 public class MantisCorePlugin extends Plugin {
 
-	public static final String PLUGIN_ID = "com.itsolut.mantis.core";
+    public static final String PLUGIN_ID = "com.itsolut.mantis.core";
 
-	public static final String ENCODING_UTF_8 = "UTF-8";
+    public static final String ENCODING_UTF_8 = "UTF-8";
 
-	private static MantisCorePlugin plugin;
+    private static MantisCorePlugin plugin;
 
-	public final static String REPOSITORY_KIND = "mantis";
+    public final static String REPOSITORY_KIND = "mantis";
 
-	private MantisRepositoryConnector connector;
-	
-	public MantisCorePlugin() {
-	}
+    private MantisRepositoryConnector connector;
 
-	public static MantisCorePlugin getDefault() {
-		return plugin;
-	}
+    public MantisCorePlugin() {
 
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    }
 
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		if (connector != null) {
-			connector.stop();
-			connector = null;
-		}
-		
-		plugin = null;
-		super.stop(context);
-	}
+    public static MantisCorePlugin getDefault() {
 
-	public MantisRepositoryConnector getConnector() {
-		return connector;
-	}
-	
-	void setConnector(MantisRepositoryConnector connector) {
-		this.connector = connector;
-	}
+        return plugin;
+    }
 
-	/**
-	 * Returns the path to the file caching repository attributes.
-	 */
-	protected IPath getRepostioryAttributeCachePath() {
-		IPath stateLocation = Platform.getStateLocation(MantisCorePlugin.getDefault().getBundle());
-		IPath cacheFile = stateLocation.append("repositoryConfigurations");
-		return cacheFile;
-	}
+    @Override
+    public void start(BundleContext context) throws Exception {
 
-	public static IStatus toStatus(Throwable e) {
-		if (e instanceof MantisLoginException || "Access Denied".equals(e.getMessage())) {
-			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, 
-					"Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.", null);
-		} else if (e instanceof MantisException) {
-			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
-		} else if (e instanceof ClassCastException) {
-			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
-		} else {
-			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
-		}
-	}
+        super.start(context);
+        plugin = this;
+    }
 
-	/**
-	 * Convenience method for logging statuses to the plug-in log
-	 * 
-	 * @param status
-	 *            the status to log
-	 */
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
+    @Override
+    public void stop(BundleContext context) throws Exception {
 
-	/**
-	 * Convenience method for logging exceptions to the plug-in log
-	 * 
-	 * @param e
-	 *            the exception to log
-	 */
-	public static void log(Throwable e) {
-		String message = e.getMessage();
-		if (e.getMessage() == null) {
-			message = e.getClass().toString();
-		}
-		log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
-	}
-	
-	public static void log(String message, Throwable e) {
-	    
-	    log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
-	}
+        if (connector != null) {
+            connector.stop();
+            connector = null;
+        }
 
-	public static void log(String string) {
-		log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, null));
-	}
+        plugin = null;
+        super.stop(context);
+    }
 
-	public static void log(String string, Exception ex) {
-		log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, ex));
-	}
+    public MantisRepositoryConnector getConnector() {
+
+        return connector;
+    }
+
+    void setConnector(MantisRepositoryConnector connector) {
+
+        this.connector = connector;
+    }
+
+    /**
+     * Returns the path to the file caching repository attributes.
+     */
+    protected IPath getRepositoryAttributeCachePath() {
+
+        IPath stateLocation = Platform.getStateLocation(MantisCorePlugin.getDefault().getBundle());
+        IPath cacheFile = stateLocation.append("repositoryConfigurations");
+        return cacheFile;
+    }
+
+    public static IStatus toStatus(Throwable e) {
+
+        if (e instanceof MantisLoginException || "Access Denied".equals(e.getMessage())) {
+            return new Status(
+                    IStatus.ERROR,
+                    PLUGIN_ID,
+                    IStatus.INFO,
+                    "Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.",
+                    null);
+        } else if (e instanceof MantisException) {
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
+        } else if (e instanceof ClassCastException) {
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
+        } else {
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
+        }
+    }
+
+    /**
+     * Convenience method for logging statuses to the plug-in log
+     * 
+     * @param status
+     *            the status to log
+     */
+    public static void log(IStatus status) {
+
+        getDefault().getLog().log(status);
+    }
+
+    /**
+     * Convenience method for logging exceptions to the plug-in log
+     * 
+     * @param e
+     *            the exception to log
+     */
+    public static void log(Throwable e) {
+
+        String message = e.getMessage();
+        if (e.getMessage() == null) {
+            message = e.getClass().toString();
+        }
+        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
+    }
+
+    public static void log(String message, Throwable e) {
+
+        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
+    }
+
+    public static void log(String string) {
+
+        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, null));
+    }
+
+    public static void log(String string, Exception ex) {
+
+        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, ex));
+    }
 
 }
-
-

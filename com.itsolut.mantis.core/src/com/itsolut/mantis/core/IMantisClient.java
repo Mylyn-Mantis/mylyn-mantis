@@ -27,204 +27,127 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
 import com.itsolut.mantis.core.model.MantisSearch;
-import com.itsolut.mantis.core.model.MantisSeverity;
 import com.itsolut.mantis.core.model.MantisTicket;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisViewState;
 
 /**
- * Defines the requirements for classes that provide remote access to 
- * Mantis repositories.
+ * Defines the requirements for classes that provide remote access to Mantis repositories.
  * 
  * @author Steffen Pingel
  * @author Chris Hane
  */
 public interface IMantisClient {
 
-    /**
-     * @author Robert Munteanu
-     *
-     * @deprecated The client-side declared version is not used anymore as we 
-     * will detect it from the server version
-     */
-    @Deprecated
-	public enum Version {
-		MC_1_0a5;
+    public static final String CHARSET = "UTF-8";
 
-		public static Version fromVersion(String version) {
-			try {
-				return Version.valueOf(version);
-			} catch (IllegalArgumentException e) {
-				return null;
-			}
-		}
+    public static final String TIME_ZONE = "UTC";
 
-		@Override
-		public String toString() {
-			switch (this) {
-			case MC_1_0a5:
-				return "Mantis Connect 1.0a5";
-			default:
-				return null;
-			}
-		}
+    // public static final String LOGIN_URL = "/login";
 
-	}
+    public static final String QUERY_URL = "/query?format=tab";
 
-	public static final String CHARSET = "UTF-8";
+    public static final String TICKET_URL = "/mc_issue_get";
 
-	public static final String TIME_ZONE = "UTC";
+    public static final String NEW_TICKET_URL = "/mc_issue_add";
 
-//	public static final String LOGIN_URL = "/login";
+    public static final String TICKET_ATTACHMENT_URL = "file_download.php?type=bug&file_id=";
 
-	public static final String QUERY_URL = "/query?format=tab";
+    public static final String DEFAULT_USERNAME = "anonymous";
 
-	public static final String TICKET_URL = "/mc_issue_get";
-
-	public static final String NEW_TICKET_URL = "/mc_issue_add";
-
-	public static final String TICKET_ATTACHMENT_URL = "file_download.php?type=bug&file_id=";
-
-	public static final String DEFAULT_USERNAME = "anonymous";
-	
-	public static final String URL_SHOW_BUG = "view.php?id=";
+    public static final String URL_SHOW_BUG = "view.php?id=";
 
     public static final String SEARCH_LIMIT = "searchLimit";
 
-	/**
-	 * Gets ticket with <code>id</code> from repository.
-	 * 
-	 * @param id
-	 *            the id of the ticket to get
-	 * @return the ticket
-	 * @throws MantisException
-	 *             thrown in case of a connection error
-	 */
-	MantisTicket getTicket(int id, IProgressMonitor monitor) throws MantisException;
+    /**
+     * Gets ticket with <code>id</code> from repository.
+     * 
+     * @param id
+     *            the id of the ticket to get
+     * @return the ticket
+     * @throws MantisException
+     *             thrown in case of a connection error
+     */
+    MantisTicket getTicket(int id, IProgressMonitor monitor) throws MantisException;
 
-	/**
-	 * Queries tickets from repository. All found tickets are added to
-	 * <code>result</code>.
-	 * 
-	 * @param query
-	 *            the search criteria
-	 * @param result
-	 *            the list of found tickets
-	 * @throws MantisException
-	 *             thrown in case of a connection error
-	 */
-	void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException;
+    /**
+     * Queries tickets from repository. All found tickets are added to <code>result</code>.
+     * 
+     * @param query
+     *            the search criteria
+     * @param result
+     *            the list of found tickets
+     * @throws MantisException
+     *             thrown in case of a connection error
+     */
+    void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException;
 
-	/**
-	 * Validates the repository connection.
-	 * 
-	 * @throws MantisException
-	 *             thrown in case of a connection error
-	 */
-	void validate(IProgressMonitor monitor) throws MantisException;
+    /**
+     * Validates the repository connection.
+     * 
+     * @throws MantisException
+     *             thrown in case of a connection error
+     */
+    void validate(IProgressMonitor monitor) throws MantisException;
 
-	/**
-	 * Updates cached repository details: milestones, versions etc.
-	 * 
-	 * @throws MantisException
-	 *             thrown in case of a connection error
-	 */
-	void updateAttributes(IProgressMonitor monitor, boolean force) throws MantisException;
+    /**
+     * Updates cached repository details: milestones, versions etc.
+     * 
+     * @throws MantisException
+     *             thrown in case of a connection error
+     */
+    void updateAttributes(IProgressMonitor monitor) throws MantisException;
 
-	MantisPriority[] getPriorities();
+    byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException;
 
-	MantisSeverity[] getSeverities();
+    void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException;
 
-	MantisResolution[] getTicketResolutions();
+    /**
+     * @param monitor
+     * @return the id of the created ticket
+     */
+    int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException;
 
-	MantisTicketStatus[] getTicketStatus();
+    void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException;
 
-	MantisReproducibility[] getReproducibility();
+    MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException;
 
-	MantisETA[] getETA();
+    /**
+     * Determines if a task is completed or not.
+     * 
+     * <p>
+     * The level of the status of the ticket is compared against the
+     * <tt>bug_resolved_status_threshold</tt> of the Mantis installation.
+     * </p>
+     * 
+     * <p>
+     * This method may require remote calls if either mantis ticket stati or the threshold have not
+     * been retrieved.
+     * </p>
+     * 
+     * @param taskData
+     *            the task data to read the status from
+     * @param progressMonitor
+     * @return true if the task is completed, false otherwise
+     * @throws MantisException
+     *             Failure in retrieving the required remote data
+     */
+    boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException;
 
-	MantisViewState[] getViewState();
+    /**
+     * Returns the cache data
+     * 
+     * <p>This method should be used only for persistence purposes.</p>
+     * 
+     * @return the cache data
+     */
+    MantisCacheData getCacheData();
 
-	MantisProjection[] getProjection();
-	
-	/**
-	 * @param project
-	 * @return all users which are allocated to this project
-	 */
-	String[] getUsers(String project, IProgressMonitor monitor);
-	
-	/**
-	 * @param project
-	 * @return all users which are allowed to handle tasks in this project
-	 */
-	String[] getDevelopers(String project, IProgressMonitor monitor);
+    /**
+     * Sets the cache data.
+     * 
+     * <p>This method should only be used for setting a previously persisted cache data.</p>
+     * @param cacheData
+     */
+    void setCacheData(MantisCacheData cacheData);
 
-	public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException;
-	
-	public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException;
-
-	public MantisProjectCategory[] getProjectCategories(String projectName, IProgressMonitor monitor) throws MantisException;
-
-	public MantisProjectFilter[] getProjectFilters(String projectName, IProgressMonitor monitor) throws MantisException;
-
-//	MantisTicketType[] getTicketTypes();
-
-	/**
-	 * @return The versions for a specific project. 
-	 */
-	MantisVersion[] getVersions(String projectName, IProgressMonitor monitor) throws MantisException;
-
-	byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException;
-
-	void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException;
-
-	/**
-	 * @param monitor 
-	 * @return the id of the created ticket
-	 */
-	int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException;
-
-	void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException;
-
-	/**
-	 * Sets a reference to the cached repository attributes.
-	 * 
-	 * @param data
-	 *            cached repository attributes
-	 */
-	void setData(MantisClientData data);
-	
-	RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException;
-	
-	List<MantisCustomFieldType> getCustomFieldTypes(IProgressMonitor monitor) throws MantisException;
-	
-	List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor) throws MantisException;
-	
-	/**
-	 * Determines if a task is completed or not.
-	 * 
-	 * <p>The level of the status of the ticket is compared against the <tt>bug_resolved_status_threshold</tt>
-	 * of the Mantis installation.</p>
-	 * 
-	 * <p>This method may require remote calls if either mantis ticket stati or the threshold have not been
-	 * retrieved.</p> 
-	 * 
-	 * @param taskData the task data to read the status from 
-	 * @param progressMonitor 
-	 * @return true if the task is completed, false otherwise
-	 * @throws MantisException Failure in retrieving the required remote data
-	 */
-	boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException;
 }

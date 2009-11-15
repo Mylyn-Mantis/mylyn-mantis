@@ -21,7 +21,10 @@ import com.itsolut.mantis.binding.MantisConnectLocator;
  * @author Robert Munteanu
  *
  */
+@SuppressWarnings("restriction")
 public class CustomMantisConnectLocator extends MantisConnectLocator {
+    
+    private static final long serialVersionUID = 1L;
     
     private AbstractWebLocation location;
     

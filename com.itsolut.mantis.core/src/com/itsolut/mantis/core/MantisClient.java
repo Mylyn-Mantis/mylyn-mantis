@@ -11,33 +11,29 @@
 
 package com.itsolut.mantis.core;
 
-import java.net.URL;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
+import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.IssueHeaderData;
+import com.itsolut.mantis.binding.IssueNoteData;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
+import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisSearchFilter;
-import com.itsolut.mantis.core.model.MantisSeverity;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisViewState;
+import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * @author Robert Munteanu
@@ -49,11 +45,14 @@ public class MantisClient implements IMantisClient {
 
     private final MantisCache cache;
 
-    public MantisClient(URL url, String username, String password, String httpUsername, String httpPassword,
-            AbstractWebLocation webLocation) {
+    private AbstractWebLocation location;
 
-        soapClient = new MantisAxis1SOAPClient(url, username, password, httpUsername, httpPassword, webLocation);
+    public MantisClient(AbstractWebLocation webLocation) throws MantisException {
+
+        soapClient = new MantisAxis1SOAPClient(webLocation);
         cache = new MantisCache(soapClient);
+        location = webLocation;
+
     }
 
     public MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException {
@@ -65,79 +64,38 @@ public class MantisClient implements IMantisClient {
 
     public int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
+        cache.refreshIfNeeded(monitor);
+
+        IssueData issueData = MantisConverter.convert(ticket, cache, getUserName());
+
+        int issueId = soapClient.addIssue(issueData, monitor);
+
+        ticket.setId(issueId);
+
+        addRelationsIfApplicable(ticket, monitor);
+
+        return issueId;
+    }
+
+    private String getUserName() {
+
+        return location.getCredentials(AuthenticationType.REPOSITORY).getUserName();
+    }
+
+    private void addRelationsIfApplicable(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+
+        if (!cache.getRepositoryVersion().isHasProperTaskRelations())
+            return;
+
+        for (MantisRelationship relationship : ticket.getRelationships())
+            soapClient.addRelationship(ticket.getId(), MantisConverter.convert(relationship), monitor);
     }
 
     public byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
-    }
+        cache.refreshIfNeeded(monitor);
 
-    public List<MantisCustomFieldType> getCustomFieldTypes(IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public List<MantisCustomField> getCustomFieldsForProject(String projectName, IProgressMonitor monitor)
-            throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getDevelopers(String project, IProgressMonitor monitor) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisETA[] getETA() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisPriority[] getPriorities() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisProject getProjectByName(String projectName, IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisProjectCategory[] getProjectCategories(String projectName, IProgressMonitor monitor)
-            throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisProjectFilter[] getProjectFilters(String projectName, IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisProjection[] getProjection() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisProject[] getProjects(IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public RepositoryVersion getRepositoryVersion(IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisReproducibility[] getReproducibility() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisSeverity[] getSeverities() {
-
-        throw new UnsupportedOperationException();
+        return soapClient.getIssueAttachment(id, monitor);
     }
 
     public MantisTicket getTicket(int ticketId, IProgressMonitor monitor) throws MantisException {
@@ -152,45 +110,43 @@ public class MantisClient implements IMantisClient {
         return ticket;
     }
 
-    public MantisResolution[] getTicketResolutions() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisTicketStatus[] getTicketStatus() {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getUsers(String project, IProgressMonitor monitor) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisVersion[] getVersions(String projectName, IProgressMonitor monitor) throws MantisException {
-
-        throw new UnsupportedOperationException();
-    }
-
-    public MantisViewState[] getViewState() {
-
-        throw new UnsupportedOperationException();
-    }
-
     public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
+        cache.refreshIfNeeded(progressMonitor);
+
+        TaskAttribute status = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
+        String statusName = status.getValue();
+        try {
+
+            MantisTicketStatus mantisStatus = cache.getStatusByName(statusName);
+
+            int resolvedStatusThreshold = cache.getResolvedStatus();
+
+            return mantisStatus.getValue() >= resolvedStatusThreshold;
+
+        } catch (MantisException e) {
+            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                    "Unable to find the level for the status named " + statusName + " ."));
+            return false;
+        }
+
     }
 
     public void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
+        cache.refreshIfNeeded(monitor);
+
+        boolean requiresBase64EncodedAttachment = cache.getRepositoryVersion().isRequiresBase64EncodedAttachment();
+
+        final byte[] encoded = requiresBase64EncodedAttachment ? Base64.encode(data).getBytes() : data;
+
+        soapClient.addIssueAttachment(id, name, encoded, monitor);
     }
 
     public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor);
-        
+
         String projectName = null;
         String filterName = null;
         for (MantisSearchFilter filter : query.getFilters()) {
@@ -201,29 +157,54 @@ public class MantisClient implements IMantisClient {
                 filterName = filter.getValues().get(0);
             }
         }
-        
+
         int projectId = cache.getProjectId(projectName);
         int filterId = cache.getProjectFilterId(projectId, filterName);
-        
-        IssueHeaderData[] issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
-        
-        for ( IssueHeaderData issueHeader : issueHeaders)
-            result.add(MantisConverter.convert(issueHeader, cache, projectName));
+
+        IProgressMonitor subMonitor = Policy.subMonitorFor(monitor, 1);
+        subMonitor.beginTask("Retrieving issue headers", 1);
+
+        try {
+            IssueHeaderData[] issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
+
+            for (IssueHeaderData issueHeader : issueHeaders)
+                result.add(MantisConverter.convert(issueHeader, cache, projectName));
+        } finally {
+            subMonitor.done();
+        }
     }
 
-    public void setData(MantisClientData data) {
+    public void updateAttributes(IProgressMonitor monitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
-    }
-
-    public void updateAttributes(IProgressMonitor monitor, boolean force) throws MantisException {
-
-        throw new UnsupportedOperationException();
+        cache.refresh(monitor);
     }
 
     public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException {
 
-        throw new UnsupportedOperationException();
+        cache.refreshIfNeeded(monitor);
+
+        IssueData issue = MantisConverter.convert(ticket, cache, getUserName());
+        issue.setId(BigInteger.valueOf(ticket.getId()));
+
+        // add comment first because when updating the issue to resolved
+        // comments can't be added
+        addCommentIfApplicable(ticket.getId(), comment, monitor);
+
+        soapClient.updateIssue(issue, monitor);
+    }
+
+    private void addCommentIfApplicable(int issueId, String comment, IProgressMonitor monitor) throws MantisException {
+
+        if (MantisUtils.isEmpty(comment))
+            return;
+
+        final IssueNoteData ind = new IssueNoteData();
+        ind.setDate_submitted(MantisUtils.transform(new Date()));
+        ind.setLast_modified(MantisUtils.transform(new Date()));
+        ind.setReporter(MantisConverter.convert(getUserName()));
+        ind.setText(comment);
+
+        soapClient.addNote(issueId, ind, monitor);
     }
 
     public void validate(IProgressMonitor monitor) throws MantisException {
@@ -245,6 +226,17 @@ public class MantisClient implements IMantisClient {
 
             monitor.done();
         }
+
+    }
+
+    public MantisCacheData getCacheData() {
+
+        return cache.getCacheData();
+    }
+
+    public void setCacheData(MantisCacheData cacheData) {
+
+        cache.setCacheData(cacheData);
 
     }
 

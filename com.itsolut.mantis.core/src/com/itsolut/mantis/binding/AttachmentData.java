@@ -7,6 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
+@SuppressWarnings({"serial", "unchecked"})
 public class AttachmentData  implements java.io.Serializable {
     private java.math.BigInteger id;
 

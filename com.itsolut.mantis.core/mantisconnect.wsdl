@@ -241,6 +241,7 @@
    <xsd:element name="access_level_rw" type="xsd:integer" minOccurs="0"/>
    <xsd:element name="length_min" type="xsd:integer" minOccurs="0"/>
    <xsd:element name="length_max" type="xsd:integer" minOccurs="0"/>
+   <xsd:element name="advanced" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_report" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_update" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="display_resolved" type="xsd:boolean" minOccurs="0"/>

@@ -21,12 +21,11 @@
 
 package com.itsolut.mantis.core;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * @author Steffen Pingel
@@ -56,11 +55,9 @@ public class MantisClientFactory {
         return DEFAULT;
     }
     
-    public IMantisClient createClient(String location, String username, String password, String httpUsername, String httpPassword, AbstractWebLocation webLocation) throws MalformedURLException {
+    public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
-        URL url = new URL(location);
-        
-        return new MantisClient(url, username, password, httpUsername, httpPassword, webLocation);
+        return new MantisClient(webLocation);
         
     }
 }

@@ -23,25 +23,19 @@ package com.itsolut.mantis.ui.wizard;
 
 import static com.itsolut.mantis.ui.util.MantisUIUtil.newEnhancedFilteredTree;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonsUiUtil;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -53,7 +47,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.itsolut.mantis.core.IMantisClient;
@@ -71,6 +64,7 @@ import com.itsolut.mantis.ui.util.MantisUIUtil;
  * @author Chris Hane
  * @author Robert Munteanu
  */
+@SuppressWarnings("restriction")
 public class MantisProjectPage extends WizardPage {
 
     private TaskRepository taskRepository;
@@ -111,8 +105,6 @@ public class MantisProjectPage extends WizardPage {
 
 		});
 		
-		updateAttributesFromRepository(false);
-		
 		projectTreeViewer.setInput(getProjects());
 		
 		Button updateButton = new Button(control, SWT.LEFT | SWT.PUSH);
@@ -121,7 +113,7 @@ public class MantisProjectPage extends WizardPage {
 		updateButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				updateAttributesFromRepository(true);
+			    MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository);
 				projectTreeViewer.setInput(getProjects());
 			}
 		});
@@ -145,14 +137,14 @@ public class MantisProjectPage extends WizardPage {
                 public void run(IProgressMonitor monitor) throws CoreException {
             
                     try {
-                        projects.addAll(Arrays.asList(client.getProjects(monitor)));
+                        projects.addAll(client.getCache(monitor).getProjects());
                     } catch (MantisException e) {
                         throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID, "Failed getting projects : " + e.getMessage(), e));
                     }
                     
                 }
             });
-		} catch (MalformedURLException e) {
+		} catch (MantisException e) {
 			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
 		} catch (CoreException e) {
             setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
@@ -164,11 +156,6 @@ public class MantisProjectPage extends WizardPage {
 	@Override
     public boolean isPageComplete() {
 		return getSelectedProject() != null;
-    }
-
-    private void updateAttributesFromRepository(boolean force) {
-
-        MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, force);
     }
 
     public MantisProject getSelectedProject() {

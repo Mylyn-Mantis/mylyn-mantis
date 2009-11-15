@@ -22,6 +22,7 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 /**
  * @author Steffen Pingel
  */
+@SuppressWarnings("restriction")
 public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 	
 	@Override
