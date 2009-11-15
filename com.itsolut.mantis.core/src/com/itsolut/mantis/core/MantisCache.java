@@ -116,12 +116,20 @@ public class MantisCache {
                             monitor));
                     Policy.advance(subMonitor, 1);
 
-                    cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
-                            cacheData.reporterThreshold, monitor));
-                    Policy.advance(subMonitor, 1);
-
                     cacheProjectDevelopers(project.getValue(), soapClient.getProjectUsers(project.getValue(),
                             cacheData.developerThreshold, monitor));
+                    Policy.advance(subMonitor, 1);
+
+                    try {
+                        cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
+                                cacheData.reporterThreshold, monitor));
+                    } catch (MantisException e) {
+                        // TODO : remove this once http://www.mantisbt.org/bugs/view.php?id=11180 is sorted out
+                        MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                                "Failed retrieving reporter information, using developers list for reporters.", e));
+                        cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
+                                cacheData.developersByProjectId.get(project.getValue())));
+                    }
                     Policy.advance(subMonitor, 1);
 
                     cacheProjectVersions(project.getValue(), soapClient.getProjectVersions(project.getValue(), monitor));
