@@ -13,8 +13,6 @@ import java.net.MalformedURLException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisClientFactory;
-import com.itsolut.mantis.core.IMantisClient.Version;
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
@@ -23,52 +21,40 @@ import com.itsolut.mantis.core.exception.MantisException;
  */
 public class MantisAxisClientTest extends AbstractMantisClientRepositoryTest {
 
-	public MantisAxisClientTest() {
-		super(Version.MC_1_0a5);
-	}
-
 	public void testupdateAttributes() throws Exception {
 
 		String username = "reporter";
 		String password = "reporter";
 
-		IMantisClient mantisClient = MantisClientFactory.getDefault().createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
-				username, password, null, null, null);
-		assertNotNull("Mantis Client failed to be created.", mantisClient);
+		IMantisClient mantisClient = newMantisClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password);
 
-		mantisClient.updateAttributes(new NullProgressMonitor(), true);
+		mantisClient.updateAttributes(new NullProgressMonitor());
 	}
-	
+
 	public void testValidatePass() throws MantisException, MalformedURLException {
 
 		String username = "reporter";
 		String password = "reporter";
 
-		IMantisClient mantisClient = MantisClientFactory.getDefault().createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
-				username, password, null, null, null);
-		assertNotNull("Mantis Client failed to be created.", mantisClient);
+		IMantisClient mantisClient = newMantisClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password);
 
 		mantisClient.validate(new NullProgressMonitor());
 
 	}
-	
-	public void testValidateFails() throws MalformedURLException {
 
-		
+	public void testValidateFails() throws MalformedURLException, MantisException {
+
 		String username = "reporter";
 		String password = "reporter12";
 
-		IMantisClient mantisClient = MantisClientFactory.getDefault().createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL,
-				username, password, null, null, null);
-		assertNotNull("Mantis Client failed to be created", mantisClient);
+		IMantisClient mantisClient = newMantisClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password);
 
 		try {
 			mantisClient.validate(new NullProgressMonitor());
 			fail("Expected MantisException");
-		} catch ( MantisException e) {
+		} catch (MantisException e) {
 			// pass
 		}
-
 	}
 
 }

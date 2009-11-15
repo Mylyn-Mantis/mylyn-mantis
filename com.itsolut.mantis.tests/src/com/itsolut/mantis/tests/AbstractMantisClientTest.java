@@ -8,10 +8,18 @@
 
 package com.itsolut.mantis.tests;
 
+import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
+import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+
 import junit.framework.TestCase;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.IMantisClient.Version;
+import com.itsolut.mantis.core.MantisClientFactory;
+import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * Provides a base implementation for test cases that access trac repositories.
@@ -21,23 +29,15 @@ import com.itsolut.mantis.core.IMantisClient.Version;
  */
 public abstract class AbstractMantisClientTest extends TestCase {
 
-	public String repositoryUrl;
+	protected IMantisClient newMantisClient(String repositoryUrl, String username, String password) throws MantisException {
 
-	public IMantisClient repository;
+		TaskRepository repository = new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, repositoryUrl);
+		repository.setCredentials(AuthenticationType.REPOSITORY, new AuthenticationCredentials(username, password),
+				false);
+		AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(repository);
 
-	public String username;
+		return MantisClientFactory.getDefault().createClient(location);
 
-	public String password;
-
-	public Version version;
-
-	public AbstractMantisClientTest(Version version) {
-
-		this.version = version;
-	}
-
-	public AbstractMantisClientTest() {
-		this(null);
 	}
 
 }
