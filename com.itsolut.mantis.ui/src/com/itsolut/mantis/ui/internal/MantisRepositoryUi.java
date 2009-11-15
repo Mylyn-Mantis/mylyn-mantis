@@ -46,6 +46,8 @@ import org.eclipse.mylyn.tasks.ui.wizards.NewWebTaskWizard;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.SourceForgeConstants;
+import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
@@ -59,132 +61,144 @@ import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
  */
 public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 
-	private static final Pattern HYPERLINK_PATTERN = Pattern.compile(
-			"(bug|issue|task) #?(\\d+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern HYPERLINK_PATTERN = Pattern.compile("(bug|issue|task) #?(\\d+)",
+            Pattern.CASE_INSENSITIVE);
 
-	@Override
-	public String getConnectorKind() {
-		return MantisCorePlugin.REPOSITORY_KIND;
-	}
+    @Override
+    public String getConnectorKind() {
 
-	
-	@Override
-	public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping selection) {
-		if (MantisRepositoryConnector.hasRichEditor(repository)) {
-			return new NewMantisTaskWizard(repository, selection);
-		} else {
-			return new NewWebTaskWizard(repository, repository.getRepositoryUrl() + IMantisClient.NEW_TICKET_URL,
-					selection);
-		}
-	}
+        return MantisCorePlugin.REPOSITORY_KIND;
+    }
 
+    @Override
+    public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping selection) {
 
-	@Override
-	public IWizard getQueryWizard(TaskRepository repository,
-			IRepositoryQuery queryToEdit) {
-		if (queryToEdit != null) {
-			return new NewMantisQueryWizard(repository, queryToEdit);
-		}
+        if (MantisRepositoryConnector.hasRichEditor(repository)) {
+            return new NewMantisTaskWizard(repository, selection);
+        } else {
+            return new NewWebTaskWizard(repository, repository.getRepositoryUrl() + IMantisClient.NEW_TICKET_URL,
+                    selection);
+        }
+    }
 
-		return new NewMantisQueryWizard(repository);
-	}
+    @Override
+    public IWizard getQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit) {
 
-	@Override
-	public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
-		return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository);
-	}
+        if (queryToEdit != null) {
+            return new NewMantisQueryWizard(repository, queryToEdit);
+        }
 
-	@Override
-	public boolean hasSearchPage() {
-		return true;
-	}
-	
-	@Override
-	public ITaskSearchPage getSearchPage(TaskRepository repository,
-			IStructuredSelection selection) {
-		return new MantisCustomQueryPage(repository);
-	}
+        return new NewMantisQueryWizard(repository);
+    }
 
-	
-	@Override
-	public List<LegendElement> getLegendElements() {
-		List<LegendElement> legendItems = new ArrayList<LegendElement>();
-		legendItems.add(LegendElement.createTask("block", MantisImages.OVERLAY_CRITICAL));
-		legendItems.add(LegendElement.createTask("major", MantisImages.OVERLAY_MAJOR));
-		legendItems.add(LegendElement.createTask("feature", MantisImages.OVERLAY_ENHANCEMENT));
-		legendItems.add(LegendElement.createTask("trivial", MantisImages.OVERLAY_MINOR));
-		return legendItems;
-		
-	}
- 
-	 
-	 @Override
-	public ImageDescriptor getTaskKindOverlay(ITask task) {
-		String severity = task.getTaskKind();
-		if (severity != null) {
-			if ("block".equals(severity)) {
-				return MantisImages.OVERLAY_CRITICAL;
-			} else if ("major".equals(severity) || "crash".equals(severity)) {
-				return MantisImages.OVERLAY_MAJOR;
-			} else if ("feature".equals(severity)) {
-				return MantisImages.OVERLAY_ENHANCEMENT;
-			} else if ("trivial".equals(severity)
-					|| "minor".equals(severity)) {
-				return MantisImages.OVERLAY_MINOR;
-			} else {
-				return null;
-			}
-		}
-		return super.getTaskKindOverlay(task);
-	}
-	 
- 
-	//
-	@Override
-	public IHyperlink[] findHyperlinks(TaskRepository repository, String text,
-			int lineOffset, int regionOffset) {
+    @Override
+    public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
 
-		Matcher matcher = HYPERLINK_PATTERN.matcher(text);
+        return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository);
+    }
 
-		List<IHyperlink> links = null;
+    @Override
+    public boolean hasSearchPage() {
 
-		while (matcher.find()) {
-			if (!isInRegion(lineOffset, matcher))
-				continue;
+        return true;
+    }
 
-			if (links == null)
-				links = new ArrayList<IHyperlink>();
+    @Override
+    public ITaskSearchPage getSearchPage(TaskRepository repository, IStructuredSelection selection) {
 
-			String id = matcher.group(2);
+        return new MantisCustomQueryPage(repository);
+    }
 
-			links.add(new TaskHyperlink(determineRegion(regionOffset, matcher),
-					repository, id));
-		}
+    @Override
+    public List<LegendElement> getLegendElements() {
 
-		return links == null ? null : links
-				.toArray(new IHyperlink[links.size()]);
+        List<LegendElement> legendItems = new ArrayList<LegendElement>();
+        legendItems.add(LegendElement.createTask("block", MantisImages.OVERLAY_CRITICAL));
+        legendItems.add(LegendElement.createTask("major", MantisImages.OVERLAY_MAJOR));
+        legendItems.add(LegendElement.createTask("feature", MantisImages.OVERLAY_ENHANCEMENT));
+        legendItems.add(LegendElement.createTask("trivial", MantisImages.OVERLAY_MINOR));
+        return legendItems;
 
-	}
-	
-	private boolean isInRegion(int lineOffset, Matcher m) {
-		return (lineOffset >= m.start() && lineOffset <= m.end());
-	}
-	
-	private IRegion determineRegion(int regionOffset, Matcher m) {
-		return new Region(regionOffset + m.start(), m.end() - m.start());
-	}
+    }
 
-	@Override
-	public String getReplyText(TaskRepository taskRepository, ITask task, ITaskComment taskComment,
-	        boolean includeTask) {
-	
-	      if (taskComment == null) {
-	            return "(In reply to comment #0)";
-	        } else if (includeTask) {
-	            return MessageFormat.format("(In reply to {0} comment #{1})", task.getTaskKey(),
-	                    taskComment.getNumber());
-	        } else {
-	            return MessageFormat.format("(In reply to comment #{0})", taskComment.getNumber());
-	        }
-	}
+    @Override
+    public String getAccountCreationUrl(TaskRepository taskRepository) {
+
+        if (taskRepository.getUrl().startsWith(SourceForgeConstants.NEW_SF_NET_URL))
+            return SourceForgeConstants.SIGNUP_URL;
+
+        return MantisUtils.getRepositoryBaseUrl(taskRepository.getRepositoryUrl()) + "signup_page.php";
+    }
+
+    @Override
+    public String getAccountManagementUrl(TaskRepository taskRepository) {
+
+        return MantisUtils.getRepositoryBaseUrl(taskRepository.getRepositoryUrl()) + "account_page.php";
+    }
+
+    @Override
+    public ImageDescriptor getTaskKindOverlay(ITask task) {
+
+        String severity = task.getTaskKind();
+        if (severity != null) {
+            if ("block".equals(severity)) {
+                return MantisImages.OVERLAY_CRITICAL;
+            } else if ("major".equals(severity) || "crash".equals(severity)) {
+                return MantisImages.OVERLAY_MAJOR;
+            } else if ("feature".equals(severity)) {
+                return MantisImages.OVERLAY_ENHANCEMENT;
+            } else if ("trivial".equals(severity) || "minor".equals(severity)) {
+                return MantisImages.OVERLAY_MINOR;
+            } else {
+                return null;
+            }
+        }
+        return super.getTaskKindOverlay(task);
+    }
+
+    //
+    @Override
+    public IHyperlink[] findHyperlinks(TaskRepository repository, String text, int lineOffset, int regionOffset) {
+
+        Matcher matcher = HYPERLINK_PATTERN.matcher(text);
+
+        List<IHyperlink> links = null;
+
+        while (matcher.find()) {
+            if (!isInRegion(lineOffset, matcher))
+                continue;
+
+            if (links == null)
+                links = new ArrayList<IHyperlink>();
+
+            String id = matcher.group(2);
+
+            links.add(new TaskHyperlink(determineRegion(regionOffset, matcher), repository, id));
+        }
+
+        return links == null ? null : links.toArray(new IHyperlink[links.size()]);
+
+    }
+
+    private boolean isInRegion(int lineOffset, Matcher m) {
+
+        return (lineOffset >= m.start() && lineOffset <= m.end());
+    }
+
+    private IRegion determineRegion(int regionOffset, Matcher m) {
+
+        return new Region(regionOffset + m.start(), m.end() - m.start());
+    }
+
+    @Override
+    public String getReplyText(TaskRepository taskRepository, ITask task, ITaskComment taskComment, boolean includeTask) {
+
+        if (taskComment == null) {
+            return "(In reply to comment #0)";
+        } else if (includeTask) {
+            return MessageFormat.format("(In reply to {0} comment #{1})", task.getTaskKey(), taskComment.getNumber());
+        } else {
+            return MessageFormat.format("(In reply to comment #{0})", taskComment.getNumber());
+        }
+    }
 }

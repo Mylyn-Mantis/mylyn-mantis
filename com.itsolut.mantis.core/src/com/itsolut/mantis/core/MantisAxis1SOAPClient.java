@@ -51,10 +51,6 @@ import com.itsolut.mantis.core.exception.MantisRemoteException;
 @SuppressWarnings("restriction")
 public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
-    private static final String OLD_SF_NET_URL = "https://apps.sourceforge.net/mantisbt/";
-
-    private static final String NEW_SF_NET_URL = "https://sourceforge.net/apps/mantisbt/";
-
     private transient MantisConnectPortType soap;
 
     private AbstractWebLocation location;
@@ -191,7 +187,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
         if (isSourceforgeRepoWithoutHttpAuth())
             message.append("For SF.net hosted apps, please make sure to use HTTP authentication only.").append('\n');
 
-        if (location.getUrl().startsWith(OLD_SF_NET_URL))
+        if (location.getUrl().startsWith(SourceForgeConstants.OLD_SF_NET_URL))
             message.append("SF.net hosted apps have been moved to https://sourceforge.net/apps/mantisbt/").append('\n');
 
         if (e instanceof AxisFault) {
@@ -213,7 +209,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
     private boolean isSourceforgeRepoWithoutHttpAuth() {
 
-        return location.getUrl().startsWith(NEW_SF_NET_URL) && doesNotHaveHttpAuth();
+        return location.getUrl().startsWith(SourceForgeConstants.NEW_SF_NET_URL) && doesNotHaveHttpAuth();
     }
 
     public IssueData getIssueData(final int issueId, IProgressMonitor monitor) throws MantisException {

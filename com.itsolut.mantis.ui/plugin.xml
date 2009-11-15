@@ -42,7 +42,7 @@
             anonymous="true"
             label="Mylyn-Mantis Support"
             repositoryKind="mantis"
-            urlRepository="https://apps.sourceforge.net/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
+            urlRepository="https://sourceforge.net/apps/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
       </repository>
    </extension> 
      <extension
