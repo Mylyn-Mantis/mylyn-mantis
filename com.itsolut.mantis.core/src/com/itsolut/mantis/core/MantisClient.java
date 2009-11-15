@@ -102,12 +102,27 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor);
 
-        MantisTicket ticket = MantisConverter.convert(soapClient.getIssueData(ticketId, monitor), cache
-                .getRepositoryVersion());
+        IssueData issueData = soapClient.getIssueData(ticketId, monitor);
+
+        registerAdditionalReporters(issueData);
+
+        MantisTicket ticket = MantisConverter.convert(issueData, cache.getRepositoryVersion());
 
         Policy.advance(monitor, 1);
 
         return ticket;
+    }
+
+    private void registerAdditionalReporters(IssueData issueData) {
+
+        int projectId = issueData.getProject().getId().intValue();
+        cache.registerAdditionalReporter(projectId, issueData.getReporter().getName());
+        if (issueData.getNotes() == null)
+            return;
+
+        for (IssueNoteData note : issueData.getNotes())
+            cache.registerAdditionalReporter(projectId, note.getReporter().getName());
+
     }
 
     public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
@@ -169,6 +184,7 @@ public class MantisClient implements IMantisClient {
 
             for (IssueHeaderData issueHeader : issueHeaders)
                 result.add(MantisConverter.convert(issueHeader, cache, projectName));
+
         } finally {
             subMonitor.done();
         }

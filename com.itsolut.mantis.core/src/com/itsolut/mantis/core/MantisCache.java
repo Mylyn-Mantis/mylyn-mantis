@@ -124,11 +124,17 @@ public class MantisCache {
                         cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
                                 cacheData.reporterThreshold, monitor));
                     } catch (MantisException e) {
-                        // TODO : remove this once http://www.mantisbt.org/bugs/view.php?id=11180 is sorted out
-                        MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                                "Failed retrieving reporter information, using developers list for reporters.", e));
-                        cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
-                                cacheData.developersByProjectId.get(project.getValue())));
+                        // TODO : remove this once http://www.mantisbt.org/bugs/view.php?id=11180 is
+                        // sorted out
+                        if (!cacheData.reportersByProjectId.containsKey(project.getValue())) {
+                            cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
+                                    cacheData.developersByProjectId.get(project.getValue())));
+                            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                                    "Failed retrieving reporter information, using developers list for reporters.", e));
+                        } else {
+                            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                                    "Failed retrieving reporter information, using previously loaded values.", e));
+                        }
                     }
                     Policy.advance(subMonitor, 1);
 
@@ -679,6 +685,24 @@ public class MantisCache {
         synchronized (sync) {
             this.cacheData = cacheData;
         }
+
+    }
+
+    /**
+     * Since for large user counts the reporter retrieval fails, we provide a hook for registering
+     * additional reporter users as they are discovered, e.g. in IssueData
+     * 
+     * @param projectId
+     *            the project id
+     * @param reporterName
+     *            the name of the reporter
+     */
+    void registerAdditionalReporter(int projectId, String reporterName) {
+
+        if (cacheData.reportersByProjectId.get(projectId).contains(reporterName))
+            return;
+
+        cacheData.reportersByProjectId.get(projectId).add(reporterName);
 
     }
 }

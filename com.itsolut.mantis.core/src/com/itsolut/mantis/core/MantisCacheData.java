@@ -73,7 +73,7 @@ public class MantisCacheData implements Serializable {
     Map<Integer, List<MantisVersion>> versionsByProjectId = new HashMap<Integer, List<MantisVersion>>();
 
     Map<Integer, List<String>> reportersByProjectId = new HashMap<Integer, List<String>>();
-
+    
     Map<Integer, List<String>> developersByProjectId = new HashMap<Integer, List<String>>();
 
     int reporterThreshold;
