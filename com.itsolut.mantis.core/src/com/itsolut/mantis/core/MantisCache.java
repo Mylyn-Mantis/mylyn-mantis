@@ -11,6 +11,8 @@
 package com.itsolut.mantis.core;
 
 import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,13 +46,14 @@ import com.itsolut.mantis.core.model.MantisViewState;
 /**
  * Holds the cached information for a complete Mantis installations.
  * 
- * <p>All access calls should be guarded by a call to {@link #refreshIfNeeded(IProgressMonitor)}, since
- * this insures that 
+ * <p>
+ * All access calls should be guarded by a call to {@link #refreshIfNeeded(IProgressMonitor)}, since
+ * this insures that
  * <ol>
- *  <li>The cache is populated</li>
- *  <li>Multi-threaded access is properly synchronised</li>
+ * <li>The cache is populated</li>
+ * <li>Multi-threaded access is properly synchronised</li>
  * </ol>
- * </p> 
+ * </p>
  * 
  * @author Robert Munteanu
  * 
@@ -71,6 +74,8 @@ public class MantisCache {
 
     private MantisCacheData cacheData = new MantisCacheData();
 
+    private final NumberFormat formatter = new DecimalFormat("#.#");
+
     public MantisCache(MantisAxis1SOAPClient soapClient) {
 
         this.soapClient = soapClient;
@@ -86,16 +91,16 @@ public class MantisCache {
         return cacheData.projects;
     }
 
-    void refreshIfNeeded(IProgressMonitor progressMonitor) throws MantisException {
+    void refreshIfNeeded(IProgressMonitor progressMonitor, String repositoryUrl) throws MantisException {
 
         synchronized (sync) {
             if (cacheData.lastUpdate == 0)
-                refresh(progressMonitor);
+                refresh(progressMonitor, repositoryUrl);
         }
 
     }
 
-    void refresh(IProgressMonitor monitor) throws MantisException {
+    void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
 
         synchronized (sync) {
 
@@ -106,7 +111,7 @@ public class MantisCache {
             try {
                 cacheProjects(soapClient.getProjectData(monitor));
 
-                subMonitor.setWorkRemaining(cacheData.projects.size() * 6 + 12);
+                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 12);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -185,11 +190,19 @@ public class MantisCache {
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
                 subMonitor.done();
-                MantisCorePlugin.log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, "Repository sync complete in "
-                        + (System.currentTimeMillis() - start) / 1000 + " seconds.", new RuntimeException()));
+                MantisCorePlugin.log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, "Repository sync for "
+                        + repositoryUrl + " complete in " + format(start)
+                        + " seconds. Last update is now " + cacheData.lastUpdate + " . Object identity " + System.identityHashCode(this) + " .", new RuntimeException()));
             }
 
         }
+    }
+
+    private String format(long start) {
+
+        double millis = (System.currentTimeMillis() - start) / (double) 1000;
+        return formatter.format(millis);
+        
     }
 
     private void cacheProjectVersions(int value, ProjectVersionData[] projectVerions) {

@@ -57,14 +57,14 @@ public class MantisClient implements IMantisClient {
 
     public MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException {
 
-        cache.refreshIfNeeded(Policy.monitorFor(progressMonitor));
+        cache.refreshIfNeeded(Policy.monitorFor(progressMonitor), location.getUrl());
 
         return cache;
     }
 
     public int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         IssueData issueData = MantisConverter.convert(ticket, cache, getUserName());
 
@@ -93,14 +93,14 @@ public class MantisClient implements IMantisClient {
 
     public byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         return soapClient.getIssueAttachment(id, monitor);
     }
 
     public MantisTicket getTicket(int ticketId, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         IssueData issueData = soapClient.getIssueData(ticketId, monitor);
 
@@ -127,7 +127,7 @@ public class MantisClient implements IMantisClient {
 
     public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
 
-        cache.refreshIfNeeded(progressMonitor);
+        cache.refreshIfNeeded(progressMonitor, location.getUrl());
 
         TaskAttribute status = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
         String statusName = status.getValue();
@@ -149,7 +149,7 @@ public class MantisClient implements IMantisClient {
 
     public void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         boolean requiresBase64EncodedAttachment = cache.getRepositoryVersion().isRequiresBase64EncodedAttachment();
 
@@ -160,7 +160,7 @@ public class MantisClient implements IMantisClient {
 
     public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         String projectName = null;
         String filterName = null;
@@ -192,12 +192,12 @@ public class MantisClient implements IMantisClient {
 
     public void updateAttributes(IProgressMonitor monitor) throws MantisException {
 
-        cache.refresh(monitor);
+        cache.refresh(monitor, location.getUrl());
     }
 
     public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor);
+        cache.refreshIfNeeded(monitor, location.getUrl());
 
         IssueData issue = MantisConverter.convert(ticket, cache, getUserName());
         issue.setId(BigInteger.valueOf(ticket.getId()));
