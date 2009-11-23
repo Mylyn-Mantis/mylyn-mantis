@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
@@ -251,6 +252,11 @@ public class MantisClient implements IMantisClient {
     }
 
     public void setCacheData(MantisCacheData cacheData) {
+
+        MantisCorePlugin.getDefault().getLog().log(
+                new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, "Setting cache data with identity "
+                        + System.identityHashCode(cacheData) + " on client with identity "
+                        + System.identityHashCode(this) + " ."));
 
         cache.setCacheData(cacheData);
 

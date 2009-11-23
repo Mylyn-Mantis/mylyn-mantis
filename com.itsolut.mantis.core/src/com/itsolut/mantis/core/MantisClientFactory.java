@@ -22,6 +22,8 @@
 package com.itsolut.mantis.core;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
@@ -32,32 +34,35 @@ import com.itsolut.mantis.core.exception.MantisException;
  * @author Chris Hane
  */
 public class MantisClientFactory {
-    
+
     private static MantisClientFactory DEFAULT = new MantisClientFactory();
-    
+
     private TaskRepositoryLocationFactory taskRepositoryLocationFactory;
-    
+
     public void setTaskRepositoryLocationFactory(TaskRepositoryLocationFactory taskRepositoryLocationFactory) {
-        
+
         this.taskRepositoryLocationFactory = taskRepositoryLocationFactory;
-        
+
     }
-    
+
     public TaskRepositoryLocationFactory getTaskRepositoryLocationFactory() {
 
         Assert.isNotNull(taskRepositoryLocationFactory);
-        
+
         return taskRepositoryLocationFactory;
     }
-    
+
     public static MantisClientFactory getDefault() {
-        
+
         return DEFAULT;
     }
-    
+
     public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
+        MantisCorePlugin.log(new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, "Creating client for location "
+                + webLocation.getUrl() + " ."));
+
         return new MantisClient(webLocation);
-        
+
     }
 }
