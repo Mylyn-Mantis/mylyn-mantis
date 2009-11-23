@@ -77,6 +77,10 @@ public class MantisClientManager implements IRepositoryListener {
 
         IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
 
+        MantisCorePlugin.log(new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, "Creating new Mantis client for url "
+                + taskRepository.getRepositoryUrl() + " . Currently cached entries : " + clientByUrl.keySet() + " ."
+                + " . MantisClientManager identity : " + System.identityHashCode(this) + " .", new RuntimeException()));
+
         MantisCacheData cacheData = state.get(location.getUrl());
         if (cacheData != null) {
             repository.setCacheData(cacheData);
