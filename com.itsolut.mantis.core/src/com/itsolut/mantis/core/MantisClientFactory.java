@@ -60,7 +60,7 @@ public class MantisClientFactory {
     public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
         MantisCorePlugin.log(new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, "Creating client for location "
-                + webLocation.getUrl() + " ."));
+                + webLocation.getUrl() + " .", new RuntimeException()));
 
         return new MantisClient(webLocation);
 
