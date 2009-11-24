@@ -46,6 +46,8 @@ public class MantisCorePlugin extends Plugin {
 
     public final static String REPOSITORY_KIND = "mantis";
 
+    private static final boolean DEBUG = true;
+
     private MantisRepositoryConnector connector;
 
     public MantisCorePlugin() {
@@ -106,9 +108,11 @@ public class MantisCorePlugin extends Plugin {
                     "Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.",
                     null);
         } else if (e instanceof MantisException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: "
+                    + e.getMessage(), e);
         } else if (e instanceof ClassCastException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO,
+                    "Error parsing server response", e);
         } else {
             return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
         }
@@ -123,6 +127,12 @@ public class MantisCorePlugin extends Plugin {
     public static void log(IStatus status) {
 
         getDefault().getLog().log(status);
+    }
+
+    public static void debug(String information, Throwable t) {
+
+        if (DEBUG)
+            getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, information, t));
     }
 
     /**

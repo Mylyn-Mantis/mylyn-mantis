@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
@@ -83,13 +82,15 @@ public class MantisClient implements IMantisClient {
         return location.getCredentials(AuthenticationType.REPOSITORY).getUserName();
     }
 
-    private void addRelationsIfApplicable(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+    private void addRelationsIfApplicable(MantisTicket ticket, IProgressMonitor monitor)
+            throws MantisException {
 
         if (!cache.getRepositoryVersion().isHasProperTaskRelations())
             return;
 
         for (MantisRelationship relationship : ticket.getRelationships())
-            soapClient.addRelationship(ticket.getId(), MantisConverter.convert(relationship), monitor);
+            soapClient.addRelationship(ticket.getId(), MantisConverter.convert(relationship),
+                    monitor);
     }
 
     public byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException {
@@ -126,11 +127,13 @@ public class MantisClient implements IMantisClient {
 
     }
 
-    public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
+    public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor)
+            throws MantisException {
 
         cache.refreshIfNeeded(progressMonitor, location.getUrl());
 
-        TaskAttribute status = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
+        TaskAttribute status = taskData.getRoot().getAttribute(
+                MantisAttributeMapper.Attribute.STATUS.getKey());
         String statusName = status.getValue();
         try {
 
@@ -148,18 +151,22 @@ public class MantisClient implements IMantisClient {
 
     }
 
-    public void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException {
+    public void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor)
+            throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        boolean requiresBase64EncodedAttachment = cache.getRepositoryVersion().isRequiresBase64EncodedAttachment();
+        boolean requiresBase64EncodedAttachment = cache.getRepositoryVersion()
+                .isRequiresBase64EncodedAttachment();
 
-        final byte[] encoded = requiresBase64EncodedAttachment ? Base64.encode(data).getBytes() : data;
+        final byte[] encoded = requiresBase64EncodedAttachment ? Base64.encode(data).getBytes()
+                : data;
 
         soapClient.addIssueAttachment(id, name, encoded, monitor);
     }
 
-    public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException {
+    public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor)
+            throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -181,7 +188,8 @@ public class MantisClient implements IMantisClient {
         subMonitor.beginTask("Retrieving issue headers", 1);
 
         try {
-            IssueHeaderData[] issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
+            IssueHeaderData[] issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query
+                    .getLimit(), monitor);
 
             for (IssueHeaderData issueHeader : issueHeaders)
                 result.add(MantisConverter.convert(issueHeader, cache, projectName));
@@ -196,7 +204,8 @@ public class MantisClient implements IMantisClient {
         cache.refresh(monitor, location.getUrl());
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException {
+    public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor)
+            throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -210,7 +219,8 @@ public class MantisClient implements IMantisClient {
         soapClient.updateIssue(issue, monitor);
     }
 
-    private void addCommentIfApplicable(int issueId, String comment, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(int issueId, String comment, IProgressMonitor monitor)
+            throws MantisException {
 
         if (MantisUtils.isEmpty(comment))
             return;
@@ -253,10 +263,9 @@ public class MantisClient implements IMantisClient {
 
     public void setCacheData(MantisCacheData cacheData) {
 
-        MantisCorePlugin.getDefault().getLog().log(
-                new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, "Setting cache data with identity "
-                        + System.identityHashCode(cacheData) + " on client with identity "
-                        + System.identityHashCode(this) + " .", new RuntimeException()));
+        MantisCorePlugin.debug("Setting cache data with identity "
+                + System.identityHashCode(cacheData) + " on client with identity "
+                + System.identityHashCode(this) + " .", new RuntimeException());
 
         cache.setCacheData(cacheData);
 
