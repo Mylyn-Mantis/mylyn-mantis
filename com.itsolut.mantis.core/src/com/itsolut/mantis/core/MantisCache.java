@@ -191,8 +191,7 @@ public class MantisCache {
             } finally {
                 subMonitor.done();
                 MantisCorePlugin.log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, "Repository sync for "
-                        + repositoryUrl + " complete in " + format(start)
-                        + " seconds. Last update is now " + cacheData.lastUpdate + " . Object identity " + System.identityHashCode(this) + " .", new RuntimeException()));
+                        + repositoryUrl + " complete in " + format(start) + " seconds."));
             }
 
         }
@@ -202,7 +201,7 @@ public class MantisCache {
 
         double millis = (System.currentTimeMillis() - start) / (double) 1000;
         return formatter.format(millis);
-        
+
     }
 
     private void cacheProjectVersions(int value, ProjectVersionData[] projectVerions) {
