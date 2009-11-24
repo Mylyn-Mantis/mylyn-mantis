@@ -36,6 +36,11 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 
@@ -46,7 +51,7 @@ import com.itsolut.mantis.core.exception.MantisException;
  * 
  * @author Steffen Pingel
  */
-public class MantisClientManager implements IRepositoryListener {
+public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
 
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private PersistedState state;
@@ -62,8 +67,7 @@ public class MantisClientManager implements IRepositoryListener {
         state.write();
     }
 
-    public synchronized IMantisClient getRepository(TaskRepository taskRepository)
-            throws MantisException {
+    public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MantisException {
 
         IMantisClient client = clientByUrl.get(taskRepository.getRepositoryUrl());
         if (client == null)
@@ -73,14 +77,13 @@ public class MantisClientManager implements IRepositoryListener {
 
     private IMantisClient newMantisClient(TaskRepository taskRepository) throws MantisException {
 
-        AbstractWebLocation location = MantisClientFactory.getDefault()
-                .getTaskRepositoryLocationFactory().createWebLocation(taskRepository);
+        AbstractWebLocation location = MantisClientFactory.getDefault().getTaskRepositoryLocationFactory()
+                .createWebLocation(taskRepository);
 
         IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
 
-        MantisCorePlugin.debug("Creating new Mantis client for url "
-                + taskRepository.getRepositoryUrl() + " . Currently cached entries : "
-                + clientByUrl.keySet() + " ." + " . MantisClientManager identity : "
+        MantisCorePlugin.debug("Creating new Mantis client for url " + taskRepository.getRepositoryUrl()
+                + " . Currently cached entries : " + clientByUrl.keySet() + " ." + " . MantisClientManager identity : "
                 + System.identityHashCode(this) + " .", new RuntimeException());
 
         MantisCacheData cacheData = state.get(location.getUrl());
@@ -100,8 +103,7 @@ public class MantisClientManager implements IRepositoryListener {
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
 
-        MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .",
-                new RuntimeException());
+        MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .", new RuntimeException());
 
         // make sure there is no stale client still in the cache, bug #149939
         clientByUrl.remove(repository.getRepositoryUrl());
@@ -113,23 +115,36 @@ public class MantisClientManager implements IRepositoryListener {
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
 
-        MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .",
-                new RuntimeException());
+        MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .", new RuntimeException());
 
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
     }
 
-    public synchronized void repositorySettingsChanged(TaskRepository repository) {
+    public void repositoryChanged(TaskRepositoryChangeEvent event) {
+
+        TaskRepository repository = event.getRepository();
+        TaskRepositoryDelta delta = event.getDelta();
 
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
 
-        MantisCorePlugin.debug("repositorySettingsChanged : " + repository.getRepositoryUrl()
-                + " .", new RuntimeException());
+        MantisCorePlugin.debug("repositoryChanged : " + repository.getUrl() + ", " + delta.getType() + " .",
+                new RuntimeException());
+
+        // do not refresh on sync time stamp updates, it's not relevant
+        if (delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP))
+            return;
 
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
+
+    }
+
+    public synchronized void repositorySettingsChanged(TaskRepository repository) {
+
+        // handled in repositoryChanged
+
     }
 
     public void repositoryUrlChanged(TaskRepository repository, String oldUrl) {
@@ -186,8 +201,8 @@ public class MantisClientManager implements IRepositoryListener {
         public void cleanCache(Throwable reason) {
 
             cacheFile.delete();
-            MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID,
-                    "Removing invalid cache file", reason));
+            MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Removing invalid cache file",
+                    reason));
         }
 
         public void write() {
