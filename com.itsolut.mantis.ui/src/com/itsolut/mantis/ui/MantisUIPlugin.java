@@ -42,7 +42,9 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
+		MantisClientFactory.getDefault().setTaskRepositoryLocationFactory(new TaskRepositoryLocationUiFactory());
 		TasksUi.getRepositoryManager().addListener(MantisCorePlugin.getDefault().getConnector().getClientManager());
+		
 	}
 
 	@Override

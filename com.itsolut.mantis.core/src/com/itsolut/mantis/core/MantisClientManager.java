@@ -22,163 +22,220 @@
 
 package com.itsolut.mantis.core;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.MalformedURLException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
-import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
-import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * Caches {@link IMantisClient} objects.
  * 
  * @author Steffen Pingel
  */
-public class MantisClientManager implements IRepositoryListener {
-    
+public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
+
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
-    
-    private Map<String, MantisClientData> clientDataByUrl = new HashMap<String, MantisClientData>();
-    
-    private File cacheFile;
-    
+    private PersistedState state;
+
     private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationFactory();
     
     public MantisClientManager(File cacheFile) {
 
-        this.cacheFile = cacheFile;
-        
-        readCache();
+        state = new PersistedState(cacheFile);
+        state.read();
     }
-    
-    public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MalformedURLException {
 
-        IMantisClient repository = clientByUrl.get(taskRepository.getRepositoryUrl());
-        if (repository == null) {
-            
-            AuthenticationCredentials repositoryCredentials = taskRepository.getCredentials(AuthenticationType.REPOSITORY);
-            AuthenticationCredentials repositoryHttpCredentials = taskRepository.getCredentials(AuthenticationType.HTTP);
-            
-            String repositoryUserName = "";
-            String repositoryPassword = "";
-            
-            if (repositoryCredentials != null) {
-            	repositoryUserName = repositoryCredentials.getUserName();
-            	repositoryPassword = repositoryCredentials.getPassword();
-            }
-            
-            String httpUserName = "";
-            String httpPassword = "";
-            
-            if (repositoryHttpCredentials != null) {
-                httpUserName = repositoryHttpCredentials.getUserName();
-                httpPassword = repositoryHttpCredentials.getPassword();
-            }
-            
-            AbstractWebLocation location = taskRepositoryLocationFactory.createWebLocation(taskRepository);
-            
-            repository = MantisClientFactory.createClient(taskRepository.getRepositoryUrl(), repositoryUserName, repositoryPassword, httpUserName, httpPassword, location);
-            
-            clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
-            
-            MantisClientData data = clientDataByUrl.get(taskRepository.getRepositoryUrl());
-            if (data == null) {
-                data = new MantisClientData();
-                clientDataByUrl.put(taskRepository.getRepositoryUrl(), data);
-            }
-            repository.setData(data);
+    public void persistCache() {
+
+        state.write();
+    }
+
+    public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MantisException {
+
+        IMantisClient client = clientByUrl.get(taskRepository.getRepositoryUrl());
+        if (client == null)
+            client = newMantisClient(taskRepository);
+        return client;
+    }
+
+    private IMantisClient newMantisClient(TaskRepository taskRepository) throws MantisException {
+
+        AbstractWebLocation location = MantisClientFactory.getDefault().getTaskRepositoryLocationFactory()
+                .createWebLocation(taskRepository);
+
+        IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
+
+        MantisCorePlugin.debug("Creating new Mantis client for url " + taskRepository.getRepositoryUrl()
+                + " . Currently cached entries : " + clientByUrl.keySet() + " ." + " . MantisClientManager identity : "
+                + System.identityHashCode(this) + " .", new RuntimeException());
+
+        MantisCacheData cacheData = state.get(location.getUrl());
+        if (cacheData != null) {
+            repository.setCacheData(cacheData);
+        } else {
+            state.add(location.getUrl(), repository.getCacheData());
         }
+
+        clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
+
         return repository;
     }
-    
+
     public synchronized void repositoryAdded(TaskRepository repository) {
+
+        if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
+            return;
+
+        MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .", new RuntimeException());
 
         // make sure there is no stale client still in the cache, bug #149939
         clientByUrl.remove(repository.getRepositoryUrl());
-        clientDataByUrl.remove(repository.getRepositoryUrl());
+        state.remove(repository.getRepositoryUrl());
     }
-    
+
     public synchronized void repositoryRemoved(TaskRepository repository) {
 
+        if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
+            return;
+
+        MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .", new RuntimeException());
+
         clientByUrl.remove(repository.getRepositoryUrl());
-        clientDataByUrl.remove(repository.getRepositoryUrl());
+        state.remove(repository.getRepositoryUrl());
     }
-    
+
+    public void repositoryChanged(TaskRepositoryChangeEvent event) {
+
+        TaskRepository repository = event.getRepository();
+        TaskRepositoryDelta delta = event.getDelta();
+
+        if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
+            return;
+
+        MantisCorePlugin.debug("repositoryChanged : " + repository.getUrl() + ", " + delta.getType() + " .",
+                new RuntimeException());
+
+        // do not refresh on sync time stamp updates, it's not relevant
+        if (delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP))
+            return;
+
+        clientByUrl.remove(repository.getRepositoryUrl());
+        state.remove(repository.getRepositoryUrl());
+
+    }
+
     public synchronized void repositorySettingsChanged(TaskRepository repository) {
 
-        clientByUrl.remove(repository.getRepositoryUrl());
-    }
-    
-    public void readCache() {
+        // handled in repositoryChanged
 
-        if (cacheFile == null || !cacheFile.exists()) {
-            return;
-        }
-        
-        ObjectInputStream in = null;
-        try {
-            in = new ObjectInputStream(new FileInputStream(cacheFile));
-            int size = in.readInt();
-            for (int i = 0; i < size; i++) {
-                String url = (String) in.readObject();
-                MantisClientData data = (MantisClientData) in.readObject();
-                if (url != null && data != null) {
-                    clientDataByUrl.put(url, data);
-                }
-            }
-        } catch (Throwable e) {
-            MantisCorePlugin.log(e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
-        
     }
-    
-    public void writeCache() {
 
-        if (cacheFile == null) {
-            return;
-        }
-        
-        ObjectOutputStream out = null;
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(cacheFile));
-            out.writeInt(clientDataByUrl.size());
-            for (String url : clientDataByUrl.keySet()) {
-                out.writeObject(url);
-                out.writeObject(clientDataByUrl.get(url));
-            }
-        } catch (IOException e) {
-            MantisCorePlugin.log(e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
-    }
-    
     public void repositoryUrlChanged(TaskRepository repository, String oldUrl) {
 
     }
-    
+
+    private static class PersistedState implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private Map<String, MantisCacheData> _cacheDataByUrl = new HashMap<String, MantisCacheData>();
+
+        private File cacheFile;
+
+        public PersistedState(File cacheFile) {
+
+            this.cacheFile = cacheFile;
+        }
+
+        public void add(String url, MantisCacheData data) {
+
+            _cacheDataByUrl.put(url, data);
+        }
+
+        public void remove(String url) {
+
+            _cacheDataByUrl.remove(url);
+        }
+
+        public MantisCacheData get(String url) {
+
+            return _cacheDataByUrl.get(url);
+        }
+
+        public void read() {
+
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new FileInputStream(cacheFile));
+                int size = in.readInt();
+                for (int i = 0; i < size; i++) {
+                    String url = (String) in.readObject();
+                    MantisCacheData data = (MantisCacheData) in.readObject();
+                    add(url, data);
+                }
+            } catch (Throwable e) {
+                cleanCache(e);
+            } finally {
+                closeSilently(in);
+            }
+
+        }
+
+        public void cleanCache(Throwable reason) {
+
+            cacheFile.delete();
+            MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Removing invalid cache file",
+                    reason));
+        }
+
+        public void write() {
+
+            ObjectOutputStream out = null;
+            try {
+                out = new ObjectOutputStream(new FileOutputStream(cacheFile));
+                out.writeInt(_cacheDataByUrl.size());
+                for (String url : _cacheDataByUrl.keySet()) {
+                    out.writeObject(url);
+                    out.writeObject(_cacheDataByUrl.get(url));
+                }
+            } catch (Throwable e) {
+                MantisCorePlugin.log(e);
+            } finally {
+                closeSilently(out);
+            }
+
+        }
+
+        private void closeSilently(Closeable closeable) {
+
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException ignored) {
+                    // ignore
+                }
+            }
+        }
+    }
+
 }

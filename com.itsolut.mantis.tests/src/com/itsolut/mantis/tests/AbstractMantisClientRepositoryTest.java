@@ -11,7 +11,7 @@ package com.itsolut.mantis.tests;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisClientFactory;
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * Test cases for classes that implement Mantis Client
@@ -20,16 +20,9 @@ import com.itsolut.mantis.core.MantisClientFactory;
  */
 public class AbstractMantisClientRepositoryTest extends AbstractMantisClientTest {
 
-	public AbstractMantisClientRepositoryTest(IMantisClient.Version version) {
-		super(version);
+	public void testValidate() throws MantisException {
+		
+		IMantisClient client = newMantisClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, "reporter", "reporter");
+		client.validate(new NullProgressMonitor());
 	}
-
-	public void testValidateHTTP() throws Exception {
-		String username = "reporter";
-		String password = "reporter";
-			
-		IMantisClient mantisClient = MantisClientFactory.createClient(MantisTestConstants.TEST_MANTIS_HTTP_URL, username, password, null, null, null);
-		mantisClient.validate(new NullProgressMonitor());
-	}
-
 }

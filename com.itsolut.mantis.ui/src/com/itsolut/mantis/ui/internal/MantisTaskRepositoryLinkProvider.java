@@ -24,7 +24,6 @@ public class MantisTaskRepositoryLinkProvider extends
 	@Override
 	public TaskRepository getTaskRepository(IResource resource,
 			IRepositoryManager repositoryManager) {
-		// TODO Auto-generated method stub
 		IProject project = resource.getProject();
 		
 		if (project == null || !project.isAccessible())

@@ -79,7 +79,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         TARGET_VERSION(Key.TARGET_VERSION, "Target version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-        VIEW_STATE(Key.VIEW_STATE, "View State:", TaskAttribute.TYPE_SHORT_TEXT, true, true),
+        VIEW_STATE(Key.VIEW_STATE, "View State:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
@@ -90,7 +90,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
         HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING), //
         RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING);
-
 
         private final boolean isHidden;
 
@@ -183,7 +182,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
     public MantisAttributeMapper(TaskRepository taskRepository) {
         super(taskRepository);
-        // TODO Auto-generated constructor stub
     }
 
     @Override

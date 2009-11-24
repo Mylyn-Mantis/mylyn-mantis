@@ -11,6 +11,7 @@ import com.itsolut.mantis.core.MantisAttributeMapper;
  * @author Robert Munteanu
  * 
  */
+@SuppressWarnings("restriction")
 public class AbstractRichTextPart extends TaskEditorRichTextPart {
 
     private String _key;

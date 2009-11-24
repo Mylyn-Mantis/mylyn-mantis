@@ -17,6 +17,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
 import org.eclipse.mylyn.internal.tasks.core.TaskTask;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.mylyn.monitor.ui.IUserAttentionListener ;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -24,7 +25,6 @@ import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
-import com.itsolut.mantis.core.IMantisClient.Version;
 
 /**
  * 
@@ -52,13 +52,11 @@ public class MantisTaskDataHandlerTest extends TestCase {
 		manager.clearRepositories(TasksUiPlugin.getDefault().getRepositoriesFilePath());
 
 		connector = (MantisRepositoryConnector) manager.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-//		TasksUiPlugin.getSynchronizationScheduler().synchronize(
-//				manager.getDefaultRepository(MantisCorePlugin.REPOSITORY_KIND));
 
 		taskDataHandler = connector.getTaskDataHandler();
 	}
 
-	protected void init(String url, Version version) {
+	protected void init(String url) {
 
 		AuthenticationCredentials creds = new AuthenticationCredentials("reporter", "reporter");
 
@@ -66,7 +64,6 @@ public class MantisTaskDataHandlerTest extends TestCase {
 		repository.setCredentials(AuthenticationType.REPOSITORY, creds, false);
 		repository.setTimeZoneId(IMantisClient.TIME_ZONE);
 		repository.setCharacterEncoding(IMantisClient.CHARSET);
-		repository.setVersion(version.name());
 
 		manager.addRepository(repository);
 	}

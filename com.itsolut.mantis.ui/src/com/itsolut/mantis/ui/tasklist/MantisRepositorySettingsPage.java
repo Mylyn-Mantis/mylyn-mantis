@@ -51,13 +51,13 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
  * @author David Carver / d_a_carver@yahoo.com - updated sample url.
  */
 public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage {
-    
+
     private static final String TITLE = "Mantis Repository Settings";
-    
+
     private static final String DESCRIPTION = "Example: http://mylyn-mantis.sourceforge.net/MantisTest/mc/mantisconnect.php";
-    
+
     private Button retrieveSubTasksButton;
-    
+
     public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository) {
 
         super(TITLE, DESCRIPTION, taskRepository);
@@ -68,11 +68,12 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         setNeedsAdvanced(true);
         setNeedsHttpAuth(true);
     }
-    
-    @Override protected void createAdditionalControls(final Composite parent) {
+
+    @Override
+    protected void createAdditionalControls(final Composite parent) {
 
         addRepositoryTemplatesToServerUrlCombo();
-        
+
         Label downloadAttachmentsLabel = new Label(parent, SWT.NONE);
         downloadAttachmentsLabel.setText("Group sub-tasks");
         retrieveSubTasksButton = new Button(parent, SWT.CHECK | SWT.LEFT);
@@ -81,90 +82,89 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
             retrieveSubTasksButton.setSelection(MantisRepositoryConfiguration.isDownloadSubTasks(repository));
         else
             retrieveSubTasksButton.setSelection(true);
-        
+
     }
-    
-    @Override protected void repositoryTemplateSelected(RepositoryTemplate template) {
+
+    @Override
+    protected void repositoryTemplateSelected(RepositoryTemplate template) {
 
         repositoryLabelEditor.setStringValue(template.label);
+
         setUrl(template.repositoryUrl);
         setAnonymous(template.anonymous);
-        
         getContainer().updateButtons();
     }
-    
-    @Override protected boolean isValidUrl(String name) {
+
+    @Override
+    protected boolean isValidUrl(String name) {
 
         if ((name.startsWith(URL_PREFIX_HTTPS) || name.startsWith(URL_PREFIX_HTTP)) && !name.endsWith("/")) {
             try {
                 new URL(name);
                 return true;
-            } catch (MalformedURLException e) {}
+            } catch (MalformedURLException e) {
+            }
         }
         return false;
     }
-    
-    @Override protected Validator getValidator(TaskRepository repository) {
 
-        return new MantisValidator(repository, getUserName(), getPassword(), getHttpAuthUserId(), getHttpAuthPassword());
+    @Override
+    protected Validator getValidator(TaskRepository repository) {
+
+        return new MantisValidator(repository);
     }
-    
-    @Override public void applyTo(TaskRepository repository) {
+
+    @Override
+    public void applyTo(TaskRepository repository) {
 
         super.applyTo(repository);
-        
+
         MantisRepositoryConfiguration.setDownloadSubTasks(repository, retrieveSubTasksButton.getSelection());
-        
+
     }
-    
-    @Override public String getConnectorKind() {
+
+    @Override
+    public String getConnectorKind() {
 
         return MantisCorePlugin.REPOSITORY_KIND;
     }
-    
+
     // public for testing
     public class MantisValidator extends Validator {
-        
 
-		private final String repositoryUrl;
-        
+        private final String repositoryUrl;
+
         private final TaskRepository taskRepository;
-        
-        private final String userName;
-        private final String password;
-        private final String httpUserName;
-        private final String httpPassword;
-        
-        public MantisValidator(TaskRepository taskRepository, String userName, String password, String httpUserName, String httpPassword) {
+
+        public MantisValidator(TaskRepository taskRepository) {
 
             this.repositoryUrl = taskRepository.getRepositoryUrl();
             this.taskRepository = taskRepository;
-            this.userName = userName;
-            this.password = password;
-            this.httpUserName = httpUserName;
-            this.httpPassword = httpPassword;
         }
-        
-        @Override public void run(IProgressMonitor monitor) throws CoreException {
+
+        @Override
+        public void run(IProgressMonitor monitor) throws CoreException {
 
             try {
-                //validate(Provider.of(monitor));
                 validate(monitor);
             } catch (MalformedURLException e) {
-                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR, MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
+                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR,
+                        MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
             } catch (MantisException e) {
-                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR, MantisUIPlugin.PLUGIN_ID, e.getMessage()));
+                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR,
+                        MantisUIPlugin.PLUGIN_ID, e.getMessage()));
             }
         }
-        
+
         public void validate(IProgressMonitor monitor) throws MalformedURLException, MantisException {
 
             AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
-            
-            IMantisClient client = MantisClientFactory.createClient(location.getUrl(), this.userName, this.password, this.httpUserName, this.httpPassword, location);
+
+            IMantisClient client = MantisClientFactory.getDefault().createClient(location);
             client.validate(monitor);
-            setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID, "Authentication credentials are valid."));
+            setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID,
+                    "Authentication credentials are valid."));
         }
     }
-    
+
 }
