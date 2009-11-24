@@ -46,7 +46,7 @@ public class MantisCorePlugin extends Plugin {
 
     public final static String REPOSITORY_KIND = "mantis";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = Boolean.getBoolean(MantisCorePlugin.class.getName().toLowerCase() + ".debug");
 
     private MantisRepositoryConnector connector;
 
@@ -108,11 +108,9 @@ public class MantisCorePlugin extends Plugin {
                     "Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.",
                     null);
         } else if (e instanceof MantisException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: "
-                    + e.getMessage(), e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
         } else if (e instanceof ClassCastException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO,
-                    "Error parsing server response", e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
         } else {
             return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
         }
@@ -129,6 +127,19 @@ public class MantisCorePlugin extends Plugin {
         getDefault().getLog().log(status);
     }
 
+    /**
+     * Logs debug information into the eclipse error log.
+     * 
+     * <p>
+     * Enabled only if the system property <tt>com.itsolut.mantis.core.mantiscoreplugin.debug</tt>
+     * is set to true
+     * </p>
+     * 
+     * @param information
+     *            the string to log
+     * @param t
+     *            a throwable, for context information
+     */
     public static void debug(String information, Throwable t) {
 
         if (DEBUG)
