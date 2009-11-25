@@ -430,8 +430,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
                 monitor.worked(1);
             }
-        } catch (Exception e) {
-            MantisCorePlugin.log(e);
+        } catch (CoreException e) {
             throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
                     "Could not determine changed tasks", e));
         }
