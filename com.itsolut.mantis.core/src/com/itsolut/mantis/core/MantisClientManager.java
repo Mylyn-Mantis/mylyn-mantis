@@ -43,7 +43,6 @@ import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 import com.itsolut.mantis.core.exception.MantisException;
 
@@ -57,8 +56,6 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private PersistedState state;
 
-    private TaskRepositoryLocationFactory taskRepositoryLocationFactory = new TaskRepositoryLocationFactory();
-    
     public MantisClientManager(File cacheFile) {
 
         state = new PersistedState(cacheFile);

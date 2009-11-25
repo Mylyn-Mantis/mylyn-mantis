@@ -27,6 +27,8 @@ public class ProjectData  implements java.io.Serializable {
 
     private com.itsolut.mantis.binding.ProjectData[] subprojects;
 
+    private java.lang.Boolean inherit_global;
+
     public ProjectData() {
     }
 

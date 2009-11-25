@@ -14,10 +14,12 @@ package com.itsolut.mantis.ui;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
 
 /**

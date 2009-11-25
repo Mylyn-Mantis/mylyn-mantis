@@ -21,7 +21,9 @@
 
 package com.itsolut.mantis.core;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 import com.itsolut.mantis.core.exception.MantisException;
 

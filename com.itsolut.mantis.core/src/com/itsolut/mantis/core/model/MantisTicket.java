@@ -66,6 +66,7 @@ public class MantisTicket {
         VIEW_STATE("view_state"),
         FIXED_IN("fixed_in"),
         TARGET_VERSION("target_version"),
+        DUE_DATE("due_date"),
         NEW_COMMENT("new_comment"),
         ATTACHID("attachid"),
         ATTACHMENT("attachment"),
@@ -213,7 +214,7 @@ public class MantisTicket {
         return getId() != MantisTicket.INVALID_ID;
     }
 
-    public void putBuiltinValue(Key key, String value) throws InvalidTicketException {
+    public void putBuiltinValue(Key key, String value)  {
         valueByKey.put(key, value);
     }
 
@@ -230,7 +231,7 @@ public class MantisTicket {
      * @throws InvalidTicketException
      *             thrown if the type of <code>value</code> is not valid
      */
-    public boolean putValue(String keyName, String value) throws InvalidTicketException {
+    public boolean putValue(String keyName, String value){
         Key key = Key.fromKey(keyName);
         if (key != null) {
             if (key == Key.ID || key == Key.LAST_UPDATED) {
