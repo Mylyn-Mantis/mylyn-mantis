@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.itsolut.mantis</groupId>
+	<artifactId>parent</artifactId>
+	<version>3.1.0.qualifier</version>
+	<packaging>pom</packaging>
+	<name>Mylyn Mantis Connector</name>
+	<modules>
+		<module>../com.itsolut.mantis</module>
+		<module>../com.itsolut.mantis.core</module>
+		<module>../com.itsolut.mantis.ui</module>
+		<module>../com.itsolut.mantis.tests</module>
+		<module>../com.itsolut.mantis-feature</module>
+		<module>../com.itsolut.mantis-site</module>
+	</modules>
+
+	<properties>
+		<tycho-version>0.5.0</tycho-version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>ganymede</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/ganymede</url>
+		</repository>
+		<repository>
+			<id>mylyn</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/mylyn/update/e3.4</url>
+		</repository>
+		<repository>
+			<id>mylyn-extras</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/mylyn/update/extras</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -276,13 +276,6 @@ litigation.
          unpack="false"/>
 
    <plugin
-         id="javax.wsdl15"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="javax.xml.rpc"
          download-size="0"
          install-size="0"
