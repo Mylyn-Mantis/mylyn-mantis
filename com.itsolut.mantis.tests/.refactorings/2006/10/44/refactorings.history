@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<session version="1.0">
+<refactoring clone="true" comment="Infer generic type arguments on 'org.eclipse.mylar.trac.tests'&#13;&#10;- Original project: 'org.eclipse.mylar.trac.tests'&#13;&#10;- Original elements:&#13;&#10;     org.eclipse.mylar.trac.tests.support.XmlRpcServer.java&#13;&#10;- Assume clone() returns an instance of the receiver type&#13;&#10;- Leave unconstrained type arguments raw" description="Infer generic type arguments" element1="/src&lt;org.eclipse.mylar.trac.tests.support{XmlRpcServer.java" flags="6" id="org.eclipse.jdt.ui.infer.typearguments" leave="true" stamp="1162336484312" version="1.0"/>
+</session>
