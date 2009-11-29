@@ -21,9 +21,9 @@
 
 	<repositories>
 		<repository>
-			<id>ganymede</id>
+			<id>galileo</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/ganymede</url>
+			<url>http://download.eclipse.org/releases/galileo</url>
 		</repository>
 		<repository>
 			<id>mylyn</id>
