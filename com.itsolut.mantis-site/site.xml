@@ -1,36 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-
    <description url="http://mylyn-mantis.sourceforge.net/eclipse/update">
       This is the Eclipse 3.3 and Mylyn Mantis Connector update site.  This connector allows integration with Mylyn and Mantis Bug Tracker within eclipse.   You must be using version 1.0.5a or greater of the Mantis Connector with this plugin.
    </description>
-<!--
-
-   <feature url="features/com.itsolut.mantis_feature_3.0.3.200906182314.jar" id="com.itsolut.mantis_feature" version="3.0.3.200906182314">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
+   <feature url="features/com.itsolut.mantis_feature_3.1.1.qualifier.jar" id="com.itsolut.mantis_feature" version="3.1.1.qualifier">
+      <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
    </feature>
-
-   <feature url="features/com.itsolut.mantis_feature_3.0.4.200908041309.jar" id="com.itsolut.mantis_feature" version="3.0.4.200908041309">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
-   </feature>
-
-   <feature url="features/com.itsolut.mantis_feature_3.0.5.200908171111.jar" id="com.itsolut.mantis_feature" version="3.0.5.200908171111">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
-   </feature>
-
-   <feature url="features/com.itsolut.mantis_feature_3.0.6.200910151319.jar" id="com.itsolut.mantis_feature" version="3.0.6.200910151319">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
-   </feature>
-
-   <feature url="features/com.itsolut.mantis_feature_3.1.0.200911251800.jar" id="com.itsolut.mantis_feature" version="3.1.0.200911251800">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
-   </feature>
--->
-
-   <feature url="features/com.itsolut.mantis_feature_3.1.0.qualifier.jar" id="com.itsolut.mantis_feature" version="3.1.0.qualifier">
-      <category name="Mylyn Mantis Connector (Mylyn 3.x)" />
-   </feature>
-   <category-def name="Mylyn Mantis Connector (Mylyn 3.x)" label="Mylyn Connector (Mylyn 3.x)">
-   </category-def>
-
+   <category-def name="Mylyn Mantis Connector (Mylyn 3.x)" label="Mylyn Connector (Mylyn 3.x)"/>
 </site>

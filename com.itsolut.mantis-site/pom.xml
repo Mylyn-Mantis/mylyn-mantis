@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>com.itsolut.mantis</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.0.qualifier</version>
+		<version>3.1.1-SNAPSHOT</version>
 		<relativePath>../com.itsolut.mantis.parent</relativePath>
 	</parent>
 
 	<artifactId>com.itsolut.mantis-site</artifactId>
 	<packaging>eclipse-update-site</packaging>
-	<version>3.1.0</version>
 	<name>Mylyn Mantis Connector update site</name>
 
 </project>
