@@ -13,29 +13,12 @@
 		<module>../com.itsolut.mantis.tests</module>
 		<module>../com.itsolut.mantis-feature</module>
 		<module>../com.itsolut.mantis-site</module>
+		<module>../com.itsolut.mantis.target</module>
 	</modules>
 
 	<properties>
 		<tycho-version>0.5.0</tycho-version>
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>galileo</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/galileo</url>
-		</repository>
-		<repository>
-			<id>mylyn</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/mylyn/update/e3.4</url>
-		</repository>
-		<repository>
-			<id>mylyn-extras</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/mylyn/update/extras</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>
@@ -51,6 +34,14 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
+					<target>
+						<artifact>
+							<groupId>com.itsolut.mantis</groupId>
+							<artifactId>com.itsolut.mantis.target</artifactId>
+							<version>3.1.1-SNAPSHOT</version>
+							<classifier>e34-mylyn33</classifier>
+						</artifact>
+					</target>
 				</configuration>
 			</plugin>
 		</plugins>
