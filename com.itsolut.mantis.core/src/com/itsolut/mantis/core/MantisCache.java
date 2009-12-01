@@ -139,8 +139,6 @@ public class MantisCache {
                         cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
                                 cacheData.reporterThreshold, monitor));
                     } catch (MantisException e) {
-                        // TODO : remove this once http://www.mantisbt.org/bugs/view.php?id=11180 is
-                        // sorted out
                         if (!cacheData.reportersByProjectId.containsKey(project.getValue())) {
                             cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
                                     cacheData.developersByProjectId.get(project.getValue())));

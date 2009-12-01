@@ -67,8 +67,6 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
     private void configureHttpAuthentication() {
 
-        // TODO: test http authentication, see if we still need this
-
         AuthenticationCredentials httpCredentials = location.getCredentials(AuthenticationType.HTTP);
         if (httpCredentials == null)
             return;
