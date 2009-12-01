@@ -60,20 +60,17 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
-import com.itsolut.mantis.core.model.MantisSearchFilter;
 import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
- * Mantis search page. Provides a form similar to the one the Bugzilla connector
- * uses.
+ * Mantis search page. Provides a form similar to the one the Bugzilla connector uses.
  * 
  * @author Steffen Pingel
  * @author Chris Hane
  * 
- *         Dave Carver - 20070806 [ 1729675 ] Internal errors when project or
- *         filter not selected
+ *         Dave Carver - 20070806 [ 1729675 ] Internal errors when project or filter not selected
  */
 @SuppressWarnings("restriction")
 public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
@@ -228,9 +225,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             if (sanitizedString.length() > 50)
                 sanitizedString = sanitizedString.substring(0, 47) + "...";
 
-            setMessage(
-                    "Unable to build query page. Please check your repository settings.\nError details: "
-                            + sanitizedString, DialogPage.ERROR);
+            setMessage("Unable to build query page. Please check your repository settings.\nError details: "
+                    + sanitizedString, DialogPage.ERROR);
         }
 
         setControl(control);
@@ -238,8 +234,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private IMantisClient getMantisClient() throws MantisException {
 
-        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi
-                .getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
+                .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
         final IMantisClient client = connector.getClientManager().getRepository(repository);
         return client;
     }
@@ -281,8 +277,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     private IRunnableContext getRunnableContext() {
 
         IRunnableContext container = getContainer();
-        
-        if ( container == null)
+
+        if (container == null)
             container = getSearchContainer().getRunnableContext();
         return container;
     }
@@ -290,31 +286,31 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     private MantisProject[] getProjects() {
 
         final List<MantisProject> projects = new ArrayList<MantisProject>();
-        
+
         try {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-            .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+                    .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
             final IMantisClient client = connector.getClientManager().getRepository(repository);
-            
-            
+
             CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
-                
+
                 public void run(IProgressMonitor monitor) throws CoreException {
-            
+
                     try {
                         projects.addAll(client.getCache(monitor).getProjects());
                     } catch (MantisException e) {
-                        throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID, "Failed getting projects : " + e.getMessage(), e));
+                        throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID,
+                                "Failed getting projects : " + e.getMessage(), e));
                     }
-                    
+
                 }
             });
         } catch (CoreException e) {
-            setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
         } catch (MantisException e) {
-            setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
+            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
         }
-        
+
         return projects.toArray(new MantisProject[0]);
     }
 
@@ -330,23 +326,19 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         return false;
     }
 
-    private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException,
-            MantisException {
+    private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException, MantisException {
 
         MantisCache cache = getMantisClient().getCache(new NullProgressMonitor());
 
-        for (MantisSearchFilter filter : MantisUtils.getMantisSearch(query).getFilters())
-            if ("project".equals(filter.getFieldName())) {
-                tree.getViewer().setSelection(new
-                 StructuredSelection(cache.getProjectByName(filter.getValues().get(0))));
-            } else if ("filter".equals(filter.getFieldName())) {
-                for (MantisProjectFilter pd : cache.getProjectFilters(getSelectedProject()
-                        .getValue()))
-                    filterCombo.add(pd.getName());
+        MantisSearch search = MantisUtils.getMantisSearch(query);
 
-                filterCombo.setText(filter.getValues().get(0));
+        tree.getViewer().setSelection(new StructuredSelection(cache.getProjectByName(search.getProjectName())));
+        
+        for (MantisProjectFilter pd : cache.getProjectFilters(getSelectedProject().getValue()))
+            filterCombo.add(pd.getName());
 
-            }
+        filterCombo.setText(search.getFilterName());
+        
     }
 
     private void createTitleGroup(Composite control) {
@@ -361,7 +353,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         titleText.setLayoutData(gd);
         titleText.addKeyListener(new KeyListener() {
-
             public void keyPressed(KeyEvent e) {
 
                 // ignore
@@ -389,13 +380,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         return validate();
     }
-    
+
     @Override
     public void setPageComplete(boolean complete) {
-    
+
         super.setPageComplete(complete);
-        
-        if ( getSearchContainer() != null)
+
+        if (getSearchContainer() != null)
             getSearchContainer().setPerformActionEnabled(complete);
     }
 
@@ -424,22 +415,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         } catch (NumberFormatException e) {
             return false;
         }
-        
+
         return returnsw;
-    }
-
-    public String getQueryUrl(String repsitoryUrl) {
-
-        MantisSearch search = new MantisSearch();
-
-        search.addFilter(new MantisSearchFilter("project", getSelectedProject().getName()));
-        search.addFilter(new MantisSearchFilter("filter", filterCombo.getText()));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(repsitoryUrl);
-        sb.append(IMantisClient.QUERY_URL);
-        sb.append(search.toUrl());
-        return sb.toString();
     }
 
     @Override
@@ -447,7 +424,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         query.setSummary(this.getQueryTitle());
         query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
-        query.setUrl(this.getQueryUrl(repository.getRepositoryUrl()));
+        query.setAttribute(IMantisClient.PROJECT_NAME, getSelectedProject().getName());
+        query.setAttribute(IMantisClient.FILTER_NAME, filterCombo.getText());
     }
 
     @Override
@@ -467,15 +445,14 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             if (getSelectedProject() == null)
                 return;
 
-            
             for (MantisProjectFilter pd : cache.getProjectFilters(getSelectedProject().getValue()))
                 filterCombo.add(pd.getName());
 
             if (valueToSet != null)
                 filterCombo.setText(valueToSet);
-            
-           if ( filterCombo.getSelectionIndex() == -1)
-               filterCombo.setText(SELECT_FILTER_IN_PROJECT);
+
+            if (filterCombo.getSelectionIndex() == -1)
+                filterCombo.setText(SELECT_FILTER_IN_PROJECT);
 
         } catch (MantisException e) {
             setErrorMessage("Failed updating attributes " + e.getMessage() + " .");
@@ -486,9 +463,9 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private void updateButtonsIfNeeded() {
 
-        if ( getContainer() != null)
+        if (getContainer() != null)
             getContainer().updateButtons();
-        
+
         setPageComplete(isPageComplete());
     }
 

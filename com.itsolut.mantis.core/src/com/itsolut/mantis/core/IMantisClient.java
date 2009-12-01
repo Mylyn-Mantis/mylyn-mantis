@@ -57,6 +57,10 @@ public interface IMantisClient {
     public static final String URL_SHOW_BUG = "view.php?id=";
 
     public static final String SEARCH_LIMIT = "searchLimit";
+    
+    public static final String PROJECT_NAME = "projectName";
+    
+    public static final String FILTER_NAME = "filterName";
 
     /**
      * Gets ticket with <code>id</code> from repository.
