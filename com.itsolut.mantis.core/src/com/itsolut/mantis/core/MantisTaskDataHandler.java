@@ -174,9 +174,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         try {
             IMantisClient client = connector.getClientManager().getRepository(
                     repository);
-            createDefaultAttributes(data, client, monitor, false);
             TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
-            projectAttribute.setValue(initializationData.getProduct());
+            String projectName = initializationData.getProduct();
+			projectAttribute.setValue(projectName);
+			
+			createDefaultAttributes(data, client, projectName, monitor, false);
             createProjectSpecificAttributes(data, client, monitor);
             createCustomFieldAttributes(data, client, null, monitor);
             return true;
@@ -491,12 +493,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public static void createDefaultAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor, boolean existingTask) throws CoreException {
-        createDefaultAttributes(data, client, null, monitor, existingTask);
-    }
-
     public static void createDefaultAttributes(TaskData data,
-            IMantisClient client, MantisTicket ticket, IProgressMonitor monitor, boolean existingTask) throws CoreException {
+            IMantisClient client, String projectName, IProgressMonitor monitor, boolean existingTask) throws CoreException {
 
         // The order here is important as it controls how it appears in the
         // Editor.
@@ -542,16 +540,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
                     cache.getViewState(), cache.getViewState()[0].getName());
 
-            String[] allProjectUsers = null;
-            String[] projectDevelopers = null;
-            if (ticket != null) {
-                allProjectUsers = cache.getUsersByProjectName(ticket.getValue(MantisTicket.Key.PROJECT), monitor);
-                projectDevelopers = cache.getDevelopersByProjectName(ticket.getValue(MantisTicket.Key.PROJECT), monitor);
-            }
-
-            createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, projectDevelopers);
+            createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, cache.getDevelopersByProjectName(projectName, monitor), true);
             if (existingTask)
-                createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, allProjectUsers);
+				createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, cache.getUsersByProjectName(projectName, monitor));
+            
             createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
             createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
@@ -716,7 +708,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 MantisCorePlugin.REPOSITORY_KIND,
                 repository.getRepositoryUrl(), ticket.getId() + "");
         try {
-            createDefaultAttributes(taskData, client, ticket, monitor, true);
+        	String projectName = ticket.getValue(Key.PROJECT);
+            createDefaultAttributes(taskData, client, projectName, monitor, true);
             updateTaskData(repository, getAttributeMapper(repository),
                     taskData, client, ticket);
             createProjectSpecificAttributes(taskData, client, monitor);
@@ -847,10 +840,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         IMantisClient client = connector.getClientManager().getRepository(
                 repository);
-        createDefaultAttributes(taskData, client, monitor, false);
-        
         TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
-        taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());
+        createDefaultAttributes(taskData, client, projectAttribute.getValue(), monitor, false);
+        getAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());
         
         createProjectSpecificAttributes(taskData, client, monitor);
     }
