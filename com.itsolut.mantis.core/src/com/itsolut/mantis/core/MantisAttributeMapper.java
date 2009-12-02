@@ -14,6 +14,8 @@ package com.itsolut.mantis.core;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITaskAttachment;
@@ -45,6 +47,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         
         return Collections.unmodifiableSet(_taskRelationKeys);
     }
+    
 
     /**
      * Attribute controls how information is displayed in the Attributes column and in the Text editor.
@@ -184,54 +187,33 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     public MantisAttributeMapper(TaskRepository taskRepository) {
         super(taskRepository);
     }
+    
+    private Map<String, Attribute> taskAttributeToMantisAttributes = new HashMap<String, Attribute>();
+    {
+    	taskAttributeToMantisAttributes.put(TaskAttribute.COMMENT_NEW, Attribute.NEW_COMMENT);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.DESCRIPTION, Attribute.DESCRIPTION);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_MODIFICATION, Attribute.LAST_UPDATED);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.SUMMARY, Attribute.SUMMARY);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_CREATION, Attribute.DATE_SUBMITTED);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.ATTACHMENT_ID, Attribute.ATTACHID);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.USER_ASSIGNED, Attribute.ASSIGNED_TO);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.TASK_KEY, Attribute.ID);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.USER_REPORTER, Attribute.REPORTER);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.STATUS, Attribute.STATUS);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.RESOLUTION, Attribute.RESOLUTION);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.PRIORITY, Attribute.PRIORITY);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.TASK_KIND, Attribute.SEVERITY);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.VERSION, Attribute.VERSION);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.SEVERITY, Attribute.SEVERITY);
+    }
 
     @Override
     public String mapToRepositoryKey(TaskAttribute parent, String key) {
-        if (key.equals(TaskAttribute.COMMENT_NEW))
-            return Attribute.NEW_COMMENT.getKey().toString();
-
-        if (key.equals(TaskAttribute.DESCRIPTION))
-            return Attribute.DESCRIPTION.getKey().toString();
-
-        if (key.equals(TaskAttribute.DATE_MODIFICATION))
-            return Attribute.LAST_UPDATED.getKey().toString();
-
-        if (key.equals(TaskAttribute.SUMMARY))
-            return Attribute.SUMMARY.getKey().toString();
-
-        if (key.equals(TaskAttribute.DATE_CREATION))
-            return Attribute.DATE_SUBMITTED.getKey().toString();
-
-        if (key.equals(TaskAttribute.ATTACHMENT_ID))
-            return Attribute.ATTACHID.getKey().toString();
-
-        if (key.equals(TaskAttribute.USER_ASSIGNED))
-            return Attribute.ASSIGNED_TO.getKey().toString();
-
-        if (key.equals(TaskAttribute.TASK_KEY))
-            return Attribute.ID.getKey().toString();
-
-        if (key.equals(TaskAttribute.USER_REPORTER))
-            return Attribute.REPORTER.getKey().toString();
-
-        if (key.equals(TaskAttribute.STATUS))
-            return Attribute.STATUS.getKey().toString();
-
-        if (key.equals(TaskAttribute.RESOLUTION))
-            return Attribute.RESOLUTION.getKey().toString();
-
-        if (key.equals(TaskAttribute.PRIORITY))
-            return Attribute.PRIORITY.getKey().toString();
-
-        if (key.equals(TaskAttribute.TASK_KIND))
-            return Attribute.SEVERITY.getKey().toString();
-        
-        if ( key.equals(TaskAttribute.VERSION))
-        	return Attribute.VERSION.getKey().toString();
-        
-        if ( key.equals(TaskAttribute.SEVERITY))
-        	return Attribute.SEVERITY.getKey().toString();
-
+    	
+    	Attribute mapped = taskAttributeToMantisAttributes.get(key);
+    	if ( mapped != null)
+    		return mapped.getKey().toString();
+    	
         return super.mapToRepositoryKey(parent, key).toString();
     }
 
@@ -266,7 +248,5 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
             taskAttachment.setDescription(MantisAttachmentHandler.CONTEXT_DESCRIPTION);
 
     }
-
-    
     
 }
