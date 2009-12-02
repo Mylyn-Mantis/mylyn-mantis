@@ -190,6 +190,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     
     private Map<String, Attribute> taskAttributeToMantisAttributes = new HashMap<String, Attribute>();
     {
+    	taskAttributeToMantisAttributes.put(TaskAttribute.PRODUCT, Attribute.PROJECT);
     	taskAttributeToMantisAttributes.put(TaskAttribute.COMMENT_NEW, Attribute.NEW_COMMENT);
     	taskAttributeToMantisAttributes.put(TaskAttribute.DESCRIPTION, Attribute.DESCRIPTION);
     	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_MODIFICATION, Attribute.LAST_UPDATED);
