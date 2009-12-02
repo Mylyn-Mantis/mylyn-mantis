@@ -24,11 +24,13 @@ import com.itsolut.mantis.core.MantisCorePlugin;
  */
 @SuppressWarnings("restriction")
 public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
-	
+
 	@Override
 	public boolean canCreatePageFor(TaskEditorInput input) {
-		if (input.getTask().getConnectorKind().equals(MantisCorePlugin.REPOSITORY_KIND)
-				|| TasksUiUtil.isOutgoingNewTask(input.getTask(), MantisCorePlugin.REPOSITORY_KIND)) {
+		if (input.getTask().getConnectorKind().equals(
+				MantisCorePlugin.REPOSITORY_KIND)
+				|| TasksUiUtil.isOutgoingNewTask(input.getTask(),
+						MantisCorePlugin.REPOSITORY_KIND)) {
 			return true;
 		}
 		return false;
@@ -48,18 +50,15 @@ public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 	public String getPageText() {
 		return "Mantis";
 	}
-	
+
 	@Override
 	public int getPriority() {
 		return PRIORITY_TASK;
 	}
-	
+
 	@Override
 	public String[] getConflictingIds(TaskEditorInput input) {
-		if (!input.getTask().getConnectorKind().equals(MantisCorePlugin.REPOSITORY_KIND)) {
-			return new String[] { ITasksUiConstants.ID_PAGE_PLANNING };
-		}
-		return null;
+		return new String[] { ITasksUiConstants.ID_PAGE_PLANNING };
 	}
-	
+
 }

@@ -19,6 +19,10 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
 	public MantisTaskEditorPage(TaskEditor editor) {
 		super(editor, MantisCorePlugin.REPOSITORY_KIND);
+		
+		setNeedsPrivateSection(true);
+		setNeedsSubmitButton(true);
+		setNeedsSubmit(true);
 	}
 
 	@Override
@@ -80,5 +84,5 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 		return newDescriptors;
 	}
-
+	
 }
