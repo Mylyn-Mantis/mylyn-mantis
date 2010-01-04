@@ -18,12 +18,16 @@
 
 package com.itsolut.mantis.core.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 
 import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.model.MantisSearch;
 
 /**
@@ -96,13 +100,69 @@ public class MantisUtils {
         else
             limit = Integer.parseInt(limitString);
 
-        String projectName = query.getAttribute(IMantisClient.PROJECT_NAME);
-        String filterName = query.getAttribute(IMantisClient.FILTER_NAME);
+        MantisSearch search;
 
-        MantisSearch search = new MantisSearch(projectName, filterName);
+        String projectName = query.getAttribute(IMantisClient.PROJECT_NAME);
+
+        // we still need to support the old format
+        if (projectName == null)
+            search = createMantisSearchFromUrl(query.getUrl());
+        else {
+            String filterName = query.getAttribute(IMantisClient.FILTER_NAME);
+            search = new MantisSearch(projectName, filterName);
+        }
+
         search.setLimit(limit);
 
         return search;
+    }
+
+    private static MantisSearch createMantisSearchFromUrl(String url) {
+
+        return MantisSearchFromUrlParser.INSTANCE.fromUrl(url);
+
+    }
+
+    /**
+     * Parser which supports the legacy query format, encoded in the url
+     * 
+     * @author Robert Munteanu
+     *
+     */
+    private static class MantisSearchFromUrlParser {
+
+        static final MantisSearchFromUrlParser INSTANCE = new MantisSearchFromUrlParser();
+
+        private MantisSearchFromUrlParser() {
+
+        }
+
+        public MantisSearch fromUrl(String url) {
+
+            StringTokenizer t = new StringTokenizer(url, "&");
+            String project = null;
+            String filter = null;
+
+            while (t.hasMoreTokens()) {
+                String token = t.nextToken();
+                int i = token.indexOf("=");
+                if (i != -1)
+                    try {
+                        String key = URLDecoder.decode(token.substring(0, i), IMantisClient.CHARSET);
+                        String value = URLDecoder.decode(token.substring(i + 1), IMantisClient.CHARSET);
+
+                        if ("project".equals(key)) {
+                            project = value;
+                        } else if ("filter".equals(key)) {
+                            filter = value;
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                        MantisCorePlugin.log(e);
+                    }
+            }
+
+            return new MantisSearch(project, filter);
+        }
     }
 
 }
