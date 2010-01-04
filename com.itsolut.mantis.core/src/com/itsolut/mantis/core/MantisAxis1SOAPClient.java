@@ -138,7 +138,8 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
         MantisException mantisException = (MantisException) exception;
 
-        return mantisException.getMessage() != null && mantisException.getMessage().toLowerCase().indexOf("access denied") != -1;
+        return mantisException.getMessage() != null
+                && mantisException.getMessage().toLowerCase().indexOf("access denied") != -1;
 
     }
 
@@ -264,9 +265,23 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
                 return getSOAP().mc_filter_get_issue_headers(getUsername(), getPassword(),
                         BigInteger.valueOf(projectId), // project
                         BigInteger.valueOf(filterId), // filter
-                        BigInteger.valueOf(1), // start page
+                        BigInteger.ONE, // start page
                         BigInteger.valueOf(limit)); // # per page
 
+            }
+
+        });
+    }
+
+    public IssueHeaderData[] getIssueHeaders(final int projectId, final int limit, IProgressMonitor monitor)
+            throws MantisException {
+
+        return call(monitor, new Callable<IssueHeaderData[]>() {
+
+            public IssueHeaderData[] call() throws Exception {
+
+                return getSOAP().mc_project_get_issue_headers(getUsername(), getPassword(),
+                        BigInteger.valueOf(projectId), BigInteger.ONE, BigInteger.valueOf(limit));
             }
 
         });
