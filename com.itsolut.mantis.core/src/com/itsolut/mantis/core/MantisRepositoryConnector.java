@@ -524,4 +524,17 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         return relations;
 
     }
+
+    @Override
+    public boolean hasRepositoryDueDate(TaskRepository taskRepository, ITask task, TaskData taskData) {
+        
+        try {
+            IMantisClient client = getClientManager().getRepository(taskRepository);
+            return client.getCache(new NullProgressMonitor()).getRepositoryVersion().isHasDueDateSupport();
+            
+        } catch (MantisException e) {
+            MantisCorePlugin.log(e);
+            return false;
+        }
+    }
 }

@@ -206,6 +206,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     	taskAttributeToMantisAttributes.put(TaskAttribute.TASK_KIND, Attribute.SEVERITY);
     	taskAttributeToMantisAttributes.put(TaskAttribute.VERSION, Attribute.VERSION);
     	taskAttributeToMantisAttributes.put(TaskAttribute.SEVERITY, Attribute.SEVERITY);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_DUE, Attribute.DUE_DATE);
     }
 
     @Override
