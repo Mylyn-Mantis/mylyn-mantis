@@ -13,10 +13,10 @@ public class MantisSearch {
 
     private int limit = DEFAULT_SEARCH_LIMIT;
 
-    public MantisSearch(String projectName, String queryName) {
+    public MantisSearch(String projectName, String filterName) {
 
         this.projectName = projectName;
-        this.filterName = queryName;
+        this.filterName = filterName;
     }
 
     public int getLimit() {
