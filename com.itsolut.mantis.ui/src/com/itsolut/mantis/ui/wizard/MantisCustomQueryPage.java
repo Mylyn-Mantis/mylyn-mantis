@@ -81,7 +81,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private static final String TITLE = "Enter query parameters";
 
-    private static final String DESCRIPTION = "Only filters created from the web interface are supported.";
+    private static final String DESCRIPTION = "Select a project and a filter to populate the task list. Custom filters can be created from the web interface.";
 
     private static final String TITLE_QUERY_TITLE = "Query Title:";
 

@@ -60,6 +60,10 @@ import com.itsolut.mantis.core.model.MantisViewState;
  */
 public class MantisCache {
 
+    static final int BUILT_IN_PROJECT_TASKS_FILTER_ID = -1;
+
+    static final String BUILT_IN_PROJECT_TASKS_FILTER_FORMAT = "[Built-in] Latest %s tasks";
+
     private static final String SUBPROJECT_SEPARATOR = " » ";
 
     private static final String RESOLVED_STATUS_THRESHOLD = "bug_resolved_status_threshold";
@@ -380,14 +384,25 @@ public class MantisCache {
 
     }
 
-    private void cacheFilters(int projectId, FilterData[] projectFilters) {
+    private void cacheFilters(int projectId, FilterData[] projectFilters) throws MantisException {
 
         List<MantisProjectFilter> filters = new ArrayList<MantisProjectFilter>();
+
+        filters.add(addDefaultFilters(projectId));
+
         for (FilterData filter : projectFilters)
             filters.add(new MantisProjectFilter(filter.getName(), filter.getId().intValue()));
 
         cacheData.projectFiltersById.put(projectId, filters);
 
+    }
+
+    private MantisProjectFilter addDefaultFilters(int projectId) throws MantisException {
+
+        String projectDisplayName = getProjectById(projectId).getDisplayName();
+        String filterDisplayName = String.format(BUILT_IN_PROJECT_TASKS_FILTER_FORMAT, projectDisplayName);
+
+        return new MantisProjectFilter(filterDisplayName, BUILT_IN_PROJECT_TASKS_FILTER_ID);
     }
 
     private void cacheProjectCustomFields(int projectId, CustomFieldDefinitionData[] customFieldData) {
@@ -632,6 +647,15 @@ public class MantisCache {
                 return project;
 
         throw new MantisException("No project with name " + projectName + " .");
+    }
+
+    public MantisProject getProjectById(int projectId) throws MantisException {
+
+        for (MantisProject project : cacheData.projects)
+            if (project.getValue() == projectId)
+                return project;
+
+        throw new MantisException("No project with id " + projectId + " .");
     }
 
     public List<MantisProjectFilter> getProjectFilters(int projectId) throws MantisException {

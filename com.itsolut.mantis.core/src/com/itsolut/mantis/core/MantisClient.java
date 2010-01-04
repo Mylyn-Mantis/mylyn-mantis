@@ -171,7 +171,12 @@ public class MantisClient implements IMantisClient {
         subMonitor.beginTask("Retrieving issue headers", 1);
 
         try {
-            IssueHeaderData[] issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
+            IssueHeaderData[] issueHeaders;
+
+            if (filterId == MantisCache.BUILT_IN_PROJECT_TASKS_FILTER_ID)
+                issueHeaders = soapClient.getIssueHeaders(projectId, filterId, subMonitor);
+            else
+                issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
 
             for (IssueHeaderData issueHeader : issueHeaders)
                 result.add(MantisConverter.convert(issueHeader, cache, projectName));
