@@ -502,7 +502,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         try {
             MantisCache cache = client.getCache(monitor);
             
-            createAttribute(data, MantisAttributeMapper.Attribute.PROJECT, null);
+            createAttribute(data, MantisAttributeMapper.Attribute.PROJECT, null).setValue(projectName);
             createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
