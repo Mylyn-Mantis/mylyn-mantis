@@ -98,6 +98,7 @@
    <xsd:element name="view_state" type="tns:ObjectRef" minOccurs="0"/>
    <xsd:element name="date_submitted" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="last_modified" type="xsd:dateTime" minOccurs="0"/>
+   <xsd:element name="time_tracking" type="xsd:integer" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="IssueNoteDataArray">

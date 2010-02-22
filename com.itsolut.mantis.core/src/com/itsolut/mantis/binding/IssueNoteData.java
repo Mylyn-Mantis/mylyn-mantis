@@ -21,6 +21,8 @@ public class IssueNoteData  implements java.io.Serializable {
 
     private java.util.Calendar last_modified;
 
+    private java.math.BigInteger time_tracking;
+
     public IssueNoteData() {
     }
 
@@ -30,13 +32,15 @@ public class IssueNoteData  implements java.io.Serializable {
            java.lang.String text,
            com.itsolut.mantis.binding.ObjectRef view_state,
            java.util.Calendar date_submitted,
-           java.util.Calendar last_modified) {
+           java.util.Calendar last_modified,
+           java.math.BigInteger time_tracking) {
            this.id = id;
            this.reporter = reporter;
            this.text = text;
            this.view_state = view_state;
            this.date_submitted = date_submitted;
            this.last_modified = last_modified;
+           this.time_tracking = time_tracking;
     }
 
 
@@ -159,6 +163,26 @@ public class IssueNoteData  implements java.io.Serializable {
         this.last_modified = last_modified;
     }
 
+
+    /**
+     * Gets the time_tracking value for this IssueNoteData.
+     * 
+     * @return time_tracking
+     */
+    public java.math.BigInteger getTime_tracking() {
+        return time_tracking;
+    }
+
+
+    /**
+     * Sets the time_tracking value for this IssueNoteData.
+     * 
+     * @param time_tracking
+     */
+    public void setTime_tracking(java.math.BigInteger time_tracking) {
+        this.time_tracking = time_tracking;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof IssueNoteData)) return false;
@@ -188,7 +212,10 @@ public class IssueNoteData  implements java.io.Serializable {
               this.date_submitted.equals(other.getDate_submitted()))) &&
             ((this.last_modified==null && other.getLast_modified()==null) || 
              (this.last_modified!=null &&
-              this.last_modified.equals(other.getLast_modified())));
+              this.last_modified.equals(other.getLast_modified()))) &&
+            ((this.time_tracking==null && other.getTime_tracking()==null) || 
+             (this.time_tracking!=null &&
+              this.time_tracking.equals(other.getTime_tracking())));
         __equalsCalc = null;
         return _equals;
     }
@@ -217,6 +244,9 @@ public class IssueNoteData  implements java.io.Serializable {
         }
         if (getLast_modified() != null) {
             _hashCode += getLast_modified().hashCode();
+        }
+        if (getTime_tracking() != null) {
+            _hashCode += getTime_tracking().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -267,6 +297,13 @@ public class IssueNoteData  implements java.io.Serializable {
         elemField.setFieldName("last_modified");
         elemField.setXmlName(new javax.xml.namespace.QName("", "last_modified"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("time_tracking");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "time_tracking"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
