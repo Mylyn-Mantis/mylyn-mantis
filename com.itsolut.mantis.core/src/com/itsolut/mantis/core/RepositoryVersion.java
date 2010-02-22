@@ -46,6 +46,14 @@ public enum RepositoryVersion {
     VERSION_1_2_RC1_OR_HIGHER(true, true, true, false),
     
     /**
+     * Versions 1.2.0 or newer.
+     * 
+     * <p>Supports target_version, task relations, requires
+     * Base64-encoding of attachments and has due date support.</p>
+     */
+    VERSION_1_2_OR_HIGHER(true, true, true, true),
+    
+    /**
      * Versions 1.3 or newer.
      * 
      * <p>Since this is a dev version, things might break.</p>
@@ -67,15 +75,13 @@ public enum RepositoryVersion {
         
         if ( versionString.startsWith("1.2")) {
         	
-        	int minorVersion = extractMantisMinorVersion(versionString);
+        	String qualifier = extractQualifierFor12x(versionString);
         	
-        	if ( minorVersion > 0)
+        	if ( qualifier.startsWith("rc"))
         		return VERSION_1_2_RC1_OR_HIGHER;
         	
-        	String qualifier = extractQualifierFor120(versionString);
-        	
-        	if ( qualifier.length() == 0 || qualifier.startsWith("rc"))
-        		return VERSION_1_2_RC1_OR_HIGHER;
+        	if ( qualifier.length() == 0)
+        	    return VERSION_1_2_OR_HIGHER;
         	
         	return VERSION_1_2_A3_OR_LOWER;
         }
@@ -114,9 +120,9 @@ public enum RepositoryVersion {
 		return Integer.parseInt(builder.toString());
 	}
 	
-	private static String extractQualifierFor120(String versionString) {
+	private static String extractQualifierFor12x(String versionString) {
 		
-		return versionString.substring("1.2.0".length());
+		return versionString.substring("1.2.".length()+1);
 	}
     
 

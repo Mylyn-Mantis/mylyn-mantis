@@ -86,7 +86,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
-        DUE_DATE(Key.DUE_DATE, "due_date", TaskAttribute.TYPE_DATETIME, false, false),
+        DUE_DATE(Key.DUE_DATE, "Due date", TaskAttribute.TYPE_DATETIME, false, false),
         // task relations
         // read-only for existing tasks. see https://bugs.eclipse.org/bugs/show_bug.cgi?id=269407
         PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
@@ -217,28 +217,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     		return mapped.getKey().toString();
     	
         return super.mapToRepositoryKey(parent, key).toString();
-    }
-
-    @Override
-    public Date getDateValue(TaskAttribute attribute) {
-        //		try {
-        //			String mappedKey = mapToRepositoryKey(attribute, attribute.getId());
-        //			if (mappedKey.equals(Attribute.DATE_SUBMITTED.getKey())
-        //					|| mappedKey.equals(Attribute.LAST_UPDATED.getKey())) {
-        //				return MantisUtils.parseDate(Long.valueOf(attribute
-        //						.getValue()));
-        //			}
-        //		} catch (Exception e) {
-        //			MantisCorePlugin.log(e);
-        //		}
-        if (attribute.getValue().length() > 0)
-            return MantisUtils.parseDate(Long.valueOf(attribute.getValue()));
-        return null;
-    }
-
-    @Override
-    public void setDateValue(TaskAttribute attribute, Date date) {
-        attribute.setValue(MantisUtils.toMantisTime(date) + "");
     }
 
     @Override

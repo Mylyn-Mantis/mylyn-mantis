@@ -521,13 +521,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             
-            if ( client.getCache(monitor).getRepositoryVersion().isHasDueDateSupport())
-                createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
-
             createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
                     cache.getProjection(), cache.getProjection()[0].getName());
             createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache
                     .getETA(), cache.getETA()[0].getName());
+            
+            if ( client.getCache(monitor).getRepositoryVersion().isHasDueDateSupport() && client.getCache(monitor).dueDateIsEnabled())
+                createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
+            
             if ( client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations())
                 createTaskRelations(data, client);
 

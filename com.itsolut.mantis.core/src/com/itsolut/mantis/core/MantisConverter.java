@@ -68,7 +68,7 @@ public class MantisConverter {
         return version;
     }
 
-    public static MantisTicket convert(IssueData issue, RepositoryVersion version) {
+    public static MantisTicket convert(IssueData issue, MantisCache cache, RepositoryVersion version) {
 
         MantisTicket ticket = new MantisTicket(issue.getId().intValue());
         ticket.setCreated(issue.getDate_submitted().getTime());
@@ -91,7 +91,7 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.VERSION, issue.getVersion());
         ticket.putBuiltinValue(Key.FIXED_IN, issue.getFixed_in_version());
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
-        if (version.isHasDueDateSupport())
+        if (version.isHasDueDateSupport() && cache.dueDateIsEnabled() && issue.getDue_date() != null)
             ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
@@ -206,14 +206,14 @@ public class MantisConverter {
         if (cache.getRepositoryVersion().isHasTargetVersionSupport())
             issue.setTarget_version(ticket.getValueAndFilterNone(Key.TARGET_VERSION));
 
-        if (cache.getRepositoryVersion().isHasDueDateSupport()) {
+        if (cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled()) {
             String dueDate = ticket.getValue(Key.DUE_DATE);
-            if (dueDate == null) {
+            if (dueDate == null || dueDate.length() == 0) {
                 issue.setDue_date(null);
             } else {
                 long dueDateMillis = Long.parseLong(dueDate);
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(dueDateMillis);
+                calendar.setTime(new Date(dueDateMillis));
                 issue.setDue_date(calendar);
             }
         }

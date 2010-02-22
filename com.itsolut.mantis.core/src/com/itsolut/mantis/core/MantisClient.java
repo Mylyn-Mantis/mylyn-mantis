@@ -105,7 +105,7 @@ public class MantisClient implements IMantisClient {
 
         registerAdditionalReporters(issueData);
 
-        MantisTicket ticket = MantisConverter.convert(issueData, cache.getRepositoryVersion());
+        MantisTicket ticket = MantisConverter.convert(issueData, cache, cache.getRepositoryVersion());
 
         Policy.advance(monitor, 1);
 

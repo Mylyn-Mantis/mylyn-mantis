@@ -529,8 +529,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public boolean hasRepositoryDueDate(TaskRepository taskRepository, ITask task, TaskData taskData) {
         
         try {
-            IMantisClient client = getClientManager().getRepository(taskRepository);
-            return client.getCache(new NullProgressMonitor()).getRepositoryVersion().isHasDueDateSupport();
+            MantisCache cache = getClientManager().getRepository(taskRepository).getCache(new NullProgressMonitor());
+            
+            return cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled();
             
         } catch (MantisException e) {
             MantisCorePlugin.log(e);

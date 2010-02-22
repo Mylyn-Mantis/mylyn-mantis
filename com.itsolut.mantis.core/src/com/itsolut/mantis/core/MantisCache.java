@@ -72,6 +72,12 @@ public class MantisCache {
 
     private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
 
+    private static final String DUE_DATE_VIEW_THRESOLD = "due_date_view_threshold";
+
+    private static final String DUE_DATE_UPDATE_THRESOLD = "due_date_update_threshold";
+    
+    static final int ACCESS_LEVEL_NOBODY = 100;
+
     private final Object sync = new Object();
 
     private MantisAxis1SOAPClient soapClient;
@@ -79,6 +85,7 @@ public class MantisCache {
     private MantisCacheData cacheData = new MantisCacheData();
 
     private final NumberFormat formatter = new DecimalFormat("#.#");
+
 
     public MantisCache(MantisAxis1SOAPClient soapClient) {
 
@@ -115,12 +122,18 @@ public class MantisCache {
             try {
                 cacheProjects(soapClient.getProjectData(monitor));
 
-                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 12);
+                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 14);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
 
                 cacheDeveloperThreshold(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD));
+                Policy.advance(subMonitor, 1);
+
+                cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
+                Policy.advance(subMonitor, 1);
+
+                cacheDueDateUpdateThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD));
                 Policy.advance(subMonitor, 1);
 
                 for (MantisProject project : cacheData.projects) {
@@ -197,6 +210,16 @@ public class MantisCache {
             }
 
         }
+    }
+
+    private void cacheDueDateUpdateThreshold(String stringValue) {
+
+        cacheData.dueDateUpdateThreshold = safeGetInt(stringValue, ACCESS_LEVEL_NOBODY);
+    }
+
+    private void cacheDueDateViewThreshold(String stringValue) {
+
+        cacheData.dueDateViewThreshold = safeGetInt(stringValue, ACCESS_LEVEL_NOBODY);
     }
 
     private String format(long start) {
@@ -748,5 +771,10 @@ public class MantisCache {
 
         cacheData.reportersByProjectId.get(projectId).add(reporterName);
 
+    }
+
+    boolean dueDateIsEnabled() {
+        
+        return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
     }
 }

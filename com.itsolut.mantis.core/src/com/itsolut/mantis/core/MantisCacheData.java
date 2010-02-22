@@ -38,7 +38,7 @@ import com.itsolut.mantis.core.model.MantisViewState;
 public class MantisCacheData implements Serializable {
 
     // increment when structure changes
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     
     long lastUpdate = 0;
 
@@ -79,6 +79,10 @@ public class MantisCacheData implements Serializable {
     int reporterThreshold;
 
     int developerThreshold;
+    
+    int dueDateUpdateThreshold;
+
+    int dueDateViewThreshold;
 
 
 }
