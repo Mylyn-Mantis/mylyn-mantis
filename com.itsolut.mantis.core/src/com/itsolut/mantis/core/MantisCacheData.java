@@ -84,5 +84,7 @@ public class MantisCacheData implements Serializable {
 
     int dueDateViewThreshold;
 
+    boolean timeTrackingEnabled;
+
 
 }

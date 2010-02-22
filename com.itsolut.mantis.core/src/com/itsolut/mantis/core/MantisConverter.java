@@ -18,6 +18,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
 import com.itsolut.mantis.binding.CustomFieldDefinitionData;
@@ -68,7 +71,7 @@ public class MantisConverter {
         return version;
     }
 
-    public static MantisTicket convert(IssueData issue, MantisCache cache, RepositoryVersion version) {
+    public static MantisTicket convert(IssueData issue, MantisClient mantisClient, IProgressMonitor monitor) throws MantisException {
 
         MantisTicket ticket = new MantisTicket(issue.getId().intValue());
         ticket.setCreated(issue.getDate_submitted().getTime());
@@ -91,20 +94,21 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.VERSION, issue.getVersion());
         ticket.putBuiltinValue(Key.FIXED_IN, issue.getFixed_in_version());
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
-        if (version.isHasDueDateSupport() && cache.dueDateIsEnabled() && issue.getDue_date() != null)
+        if (mantisClient.isDueDateEnabled(monitor) && issue.getDue_date() != null)
             ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
 
         ticket.putBuiltinValue(Key.REPORTER, issue.getReporter().getName());
-        if (issue.getHandler() != null) {
+        if (issue.getHandler() != null)
             ticket.putBuiltinValue(Key.ASSIGNED_TO, issue.getHandler().getName());
-        }
+        
+        boolean supportsTimeTracking = mantisClient.isTimeTrackingEnabled(monitor);
 
         if (issue.getNotes() != null)
             for (IssueNoteData ind : issue.getNotes())
-                ticket.addComment(convert(ind));
+                ticket.addComment(convert(ind, supportsTimeTracking));
 
         if (issue.getAttachments() != null)
             for (AttachmentData ad : issue.getAttachments())
@@ -112,7 +116,7 @@ public class MantisConverter {
 
         if (issue.getRelationships() != null)
             for (RelationshipData rel : issue.getRelationships())
-                ticket.addRelationship(convert(rel, version));
+                ticket.addRelationship(convert(rel, mantisClient.getCache(monitor).getRepositoryVersion()));
 
         if (issue.getCustom_fields() != null)
             for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
@@ -136,7 +140,7 @@ public class MantisConverter {
 
     }
 
-    private static MantisComment convert(IssueNoteData ind) {
+    private static MantisComment convert(IssueNoteData ind, boolean supportsTimeTracking) {
 
         MantisComment comment = new MantisComment();
         comment.setId(ind.getId().intValue());
@@ -144,6 +148,8 @@ public class MantisConverter {
         comment.setText(ind.getText());
         comment.setDateSubmitted(MantisUtils.transform(ind.getDate_submitted()));
         comment.setLastModified(MantisUtils.transform(ind.getLast_modified()));
+        if ( supportsTimeTracking)
+            comment.setTimeTracking(ind.getTime_tracking().intValue());
 
         return comment;
 
@@ -183,7 +189,9 @@ public class MantisConverter {
             return ticket;
     }
     
-    public static IssueData convert(MantisTicket ticket, MantisCache cache, String username) throws MantisException {
+    public static IssueData convert(MantisTicket ticket, IMantisClient client, String username) throws MantisException {
+
+        MantisCache cache = client.getCache(new NullProgressMonitor());
         
         ObjectRef project = cache.getProjectAsObjectRef(ticket.getValue(Key.PROJECT));
 
@@ -206,7 +214,7 @@ public class MantisConverter {
         if (cache.getRepositoryVersion().isHasTargetVersionSupport())
             issue.setTarget_version(ticket.getValueAndFilterNone(Key.TARGET_VERSION));
 
-        if (cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled()) {
+        if (client.isDueDateEnabled(new NullProgressMonitor())) {
             String dueDate = ticket.getValue(Key.DUE_DATE);
             if (dueDate == null || dueDate.length() == 0) {
                 issue.setDue_date(null);

@@ -17,61 +17,87 @@ import java.util.Date;
  */
 public class MantisComment {
 
-	private int id;
-	
-	private String reporter;
+    private int id;
 
-	private Date dateSubmitted;
+    private String reporter;
 
-	private Date lastModified;
+    private Date dateSubmitted;
 
-	private String text;
+    private Date lastModified;
 
-	public MantisComment() {
-	}
-	
-	
-	public Date getDateSubmitted() {
-		return dateSubmitted;
-	}
-	public void setDateSubmitted(Date dateSubmitted) {
-		this.dateSubmitted = dateSubmitted;
-	}
+    private String text;
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
+    private int timeTracking;
 
-	public Date getLastModified() {
-		return lastModified;
-	}
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
+    public MantisComment() {
 
-	public String getReporter() {
-		return reporter;
-	}
-	public void setReporter(String reporter) {
-		this.reporter = reporter;
-	}
+    }
 
-	public String getText() {
-		return text;
-	}
-	public void setText(String text) {
-		this.text = text;
-	}
+    public Date getDateSubmitted() {
 
+        return dateSubmitted;
+    }
 
-	@Override
-	public String toString() {
-		return "[" + text + "] " + reporter + " - " + dateSubmitted ;
-	}
+    public void setDateSubmitted(Date dateSubmitted) {
 
+        this.dateSubmitted = dateSubmitted;
+    }
 
+    public int getId() {
+
+        return id;
+    }
+
+    public void setId(int id) {
+
+        this.id = id;
+    }
+
+    public Date getLastModified() {
+
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+
+        this.lastModified = lastModified;
+    }
+
+    public String getReporter() {
+
+        return reporter;
+    }
+
+    public void setReporter(String reporter) {
+
+        this.reporter = reporter;
+    }
+
+    public String getText() {
+
+        return text;
+    }
+
+    public void setText(String text) {
+
+        this.text = text;
+    }
+
+    public void setTimeTracking(int timeTracking) {
+
+        this.timeTracking = timeTracking;
+
+    }
+
+    public int getTimeTracking() {
+
+        return timeTracking;
+    }
+
+    @Override
+    public String toString() {
+
+        return "[" + text + "] " + reporter + " - " + dateSubmitted;
+    }
 
 }

@@ -65,7 +65,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        IssueData issueData = MantisConverter.convert(ticket, cache, getUserName());
+        IssueData issueData = MantisConverter.convert(ticket, this, getUserName());
 
         int issueId = soapClient.addIssue(issueData, monitor);
 
@@ -105,7 +105,7 @@ public class MantisClient implements IMantisClient {
 
         registerAdditionalReporters(issueData);
 
-        MantisTicket ticket = MantisConverter.convert(issueData, cache, cache.getRepositoryVersion());
+        MantisTicket ticket = MantisConverter.convert(issueData, this, monitor);
 
         Policy.advance(monitor, 1);
 
@@ -195,7 +195,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        IssueData issue = MantisConverter.convert(ticket, cache, getUserName());
+        IssueData issue = MantisConverter.convert(ticket, this, getUserName());
         issue.setId(BigInteger.valueOf(ticket.getId()));
 
         // add comment first because when updating the issue to resolved
@@ -241,6 +241,20 @@ public class MantisClient implements IMantisClient {
 
     }
 
+    public boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException {
+
+        cache.refreshIfNeeded(monitor, location.getUrl());
+        
+        return cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled(); 
+    }
+    
+    public boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException {
+
+        cache.refreshIfNeeded(monitor, location.getUrl());
+        
+        return cache.getCacheData().timeTrackingEnabled;
+    }
+    
     public MantisCacheData getCacheData() {
 
         return cache.getCacheData();

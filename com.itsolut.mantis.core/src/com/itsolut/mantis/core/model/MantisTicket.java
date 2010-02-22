@@ -74,7 +74,8 @@ public class MantisTicket {
         CHILD_OF("child_of"),
         HAS_DUPLICATE("has_duplicate"),
         DUPLICATE_OF("duplicate_of"),
-        RELATED_TO("related_to");
+        RELATED_TO("related_to"), 
+        TIME_SPENT("time_spent");
 
 
         public static Key fromKey(String name) {
@@ -105,6 +106,8 @@ public class MantisTicket {
     public static final int INVALID_ID = -1;
 
     private int id = INVALID_ID;
+    
+    private int timeSpent = 0;
 
     private Date lastChanged;
     private Date created;
@@ -267,7 +270,18 @@ public class MantisTicket {
             comments = new ArrayList<MantisComment>();
         }
         comments.add(comment);
+        
+        recordTimeTracking(comment);
     }
+    
+    private void recordTimeTracking(MantisComment comment) {
+
+        timeSpent += comment.getTimeTracking();
+        
+        putValue(Key.TIME_SPENT.toString(), String.format("%d:%2d", timeSpent / 60, timeSpent % 60));
+        
+    }
+    
     public MantisComment[] getComments() {
         return (comments != null) ? comments.toArray(new MantisComment[0]) : null;
     }

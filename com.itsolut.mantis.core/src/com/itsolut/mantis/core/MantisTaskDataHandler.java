@@ -526,8 +526,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache
                     .getETA(), cache.getETA()[0].getName());
             
-            if ( client.getCache(monitor).getRepositoryVersion().isHasDueDateSupport() && client.getCache(monitor).dueDateIsEnabled())
+            if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
+            if (client.isTimeTrackingEnabled(monitor))
+                createAttribute(data, MantisAttributeMapper.Attribute.TIME_SPENT, null);
             
             if ( client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations())
                 createTaskRelations(data, client);

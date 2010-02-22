@@ -153,5 +153,9 @@ public interface IMantisClient {
      * @param cacheData
      */
     void setCacheData(MantisCacheData cacheData);
+    
+    boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException;
+    
+    boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException;
 
 }

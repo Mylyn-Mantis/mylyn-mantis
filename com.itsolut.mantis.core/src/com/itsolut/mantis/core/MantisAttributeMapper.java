@@ -12,7 +12,6 @@
 package com.itsolut.mantis.core;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * Provides a mapping from Mylyn task keys to Mantis ticket keys.
@@ -93,7 +91,9 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
         DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
         HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING), //
-        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING);
+        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
+        // virtual keys
+        TIME_SPENT(Key.TIME_SPENT, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, false, ReadOnly.ALWAYS_READ_ONLY);
 
         private final boolean isHidden;
 
