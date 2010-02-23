@@ -191,7 +191,7 @@ public class MantisClient implements IMantisClient {
         cache.refresh(monitor, location.getUrl());
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException {
+    public void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -200,20 +200,21 @@ public class MantisClient implements IMantisClient {
 
         // add comment first because when updating the issue to resolved
         // comments can't be added
-        addCommentIfApplicable(ticket.getId(), comment, monitor);
+        addCommentIfApplicable(ticket.getId(), comment, timeTracking, monitor);
 
         soapClient.updateIssue(issue, monitor);
     }
 
-    private void addCommentIfApplicable(int issueId, String comment, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
 
-        if (MantisUtils.isEmpty(comment))
+        if (MantisUtils.isEmpty(comment) && timeTracking == 0)
             return;
 
         final IssueNoteData ind = new IssueNoteData();
         ind.setDate_submitted(MantisUtils.transform(new Date()));
         ind.setLast_modified(MantisUtils.transform(new Date()));
         ind.setReporter(MantisConverter.convert(getUserName()));
+        ind.setTime_tracking(BigInteger.valueOf(timeTracking));
         ind.setText(comment);
 
         soapClient.addNote(issueId, ind, monitor);

@@ -219,24 +219,25 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                         + "");
             } else {
                 
-                System.out.println("Updating task");
-                
                 String newComment = "";
                 TaskAttribute newCommentAttribute = taskData.getRoot().getMappedAttribute(TaskAttribute.COMMENT_NEW);
                 if (newCommentAttribute != null)
                     newComment = newCommentAttribute.getValue();
-                TaskAttribute timeTrackingAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.TIME_SPENT_NEW.toString());
-                
-                System.out.println(timeTrackingAttribute);
+                TaskAttribute timeTrackingAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.TIME_SPENT_NEW.getKey());
                 
                 int timeTracking = 0;
                 if( timeTrackingAttribute  != null && timeTrackingAttribute.getValue() != null && timeTrackingAttribute.getValue().length() != 0 ) {
                     timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
+                    timeTrackingAttribute.clearValues();
                 }
                 
-                client.updateTicket(ticket, newComment, monitor);
+                
+                client.updateTicket(ticket, newComment, timeTracking, monitor);
+                
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
+        } catch ( NumberFormatException e) {
+            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, "Invalid time tracking value, must be an integer."));
         } catch (Exception e) {
             MantisCorePlugin.log(e);
             throw new CoreException(MantisCorePlugin.toStatus(e));

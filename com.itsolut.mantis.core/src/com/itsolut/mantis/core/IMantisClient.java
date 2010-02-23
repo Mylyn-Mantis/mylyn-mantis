@@ -111,7 +111,7 @@ public interface IMantisClient {
      */
     int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException;
 
-    void updateTicket(MantisTicket ticket, String comment, IProgressMonitor monitor) throws MantisException;
+    void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException;
 
     MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException;
 

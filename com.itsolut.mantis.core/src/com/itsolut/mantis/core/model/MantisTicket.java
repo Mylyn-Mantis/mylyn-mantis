@@ -280,7 +280,7 @@ public class MantisTicket {
         timeSpent += comment.getTimeTracking();
         
         putValue(Key.TIME_SPENT.toString(), String.format("%d:%2d", timeSpent / 60, timeSpent % 60));
-        putValue(Key.TIME_SPENT_NEW.toString(), "asd");
+        putValue(Key.TIME_SPENT_NEW.toString(), "");
         
     }
     
