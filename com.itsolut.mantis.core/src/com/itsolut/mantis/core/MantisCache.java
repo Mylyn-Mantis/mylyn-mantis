@@ -132,14 +132,35 @@ public class MantisCache {
                 cacheDeveloperThreshold(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
 
-                cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
-                Policy.advance(subMonitor, 1);
+                try {
+                    cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
+                } catch (MantisException e) {
+                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
+                    cacheDueDateViewThreshold(ACCESS_LEVEL_NOBODY+"");
+                } finally {
+                    Policy.advance(subMonitor, 1);
+                }
 
-                cacheDueDateUpdateThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD));
-                Policy.advance(subMonitor, 1);
+                try {
+                    cacheDueDateUpdateThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD));
+                } catch (MantisException e) {
+                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                            "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
+                    cacheDueDateUpdateThreshold(ACCESS_LEVEL_NOBODY + "");
+                } finally {
+                    Policy.advance(subMonitor, 1);
+                }
 
-                cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED));
-                Policy.advance(subMonitor, 1);
+
+                try {
+                    cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED));
+                } catch (MantisException e) {
+                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
+                            "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
+                    cacheTimeTrackingEnabled(Boolean.FALSE.toString());
+                } finally {
+                    Policy.advance(subMonitor, 1);
+                }
                 
                 for (MantisProject project : cacheData.projects) {
                     cacheFilters(project.getValue(), soapClient.getProjectFilters(project.getValue(), monitor));

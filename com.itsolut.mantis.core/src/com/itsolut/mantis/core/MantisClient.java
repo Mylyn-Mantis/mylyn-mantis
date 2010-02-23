@@ -253,7 +253,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
         
-        return cache.getCacheData().timeTrackingEnabled;
+        return cache.getCacheData().timeTrackingEnabled && cache.getRepositoryVersion().isHasTimeTrackingSupport();
     }
     
     public MantisCacheData getCacheData() {

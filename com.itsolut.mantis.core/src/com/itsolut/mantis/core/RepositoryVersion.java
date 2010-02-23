@@ -17,7 +17,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * does not require attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_6_OR_LOWER(false, false, false, false), 
+    VERSION_1_1_6_OR_LOWER(false, false, false, false, false), 
 
     /**
      * Versions 1.1.7 or higher
@@ -26,7 +26,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * requires attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_7_OR_HIGHER(false, false, true, false), 
+    VERSION_1_1_7_OR_HIGHER(false, false, true, false, false), 
 
     /**
      * Version 1.2 alpha 3 or previous
@@ -34,7 +34,7 @@ public enum RepositoryVersion {
      * <p>Has target_version and proper task relation support, introduced 
      * after 1.2.0a2. Does not require attachments to be Base64-Encoded.</p>
      */
-    VERSION_1_2_A3_OR_LOWER(true, true, false, false),
+    VERSION_1_2_A3_OR_LOWER(true, true, false, false, false),
     
     /**
      * Versions 1.2 rc1 or newwer
@@ -43,7 +43,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * requires attachments to be Base64-encoded</p>
      */
-    VERSION_1_2_RC1_OR_HIGHER(true, true, true, false),
+    VERSION_1_2_RC1_OR_HIGHER(true, true, true, false, false),
     
     /**
      * Versions 1.2.0 or newer.
@@ -51,7 +51,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_OR_HIGHER(true, true, true, true),
+    VERSION_1_2_OR_HIGHER(true, true, true, true, true),
     
     /**
      * Versions 1.3 or newer.
@@ -61,7 +61,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_3_DEV(true, true, true, true);
+    VERSION_1_3_DEV(true, true, true, true, true);
     
 
     
@@ -130,13 +130,15 @@ public enum RepositoryVersion {
     private final boolean hasTargetVersionSupport;
     private final boolean requiresBase64EncodedAttachment;
     private final boolean hasDueDateSupport;
+    private final boolean hasTimeTrackingSupport;
     
-    private RepositoryVersion(boolean hasProperTaskRelations, boolean hasTargetVersionSupport, boolean requiresBase64EncodedAttachment, boolean hasDueDateSupport) {
+    private RepositoryVersion(boolean hasProperTaskRelations, boolean hasTargetVersionSupport, boolean requiresBase64EncodedAttachment, boolean hasDueDateSupport, boolean hasTimeTrackingSupport) {
 
         this.hasProperTaskRelations = hasProperTaskRelations;
         this.hasTargetVersionSupport = hasTargetVersionSupport;
         this.requiresBase64EncodedAttachment = requiresBase64EncodedAttachment;
         this.hasDueDateSupport = hasDueDateSupport;
+        this.hasTimeTrackingSupport = hasTimeTrackingSupport;
     }
     
     
@@ -158,5 +160,10 @@ public enum RepositoryVersion {
     public boolean isHasDueDateSupport() {
 
         return hasDueDateSupport;
+    }
+    
+    public boolean isHasTimeTrackingSupport() {
+
+        return hasTimeTrackingSupport;
     }
 }
