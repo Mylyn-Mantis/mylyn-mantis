@@ -93,7 +93,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING), //
         RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
         // virtual keys
-        TIME_SPENT(Key.TIME_SPENT, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, false, ReadOnly.ALWAYS_READ_ONLY);
+        TIME_SPENT(Key.TIME_SPENT, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, false, ReadOnly.ALWAYS_READ_ONLY),
+        TIME_SPENT_NEW(Key.TIME_SPENT_NEW, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, true, ReadOnly.NEVER_READ_ONLY);
 
         private final boolean isHidden;
 

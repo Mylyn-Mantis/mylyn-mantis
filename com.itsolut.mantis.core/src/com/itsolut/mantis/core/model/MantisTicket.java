@@ -75,7 +75,8 @@ public class MantisTicket {
         HAS_DUPLICATE("has_duplicate"),
         DUPLICATE_OF("duplicate_of"),
         RELATED_TO("related_to"), 
-        TIME_SPENT("time_spent");
+        TIME_SPENT("time_spent"), 
+        TIME_SPENT_NEW("time_spent_new");
 
 
         public static Key fromKey(String name) {
@@ -279,6 +280,7 @@ public class MantisTicket {
         timeSpent += comment.getTimeTracking();
         
         putValue(Key.TIME_SPENT.toString(), String.format("%d:%2d", timeSpent / 60, timeSpent % 60));
+        putValue(Key.TIME_SPENT_NEW.toString(), "asd");
         
     }
     

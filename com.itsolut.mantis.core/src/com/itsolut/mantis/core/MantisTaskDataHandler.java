@@ -78,6 +78,17 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("resolved");
             }
         },
+        
+        TRACK_TIME("Track time ", TaskAttribute.TYPE_SHORT_TEXT, MantisAttributeMapper.Attribute.TIME_SPENT_NEW) {
+
+            @Override
+            public void performPostOperation(TaskData taskData) {
+
+                return;
+                
+            }
+            
+        },
 
         ASSIGN_TO("Assign to ", TaskAttribute.TYPE_PERSON,
                 MantisAttributeMapper.Attribute.ASSIGNED_TO) {
@@ -207,18 +218,24 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, id
                         + "");
             } else {
-
-
-
+                
+                System.out.println("Updating task");
+                
                 String newComment = "";
-                TaskAttribute newCommentAttribute = taskData.getRoot()
-                .getMappedAttribute(TaskAttribute.COMMENT_NEW);
+                TaskAttribute newCommentAttribute = taskData.getRoot().getMappedAttribute(TaskAttribute.COMMENT_NEW);
                 if (newCommentAttribute != null)
                     newComment = newCommentAttribute.getValue();
+                TaskAttribute timeTrackingAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.TIME_SPENT_NEW.toString());
+                
+                System.out.println(timeTrackingAttribute);
+                
+                int timeTracking = 0;
+                if( timeTrackingAttribute  != null && timeTrackingAttribute.getValue() != null && timeTrackingAttribute.getValue().length() != 0 ) {
+                    timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
+                }
+                
                 client.updateTicket(ticket, newComment, monitor);
-                return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket
-                        .getId()
-                        + "");
+                return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
         } catch (Exception e) {
             MantisCorePlugin.log(e);
@@ -327,7 +344,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     public static void updateTaskData(TaskRepository repository,
             TaskAttributeMapper attributeMapper, TaskData data,
-            IMantisClient client, MantisTicket ticket) throws CoreException {
+            IMantisClient client, MantisTicket ticket) throws CoreException, MantisException {
 
         if (ticket.getCreated() != null)
             data.getRoot().getAttribute(
@@ -346,8 +363,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
         addOperation(data, ticket, OperationType.LEAVE);
+        if ( client.isTimeTrackingEnabled(new NullProgressMonitor()))
+            addOperation(data, ticket, OperationType.TRACK_TIME);
         addOperation(data, ticket, OperationType.RESOLVE_AS);
         addOperation(data, ticket, OperationType.ASSIGN_TO);
+
 
         if (lastChanged != null)
             data.getRoot().getAttribute(
@@ -528,8 +548,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             
             if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
-            if (client.isTimeTrackingEnabled(monitor))
+            if (client.isTimeTrackingEnabled(monitor)) {
                 createAttribute(data, MantisAttributeMapper.Attribute.TIME_SPENT, null);
+                createAttribute(data, MantisAttributeMapper.Attribute.TIME_SPENT_NEW, null);
+            }
             
             if ( client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations())
                 createTaskRelations(data, client);
