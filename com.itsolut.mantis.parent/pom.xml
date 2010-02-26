@@ -38,7 +38,7 @@
 						<artifact>
 							<groupId>com.itsolut.mantis</groupId>
 							<artifactId>com.itsolut.mantis.target</artifactId>
-							<version>3.1.1-SNAPSHOT</version>
+							<version>${project.version}</version>
 							<classifier>e34-mylyn33</classifier>
 						</artifact>
 					</target>
