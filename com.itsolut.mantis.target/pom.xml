@@ -6,13 +6,12 @@
 	<parent>
 		<groupId>com.itsolut.mantis</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.1-SNAPSHOT</version>
+		<version>3.1.2-SNAPSHOT</version>
 		<relativePath>../com.itsolut.mantis.parent</relativePath>
 	</parent>
 
 	<artifactId>com.itsolut.mantis.target</artifactId>
 	<name>Mylyn Mantis Connector target definitions</name>
-	<version>3.1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<build>
