@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -802,10 +803,23 @@ public class MantisCache {
      */
     void registerAdditionalReporter(int projectId, String reporterName) {
 
-        if (cacheData.reportersByProjectId.get(projectId).contains(reporterName))
+    	// debug for issue #119
+    	if ( cacheData.reportersByProjectId == null) {
+    		MantisCorePlugin.log(new RuntimeException("cacheData.reportersByProjectId is null."));
+    		cacheData.reportersByProjectId = new HashMap<Integer, List<String>>();
+    	}
+    	
+        List<String> reporters = cacheData.reportersByProjectId.get(projectId);
+        if ( reporters == null) {
+        	MantisCorePlugin.log(new RuntimeException("cacheData.reportersByProjectId is null for projectId " + projectId + " ."));
+        	cacheData.reportersByProjectId.put(projectId, new ArrayList<String>());
+        }
+        
+        
+		if (reporters.contains(reporterName))
             return;
 
-        cacheData.reportersByProjectId.get(projectId).add(reporterName);
+        reporters.add(reporterName);
 
     }
 
