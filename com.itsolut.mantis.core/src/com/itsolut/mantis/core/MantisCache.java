@@ -79,6 +79,10 @@ public class MantisCache {
     
     private static final String TIME_TRACKING_ENABLED = "time_tracking_enabled";
     
+    private static final String BUG_ASSIGNED_STATUS = "bug_assigned_status";
+    
+    static final int STATUS_ASSIGNED = 50;
+    
     static final int ACCESS_LEVEL_NOBODY = 100;
 
     private final Object sync = new Object();
@@ -125,12 +129,15 @@ public class MantisCache {
             try {
                 cacheProjects(soapClient.getProjectData(monitor));
 
-                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 15);
+                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 16);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
 
                 cacheDeveloperThreshold(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD));
+                Policy.advance(subMonitor, 1);
+                
+                cacheAssignedStatus(soapClient.getStringConfiguration(monitor, BUG_ASSIGNED_STATUS));
                 Policy.advance(subMonitor, 1);
 
                 try {
@@ -239,6 +246,8 @@ public class MantisCache {
         }
     }
 
+
+
     private void cacheTimeTrackingEnabled(String stringValue) {
         
         cacheData.timeTrackingEnabled = parseMantisBoolean(stringValue);
@@ -257,6 +266,12 @@ public class MantisCache {
     private void cacheDueDateViewThreshold(String stringValue) {
 
         cacheData.dueDateViewThreshold = safeGetInt(stringValue, ACCESS_LEVEL_NOBODY);
+    }
+    
+    private void cacheAssignedStatus(String stringValue) {
+
+        cacheData.bugAssignedStatus = safeGetInt(stringValue, STATUS_ASSIGNED);
+        
     }
 
     private String format(long start) {
@@ -775,6 +790,15 @@ public class MantisCache {
 
         return versions.toArray(new MantisVersion[versions.size()]);
     }
+    
+    public String getAssignedStatus() throws MantisException {
+
+        for ( MantisTicketStatus status : cacheData.statuses)
+            if ( status.getValue() == cacheData.bugAssignedStatus)
+                return status.getName();
+        
+        throw new MantisException("No status with id " + cacheData.bugAssignedStatus + " .");
+    }
 
     MantisCacheData getCacheData() {
 
@@ -827,4 +851,5 @@ public class MantisCache {
         
         return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
     }
+    
 }

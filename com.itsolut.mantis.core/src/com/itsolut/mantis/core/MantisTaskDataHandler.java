@@ -38,6 +38,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
+import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
@@ -74,9 +75,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             @Override
             public void performPostOperation(TaskData taskData) {
-
-                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("resolved");
-            }
+            
+                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("resolved");            }
         },
         
         TRACK_TIME("Track time ", TaskAttribute.TYPE_SHORT_TEXT, MantisAttributeMapper.Attribute.TIME_SPENT_NEW) {
@@ -96,7 +96,17 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             @Override
             public void performPostOperation(TaskData taskData) {
 
-                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("assigned");
+                String assignedStatus;
+                try {
+                    IMantisClient repository = MantisCorePlugin.getDefault().getConnector().getClientManager().getRepository(taskData.getRepositoryUrl());
+                    assignedStatus = repository.getCache(new NullProgressMonitor()).getAssignedStatus();
+                    
+                } catch (MantisException e) {
+                    assignedStatus = "assigned";
+                    MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed retrieving customised assigned bug status. Using default.", e));
+                }
+                
+                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(assignedStatus);
             }
         };
 
