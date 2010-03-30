@@ -46,7 +46,7 @@ public class MantisCorePlugin extends Plugin {
 
     public final static String REPOSITORY_KIND = "mantis";
 
-    private static final boolean DEBUG = Boolean.getBoolean(MantisCorePlugin.class.getName().toLowerCase() + ".debug");
+    public static final boolean DEBUG = Boolean.getBoolean(MantisCorePlugin.class.getName().toLowerCase() + ".debug");
 
     private MantisRepositoryConnector connector;
 

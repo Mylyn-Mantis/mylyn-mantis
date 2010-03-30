@@ -256,10 +256,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     /**
      * Gets the changed tasks for a given query
      * 
-     * For the <tt>repository</tt>, run the <tt>query</tt> to get the latest information about the
+     * <p>For the <tt>repository</tt>, run the <tt>query</tt> to get the latest information about the
      * tasks. This allows the connector to get a limited list of items instead of every item in the
      * repository. Next check to see if the tasks have changed since the last synchronization. If
-     * so, add their ids to a List.
+     * so, add their ids to a List.</p>
      * 
      * @param monitor
      * 
@@ -268,6 +268,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since,
             IProgressMonitor monitor) {
 
+        if (MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("Looking for tasks changed in query " + query + " since " + since + " .", null);
+        
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
 
@@ -278,8 +281,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
             for (MantisTicket ticket : tickets) {
                 if (ticket.getLastChanged() != null) {
-                    if (ticket.getLastChanged().compareTo(since) > 0)
-                        changedTickets.add(new Integer(ticket.getId()));
+                    if (ticket.getLastChanged().compareTo(since) > 0) {
+//                        MantisCorePlugin.debug("Ticket with id " + ticket.getId() + " and lastChanged " + ticket.getLastChanged() + " marked as changed.", null);
+                        changedTickets.add(Integer.valueOf(ticket.getId()));
+                    }
                 }
             }
         } catch (Throwable e) {
@@ -287,6 +292,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                     + e.getMessage() + " .", e);
             return Collections.emptyList();
         }
+        
+        if ( MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("Found " + changedTickets.size() + " changed tickets.", null);
+        
         return changedTickets;
     }
 
@@ -386,19 +395,17 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
 
         if (repository.getSynchronizationTimeStamp() == null || repository.getSynchronizationTimeStamp().length() == 0) {
-            for (ITask task : event.getTasks()) {
+            for (ITask task : event.getTasks())
                 event.markStale(task);
-            }
             return;
         }
 
         Date since = new Date(0);
         try {
-            if (repository.getSynchronizationTimeStamp().length() > 0) {
-                since = MantisUtils.parseDate(Integer.parseInt(repository.getSynchronizationTimeStamp()));
-            }
+            if (repository.getSynchronizationTimeStamp().length() > 0)
+                since = MantisUtils.parseDate(Long.valueOf(repository.getSynchronizationTimeStamp()));
         } catch (NumberFormatException e) {
-            // MantisCorePlugin.log(e);
+             MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed parsing repository synchronisationTimestamp " + repository.getSynchronizationTimeStamp() + " .", e));
         }
 
         try {
@@ -419,6 +426,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             for (IRepositoryQuery query : queries) {
 
                 List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since, monitor);
+                
+                MantisCorePlugin.debug("Found " + taskIds.size() + " changed task ids.", null);
+                
                 for (Integer taskId : taskIds) {
                     for (ITask task : event.getTasks()) {
                         if (getTicketId(task.getTaskId()) == taskId.intValue()) {
@@ -460,6 +470,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             monitor.beginTask("", 1);
             if (event.isFullSynchronization()) {
                 Date date = this.getSynchronizationTimestamp(event);
+                
+                MantisCorePlugin.log("Synchronisation timestamp from event is " + date + " .");
                 if (date != null) {
                     event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
                 } else {

@@ -40,12 +40,12 @@ public class MantisUtils {
 
     public static Date parseDate(long seconds) {
 
-        return new Date(seconds * 1000l);
+        return new Date(seconds);
     }
 
     public static long toMantisTime(Date date) {
 
-        return date.getTime() / 1000l;
+        return date.getTime();
     }
 
     public static Date transform(Calendar cal) {

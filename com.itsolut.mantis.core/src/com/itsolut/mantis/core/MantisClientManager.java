@@ -82,7 +82,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
 
-        MantisCorePlugin.debug("Creating new Mantis client for url " + taskRepository.getRepositoryUrl()
+        if ( MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("Creating new Mantis client for url " + taskRepository.getRepositoryUrl()
                 + " . Currently cached entries : " + clientByUrl.keySet() + " ." + " . MantisClientManager identity : "
                 + System.identityHashCode(this) + " .", new RuntimeException());
 
@@ -103,7 +104,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
 
-        MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .", new RuntimeException());
+        if (MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .", new RuntimeException());
 
         // make sure there is no stale client still in the cache, bug #149939
         clientByUrl.remove(repository.getRepositoryUrl());
@@ -114,8 +116,9 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
-
-        MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .", new RuntimeException());
+        
+        if (MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .", new RuntimeException());
 
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
@@ -128,8 +131,9 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
-
-        MantisCorePlugin.debug("repositoryChanged : " + repository.getUrl() + ", " + delta.getType() + " .",
+        
+        if (MantisCorePlugin.DEBUG)
+            MantisCorePlugin.debug("repositoryChanged : " + repository.getUrl() + ", " + delta.getType() + " = " + delta.getKey() + " .",
                 new RuntimeException());
 
         // do not refresh on sync time stamp updates, it's not relevant
