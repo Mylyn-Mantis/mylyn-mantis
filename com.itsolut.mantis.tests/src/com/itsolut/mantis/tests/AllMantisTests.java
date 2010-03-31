@@ -22,11 +22,12 @@ public class AllMantisTests {
 
 		TestSuite suite = new TestSuite("Test for com.itsolut.mantis.tests");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(MantisAxisClientTest.class);
 		suite.addTestSuite(MantisTaskDataHandlerTest.class);
 		suite.addTestSuite(MantisUtilsTest.class);
+		suite.addTestSuite(MantisRepositoryConnector12IntegrationTest.class);
 		suite.addTestSuite(MantisRepositoryConnectorTest.class);
 		suite.addTestSuite(MantisRelationshipTest.class);
+		suite.addTestSuite(MantisClient12IntegrationTest.class);
 		//$JUnit-END$
 		return suite;
 	}

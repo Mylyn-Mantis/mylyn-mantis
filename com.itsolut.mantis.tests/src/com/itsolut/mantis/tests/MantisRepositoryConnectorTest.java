@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2004, 2007 Mylyn project committers and others.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +11,6 @@ package com.itsolut.mantis.tests;
 
 import junit.framework.TestCase;
 
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
-
-import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 
 public class MantisRepositoryConnectorTest extends TestCase {
@@ -21,8 +18,6 @@ public class MantisRepositoryConnectorTest extends TestCase {
 	private static final String REPOSITORY_ROOT = "http://mylyn-mantis.sourceforge.net/MantisTest/";
 
 	private MantisRepositoryConnector connector;
-
-	private TaskRepositoryManager manager;
 
 	private final String taskId = "12";
 
@@ -33,10 +28,7 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 		super.setUp();
 
-		manager = TasksUiPlugin.getRepositoryManager();
-		manager.clearRepositories(TasksUiPlugin.getDefault().getRepositoriesFilePath());
-
-		connector = (MantisRepositoryConnector) manager.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+		connector = new MantisRepositoryConnector();
 
 	}
 

@@ -14,10 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryManager;
 import org.eclipse.mylyn.internal.tasks.core.TaskTask;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
-import org.eclipse.mylyn.monitor.ui.IUserAttentionListener ;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -37,8 +34,6 @@ public class MantisTaskDataHandlerTest extends TestCase {
 
 	private TaskRepository repository;
 
-	private TaskRepositoryManager manager;
-
 	private AbstractTaskDataHandler taskDataHandler;
 
 	public MantisTaskDataHandlerTest() {
@@ -48,11 +43,7 @@ public class MantisTaskDataHandlerTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		manager = TasksUiPlugin.getRepositoryManager();
-		manager.clearRepositories(TasksUiPlugin.getDefault().getRepositoriesFilePath());
-
-		connector = (MantisRepositoryConnector) manager.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-
+		connector = new MantisRepositoryConnector();
 		taskDataHandler = connector.getTaskDataHandler();
 	}
 
@@ -65,7 +56,6 @@ public class MantisTaskDataHandlerTest extends TestCase {
 		repository.setTimeZoneId(IMantisClient.TIME_ZONE);
 		repository.setCharacterEncoding(IMantisClient.CHARSET);
 
-		manager.addRepository(repository);
 	}
 
 //	public void testGetSubTasks() throws CoreException {
