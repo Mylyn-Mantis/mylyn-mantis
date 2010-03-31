@@ -8,7 +8,7 @@
 
 package com.itsolut.mantis.tests;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -16,7 +16,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Steffen Pingel
  */
-public class MantisTestPlugin extends AbstractUIPlugin {
+public class MantisTestPlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.itsolut.mantis.tests";
