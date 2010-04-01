@@ -8,6 +8,8 @@
 
 package com.itsolut.mantis.tests;
 
+import com.itsolut.mantis.core.RepositoryVersionTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -23,6 +25,7 @@ public class AllMantisTests {
 		TestSuite suite = new TestSuite("Test for com.itsolut.mantis.tests");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(Mantis12TaskDataHandlerTest.class);
+		suite.addTestSuite(RepositoryVersionTest.class);
 		suite.addTestSuite(MantisUtilsTest.class);
 		suite.addTestSuite(MantisRepositoryConnector12IntegrationTest.class);
 		suite.addTestSuite(MantisRepositoryConnectorTest.class);
