@@ -10,12 +10,14 @@
 
 package com.itsolut.mantis.tests;
 
+import static com.itsolut.mantis.tests.RepositoryConfiguration.MANTIS_12_BASIC;
+
 public class MantisClient12IntegrationTest extends AbstractMantisClientIntegrationTest {
 
 	@Override
-	protected String getRepositoryUrl() {
-		
-		return "http://localhost/~robert/mantis-1.2/api/soap/mantisconnect.php";
+	protected RepositoryConfiguration getRepositoryConfiguration() {
+
+		return MANTIS_12_BASIC;
 	}
 
 }

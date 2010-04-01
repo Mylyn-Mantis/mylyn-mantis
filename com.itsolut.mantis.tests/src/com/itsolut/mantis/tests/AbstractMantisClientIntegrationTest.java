@@ -10,7 +10,6 @@
 package com.itsolut.mantis.tests;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -18,16 +17,8 @@ import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.mylyn.commons.net.AbstractWebLocation;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
 
-import com.itsolut.mantis.binding.IssueData;
-import com.itsolut.mantis.binding.MantisConnectPortType;
-import com.itsolut.mantis.binding.ObjectRef;
-import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -36,41 +27,18 @@ import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 
-public abstract class AbstractMantisClientIntegrationTest extends TestCase {
+public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegrationTest {
 
 	private static final String UTF8 = "UTF-8";
 
-	private MantisRepositoryAccessor repositoryAccessor;
-
-	protected abstract String getRepositoryUrl();
-	
-	private String getRepositoryUrlWithOverride() {
-		
-		return System.getProperty("mantis.test."+getOverrideKey()+".url", getRepositoryUrl());
-	}
-	
-	protected String getOverrideKey () {
-		
-		return getClass().getSimpleName();
-	}
-
-	protected String getPassword() {
-		return "root";
-	}
-
-	protected String getUsername() {
-
-		return "administrator";
-	}
-
 	public void testValidate() throws MantisException {
 
-		getClient().validate(new NullProgressMonitor());
+		repositoryAccessor.getClient().validate(new NullProgressMonitor());
 	}
 
 	public void testRefreshAttributes() throws MantisException {
 
-		getClient().updateAttributes(new NullProgressMonitor());
+		repositoryAccessor.getClient().updateAttributes(new NullProgressMonitor());
 	}
 
 	public void testGetExistingTask() throws MantisException, MalformedURLException, RemoteException, ServiceException {
@@ -80,7 +48,7 @@ public abstract class AbstractMantisClientIntegrationTest extends TestCase {
 		
 		int taskId = createTask(summary, description);
 
-		MantisTicket ticket = getClient().getTicket(taskId, new NullProgressMonitor());
+		MantisTicket ticket = repositoryAccessor.getClient().getTicket(taskId, new NullProgressMonitor());
 
 		assertEquals(summary, ticket.getValue(Key.SUMMARY));
 		assertEquals(description, ticket.getValue(Key.DESCRIPTION));
@@ -91,8 +59,8 @@ public abstract class AbstractMantisClientIntegrationTest extends TestCase {
 		int firstTaskId = createTask("First task", "Description");
 		int secondTaskId = createTask("Second task", "Description");
 		
-		MantisCache cache = getClient().getCache(new NullProgressMonitor());
-		MantisProject project = cache.getProjectById(1);
+		MantisCache cache = repositoryAccessor.getClient().getCache(new NullProgressMonitor());
+		MantisProject project = cache.getProjectById(DEFAULT_PROJECT_ID.intValue());
 		
 		List<MantisProjectFilter> projectFilters = cache.getProjectFilters(1);
 		
@@ -102,7 +70,7 @@ public abstract class AbstractMantisClientIntegrationTest extends TestCase {
 		
 		List<MantisTicket> results = new ArrayList<MantisTicket>(2);
 		
-		getClient().search(new MantisSearch(project.getName(), filter.getName()), results, new NullProgressMonitor());
+		repositoryAccessor.getClient().search(new MantisSearch(project.getName(), filter.getName()), results, new NullProgressMonitor());
 		
 		assertEquals(2, results.size());
 		assertTicketIsFoundById(results, firstTaskId);
@@ -126,66 +94,18 @@ public abstract class AbstractMantisClientIntegrationTest extends TestCase {
 		
 		int taskId = createTask("Attachment test task", "Description");
 		
-		getClient().putAttachmentData(taskId, "sample.txt", attachmentContents.getBytes(UTF8), new NullProgressMonitor());
+		repositoryAccessor.getClient().putAttachmentData(taskId, "sample.txt", attachmentContents.getBytes(UTF8), new NullProgressMonitor());
 		
-		MantisTicket ticket = getClient().getTicket(taskId, new NullProgressMonitor());
+		MantisTicket ticket = repositoryAccessor.getClient().getTicket(taskId, new NullProgressMonitor());
 		
 		assertEquals(1, ticket.getAttachments().length);
 		
 		int attachmentId = ticket.getAttachments()[0].getId();
 		
-		byte[] attachmentData = getClient().getAttachmentData(attachmentId, new NullProgressMonitor());
+		byte[] attachmentData = repositoryAccessor.getClient().getAttachmentData(attachmentId, new NullProgressMonitor());
 		
 		assertEquals(attachmentContents, new String(attachmentData, UTF8));
 	}
 
-	protected int createTask(String summary, String description) throws MalformedURLException, ServiceException,
-			RemoteException {
-
-		IssueData issue = new IssueData();
-		issue.setSummary(summary);
-		issue.setDescription(description);
-		issue.setProject(new ObjectRef(BigInteger.ONE, ""));
-		issue.setCategory("General");
-
-		int newTaskId = getMantisConnectPort().mc_issue_add(getUsername(), getPassword(), issue).intValue();
-
-		repositoryAccessor.registerIssueToDelete(newTaskId);
-
-		return newTaskId;
-
-	}
-
-	protected AbstractWebLocation getLocation() {
-
-		return repositoryAccessor.getLocation();
-	}
-
-	protected IMantisClient getClient() {
-
-		return repositoryAccessor.getClient();
-	}
-	
-	protected TaskRepository getRepository() {
-		
-		return repositoryAccessor.getRepository();
-	}
-	
-	protected MantisConnectPortType getMantisConnectPort() {
-		
-		return repositoryAccessor.getMantisConnectPort();
-	}
-
-	protected void setUp() throws Exception {
-
-		repositoryAccessor = new MantisRepositoryAccessor(getUsername(), getPassword(), getRepositoryUrlWithOverride());
-		repositoryAccessor.init();
-
-	}
-
-	protected void tearDown() throws Exception {
-
-		repositoryAccessor.deleteIssues();
-	}
 
 }
