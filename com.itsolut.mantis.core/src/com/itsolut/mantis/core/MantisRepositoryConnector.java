@@ -157,8 +157,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
             for (MantisTicket ticket : tickets) {
                 TaskData taskData = offlineTaskHandler.createTaskDataFromTicket(client, repository, ticket, monitor);
-                // we sent partial data to the task list, for performance reasons
-                taskData.setPartial(true);
+                taskData.setPartial(true); // IMantisClient.search returns partial data
                 resultCollector.accept(taskData);
             }
         } catch (Throwable e) {
