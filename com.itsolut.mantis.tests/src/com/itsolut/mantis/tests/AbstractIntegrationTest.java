@@ -61,6 +61,8 @@ public abstract class AbstractIntegrationTest extends TestCase {
 		repositoryAccessor = new MantisRepositoryAccessor(getUsername(), getPassword(), getRepositoryUrlWithOverride());
 		repositoryAccessor.init();
 		
+		objectsFactory = new MylynObjectsFactory();
+		
 		postSetUp();
 	}
 
