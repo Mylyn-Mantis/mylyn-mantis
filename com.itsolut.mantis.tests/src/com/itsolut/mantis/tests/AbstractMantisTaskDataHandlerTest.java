@@ -10,11 +10,9 @@
 
 package com.itsolut.mantis.tests;
 
-import org.eclipse.mylyn.internal.tasks.core.TaskTask;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 
-import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 
 public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrationTest {
@@ -34,17 +32,12 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 	
 	public void testUnableToCloneTaskWithoutProperKey() {
 		
-		assertFalse(newTaskDataHandler().canInitializeSubTaskData(repositoryAccessor.getRepository(), newDummyTask()));
+		assertFalse(newTaskDataHandler().canInitializeSubTaskData(repositoryAccessor.getRepository(), getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), "1")));
 	}
 
-	private ITask newDummyTask() {
-		
-		return new TaskTask(MantisCorePlugin.REPOSITORY_KIND, repositoryAccessor.getLocation().getUrl(), "1");
-	}
-	
 	public void testAbleToCloneTaskWithProperKey() {
 		
-		ITask task = newDummyTask();
+		ITask task = getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), "1");
 		task.setAttribute(MantisRepositoryConnector.TASK_KEY_SUPPORTS_SUBTASKS, Boolean.TRUE.toString());
 		assertTrue(newTaskDataHandler().canInitializeSubTaskData(repositoryAccessor.getRepository(), task));
 	}

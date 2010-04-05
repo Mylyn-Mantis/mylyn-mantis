@@ -32,6 +32,7 @@ public abstract class AbstractIntegrationTest extends TestCase {
 	protected static final String DEFAULT_CATEGORY_NAME = "General";
 	
 	protected MantisRepositoryAccessor repositoryAccessor;
+	private MylynObjectsFactory objectsFactory;
 	
 	private String getRepositoryUrlWithOverride() {
 
@@ -78,6 +79,10 @@ public abstract class AbstractIntegrationTest extends TestCase {
 
 	protected void preTearDown() {
 		
+	}
+	
+	protected MylynObjectsFactory getObjectsFactory() {
+		return objectsFactory;
 	}
 
 	protected int createTask(String summary, String description) throws MalformedURLException, ServiceException,

@@ -22,8 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.internal.tasks.core.RepositoryQuery;
-import org.eclipse.mylyn.internal.tasks.core.sync.SynchronizationSession;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
@@ -44,8 +42,6 @@ import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisRelationship;
 
 public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends AbstractIntegrationTest {
-
-	private int queryCounter;
 
 	public void testGetTaskData() throws MalformedURLException, RemoteException, ServiceException, CoreException {
 
@@ -80,7 +76,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		MantisRepositoryConnector connector = new MantisRepositoryConnector();
 
-		IRepositoryQuery query = newQuery(connector);
+		IRepositoryQuery query = getObjectsFactory().newQuery();
 		query.setAttribute(IMantisClient.PROJECT_NAME, project.getName());
 		query.setAttribute(IMantisClient.FILTER_NAME, filter.getName());
 		TaskDataCollector resultCollector = new TaskDataCollector() {
@@ -91,7 +87,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 				hits.add(taskData);
 			}
 		};
-		ISynchronizationSession event = newSession();
+		ISynchronizationSession event = getObjectsFactory().newSession();
 		IStatus status = connector.performQuery(repositoryAccessor.getRepository(), query, resultCollector, event,
 				new NullProgressMonitor());
 
@@ -123,7 +119,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		MantisRepositoryConnector connector = new MantisRepositoryConnector();
 
-		IRepositoryQuery query = newQuery(connector);
+		IRepositoryQuery query = getObjectsFactory().newQuery();
 		query.setAttribute(IMantisClient.PROJECT_NAME, project.getName());
 		query.setAttribute(IMantisClient.FILTER_NAME, filter.getName());
 		TaskDataCollector resultCollector = new TaskDataCollector() {
@@ -134,7 +130,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 				hits.add(taskData);
 			}
 		};
-		ISynchronizationSession event = newSession();
+		ISynchronizationSession event = getObjectsFactory().newSession();
 		IStatus status = connector.performQuery(repositoryAccessor.getRepository(), query, resultCollector, event,
 				new NullProgressMonitor());
 
@@ -151,7 +147,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		hits.clear();
 
-		event = newSession();
+		event = getObjectsFactory().newSession();
 		status = connector.performQuery(repositoryAccessor.getRepository(), query, resultCollector, event,
 				new NullProgressMonitor());
 
@@ -200,14 +196,6 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		assertEquals("kind", expected.getKind(), actual.getKind());
 		assertEquals("taskId", expected.getTaskId(), actual.getTaskId());
 		assertEquals("direction", expected.getDirection(), actual.getDirection());
-	}
-
-	private RepositoryQuery newQuery(MantisRepositoryConnector connector) {
-		return new RepositoryQuery(connector.getConnectorKind(), "test-" + ++queryCounter);
-	}
-
-	private SynchronizationSession newSession() {
-		return new SynchronizationSession();
 	}
 
 	private void assertAttributeEquals(TaskAttribute mappedAttribute, String expectedValue) {

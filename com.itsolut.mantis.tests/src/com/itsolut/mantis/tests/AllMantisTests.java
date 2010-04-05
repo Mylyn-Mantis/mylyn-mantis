@@ -31,6 +31,7 @@ public class AllMantisTests {
 		suite.addTestSuite(MantisRepositoryConnectorTest.class);
 		suite.addTestSuite(MantisRelationshipTest.class);
 		suite.addTestSuite(MantisClient12IntegrationTest.class);
+		suite.addTestSuite(Mantis12AttachmentHandlerTest.class);
 		//$JUnit-END$
 		return suite;
 	}

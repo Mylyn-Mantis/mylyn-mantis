@@ -57,7 +57,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
     private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment, IProgressMonitor monitor) throws CoreException {
         String id = attachment.getAttachmentId();
-        if (id == null) {
+        if (id == null || id.length() == 0) {
             throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
         }
 
