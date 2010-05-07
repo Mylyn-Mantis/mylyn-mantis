@@ -19,23 +19,7 @@ Export-Package:
  com.itsolut.mantis.core,
  com.itsolut.mantis.core.exception,
  com.itsolut.mantis.core.model,
- com.itsolut.mantis.core.util,
- com.sun.activation.registries,
- com.sun.activation.viewers,
- com.sun.mail.handlers,
- com.sun.mail.iap,
- com.sun.mail.imap,
- com.sun.mail.imap.protocol,
- com.sun.mail.pop3,
- com.sun.mail.smtp,
- com.sun.mail.util,
- javax.activation,
- javax.mail,
- javax.mail.event,
- javax.mail.internet,
- javax.mail.search,
- javax.mail.util,
- javax.xml.soap
+ com.itsolut.mantis.core.util
 Bundle-Activator: com.itsolut.mantis.core.MantisCorePlugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .,
