@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.tasks.core.RepositoryStatus;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
 
 import com.itsolut.mantis.core.exception.MantisException;
@@ -38,7 +40,7 @@ import com.itsolut.mantis.core.exception.MantisLoginException;
  */
 public class MantisCorePlugin extends Plugin {
 
-    public static final String PLUGIN_ID = "com.itsolut.mantis.core";
+    private static final String PLUGIN_ID = "com.itsolut.mantis.core";
 
     public static final String ENCODING_UTF_8 = "UTF-8";
 
@@ -116,13 +118,7 @@ public class MantisCorePlugin extends Plugin {
         }
     }
 
-    /**
-     * Convenience method for logging statuses to the plug-in log
-     * 
-     * @param status
-     *            the status to log
-     */
-    public static void log(IStatus status) {
+    private static void log(IStatus status) {
 
         getDefault().getLog().log(status);
     }
@@ -152,28 +148,57 @@ public class MantisCorePlugin extends Plugin {
      * @param e
      *            the exception to log
      */
-    public static void log(Throwable e) {
+    public static void error(Throwable e) {
 
         String message = e.getMessage();
         if (e.getMessage() == null) {
             message = e.getClass().toString();
         }
-        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
+        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e));
     }
 
-    public static void log(String message, Throwable e) {
+    public static void error(String message, Throwable e) {
 
-        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, 0, message, e));
+        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e));
     }
 
-    public static void log(String string) {
+    public static void info(String string) {
 
-        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, null));
+        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, string));
     }
 
-    public static void log(String string, Exception ex) {
+    public static void info(String string, Exception ex) {
 
-        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, 0, string, ex));
+        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, string, ex));
     }
+    
+    public static void warn(String message) {
+        
+        log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, message));
+    }
+    
+    public static void warn(String message, Throwable e) {
+        
+        log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, message, e));
+    }
+    
+    public static IStatus errorStatus(String message, Throwable e) {
+        
+        return new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e);
+    }
+    
+    public static IStatus ioErrorRepositoryStatus(TaskRepository repository, String message, Throwable e) {
+
+        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_IO, message, e);
+    }
+    
+    public static IStatus configurationErrorRepositoryStatus(TaskRepository repository, String message, Throwable e) {
+        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, message, e);
+    }
+    
+    public static IStatus configurationErrorRepositoryStatus(TaskRepository repository, String message) {
+        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, message);
+    }
+
 
 }

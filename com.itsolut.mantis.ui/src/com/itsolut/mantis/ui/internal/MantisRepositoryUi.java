@@ -41,11 +41,8 @@ import org.eclipse.mylyn.tasks.ui.LegendElement;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
-import org.eclipse.mylyn.tasks.ui.wizards.NewWebTaskWizard;
 
-import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
@@ -73,12 +70,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     @Override
     public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping selection) {
 
-        if (MantisRepositoryConnector.hasRichEditor(repository)) {
-            return new NewMantisTaskWizard(repository, selection);
-        } else {
-            return new NewWebTaskWizard(repository, repository.getRepositoryUrl() + IMantisClient.NEW_TICKET_URL,
-                    selection);
-        }
+       return new NewMantisTaskWizard(repository, selection);
     }
 
     @Override

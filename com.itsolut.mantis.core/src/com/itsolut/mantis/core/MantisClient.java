@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
@@ -139,8 +138,7 @@ public class MantisClient implements IMantisClient {
             return mantisStatus.getValue() >= resolvedStatusThreshold;
 
         } catch (MantisException e) {
-            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                    "Unable to find the level for the status named " + statusName + " ."));
+            MantisCorePlugin.warn("Unable to find the level for the status named " + statusName + " .");
             return false;
         }
 

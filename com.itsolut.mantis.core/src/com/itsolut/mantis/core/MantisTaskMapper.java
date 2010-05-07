@@ -37,7 +37,7 @@ final class MantisTaskMapper extends TaskMapper {
 
             return null;
         } catch (MantisException e) {
-            MantisCorePlugin.log(e);
+            MantisCorePlugin.error(e);
             return null;
         }
     }

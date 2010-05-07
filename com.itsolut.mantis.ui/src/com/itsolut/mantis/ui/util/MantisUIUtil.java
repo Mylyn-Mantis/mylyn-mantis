@@ -36,7 +36,7 @@ public class MantisUIUtil {
         try {
             client = connector.getClientManager().getRepository(repository);
         } catch (MantisException e) {
-            MantisUIPlugin.handleMantisException(e);
+            MantisUIPlugin.handleError(e, "Failed getting the repository.", true);
             return;
         }
 
@@ -58,9 +58,10 @@ public class MantisUIUtil {
             else
                 PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
         } catch (InvocationTargetException e) {
-            MantisUIPlugin.handleMantisException(e.getCause());
+            MantisUIPlugin.handleError(e, "Failed updating the repository attributes.",  true);
             return;
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return;
         }
 

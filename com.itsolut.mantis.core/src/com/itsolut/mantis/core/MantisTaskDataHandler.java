@@ -20,14 +20,10 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
-import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -38,7 +34,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
@@ -103,7 +98,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     
                 } catch (MantisException e) {
                     assignedStatus = "assigned";
-                    MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed retrieving customised assigned bug status. Using default.", e));
+                    MantisCorePlugin.warn("Failed retrieving customised assigned bug status. Using default.", e);
                 }
                 
                 taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(assignedStatus);
@@ -203,8 +198,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createProjectSpecificAttributes(data, client, monitor);
             createCustomFieldAttributes(data, client, null, monitor);
             return true;
-        } catch (OperationCanceledException e) {
-            throw e;
         } catch (Exception e) {
             throw new CoreException(MantisCorePlugin.toStatus(e));
         }
@@ -247,9 +240,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
         } catch ( NumberFormatException e) {
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, "Invalid time tracking value, must be an integer."));
+            throw new CoreException(MantisCorePlugin.errorStatus("Invalid time tracking value, must be an integer.", e));
         } catch (Exception e) {
-            MantisCorePlugin.log(e);
             throw new CoreException(MantisCorePlugin.toStatus(e));
         }
     }
@@ -323,33 +315,19 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     public TaskData getTaskData(TaskRepository repository, String taskId,
             IProgressMonitor monitor) throws CoreException {
-        try {
-            int id = Integer.parseInt(taskId);
-            if (!MantisRepositoryConnector.hasRichEditor(repository))
-                throw new CoreException(new Status(Status.ERROR,
-                        MantisCorePlugin.PLUGIN_ID, 0,
-                        "Does not have a rich editor", null));
 
-            try {
-                IMantisClient client = connector.getClientManager().getRepository(
-                        repository);
-                MantisTicket ticket = client.getTicket(id, monitor);
-                // createDefaultAttributes(data, client, true);
-                // updateTaskData(repository, attributeMapper, data, client,
-                // ticket);
-                // createProjectSpecificAttributes(data, client);
-                return createTaskDataFromTicket(client, repository, ticket,
-                        monitor);
-            } catch (Exception e) {
-                MantisCorePlugin.log(e);
-                throw new CoreException(new Status(IStatus.ERROR,
-                        MantisCorePlugin.PLUGIN_ID, 0, "Ticket download from "
-                        + repository.getRepositoryUrl() + " for task " + id
-                        + " failed : " + e.getMessage() + " .", e));
-            }
-        } catch (NumberFormatException e) {
-            throw new CoreException(new Status(Status.ERROR,
-                    MantisCorePlugin.PLUGIN_ID, "Task id must be numeric", e));
+        int id = MantisRepositoryConnector.getTicketId(taskId);
+        try {
+            IMantisClient client = connector.getClientManager().getRepository(repository);
+            MantisTicket ticket = client.getTicket(id, monitor);
+            // createDefaultAttributes(data, client, true);
+            // updateTaskData(repository, attributeMapper, data, client,
+            // ticket);
+            // createProjectSpecificAttributes(data, client);
+            return createTaskDataFromTicket(client, repository, ticket, monitor);
+        } catch (Exception e) {
+            throw new CoreException(MantisCorePlugin.errorStatus("Ticket download from "
+                    + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e));
         }
     }
 
@@ -602,9 +580,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(data, MantisAttributeMapper.Attribute.RELATED_TO, null);
     }
 
-    public static void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) {
+    public static void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) throws MantisException {
 
-        try {
             // categories
             TaskAttribute attr = getAttribute(data,
                     MantisAttributeMapper.Attribute.CATEGORY.getKey());
@@ -664,11 +641,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport() && MantisUtils.isEmpty(targetVersionAttr.getValue()))
                 targetVersionAttr.setValue("none");
-            
-        } catch (MantisException ex) {
-            MantisCorePlugin.log(new Status(Status.ERROR,
-                    MantisCorePlugin.PLUGIN_ID, 0, ex.getMessage(), ex));
-        }
     }
 
     private static TaskAttribute createAttribute(TaskData data,
@@ -751,12 +723,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createProjectSpecificAttributes(taskData, client, monitor);
             createCustomFieldAttributes(taskData, client, ticket, monitor);
 
-            if (!MantisRepositoryConnector.hasRichEditor(repository))
-                // updateTaskDataFromTicket(taskData, ticket, client);
-                taskData.setPartial(true);
             return taskData;
-        } catch (OperationCanceledException e) {
-            throw e;
         } catch (Exception e) {
             throw new CoreException(MantisCorePlugin.toStatus(e));
         }
@@ -855,11 +822,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 			return true;
 		} catch (MalformedURLException e) {
-			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
-					RepositoryStatus.ERROR_REPOSITORY, "Invalid repository configuration."));
+			throw new CoreException(MantisCorePlugin.configurationErrorRepositoryStatus(repository, "Invalid repository configuration.", e));
 		} catch (MantisException e) {
-			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
-					RepositoryStatus.ERROR_REPOSITORY, "Failed updating attributes."));
+			throw new CoreException(MantisCorePlugin.ioErrorRepositoryStatus(repository,"Failed updating attributes.", e));
 
 		}
     }
@@ -867,8 +832,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void validateSupportsSubtasks(TaskRepository repository, TaskData parentTaskData) throws CoreException {
 
         if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
-			throw new CoreException(new RepositoryStatus(repository, IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
-					RepositoryStatus.ERROR_REPOSITORY, "The repository does not support subtasks."));
+			throw new CoreException(MantisCorePlugin.configurationErrorRepositoryStatus(repository, "The repository does not support subtasks."));
     }
     
     private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,

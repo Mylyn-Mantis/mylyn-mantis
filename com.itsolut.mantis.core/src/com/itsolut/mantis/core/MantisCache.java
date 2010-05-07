@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.Policy;
 
@@ -143,8 +142,8 @@ public class MantisCache {
                 try {
                     cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
                 } catch (MantisException e) {
-                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
-                    cacheDueDateViewThreshold(ACCESS_LEVEL_NOBODY+"");
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
+                    cacheDueDateViewThreshold(String.valueOf(ACCESS_LEVEL_NOBODY));
                 } finally {
                     Policy.advance(subMonitor, 1);
                 }
@@ -152,8 +151,7 @@ public class MantisCache {
                 try {
                     cacheDueDateUpdateThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD));
                 } catch (MantisException e) {
-                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                            "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
                     cacheDueDateUpdateThreshold(ACCESS_LEVEL_NOBODY + "");
                 } finally {
                     Policy.advance(subMonitor, 1);
@@ -163,8 +161,7 @@ public class MantisCache {
                 try {
                     cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED));
                 } catch (MantisException e) {
-                    MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                            "Failed retrieving configuration value: " + e.getMessage() + " . Using default value."));
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
                     cacheTimeTrackingEnabled(Boolean.FALSE.toString());
                 } finally {
                     Policy.advance(subMonitor, 1);
@@ -193,11 +190,9 @@ public class MantisCache {
                         if (!cacheData.reportersByProjectId.containsKey(project.getValue())) {
                             cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
                                     cacheData.developersByProjectId.get(project.getValue())));
-                            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                                    "Failed retrieving reporter information, using developers list for reporters.", e));
+                            MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
                         } else {
-                            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                                    "Failed retrieving reporter information, using previously loaded values.", e));
+                            MantisCorePlugin.info("Failed retrieving reporter information, using previously loaded values.", e);
                         }
                     }
                     Policy.advance(subMonitor, 1);
@@ -239,8 +234,8 @@ public class MantisCache {
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
                 subMonitor.done();
-                MantisCorePlugin.log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, "Repository sync for "
-                        + repositoryUrl + " complete in " + format(start) + " seconds."));
+                MantisCorePlugin.info("Repository sync for " + repositoryUrl + " complete in " + format(start)
+                        + " seconds.");
             }
 
         }
@@ -326,8 +321,8 @@ public class MantisCache {
         try {
             return Integer.parseInt(stringConfiguration);
         } catch (NumberFormatException e) {
-            MantisCorePlugin.log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID,
-                    "Failed parsing config option value " + stringConfiguration + ". Using default value.", e));
+            MantisCorePlugin.warn("Failed parsing config option value " + stringConfiguration
+                    + ". Using default value.", e);
             return defaultValue;
         }
     }
@@ -829,13 +824,13 @@ public class MantisCache {
 
     	// debug for issue #119
     	if ( cacheData.reportersByProjectId == null) {
-    		MantisCorePlugin.log(new RuntimeException("cacheData.reportersByProjectId is null."));
+    		MantisCorePlugin.error(new RuntimeException("cacheData.reportersByProjectId is null."));
     		cacheData.reportersByProjectId = new HashMap<Integer, List<String>>();
     	}
     	
         List<String> reporters = cacheData.reportersByProjectId.get(projectId);
         if ( reporters == null) {
-        	MantisCorePlugin.log(new RuntimeException("cacheData.reportersByProjectId is null for projectId " + projectId + " ."));
+        	MantisCorePlugin.error(new RuntimeException("cacheData.reportersByProjectId is null for projectId " + projectId + " ."));
         	cacheData.reportersByProjectId.put(projectId, new ArrayList<String>());
         }
         

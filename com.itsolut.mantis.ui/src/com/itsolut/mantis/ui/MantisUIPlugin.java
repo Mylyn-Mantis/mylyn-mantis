@@ -12,11 +12,11 @@
 package com.itsolut.mantis.ui;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 
 import com.itsolut.mantis.core.MantisClientFactory;
@@ -29,8 +29,6 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 public class MantisUIPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "com.itsolut.mantis.ui";
-
-	public final static String TITLE_MESSAGE_DIALOG = "Mylar Mantis Client";
 
 	public static final String NEW_BUG_EDITOR_ID = PLUGIN_ID + ".newBugEditor";
 
@@ -60,18 +58,16 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	public static MantisUIPlugin getDefault() {
 		return plugin;
 	}
+	
+    public static void handleError(Throwable throwable, String message, boolean show) {
 
-	public static void handleMantisException(Throwable e) {
-		handleMantisException(MantisCorePlugin.toStatus(e));
-	}
+        IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, throwable);
 
-	public static void handleMantisException(IStatus status) {
-		if (status.getCode() == IStatus.ERROR) {
-			StatusHandler.log(status);
-			ErrorDialog.openError(null, TITLE_MESSAGE_DIALOG, null, status);
-		} else if (status.getCode() == IStatus.INFO) {
-			ErrorDialog.openError(null, TITLE_MESSAGE_DIALOG, null, status);
-		}
-	}
+        int style = StatusManager.LOG;
+        if (show)
+            style |= StatusManager.SHOW;
+
+        StatusManager.getManager().handle(status, style);
+    }
 
 }

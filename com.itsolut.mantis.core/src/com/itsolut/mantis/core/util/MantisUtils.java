@@ -157,7 +157,7 @@ public class MantisUtils {
                             filter = value;
                         }
                     } catch (UnsupportedEncodingException e) {
-                        MantisCorePlugin.log(e);
+                        MantisCorePlugin.error(e);
                     }
             }
 

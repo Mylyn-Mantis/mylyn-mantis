@@ -41,7 +41,6 @@ import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
@@ -169,16 +168,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     }
 
-    protected void updateAttributes(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
+    protected void updateAttributes(TaskRepository repository, IProgressMonitor monitor) throws CoreException, MantisException {
 
-        try {
-            IMantisClient client = getClientManager().getRepository(repository);
-            client.updateAttributes(monitor);
-        } catch (Exception e) {
-            MantisCorePlugin.log(e);
-            throw new CoreException(RepositoryStatus.createStatus(repository.getRepositoryUrl(), IStatus.WARNING,
-                    MantisCorePlugin.PLUGIN_ID, "Could not update attributes"));
-        }
+        IMantisClient client = getClientManager().getRepository(repository);
+        client.updateAttributes(monitor);
     }
 
     public synchronized MantisClientManager getClientManager() {
@@ -197,21 +190,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public static String getTicketDescription(TaskData taskData) {
 
         return taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.DESCRIPTION.toString()).toString();
-    }
-
-    public static boolean hasChangedSince(TaskRepository repository) {
-
-        return true;
-    }
-
-    public static boolean hasRichEditor(TaskRepository repository) {
-
-        return true;
-    }
-
-    public static boolean hasAttachmentSupport(TaskRepository repository, ITask task) {
-
-        return true;
     }
 
     public void stop() {
@@ -240,8 +218,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             return Integer.parseInt(taskId);
         } catch (NumberFormatException e) {
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
-                    "Invalid ticket id: " + taskId, e));
+            throw new CoreException(MantisCorePlugin.errorStatus("Invalid ticket id: " + taskId + ".", e));
         }
     }
 
@@ -287,7 +264,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 }
             }
         } catch (Throwable e) {
-            MantisCorePlugin.log("Failed getting new tasks for query " + query.getSummary() + " . Message : "
+            MantisCorePlugin.error("Failed getting new tasks for query " + query.getSummary() + " . Message : "
                     + e.getMessage() + " .", e);
             return Collections.emptyList();
         }
@@ -303,9 +280,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         try {
             updateAttributes(repository, monitor);
-        } catch (Exception e) {
-            throw new CoreException(RepositoryStatus.createStatus(repository.getRepositoryUrl(), IStatus.WARNING,
-                    MantisCorePlugin.PLUGIN_ID, "Could not update attributes"));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.ioErrorRepositoryStatus(repository, "Could not update attributes", e));
         }
 
     }
@@ -346,7 +322,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             IMantisClient client = getClientManager().getRepository(taskData.getAttributeMapper().getTaskRepository());
             completed = client.isCompleted(taskData, new NullProgressMonitor());
         } catch (MantisException e) {
-            MantisCorePlugin.log(e);
+            MantisCorePlugin.error(e);
         }
 
         Date completionDate = completed ? scheme.getModificationDate() : null;
@@ -388,10 +364,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
 
         TaskRepository repository = event.getTaskRepository();
-        if (!MantisRepositoryConnector.hasChangedSince(repository)) {
-            // always run the queries for web mode
-            return;
-        }
 
         if (repository.getSynchronizationTimeStamp() == null || repository.getSynchronizationTimeStamp().length() == 0) {
             for (ITask task : event.getTasks())
@@ -404,44 +376,39 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             if (repository.getSynchronizationTimeStamp().length() > 0)
                 since = MantisUtils.parseDate(Long.valueOf(repository.getSynchronizationTimeStamp()));
         } catch (NumberFormatException e) {
-             MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Failed parsing repository synchronisationTimestamp " + repository.getSynchronizationTimeStamp() + " .", e));
+             MantisCorePlugin.warn("Failed parsing repository synchronisationTimestamp " + repository.getSynchronizationTimeStamp() + " .", e);
         }
 
-        try {
 
-            // Run the queries to get the list of tasks currently meeting the query
-            // criteria. The result returned are only the ids that have changed.
-            // Next checkt to see if any of these ids matches the ones in the
-            // task list. If so, then set it to stale.
-            // 
-            // The prior implementation retireved each id individually, and
-            // checked it's date, this caused unnecessary SOAP traffic during
-            // synchronization.
-            event.setNeedsPerformQueries(false);
-            List<IRepositoryQuery> queries = getMantisQueriesFor(repository);
+        // Run the queries to get the list of tasks currently meeting the query
+        // criteria. The result returned are only the ids that have changed.
+        // Next checkt to see if any of these ids matches the ones in the
+        // task list. If so, then set it to stale.
+        // 
+        // The prior implementation retireved each id individually, and
+        // checked it's date, this caused unnecessary SOAP traffic during
+        // synchronization.
+        event.setNeedsPerformQueries(false);
+        List<IRepositoryQuery> queries = getMantisQueriesFor(repository);
 
-            monitor.beginTask("Retrieving queries for repository", queries.size());
+        monitor.beginTask("Retrieving queries for repository", queries.size());
 
-            for (IRepositoryQuery query : queries) {
+        for (IRepositoryQuery query : queries) {
 
-                List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since, monitor);
-                
-                MantisCorePlugin.debug("Found " + taskIds.size() + " changed task ids.", null);
-                
-                for (Integer taskId : taskIds) {
-                    for (ITask task : event.getTasks()) {
-                        if (getTicketId(task.getTaskId()) == taskId.intValue()) {
-                            event.setNeedsPerformQueries(true);
-                            event.markStale(task);
-                        }
+            List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since, monitor);
+
+            MantisCorePlugin.debug("Found " + taskIds.size() + " changed task ids.", null);
+
+            for (Integer taskId : taskIds) {
+                for (ITask task : event.getTasks()) {
+                    if (getTicketId(task.getTaskId()) == taskId.intValue()) {
+                        event.setNeedsPerformQueries(true);
+                        event.markStale(task);
                     }
                 }
-
-                monitor.worked(1);
             }
-        } catch (CoreException e) {
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK,
-                    "Could not determine changed tasks", e));
+
+            monitor.worked(1);
         }
     }
 
@@ -470,7 +437,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             if (event.isFullSynchronization()) {
                 Date date = this.getSynchronizationTimestamp(event);
                 
-                MantisCorePlugin.log("Synchronisation timestamp from event is " + date + " .");
+                MantisCorePlugin.info("Synchronisation timestamp from event is " + date + " .");
                 if (date != null) {
                     event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
                 } else {
@@ -542,7 +509,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             return getClientManager().getRepository(taskRepository).isDueDateEnabled(new NullProgressMonitor());
         } catch (MantisException e) {
-            MantisCorePlugin.log(e);
+            MantisCorePlugin.error(e);
             return false;
         }
     }

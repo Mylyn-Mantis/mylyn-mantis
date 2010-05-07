@@ -33,8 +33,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
 import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
@@ -212,9 +210,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         public void cleanCache(Throwable reason) {
 
+            MantisCorePlugin.warn("Removing invalid cache file", reason);
             cacheFile.delete();
-            MantisCorePlugin.log(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "Removing invalid cache file",
-                    reason));
         }
 
         public void write() {
@@ -228,7 +225,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
                     out.writeObject(_cacheDataByUrl.get(url));
                 }
             } catch (Throwable e) {
-                MantisCorePlugin.log(e);
+                MantisCorePlugin.error(e);
             } finally {
                 closeSilently(out);
             }

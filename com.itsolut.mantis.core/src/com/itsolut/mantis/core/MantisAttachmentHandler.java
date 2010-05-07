@@ -22,9 +22,6 @@ import java.util.Date;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
@@ -58,15 +55,14 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
     private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment, IProgressMonitor monitor) throws CoreException {
         String id = attachment.getAttachmentId();
         if (id == null || id.length() == 0) {
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
+            throw new CoreException(MantisCorePlugin.errorStatus("Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
         }
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
             return client.getAttachmentData(Integer.parseInt(id), monitor);
         } catch (Exception e) {
-            MantisCorePlugin.log(e);
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e ));
+            throw new CoreException(MantisCorePlugin.errorStatus("Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e ));
         }
     }
 
@@ -78,18 +74,14 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
     @Override
     public boolean canGetContent(TaskRepository repository, ITask task) {
-        if (repository == null) {
-            return false;
-        }
-        return MantisRepositoryConnector.hasAttachmentSupport(repository, task);
+        
+        return repository != null;
     }
 
     @Override
     public boolean canPostContent(TaskRepository repository, ITask task) {
-        if (repository == null) {
-            return false;
-        }
-        return MantisRepositoryConnector.hasAttachmentSupport(repository, task);
+        
+        return repository != null;
     }
 
     @Override
@@ -110,9 +102,6 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             AbstractTaskAttachmentSource source, String comment,
             TaskAttribute attachmentAttribute, IProgressMonitor monitor)
     throws CoreException {
-        if (!MantisRepositoryConnector.hasAttachmentSupport(repository, task)) {
-            throw new CoreException(new Status(IStatus.INFO, MantisCorePlugin.PLUGIN_ID, IStatus.OK, "Attachments are not supported by this repository access type.", null));
-        }
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
@@ -133,8 +122,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             
             client.putAttachmentData(id, filename, data, monitor);
         } catch (Exception e) {
-            MantisCorePlugin.log(e);
-            throw new CoreException(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID, 0, "Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e ));
+            throw new CoreException(MantisCorePlugin.errorStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e ));
         }
     }
 
@@ -162,8 +150,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             try {
                 return attachment.createInputStream(null);
             } catch (CoreException e) {
-                StatusHandler.log(new Status(IStatus.ERROR, MantisCorePlugin.PLUGIN_ID,
-                        "Error submitting attachment", e));
+                MantisCorePlugin.error(e);
                 throw new IOException("Failed to create source stream");
             }
         }
