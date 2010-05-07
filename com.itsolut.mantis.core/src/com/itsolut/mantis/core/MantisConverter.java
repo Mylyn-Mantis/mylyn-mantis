@@ -177,7 +177,7 @@ public class MantisConverter {
             ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
 
             ticket.putBuiltinValue(Key.RESOLUTION, cache.getResolution(ihd.getResolution().intValue()).getName());
-            ticket.putBuiltinValue(Key.PRIORITY, cache.getResolution(ihd.getPriority().intValue()).getName());
+            ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
             ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
             ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
 
