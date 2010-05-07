@@ -11,7 +11,6 @@
 
 package com.itsolut.mantis.core;
 
-import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumMap;
@@ -198,8 +197,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createProjectSpecificAttributes(data, client, monitor);
             createCustomFieldAttributes(data, client, null, monitor);
             return true;
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.toStatus(e));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
         }
     }
 
@@ -240,9 +239,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
         } catch ( NumberFormatException e) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Invalid time tracking value, must be an integer.", e));
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.toStatus(e));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid time tracking value, must be an integer.", e, repository));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed submitting task data.", e, repository));
         }
     }
 
@@ -325,9 +324,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             // ticket);
             // createProjectSpecificAttributes(data, client);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Ticket download from "
-                    + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
+                    + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e, repository));
         }
     }
 
@@ -566,7 +565,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
             .setType(TaskAttribute.TYPE_OPERATION);
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.toStatus(e));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, null));
         }
 
     }
@@ -724,8 +723,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createCustomFieldAttributes(taskData, client, ticket, monitor);
 
             return taskData;
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.toStatus(e));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
         }
     }
 
@@ -821,10 +820,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			setChildAttribute(taskData, parentTaskData);
 
 			return true;
-		} catch (MalformedURLException e) {
-			throw new CoreException(MantisCorePlugin.configurationErrorRepositoryStatus(repository, "Invalid repository configuration.", e));
 		} catch (MantisException e) {
-			throw new CoreException(MantisCorePlugin.ioErrorRepositoryStatus(repository,"Failed updating attributes.", e));
+			throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed updating attributes.", e, repository));
 
 		}
     }
@@ -832,11 +829,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void validateSupportsSubtasks(TaskRepository repository, TaskData parentTaskData) throws CoreException {
 
         if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
-			throw new CoreException(MantisCorePlugin.configurationErrorRepositoryStatus(repository, "The repository does not support subtasks."));
+			throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("The repository does not support subtasks.", null, repository));
     }
     
     private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,
-            IProgressMonitor monitor) throws MalformedURLException, MantisException, CoreException {
+            IProgressMonitor monitor) throws MantisException, CoreException {
 
         IMantisClient client = connector.getClientManager().getRepository(
                 repository);

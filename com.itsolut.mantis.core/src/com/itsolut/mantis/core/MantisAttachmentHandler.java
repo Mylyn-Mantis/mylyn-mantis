@@ -19,7 +19,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.httpclient.methods.multipart.PartSource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -28,6 +27,8 @@ import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentSource;
 import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * 
@@ -55,14 +56,14 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
     private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment, IProgressMonitor monitor) throws CoreException {
         String id = attachment.getAttachmentId();
         if (id == null || id.length() == 0) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null, repository));
         }
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
             return client.getAttachmentData(Integer.parseInt(id), monitor);
         } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e ));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e , repository));
         }
     }
 
@@ -105,7 +106,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
-            int id = Integer.parseInt(task.getTaskId());
+            int id = MantisRepositoryConnector.getTicketId(task.getTaskId());
             byte[] data = readData(source, monitor);
 
             //hack since context methods are final in superclasses & Mantis does not have a description column
@@ -121,8 +122,10 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             
             
             client.putAttachmentData(id, filename, data, monitor);
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e ));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
+        } catch (IOException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
         }
     }
 
@@ -136,34 +139,4 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             in.close();
         }
     }
-
-
-    public static class AttachmentPartSource implements PartSource {
-
-        private final AbstractTaskAttachmentSource attachment;
-
-        public AttachmentPartSource(AbstractTaskAttachmentSource attachment) {
-            this.attachment = attachment;
-        }
-
-        public InputStream createInputStream() throws IOException {
-            try {
-                return attachment.createInputStream(null);
-            } catch (CoreException e) {
-                MantisCorePlugin.error(e);
-                throw new IOException("Failed to create source stream");
-            }
-        }
-
-        public String getFileName() {
-            return attachment.getName();
-        }
-
-        public long getLength() {
-            return attachment.getLength();
-        }
-
-    }
-
-
 }

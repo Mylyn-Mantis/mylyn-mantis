@@ -20,6 +20,8 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -29,8 +31,9 @@ import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
 
-import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisLoginException;
+import com.itsolut.mantis.core.exception.MantisRemoteException;
 
 /**
  * The headless Trac plug-in class.
@@ -51,6 +54,8 @@ public class MantisCorePlugin extends Plugin {
     public static final boolean DEBUG = Boolean.getBoolean(MantisCorePlugin.class.getName().toLowerCase() + ".debug");
 
     private MantisRepositoryConnector connector;
+    
+    private StatusFactory statusFactory;
 
     public MantisCorePlugin() {
 
@@ -66,6 +71,7 @@ public class MantisCorePlugin extends Plugin {
 
         super.start(context);
         plugin = this;
+        statusFactory = new StatusFactory();
     }
 
     @Override
@@ -80,6 +86,11 @@ public class MantisCorePlugin extends Plugin {
         super.stop(context);
     }
 
+    public StatusFactory getStatusFactory() {
+
+        return statusFactory;
+    }
+    
     public MantisRepositoryConnector getConnector() {
 
         return connector;
@@ -98,24 +109,6 @@ public class MantisCorePlugin extends Plugin {
         IPath stateLocation = Platform.getStateLocation(MantisCorePlugin.getDefault().getBundle());
         IPath cacheFile = stateLocation.append("repositoryConfigurations");
         return cacheFile;
-    }
-
-    public static IStatus toStatus(Throwable e) {
-
-        if (e instanceof MantisLoginException || "Access Denied".equals(e.getMessage())) {
-            return new Status(
-                    IStatus.ERROR,
-                    PLUGIN_ID,
-                    IStatus.INFO,
-                    "Your login name or password is incorrect. Ensure proper repository configuration in Task Repositories View.",
-                    null);
-        } else if (e instanceof MantisException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Connection Error: " + e.getMessage(), e);
-        } else if (e instanceof ClassCastException) {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.INFO, "Error parsing server response", e);
-        } else {
-            return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Unexpected error", e);
-        }
     }
 
     private static void log(IStatus status) {
@@ -141,35 +134,10 @@ public class MantisCorePlugin extends Plugin {
         if (DEBUG)
             getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, information, t));
     }
-
-    /**
-     * Convenience method for logging exceptions to the plug-in log
-     * 
-     * @param e
-     *            the exception to log
-     */
-    public static void error(Throwable e) {
-
-        String message = e.getMessage();
-        if (e.getMessage() == null) {
-            message = e.getClass().toString();
-        }
-        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e));
-    }
-
-    public static void error(String message, Throwable e) {
-
-        log(new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e));
-    }
-
-    public static void info(String string) {
-
-        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, string));
-    }
-
-    public static void info(String string, Exception ex) {
-
-        log(new Status(Status.INFO, MantisCorePlugin.PLUGIN_ID, string, ex));
+    
+    public static void error(String message, Throwable t) {
+        
+        log(getDefault().getStatusFactory().toStatus(message, t, null));
     }
     
     public static void warn(String message) {
@@ -182,23 +150,27 @@ public class MantisCorePlugin extends Plugin {
         log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, message, e));
     }
     
-    public static IStatus errorStatus(String message, Throwable e) {
+    public static class StatusFactory {
+
+        public Status toStatus( String message, Throwable t, TaskRepository repository) {
+            
+            String actualMessage = message == null ? t.getMessage() : message;
+            
+            if ( repository == null)
+                return new Status(IStatus.ERROR, PLUGIN_ID, actualMessage, t);
+            
+            if ( t instanceof MantisLoginException || "Access Denied".equals(actualMessage))
+                return RepositoryStatus.createLoginError(repository.getRepositoryUrl(), actualMessage);
+            if ( t instanceof MantisRemoteException)
+                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, actualMessage);
+            if ( t instanceof MantisLocalException)
+                return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
+            if ( t instanceof IOException)
+                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_IO, actualMessage);
+            
+            return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
+            
+        }
         
-        return new Status(Status.ERROR, MantisCorePlugin.PLUGIN_ID, message, e);
     }
-    
-    public static IStatus ioErrorRepositoryStatus(TaskRepository repository, String message, Throwable e) {
-
-        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_IO, message, e);
-    }
-    
-    public static IStatus configurationErrorRepositoryStatus(TaskRepository repository, String message, Throwable e) {
-        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, message, e);
-    }
-    
-    public static IStatus configurationErrorRepositoryStatus(TaskRepository repository, String message) {
-        return new RepositoryStatus(repository, IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, message);
-    }
-
-
 }

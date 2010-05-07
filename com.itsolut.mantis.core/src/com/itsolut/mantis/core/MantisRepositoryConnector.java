@@ -26,7 +26,6 @@ package com.itsolut.mantis.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +50,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
+import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
@@ -159,9 +159,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 taskData.setPartial(true); // IMantisClient.search returns partial data
                 resultCollector.accept(taskData);
             }
-        } catch (Throwable e) {
-            // MantisCorePlugin.log(e);
-            return MantisCorePlugin.toStatus(e);
+        } catch (MantisException e) {
+            return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
+        } catch (CoreException e) {
+            return e.getStatus();
         }
 
         return Status.OK_STATUS;
@@ -218,7 +219,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             return Integer.parseInt(taskId);
         } catch (NumberFormatException e) {
-            throw new CoreException(MantisCorePlugin.errorStatus("Invalid ticket id: " + taskId + ".", e));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid ticket id: " + taskId + ".", e, null));
         }
     }
 
@@ -238,14 +239,13 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
      * so, add their ids to a List.</p>
      * 
      * @param monitor
-     * 
-     * @return the ids of the changed tasks, or an empty list
+     * @return the ids of the changed tasks
+     * @throws CoreException 
      */
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since,
-            IProgressMonitor monitor) {
+            IProgressMonitor monitor) throws CoreException {
 
-        if (MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("Looking for tasks changed in query " + query + " since " + since + " .", null);
+        MantisCorePlugin.debug(NLS.bind("Looking for tasks changed in query {0} since {1} .", query, since), null);
         
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
@@ -255,22 +255,14 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             client = getClientManager().getRepository(repository);
             client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
 
-            for (MantisTicket ticket : tickets) {
-                if (ticket.getLastChanged() != null) {
-                    if (ticket.getLastChanged().compareTo(since) > 0) {
-//                        MantisCorePlugin.debug("Ticket with id " + ticket.getId() + " and lastChanged " + ticket.getLastChanged() + " marked as changed.", null);
-                        changedTickets.add(Integer.valueOf(ticket.getId()));
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            MantisCorePlugin.error("Failed getting new tasks for query " + query.getSummary() + " . Message : "
-                    + e.getMessage() + " .", e);
-            return Collections.emptyList();
+            for (MantisTicket ticket : tickets)
+                if (ticket.getLastChanged() != null && ticket.getLastChanged().compareTo(since) > 0)
+                    changedTickets.add(Integer.valueOf(ticket.getId()));
+        } catch (MantisException e) {
+           throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed getting changed tasks.", e, repository));
         }
         
-        if ( MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("Found " + changedTickets.size() + " changed tickets.", null);
+        MantisCorePlugin.debug(NLS.bind("Found {0} changed tickets.", changedTickets.size()), null);
         
         return changedTickets;
     }
@@ -281,7 +273,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             updateAttributes(repository, monitor);
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.ioErrorRepositoryStatus(repository, "Could not update attributes", e));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, repository));
         }
 
     }
@@ -316,14 +308,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         TaskMapper scheme = getTaskMapper(taskData);
         scheme.applyTo(task);
 
-        boolean completed = false;
-
-        try {
-            IMantisClient client = getClientManager().getRepository(taskData.getAttributeMapper().getTaskRepository());
-            completed = client.isCompleted(taskData, new NullProgressMonitor());
-        } catch (MantisException e) {
-            MantisCorePlugin.error(e);
-        }
+        boolean completed = isCompleted(taskData);
 
         Date completionDate = completed ? scheme.getModificationDate() : null;
 
@@ -338,6 +323,19 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(supportsSubtasks));
 
+    }
+
+    private boolean isCompleted(TaskData taskData) {
+
+        boolean completed = false;
+
+        try {
+            IMantisClient client = getClientManager().getRepository(taskData.getAttributeMapper().getTaskRepository());
+            completed = client.isCompleted(taskData, new NullProgressMonitor());
+        } catch (MantisException e) {
+            MantisCorePlugin.error("Failed determining the completed status", e);
+        }
+        return completed;
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {
@@ -395,7 +393,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         for (IRepositoryQuery query : queries) {
 
-            List<Integer> taskIds = this.getChangedTasksByQuery(query, repository, since, monitor);
+            List<Integer> taskIds = getChangedTasksByQuery(query, repository, since, monitor);
 
             MantisCorePlugin.debug("Found " + taskIds.size() + " changed task ids.", null);
 
@@ -435,20 +433,19 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             monitor.beginTask("", 1);
             if (event.isFullSynchronization()) {
-                Date date = this.getSynchronizationTimestamp(event);
+                Date date = getSynchronizationTimestamp(event);
                 
-                MantisCorePlugin.info("Synchronisation timestamp from event is " + date + " .");
+                MantisCorePlugin.debug(NLS.bind("Synchronisation timestamp from event for {0} is {1} .", event.getTaskRepository(), date), null);
+                
                 if (date != null) {
                     event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
                 } else {
-                    date = new Date();
-                    event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
+                    event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(new Date()) + "");
                 }
             }
-        } catch (Exception ex) {
-            MantisCorePlugin.toStatus(ex);
-            Date date = new Date();
-            event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");
+        } catch (RuntimeException e) {
+            event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(new Date()) + "");
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, event.getTaskRepository()));
         } finally {
             monitor.done();
         }
@@ -509,7 +506,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             return getClientManager().getRepository(taskRepository).isDueDateEnabled(new NullProgressMonitor());
         } catch (MantisException e) {
-            MantisCorePlugin.error(e);
+            MantisCorePlugin.error("Failed determining if the due date is enabled", e);
             return false;
         }
     }

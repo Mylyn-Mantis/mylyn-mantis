@@ -216,7 +216,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                 restoreSearchFilterFromQuery(query);
             }
         } catch (Exception e1) {
-            MantisCorePlugin.error(e1);
 
             // Axis does send very verbose errors which break the layout if
             // displayed directly

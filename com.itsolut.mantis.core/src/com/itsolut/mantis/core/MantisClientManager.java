@@ -41,6 +41,7 @@ import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.core.exception.MantisException;
 
@@ -88,11 +89,6 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
 
-        if ( MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("Creating new Mantis client for url " + taskRepository.getRepositoryUrl()
-                + " . Currently cached entries : " + clientByUrl.keySet() + " ." + " . MantisClientManager identity : "
-                + System.identityHashCode(this) + " .", new RuntimeException());
-
         MantisCacheData cacheData = state.get(location.getUrl());
         if (cacheData != null) {
             repository.setCacheData(cacheData);
@@ -110,9 +106,6 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
 
-        if (MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("repositoryAdded : " + repository.getRepositoryUrl() + " .", new RuntimeException());
-
         // make sure there is no stale client still in the cache, bug #149939
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
@@ -123,9 +116,6 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
         
-        if (MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("repositoryRemoved : " + repository.getRepositoryUrl() + " .", new RuntimeException());
-
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
     }
@@ -138,9 +128,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
         
-        if (MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("repositoryChanged : " + repository.getUrl() + ", " + delta.getType() + " = " + delta.getKey() + " .",
-                new RuntimeException());
+        MantisCorePlugin.debug(NLS.bind("repositoryChanged : {0} , {1} = {2} .",  new Object[] {repository.getUrl(), delta.getType(), delta.getKey()}), null);
 
         // do not refresh on sync time stamp updates, it's not relevant
         if (delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP))
@@ -225,7 +213,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
                     out.writeObject(_cacheDataByUrl.get(url));
                 }
             } catch (Throwable e) {
-                MantisCorePlugin.error(e);
+                MantisCorePlugin.error("Failed writing persistent state.", e);
             } finally {
                 closeSilently(out);
             }

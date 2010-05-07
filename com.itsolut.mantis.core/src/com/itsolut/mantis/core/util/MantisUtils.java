@@ -157,7 +157,7 @@ public class MantisUtils {
                             filter = value;
                         }
                     } catch (UnsupportedEncodingException e) {
-                        MantisCorePlugin.error(e);
+                        MantisCorePlugin.error("Unexpected encoding problem while parsing search string.", e);
                     }
             }
 

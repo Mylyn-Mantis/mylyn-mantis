@@ -261,12 +261,7 @@ public class MantisClient implements IMantisClient {
 
     public void setCacheData(MantisCacheData cacheData) {
 
-        if ( MantisCorePlugin.DEBUG)
-            MantisCorePlugin.debug("Setting cache data with identity " + System.identityHashCode(cacheData)
-                + " on client with identity " + System.identityHashCode(this) + " .", new RuntimeException());
-
         cache.setCacheData(cacheData);
-
     }
 
 }

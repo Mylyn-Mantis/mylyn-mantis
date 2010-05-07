@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.CustomFieldDefinitionData;
@@ -192,7 +193,7 @@ public class MantisCache {
                                     cacheData.developersByProjectId.get(project.getValue())));
                             MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
                         } else {
-                            MantisCorePlugin.info("Failed retrieving reporter information, using previously loaded values.", e);
+                            MantisCorePlugin.warn("Failed retrieving reporter information, using previously loaded values.", e);
                         }
                     }
                     Policy.advance(subMonitor, 1);
@@ -234,8 +235,8 @@ public class MantisCache {
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
                 subMonitor.done();
-                MantisCorePlugin.info("Repository sync for " + repositoryUrl + " complete in " + format(start)
-                        + " seconds.");
+                MantisCorePlugin.debug(NLS.bind("Repository sync for {0} complete in {1} seconds.", repositoryUrl,
+                        format(start)), null);
             }
 
         }
@@ -824,14 +825,15 @@ public class MantisCache {
 
     	// debug for issue #119
     	if ( cacheData.reportersByProjectId == null) {
-    		MantisCorePlugin.error(new RuntimeException("cacheData.reportersByProjectId is null."));
+    		MantisCorePlugin.warn("cacheData.reportersByProjectId is null.", new RuntimeException());
     		cacheData.reportersByProjectId = new HashMap<Integer, List<String>>();
     	}
     	
         List<String> reporters = cacheData.reportersByProjectId.get(projectId);
-        if ( reporters == null) {
-        	MantisCorePlugin.error(new RuntimeException("cacheData.reportersByProjectId is null for projectId " + projectId + " ."));
-        	cacheData.reportersByProjectId.put(projectId, new ArrayList<String>());
+        if (reporters == null) {
+            MantisCorePlugin.warn("cacheData.reportersByProjectId is null for projectId " + projectId + " .",
+                    new RuntimeException());
+            cacheData.reportersByProjectId.put(projectId, new ArrayList<String>());
         }
         
         

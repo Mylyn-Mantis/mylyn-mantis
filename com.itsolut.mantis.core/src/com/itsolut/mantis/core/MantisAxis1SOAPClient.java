@@ -41,6 +41,7 @@ import com.itsolut.mantis.binding.ProjectData;
 import com.itsolut.mantis.binding.ProjectVersionData;
 import com.itsolut.mantis.binding.RelationshipData;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
 
 /**
@@ -115,7 +116,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
             } catch (ServiceException e) {
                 throw new MantisRemoteException(e);
             } catch (MalformedURLException e) {
-                throw new MantisRemoteException(e);
+                throw new MantisLocalException(e);
             }
 
             return soap;
