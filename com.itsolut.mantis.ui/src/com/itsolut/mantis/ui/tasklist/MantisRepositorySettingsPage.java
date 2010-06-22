@@ -120,7 +120,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         super.applyTo(repository);
 
         MantisRepositoryConfiguration.setDownloadSubTasks(repository, retrieveSubTasksButton.getSelection());
-
+        MantisRepositoryConfiguration.setCategoryIfNotSet(repository);
     }
 
     @Override

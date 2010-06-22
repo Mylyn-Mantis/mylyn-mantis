@@ -7,13 +7,12 @@
  *******************************************************************************/
 package com.itsolut.mantis.ui.internal;
 
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryMigrator;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 
-@SuppressWarnings("restriction")
 public class MantisRepositoryMigrator extends AbstractRepositoryMigrator {
 
 	@Override
@@ -24,11 +23,8 @@ public class MantisRepositoryMigrator extends AbstractRepositoryMigrator {
 	
 	@Override
 	public boolean migrateRepository(TaskRepository repository) {
-		if (repository.getProperty(IRepositoryConstants.PROPERTY_CATEGORY) == null) {
-			repository.setProperty(IRepositoryConstants.PROPERTY_CATEGORY, IRepositoryConstants.CATEGORY_BUGS);
-			return true;
-		}
-		return false;
+		
+		return MantisRepositoryConfiguration.setCategoryIfNotSet(repository);
 	}
 
 }
