@@ -25,7 +25,7 @@ public class MantisRepositoryMigrator extends AbstractRepositoryMigrator {
 	@Override
 	public boolean migrateRepository(TaskRepository repository) {
 		if (repository.getProperty(IRepositoryConstants.PROPERTY_CATEGORY) == null) {
-			repository.setProperty(IRepositoryConstants.PROPERTY_CATEGORY, IRepositoryConstants.CATEGORY_TASKS);
+			repository.setProperty(IRepositoryConstants.PROPERTY_CATEGORY, IRepositoryConstants.CATEGORY_BUGS);
 			return true;
 		}
 		return false;
