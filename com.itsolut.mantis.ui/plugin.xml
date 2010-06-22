@@ -16,6 +16,9 @@
             overlayIcon="icons/eview16/overlay-mantis.gif"/>
 	  <taskListMigrator 
             class="com.itsolut.mantis.ui.tasklist.MantisTaskListMigrator"/>
+   <repositoryMigrator
+         class="com.itsolut.mantis.ui.internal.MantisRepositoryMigrator">
+   </repositoryMigrator>
 <!--      <taskListFactory
             class="com.itsolut.mantis.ui.tasklist.MantisTaskListFactory"
             id="com.itsolut.mantis.ui.tasklist.MantisTaskList"
