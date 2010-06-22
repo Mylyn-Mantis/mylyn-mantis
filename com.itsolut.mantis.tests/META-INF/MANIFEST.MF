@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mylyn Mantis Connector Tests
+Bundle-SymbolicName: com.itsolut.mantis.tests
+Bundle-Version: 3.1.3.qualifier
+Require-Bundle: org.junit,
+ org.eclipse.core.runtime,
+ org.eclipse.mylyn.tasks.core,
+ com.itsolut.mantis.core,
+ org.eclipse.mylyn.commons.net;bundle-version="[3.3.0,4.0.0)",
+ org.apache.axis;bundle-version="1.4.0",
+ javax.xml.rpc
+Export-Package: com.itsolut.mantis.tests
+Bundle-Activator: com.itsolut.mantis.tests.MantisTestPlugin
+Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
