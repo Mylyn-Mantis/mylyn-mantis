@@ -39,7 +39,7 @@
 							<groupId>com.itsolut.mantis</groupId>
 							<artifactId>com.itsolut.mantis.target</artifactId>
 							<version>${project.version}</version>
-							<classifier>e34-mylyn33</classifier>
+							<classifier>e34-mylyn34</classifier>
 						</artifact>
 					</target>
 				</configuration>

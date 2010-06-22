@@ -30,9 +30,9 @@
 						<configuration>
 							<artifacts>
 								<artifact>
-									<file>e34-mylyn33.target</file>
+									<file>e34-mylyn34.target</file>
 									<type>target</type>
-									<classifier>e34-mylyn33</classifier>
+									<classifier>e34-mylyn34</classifier>
 								</artifact>
 							</artifacts>
 						</configuration>
