@@ -657,7 +657,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if (allowEmtpy)
                 attr.putOption("", "");
             for (Object value : values)
-                attr.putOption(value.toString(), value.toString());
+                attr.putOption(String.valueOf(value), String.valueOf(value));
         }
         return attr;
     }
