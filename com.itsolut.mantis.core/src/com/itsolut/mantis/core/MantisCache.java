@@ -796,6 +796,15 @@ public class MantisCache {
         throw new MantisException("No status with id " + cacheData.bugAssignedStatus + " .");
     }
 
+    public String getResolvedStatusName() throws MantisException {
+        
+        for ( MantisTicketStatus status : cacheData.statuses)
+            if ( status.getValue() == cacheData.resolvedStatus)
+                return status.getName();
+        
+        throw new MantisException("No status with id " + cacheData.resolvedStatus + " .");
+    }
+
     MantisCacheData getCacheData() {
 
         synchronized (sync) {

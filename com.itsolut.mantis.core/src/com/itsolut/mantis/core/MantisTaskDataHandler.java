@@ -69,8 +69,19 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             @Override
             public void performPostOperation(TaskData taskData) {
-            
-                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue("resolved");            }
+           
+                String resolvedStatus;
+                try {
+                    IMantisClient repository = MantisCorePlugin.getDefault().getConnector().getClientManager().getRepository(taskData.getRepositoryUrl());
+                    resolvedStatus = repository.getCache(new NullProgressMonitor()).getAssignedStatus();
+                    
+                } catch (MantisException e) {
+                    resolvedStatus = "resolved";
+                    MantisCorePlugin.warn("Failed retrieving customised resolved bug status. Using default.", e);
+                }
+                
+                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(resolvedStatus);
+           }
         },
         
         TRACK_TIME("Track time ", TaskAttribute.TYPE_SHORT_TEXT, MantisAttributeMapper.Attribute.TIME_SPENT_NEW) {
