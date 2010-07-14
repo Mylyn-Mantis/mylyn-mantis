@@ -73,7 +73,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 String resolvedStatus;
                 try {
                     IMantisClient repository = MantisCorePlugin.getDefault().getConnector().getClientManager().getRepository(taskData.getRepositoryUrl());
-                    resolvedStatus = repository.getCache(new NullProgressMonitor()).getAssignedStatus();
+                    resolvedStatus = repository.getCache(new NullProgressMonitor()).getResolvedStatusName();
                     
                 } catch (MantisException e) {
                     resolvedStatus = "resolved";
