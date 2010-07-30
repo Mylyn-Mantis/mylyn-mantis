@@ -54,6 +54,14 @@ public enum RepositoryVersion {
     VERSION_1_2_OR_HIGHER(true, true, true, true, true),
     
     /**
+     * Versions 1.2.2 or newer.
+     * 
+     * <p>Supports target_version, task relations, does not require
+     * Base64-encoding of attachments and has due date support.</p>
+     */
+    VERSION_1_2_2_OR_HIGHER(true, true, false, true, true),
+    
+    /**
      * Versions 1.3 or newer.
      * 
      * <p>Since this is a dev version, things might break.</p>
@@ -80,8 +88,14 @@ public enum RepositoryVersion {
         	if ( qualifier.startsWith("rc"))
         		return VERSION_1_2_RC1_OR_HIGHER;
         	
-        	if ( qualifier.length() == 0)
-        	    return VERSION_1_2_OR_HIGHER;
+        	if ( qualifier.length() == 0) {
+        		
+        		int minorVersion = extractMantisMinorVersion(versionString);
+        		if ( minorVersion < 2)
+        			return VERSION_1_2_OR_HIGHER;
+        		else
+        			return VERSION_1_2_2_OR_HIGHER;
+        	}
         	
         	return VERSION_1_2_A3_OR_LOWER;
         }

@@ -78,5 +78,10 @@ public class RepositoryVersionTest extends TestCase {
 	public void testVersion13DevisRecognized() throws MantisException {
 		assertEquals(RepositoryVersion.VERSION_1_3_DEV, RepositoryVersion.fromVersionString("1.3dev"));
 	}
+	
+	public void testVersion122IsRecognized() throws MantisException {
+
+		assertEquals(RepositoryVersion.VERSION_1_2_2_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.2"));
+	}
 
 }
