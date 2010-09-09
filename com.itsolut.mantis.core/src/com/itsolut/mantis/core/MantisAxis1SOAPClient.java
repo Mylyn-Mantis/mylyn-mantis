@@ -90,11 +90,19 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
     private String getUsername() {
 
-        return location.getCredentials(AuthenticationType.REPOSITORY).getUserName();
+        AuthenticationCredentials credentials = location.getCredentials(AuthenticationType.REPOSITORY);
+        if ( credentials == null)
+            return null;
+        
+        return credentials.getUserName();
     }
 
     private String getPassword() {
-
+      
+        AuthenticationCredentials credentials = location.getCredentials(AuthenticationType.REPOSITORY);
+        if ( credentials == null)
+            return null;
+        
         return location.getCredentials(AuthenticationType.REPOSITORY).getPassword();
     }
 
