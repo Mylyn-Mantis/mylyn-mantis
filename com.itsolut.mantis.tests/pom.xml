@@ -12,6 +12,10 @@
 	<artifactId>com.itsolut.mantis.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 	<name>Mylyn Mantis Connector tests</name>
+	
+	<properties>
+		<mantis.test.MANTIS_12_BASIC.url>http://localhost/mantis-1.2/api/soap/mantisconnect.php</mantis.test.MANTIS_12_BASIC.url>
+	</properties>
 
 	<build>
 		<plugins>
@@ -20,7 +24,9 @@
 				<artifactId>maven-osgi-test-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<useUIHarness>true</useUIHarness>
+					<systemProperties>
+						<mantis.test.MANTIS_12_BASIC.url>${mantis.test.MANTIS_12_BASIC.url}</mantis.test.MANTIS_12_BASIC.url>
+					</systemProperties>
 				</configuration>
 			</plugin>
 		</plugins>
