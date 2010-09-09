@@ -250,9 +250,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
         } catch ( NumberFormatException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid time tracking value, must be an integer.", e, repository));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid time tracking value, must be an integer.", new MantisException(e), repository));
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed submitting task data.", e, repository));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
         }
     }
 
