@@ -23,11 +23,16 @@ package com.itsolut.mantis.ui.tasklist;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -36,7 +41,10 @@ import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisClientFactory;
@@ -128,7 +136,22 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
         return MantisCorePlugin.REPOSITORY_KIND;
     }
-
+    
+    @Override
+    protected void applyValidatorResult(Validator validator) {
+    
+        super.applyValidatorResult(validator);
+        
+        if ( validator.getStatus().getSeverity() != IStatus.ERROR)
+            return;
+        
+        if ( validator.getStatus().getMessage().toLowerCase(Locale.ENGLISH).indexOf("access denied") != -1)
+            return;
+        
+        
+        ErrorDialog.openError(getShell(), "Unexpected repository error", "The repository has returned an unknown error. Most likely there is an error in the repository configuration.\n\nPlease see https://sourceforge.net/apps/mediawiki/mylyn-mantis/index.php?title=Troubleshooting for instructions.\n\nThe actual error message follows.", validator.getStatus());
+    }
+    
     // public for testing
     public class MantisValidator extends Validator {
 
