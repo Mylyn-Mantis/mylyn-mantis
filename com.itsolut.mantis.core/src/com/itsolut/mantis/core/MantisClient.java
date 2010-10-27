@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.axis.encoding.Base64;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -77,7 +78,18 @@ public class MantisClient implements IMantisClient {
 
     private String getUserName() {
 
-        return location.getCredentials(AuthenticationType.REPOSITORY).getUserName();
+        // usual case
+        AuthenticationCredentials credentials = location.getCredentials(AuthenticationType.REPOSITORY);
+        
+        // HTTP-only authentication
+        if  ( credentials == null)
+            credentials = location.getCredentials(AuthenticationType.HTTP);
+        
+        // no login specified is not supported ATM by the SOAP API, but there's no harm done either
+        if ( credentials == null)
+            return null;
+        
+        return credentials.getUserName();
     }
 
     private void addRelationsIfApplicable(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
