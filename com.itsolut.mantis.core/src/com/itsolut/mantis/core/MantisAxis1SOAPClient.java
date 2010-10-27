@@ -115,7 +115,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
             }
 
             try {
-                FileProvider provider = new FileProvider(this.getClass().getClassLoader().getResourceAsStream(
+                FileProvider provider = new FileProvider(getClass().getResourceAsStream(
                         "client-config.wsdd"));
                 CustomMantisConnectLocator locator = new CustomMantisConnectLocator(provider);
                 locator.setLocation(getLocation());
