@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.AttachmentData;
@@ -121,6 +122,8 @@ public class MantisConverter {
         if (issue.getCustom_fields() != null)
             for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
                 ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
+        
+        MantisCorePlugin.debug(NLS.bind("Converted IssueData to {0}." , ticket), null);
 
         return ticket;
 
@@ -180,11 +183,14 @@ public class MantisConverter {
             ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
             ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
             ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
+            
 
             // DC: Added so that it isn't necessary to retrieve all tasks one at time
             // to see if they have changed since the last synchronization.
             // This cuts down on the number of soap requests that need to be made to the server.
             ticket.setLastChanged(ihd.getLast_updated().getTime());
+            
+            MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}." , ticket), null);
             
             return ticket;
     }
