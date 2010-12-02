@@ -295,11 +295,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         Date repositoryDate = mapper.getModificationDate();
         Date taskModDate = task.getModificationDate();
+        
+        MantisCorePlugin.debug(NLS.bind("Checking if task with id {0} has changed: repositoryDate is {1} and task modification date is {2}", new Object[] { task.getTaskId(), repositoryDate, taskModDate }), null);
 
-        if (repositoryDate != null && repositoryDate.equals(taskModDate)) {
-            return false;
-        }
-        return true;
+        return repositoryDate == null || !repositoryDate.equals(taskModDate) ? true : false;
     }
 
     @Override
