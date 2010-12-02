@@ -327,4 +327,23 @@ public class MantisTicket {
     //	}
 
 
+    @Override
+    public String toString() {
+    
+        StringBuilder toString = new StringBuilder();
+        toString.append(getClass().getSimpleName());
+        toString.append('{');
+        
+        toString.append(" id : ").append(id).append(",");
+        
+        for ( Map.Entry<Key, String> entry : valueByKey.entrySet())
+            toString.append(' ').append(entry.getKey()).append(" : ").append(entry.getValue()).append(",");
+
+        toString.append(" created : ").append(created).append(",");
+        toString.append(" lastChanged : ").append(lastChanged).append(" ");
+        
+        toString.append('}');
+        
+        return toString.toString();
+    }
 }
