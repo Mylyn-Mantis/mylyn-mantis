@@ -352,10 +352,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public void preSynchronization(ISynchronizationSession event, IProgressMonitor monitor) throws CoreException {
 
-        if (!event.isFullSynchronization()) {
-            return;
-        }
-
         // No Tasks, don't contact the repository
         if (event.getTasks().isEmpty()) {
             return;
@@ -395,13 +391,15 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
             List<Integer> taskIds = getChangedTasksByQuery(query, repository, since, monitor);
 
-            MantisCorePlugin.debug("Found " + taskIds.size() + " changed task ids.", null);
+            MantisCorePlugin.debug(NLS.bind("Found {0} changed task ids.", taskIds.size()), null);
 
             for (Integer taskId : taskIds) {
                 for (ITask task : event.getTasks()) {
                     if (getTicketId(task.getTaskId()) == taskId.intValue()) {
                         event.setNeedsPerformQueries(true);
                         event.markStale(task);
+                        
+                        MantisCorePlugin.debug(NLS.bind("Marking task {0} as stale.", task), null);
                     }
                 }
             }
