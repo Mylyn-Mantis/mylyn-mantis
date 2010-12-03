@@ -37,7 +37,7 @@ public class MantisImages {
 			throw new MalformedURLException();
 
 		StringBuffer buffer = new StringBuffer(prefix);
-		if (prefix != "")
+		if (!"".equals(prefix))
 			buffer.append('/');
 		buffer.append(name);
 		return new URL(baseURL, buffer.toString());
