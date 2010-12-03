@@ -22,14 +22,7 @@
 
 package com.itsolut.mantis.core;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -188,6 +181,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
                     MantisCacheData data = (MantisCacheData) in.readObject();
                     add(url, data);
                 }
+            } catch ( FileNotFoundException cacheDoesNotExist) {
+                // possible, deal with it
             } catch (Throwable e) {
                 cleanCache(e);
             } finally {
