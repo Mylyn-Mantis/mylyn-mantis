@@ -62,8 +62,8 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
             return client.getAttachmentData(Integer.parseInt(id), monitor);
-        } catch (Exception e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " +repository.getRepositoryUrl() + " failed, please see details.", e , repository));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " +repository.getRepositoryUrl() + " failed : " + e.getMessage(), e , repository));
         }
     }
 
