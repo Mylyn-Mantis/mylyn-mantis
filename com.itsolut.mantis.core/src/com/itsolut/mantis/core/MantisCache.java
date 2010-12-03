@@ -840,9 +840,10 @@ public class MantisCache {
     	
         List<String> reporters = cacheData.reportersByProjectId.get(projectId);
         if (reporters == null) {
+            reporters = new ArrayList<String>();
             MantisCorePlugin.warn("cacheData.reportersByProjectId is null for projectId " + projectId + " .",
                     new RuntimeException());
-            cacheData.reportersByProjectId.put(projectId, new ArrayList<String>());
+            cacheData.reportersByProjectId.put(projectId, reporters);
         }
         
         
