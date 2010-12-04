@@ -727,6 +727,26 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
         }
     }
+    
+    public TaskData createTaskDataFromPartialTicket(IMantisClient client,
+            TaskRepository repository, MantisTicket ticket,
+            IProgressMonitor monitor) throws CoreException, MantisException {
+     
+        TaskData taskData = new TaskData(getAttributeMapper(repository),
+                MantisCorePlugin.REPOSITORY_KIND,
+                repository.getRepositoryUrl(), String.valueOf(ticket.getId()));
+        taskData.setPartial(true);
+        
+        createAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT).setValue(ticket.getValue(Key.PROJECT));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.SUMMARY).setValue(ticket.getValue(Key.SUMMARY));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.STATUS).setValue(ticket.getValue(Key.STATUS));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.RESOLUTION).setValue(ticket.getValue(Key.RESOLUTION));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.PRIORITY).setValue(ticket.getValue(Key.PRIORITY));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.SEVERITY).setValue(ticket.getValue(Key.SEVERITY));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
+        
+        return taskData;
+    }
 
     /**
      * @param taskData

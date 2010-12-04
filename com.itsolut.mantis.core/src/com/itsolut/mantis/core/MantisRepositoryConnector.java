@@ -138,11 +138,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             client = getClientManager().getRepository(repository);
             client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
-            for (MantisTicket ticket : tickets) {
-                TaskData taskData = offlineTaskHandler.createTaskDataFromTicket(client, repository, ticket, monitor);
-                taskData.setPartial(true); // IMantisClient.search returns partial data
-                resultCollector.accept(taskData);
-            }
+            for (MantisTicket ticket : tickets)
+                resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository, ticket, monitor));
+            
         } catch (MantisException e) {
             return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
         } catch (CoreException e) {
@@ -262,7 +260,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         Date repositoryDate = mapper.getModificationDate();
         Date taskModDate = task.getModificationDate();
         
-        MantisCorePlugin.debug(NLS.bind("Checking if task with id {0} has changed: repositoryDate is {1} and task modification date is {2}", new Object[] { task.getTaskId(), repositoryDate, taskModDate }), null);
+        MantisCorePlugin.debug(NLS.bind("Checking if task with id {0} has changed: repositoryDate is {1} and task modification date is {2}", new Object[] { task.getTaskId(), repositoryDate, taskModDate }), new RuntimeException());
 
         return repositoryDate == null || !repositoryDate.equals(taskModDate) ? true : false;
     }

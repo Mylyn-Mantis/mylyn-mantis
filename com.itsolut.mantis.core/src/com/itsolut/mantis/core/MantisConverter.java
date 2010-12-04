@@ -190,7 +190,7 @@ public class MantisConverter {
             // This cuts down on the number of soap requests that need to be made to the server.
             ticket.setLastChanged(ihd.getLast_updated().getTime());
             
-            MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}." , ticket), null);
+            MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}." , ticket), new RuntimeException());
             
             return ticket;
     }
