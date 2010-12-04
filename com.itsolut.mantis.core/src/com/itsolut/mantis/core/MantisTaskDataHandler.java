@@ -275,7 +275,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         type.performPostOperation(taskData);
     }
 
-    public MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws InvalidTicketException {
+    private MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws InvalidTicketException {
         MantisTicket ticket;
         if (data.getTaskId() == null || data.getTaskId().length() == 0)
             ticket = new MantisTicket();
@@ -341,7 +341,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public void updateTaskData(TaskRepository repository,
+    private void updateTaskData(TaskRepository repository,
             TaskAttributeMapper attributeMapper, TaskData data,
             IMantisClient client, MantisTicket ticket) throws CoreException, MantisException {
 
@@ -501,7 +501,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public void createDefaultAttributes(TaskData data,
+    private void createDefaultAttributes(TaskData data,
             IMantisClient client, String projectName, IProgressMonitor monitor, boolean existingTask) throws CoreException {
 
         // The order here is important as it controls how it appears in the
@@ -579,7 +579,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(data, MantisAttributeMapper.Attribute.RELATED_TO, null);
     }
 
-    public void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+    private void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) throws MantisException {
 
             // categories
             TaskAttribute attr = getAttribute(data,
@@ -735,7 +735,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
      * @param monitor
      * @throws MantisException
      */
-    public void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
+    private void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
             MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
         
         TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
