@@ -20,7 +20,6 @@ import junit.framework.TestSuite;
 public class AllMantisTests {
 
 	public static Test suite() {
-		//		UrlConnectionUtil.initCommonsLoggingSettings();
 
 		TestSuite suite = new TestSuite("Test for com.itsolut.mantis.tests");
 		//$JUnit-BEGIN$
