@@ -352,11 +352,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         for (IRepositoryQuery query : queries) {
 
-            List<Integer> taskIds = getChangedTasksByQuery(query, repository, since, monitor);
-
-            MantisCorePlugin.debug(NLS.bind("Found {0} changed task ids.", taskIds.size()), null);
-
-            for (Integer taskId : taskIds) {
+            for (Integer taskId : getChangedTasksByQuery(query, repository, since, monitor)) {
                 for (ITask task : event.getTasks()) {
                     if (getTicketId(task.getTaskId()) == taskId.intValue()) {
                         event.setNeedsPerformQueries(true);
