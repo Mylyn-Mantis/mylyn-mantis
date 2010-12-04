@@ -158,7 +158,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private static final String CONTEXT_ATTACHMENT_FILENAME_LEGACY = "mylar-context.zip";
 
-    private final Map<Attribute, RelationType> attributeToRelationType = new EnumMap<Attribute, RelationType>(Attribute.class);
+    private static final Map<Attribute, RelationType> attributeToRelationType = new EnumMap<Attribute, RelationType>(Attribute.class);
 
     {
         attributeToRelationType.put(Attribute.RELATED_TO, RelationType.RELATED);
@@ -341,7 +341,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public static void updateTaskData(TaskRepository repository,
+    public void updateTaskData(TaskRepository repository,
             TaskAttributeMapper attributeMapper, TaskData data,
             IMantisClient client, MantisTicket ticket) throws CoreException, MantisException {
 
@@ -376,7 +376,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
 
-    private static void addOperation(TaskData data, MantisTicket ticket, OperationType operation) {
+    private void addOperation(TaskData data, MantisTicket ticket, OperationType operation) {
 
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
 
@@ -392,17 +392,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 operation.getAttribute().getKey());
     }
 
-    // Resolve As Operation
-    // MantisResolution[] options = client.getTicketResolutions();
-    // TaskAttribute operationResolveAs = data.getRoot().createAttribute(
-    // TaskAttribute.OPERATION);
-    // for (MantisResolution op : options) {
-    // operationResolveAs.putOption(op.getName(), op.getName());
-    // }
-    // operationResolveAs.setValue("fixed");
-    // TaskOperation.applyTo(operationResolveAs, "resolve_as", "Resolve As");
-
-    private static void addRelationships(TaskData data, MantisTicket ticket) {
+    private void addRelationships(TaskData data, MantisTicket ticket) {
 
         // relationships - support only child issues
         MantisRelationship[] relationsShips = ticket.getRelationships();
@@ -451,8 +441,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
-
-    private static void addAttachments(TaskRepository repository,
+    private void addAttachments(TaskRepository repository,
             TaskData data, MantisTicket ticket) {
 
         int i = 1;
@@ -486,7 +475,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    private static void addComments(TaskData data, MantisTicket ticket) {
+    private void addComments(TaskData data, MantisTicket ticket) {
         int i = 1;
         if (ticket.getComments() == null)
             return;
@@ -512,7 +501,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    public static void createDefaultAttributes(TaskData data,
+    public void createDefaultAttributes(TaskData data,
             IMantisClient client, String projectName, IProgressMonitor monitor, boolean existingTask) throws CoreException {
 
         // The order here is important as it controls how it appears in the
@@ -581,7 +570,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
-    private static void createTaskRelations(TaskData data, IMantisClient client) {
+    private void createTaskRelations(TaskData data, IMantisClient client) {
 
         createAttribute(data, MantisAttributeMapper.Attribute.PARENT_OF, null);
         createAttribute(data, MantisAttributeMapper.Attribute.CHILD_OF, null);
@@ -590,7 +579,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(data, MantisAttributeMapper.Attribute.RELATED_TO, null);
     }
 
-    public static void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+    public void createProjectSpecificAttributes(TaskData data, IMantisClient client, IProgressMonitor monitor) throws MantisException {
 
             // categories
             TaskAttribute attr = getAttribute(data,
@@ -653,7 +642,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 targetVersionAttr.setValue("none");
     }
 
-    private static TaskAttribute createAttribute(TaskData data,
+    private TaskAttribute createAttribute(TaskData data,
             MantisAttributeMapper.Attribute attribute, Object[] values,
             boolean allowEmtpy) {
 
@@ -673,7 +662,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         return attr;
     }
 
-    private static TaskAttribute createAttribute(TaskData data,
+    private TaskAttribute createAttribute(TaskData data,
             MantisAttributeMapper.Attribute attribute) {
 
         boolean readOnly = data.isNew() ? attribute.isReadOnlyForNewTask() : attribute.isReadOnlyForExistingTask();
@@ -685,7 +674,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         return attr;
     }
 
-    private static TaskAttribute createAttribute(TaskData data,
+    private TaskAttribute createAttribute(TaskData data,
             MantisAttributeMapper.Attribute attribute, Object[] values,
             String defaultValue) {
         TaskAttribute rta = createAttribute(data, attribute, values, false);
@@ -693,14 +682,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         return rta;
     }
 
-    private static TaskAttribute getAttribute(TaskData data, String key) {
+    private TaskAttribute getAttribute(TaskData data, String key) {
         TaskAttribute attribute = data.getRoot().getAttribute(key);
         if (attribute == null)
             attribute = data.getRoot().createAttribute(key);
         return attribute;
     }
 
-    private static TaskAttribute createAttribute(TaskData data,
+    private TaskAttribute createAttribute(TaskData data,
             MantisAttributeMapper.Attribute attribute, Object[] values) {
         return createAttribute(data, attribute, values, false);
     }
@@ -746,7 +735,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
      * @param monitor
      * @throws MantisException
      */
-    public static void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
+    public void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
             MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
         
         TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
