@@ -771,42 +771,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
     }
 
-    /**
-     * Updates attributes of <code>taskData</code> from <code>ticket</code>.
-     * @throws MantisException 
-     * 
-     * @deprecated Possibly not used - double-check
-     */
-    @Deprecated
-    public void updateTaskDataFromTicket(TaskData taskData,
-            MantisTicket ticket, IMantisClient client) throws MantisException {
-
-        TaskAttribute attributeSummary = taskData.getRoot().getAttribute(
-                TaskAttribute.SUMMARY);
-        if (ticket.getValue(Key.SUMMARY) != null)
-            attributeSummary.setValue(ticket.getValue(Key.SUMMARY));
-
-        TaskAttribute attributeCompletionDate = taskData.getRoot()
-        .getAttribute(TaskAttribute.DATE_COMPLETION);
-
-        if (client.isCompleted(taskData, new NullProgressMonitor()))
-            attributeCompletionDate
-            .setValue(ticket.getLastChanged().toString());
-        else
-            attributeCompletionDate.setValue(null);
-
-        String priority = ticket.getValue(Key.PRIORITY);
-        TaskAttribute attributePriority = taskData.getRoot().getAttribute(
-                TaskAttribute.PRIORITY);
-        attributePriority.setValue(MantisPriorityLevel.getMylynPriority(
-                priority).toString());
-
-        TaskAttribute attributeCreationDate = taskData.getRoot().getAttribute(
-                TaskAttribute.DATE_CREATION);
-        if (ticket.getCreated() != null)
-            attributeCreationDate.setValue(ticket.getCreated().toString());
-    }
-    
     @Override
     public boolean canInitializeSubTaskData(TaskRepository taskRepository,
     		ITask task) {

@@ -59,7 +59,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
      *
      */
     public enum Attribute {
-        ID(Key.ID, "<used by search engine>", IMantisConstants.METADATA_SEARCH_ID, true),
+        ID(Key.ID, "<used by search engine>", MantisAttributeMapper.METADATA_SEARCH_ID, true),
         ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
         CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -190,6 +190,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     }
     
     private Map<String, Attribute> taskAttributeToMantisAttributes = new HashMap<String, Attribute>();
+
+    public static final String METADATA_SEARCH_ID = "mantis.search.id";
     {
     	taskAttributeToMantisAttributes.put(TaskAttribute.PRODUCT, Attribute.PROJECT);
     	taskAttributeToMantisAttributes.put(TaskAttribute.COMMENT_NEW, Attribute.NEW_COMMENT);

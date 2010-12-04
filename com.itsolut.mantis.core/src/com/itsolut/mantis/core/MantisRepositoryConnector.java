@@ -29,32 +29,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.core.runtime.*;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
-import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
-import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
-import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
-import org.eclipse.mylyn.tasks.core.data.TaskMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskRelation;
+import org.eclipse.mylyn.tasks.core.*;
+import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
-import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -183,29 +167,11 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         return clientManager;
     }
 
-    public static String getTicketDescription(MantisTicket ticket) {
-
-        return ticket.getValue(Key.SUMMARY);
-    }
-
-    public static String getTicketDescription(TaskData taskData) {
-
-        return taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.DESCRIPTION.toString()).toString();
-    }
-
     public void stop() {
 
         if (clientManager != null)
             clientManager.persistCache();
 
-    }
-
-    public static String getDisplayUsername(TaskRepository repository) {
-
-        if (repository.getCredentials(AuthenticationType.REPOSITORY) == null) {
-            return IMantisClient.DEFAULT_USERNAME;
-        }
-        return repository.getUserName();
     }
 
     @Override

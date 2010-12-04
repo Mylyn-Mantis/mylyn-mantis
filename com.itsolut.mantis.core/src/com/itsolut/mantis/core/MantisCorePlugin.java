@@ -57,10 +57,6 @@ public class MantisCorePlugin extends Plugin {
     
     private StatusFactory statusFactory;
 
-    public MantisCorePlugin() {
-
-    }
-
     public static MantisCorePlugin getDefault() {
 
         return plugin;

@@ -38,9 +38,9 @@ import com.itsolut.mantis.core.model.MantisSearch;
  */
 public class MantisUtils {
 
-    public static Date parseDate(long seconds) {
+    public static Date parseDate(long milliseconds) {
 
-        return new Date(seconds);
+        return new Date(milliseconds);
     }
 
     public static long toMantisTime(Date date) {
@@ -77,15 +77,6 @@ public class MantisUtils {
             baseUrl = repositoryUrl.substring(0, repositoryUrl.toLowerCase().indexOf("api/soap/mantisconnect.php"));
 
         return baseUrl;
-    }
-
-    public static String getQueryParameter(IRepositoryQuery query) {
-
-        String url = query.getUrl();
-        int i = url.indexOf(IMantisClient.QUERY_URL);
-        if (i == -1)
-            return null;
-        return url.substring(i + IMantisClient.QUERY_URL.length());
     }
 
     /**

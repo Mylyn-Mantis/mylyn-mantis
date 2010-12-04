@@ -42,17 +42,7 @@ public interface IMantisClient {
 
     public static final String TIME_ZONE = "UTC";
 
-    // public static final String LOGIN_URL = "/login";
-
-    public static final String QUERY_URL = "/query?format=tab";
-
-    public static final String TICKET_URL = "/mc_issue_get";
-
-    public static final String NEW_TICKET_URL = "/mc_issue_add";
-
     public static final String TICKET_ATTACHMENT_URL = "file_download.php?type=bug&file_id=";
-
-    public static final String DEFAULT_USERNAME = "anonymous";
 
     public static final String URL_SHOW_BUG = "view.php?id=";
 
