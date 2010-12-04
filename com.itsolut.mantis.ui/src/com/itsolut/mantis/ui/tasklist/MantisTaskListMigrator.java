@@ -19,10 +19,6 @@ import org.w3c.dom.Element;
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 
-/**
- * @author Rob Elves
- * @since 3.0
- */
 public class MantisTaskListMigrator extends AbstractTaskListMigrator {
 
 	private static final String KEY_SEVERITY = "mantis.severity";
@@ -53,9 +49,6 @@ public class MantisTaskListMigrator extends AbstractTaskListMigrator {
 	@Override
 	public void migrateQuery(IRepositoryQuery query, Element element) {
 		query.setAttribute(KEY_MANTIS_QUERY, Boolean.TRUE.toString());
-//		if (element.getNodeName().equals(IBugzillaConstants.TAG_BUGZILLA_CUSTOM_QUERY)) {
-//			query.setAttribute(IBugzillaConstants.ATTRIBUTE_BUGZILLA_QUERY_CUSTOM, Boolean.TRUE.toString());
-//		}
 	}
 
 	@Override
@@ -64,13 +57,6 @@ public class MantisTaskListMigrator extends AbstractTaskListMigrator {
 			task.setAttribute(MantisAttributeMapper.Attribute.STATUS.getKey(),
 					element.getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()));
 		}
-//		if (element.hasAttribute(KEY_PRODUCT)) {
-//			task.setAttribute(BugzillaAttribute.PRODUCT.getKey(),
-//					element.getAttribute(BugzillaAttribute.PRODUCT.getKey()));
-//		}
-//		if (element.hasAttribute(KEY_LAST_MOD_DATE)) {
-//			task.setAttribute(BugzillaAttribute.DELTA_TS.getKey(), element.getAttribute(KEY_LAST_MOD_DATE));
-//		}
 	}
 
 }
