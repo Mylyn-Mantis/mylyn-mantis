@@ -209,7 +209,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since,
             IProgressMonitor monitor) throws CoreException {
 
-        MantisCorePlugin.debug(NLS.bind("Looking for tasks changed in query {0} since {1} .", query, since), null);
+        MantisCorePlugin.debug(NLS.bind("Looking for tasks changed in query {0} since {1} .", query.getSummary(), since), null);
         
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
