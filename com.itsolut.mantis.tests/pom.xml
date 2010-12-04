@@ -24,6 +24,7 @@
 				<artifactId>maven-osgi-test-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
+					<useUIHarness>true</useUIHarness> 
 					<systemProperties>
 						<mantis.test.MANTIS_12_BASIC.url>${mantis.test.MANTIS_12_BASIC.url}</mantis.test.MANTIS_12_BASIC.url>
 					</systemProperties>
