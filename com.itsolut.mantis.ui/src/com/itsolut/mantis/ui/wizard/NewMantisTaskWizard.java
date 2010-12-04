@@ -67,14 +67,5 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 			}
 		};
 	}
-	
-//	@Override
-//	public boolean performFinish() {
-//		TaskEditorInput editorInput = new TaskEditorInput(taskRepository, (ITask)this.newTaskPage.getRepositoryTaskData());
-//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//		TasksUiUtil.openEditor(editorInput, TaskEditor.ID_EDITOR, page);
-//		
-//		return true;
-//	}
 
 }
