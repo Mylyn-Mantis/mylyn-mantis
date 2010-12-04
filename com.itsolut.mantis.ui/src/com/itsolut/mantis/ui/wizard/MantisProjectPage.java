@@ -47,7 +47,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -55,6 +54,7 @@ import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.ui.MantisUIPlugin;
+import com.itsolut.mantis.ui.internal.MantisImages;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
@@ -74,8 +74,7 @@ public class MantisProjectPage extends WizardPage {
         super("New Task");
         setTitle("Mantis - Select project");
         setDescription("Select the tickets project.");
-        setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.itsolut.mantis.ui",
-        "icons/wizban/mantis_logo_button.gif"));
+        setImageDescriptor(MantisImages.WIZARD);
 
         this.taskRepository = taskRepository;
     }

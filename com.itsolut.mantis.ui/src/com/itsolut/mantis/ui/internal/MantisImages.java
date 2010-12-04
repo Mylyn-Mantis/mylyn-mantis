@@ -21,6 +21,8 @@ public class MantisImages {
 	public static final ImageDescriptor OVERLAY_ENHANCEMENT = create(T_VIEW, "overlay-enhancement.gif");
 
 	public static final ImageDescriptor OVERLAY_MINOR = create(T_VIEW, "overlay-minor.gif");
+	
+	public static final ImageDescriptor WIZARD = create(T_VIEW, "wizban/mantis_logo_button.gif");
 
 	private static ImageDescriptor create(String prefix, String name) {
 		try {
