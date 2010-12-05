@@ -54,7 +54,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         state.read();
     }
 
-    public void persistCache() {
+    public synchronized void persistCache() {
 
         state.write();
     }
@@ -113,7 +113,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         state.remove(repository.getRepositoryUrl());
     }
 
-    public void repositoryChanged(TaskRepositoryChangeEvent event) {
+    public synchronized void repositoryChanged(TaskRepositoryChangeEvent event) {
 
         TaskRepository repository = event.getRepository();
         TaskRepositoryDelta delta = event.getDelta();
