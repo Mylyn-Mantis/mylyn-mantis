@@ -39,8 +39,6 @@ public class MantisRepositoryAccessor {
 	private final String password;
 	private final String repositoryUrl;
 	
-	
-
 	public MantisRepositoryAccessor(String username, String password, String repositoryUrl) {
 		
 		this.username = username;
