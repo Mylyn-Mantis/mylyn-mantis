@@ -148,9 +148,8 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
         return super.getTaskKindOverlay(task);
     }
 
-    //
     @Override
-    public IHyperlink[] findHyperlinks(TaskRepository repository, String text, int lineOffset, int regionOffset) {
+    public IHyperlink[] findHyperlinks(TaskRepository repository, ITask task, String text, int lineOffset, int regionOffset) {
 
         Matcher matcher = HYPERLINK_PATTERN.matcher(text);
 
