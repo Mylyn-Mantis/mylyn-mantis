@@ -95,7 +95,6 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		assertEquals("hits.size", 2, hits.size());
 		for (TaskData taskData : hits) {
 			assertNotNull("summary", taskData.getRoot().getMappedAttribute(TaskAttribute.SUMMARY));
-			assertNotNull("description", taskData.getRoot().getMappedAttribute(TaskAttribute.DESCRIPTION));
 			assertNotNull("status", taskData.getRoot().getMappedAttribute(TaskAttribute.STATUS));
 			assertTrue(taskData.isPartial());
 		}
