@@ -196,7 +196,6 @@ public class MantisTicket {
         valueByKey.put(key, value);
     }
 
-    //
     /**
      * Stores a value as it is retrieved from the repository.
      * 
@@ -246,7 +245,7 @@ public class MantisTicket {
 
         timeSpent += comment.getTimeTracking();
         
-        putValue(Key.TIME_SPENT.toString(), String.format("%d:%2d", timeSpent / 60, timeSpent % 60));
+        putValue(Key.TIME_SPENT.toString(), String.format("%d:%02d", timeSpent / 60, timeSpent % 60));
         putValue(Key.TIME_SPENT_NEW.toString(), "");
         
     }
