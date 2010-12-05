@@ -104,22 +104,12 @@ public class MantisTicket {
         }
     }
 
-    public static final int INVALID_ID = -1;
-
-    private int id = INVALID_ID;
+    private int id;
     
     private int timeSpent = 0;
 
     private Date lastChanged;
     private Date created;
-
-    //	/**
-    //	 * User defined custom ticket fields.
-    //	 *
-    //	 * @see http://projects.edgewall.com/trac/wiki/TracTicketsCustomFields
-    //	 */
-    //	private Map<String, String> customValueByKey;
-    //
 
     /** Mantis' built-in ticket properties. */
     private final Map<Key, String> valueByKey = new HashMap<Key, String>();
@@ -132,13 +122,11 @@ public class MantisTicket {
     
     private Map<String, String> customFieldValues = new HashMap<String, String>(); 
 
-    //	private String[] actions;
-    //
-    //	private String[] resolutions;
-    //
     public MantisTicket() {
+
+        this(-1);
     }
-    //
+    
     /**
      * Constructs a Trac ticket.
      * 
@@ -172,13 +160,6 @@ public class MantisTicket {
         this.lastChanged = lastChanged;
     }
 
-    //	public String getCustomValue(String key) {
-    //		if (customValueByKey == null) {
-    //			return null;
-    //		}
-    //		return customValueByKey.get(key);
-    //	}
-    //
     public String getValue(Key key) {
         return valueByKey.get(key);
     }
@@ -208,26 +189,13 @@ public class MantisTicket {
         for (Key key : valueByKey.keySet()) {
             result.put(key.getKey(), valueByKey.get(key));
         }
-        //		if (customValueByKey != null) {
-        //			result.putAll(customValueByKey);
-        //		}
         return result;
-    }
-
-    public boolean isValid() {
-        return getId() != MantisTicket.INVALID_ID;
     }
 
     public void putBuiltinValue(Key key, String value)  {
         valueByKey.put(key, value);
     }
 
-    //	public void putCustomValue(String key, String value) {
-    //		if (customValueByKey == null) {
-    //			customValueByKey = new HashMap<String, String>();
-    //		}
-    //		customValueByKey.put(key, value);
-    //	}
     //
     /**
      * Stores a value as it is retrieved from the repository.
@@ -238,12 +206,11 @@ public class MantisTicket {
     public boolean putValue(String keyName, String value){
         Key key = Key.fromKey(keyName);
         if (key != null) {
+            
             if (key == Key.ID || key == Key.LAST_UPDATED) {
                 return false;
             }
             putBuiltinValue(key, value);
-            //		} else if (value instanceof String) {
-            //			putCustomValue(keyName, value);
         } else {
             putCustomFieldValue(keyName, value);
         }
@@ -309,22 +276,6 @@ public class MantisTicket {
     public MantisAttachment[] getAttachments() {
         return (attachments != null) ? attachments.toArray(new MantisAttachment[0]) : null;
     }
-
-    //	public void setActions(String[] actions) {
-    //		this.actions = actions;
-    //	}
-    //
-    //	public String[] getActions() {
-    //		return actions;
-    //	}
-    //
-    //	public void setResolutions(String[] resolutions) {
-    //		this.resolutions = resolutions;
-    //	}
-    //
-    //	public String[] getResolutions() {
-    //		return resolutions;
-    //	}
 
 
     @Override
