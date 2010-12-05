@@ -7,7 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings({"serial", "unused", "rawtypes"})
 public class RelationshipData  implements java.io.Serializable {
     private java.math.BigInteger id;
 

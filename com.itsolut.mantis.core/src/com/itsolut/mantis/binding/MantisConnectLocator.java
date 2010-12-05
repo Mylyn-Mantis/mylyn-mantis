@@ -7,7 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings({"serial", "rawtypes", "unchecked"})
 public class MantisConnectLocator extends org.apache.axis.client.Service implements com.itsolut.mantis.binding.MantisConnect {
 
     public MantisConnectLocator() {

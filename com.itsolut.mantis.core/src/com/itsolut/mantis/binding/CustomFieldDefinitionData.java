@@ -7,7 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings({"serial", "unused", "rawtypes"})
 public class CustomFieldDefinitionData  implements java.io.Serializable {
     private com.itsolut.mantis.binding.ObjectRef field;
 
