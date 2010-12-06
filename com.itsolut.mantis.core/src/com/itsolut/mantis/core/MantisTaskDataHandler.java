@@ -330,10 +330,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
             MantisTicket ticket = client.getTicket(id, monitor);
-            // createDefaultAttributes(data, client, true);
-            // updateTaskData(repository, attributeMapper, data, client,
-            // ticket);
-            // createProjectSpecificAttributes(data, client);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
@@ -711,9 +707,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     public TaskData createTaskDataFromTicket(IMantisClient client,
             TaskRepository repository, MantisTicket ticket,
             IProgressMonitor monitor) throws CoreException {
-        TaskData taskData = new TaskData(getAttributeMapper(repository),
-                MantisCorePlugin.REPOSITORY_KIND,
-                repository.getRepositoryUrl(), ticket.getId() + "");
+        TaskData taskData = newTaskData(repository, ticket);
         try {
         	String projectName = ticket.getValue(Key.PROJECT);
             createDefaultAttributes(taskData, client, projectName, monitor, true);
@@ -732,9 +726,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskRepository repository, MantisTicket ticket,
             IProgressMonitor monitor) throws CoreException, MantisException {
      
-        TaskData taskData = new TaskData(getAttributeMapper(repository),
-                MantisCorePlugin.REPOSITORY_KIND,
-                repository.getRepositoryUrl(), String.valueOf(ticket.getId()));
+        TaskData taskData = newTaskData(repository, ticket);
         taskData.setPartial(true);
         
         createAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT).setValue(ticket.getValue(Key.PROJECT));
@@ -746,6 +738,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
         
         return taskData;
+    }
+
+    private TaskData newTaskData(TaskRepository repository, MantisTicket ticket) {
+
+        return new TaskData(getAttributeMapper(repository), MantisCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), String.valueOf(ticket.getId()));
     }
 
     /**
