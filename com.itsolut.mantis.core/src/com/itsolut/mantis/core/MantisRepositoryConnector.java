@@ -138,8 +138,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             client = getClientManager().getRepository(repository);
             client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
-            for (MantisTicket ticket : tickets)
+            for (MantisTicket ticket : tickets) {
+                ticket.setLastChanged(null); // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
                 resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository, ticket, monitor));
+            }
             
         } catch (MantisException e) {
             return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
@@ -252,17 +254,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     // Based off of Trac Implementation.
     @Override
     public boolean hasTaskChanged(TaskRepository taskRepository, ITask task, TaskData taskData) {
-
-        // always take into account the modification date since it
-        // is returned by the search query
-        TaskMapper mapper = getTaskMapper(taskData);
-
-        Date repositoryDate = mapper.getModificationDate();
-        Date taskModDate = task.getModificationDate();
         
-        MantisCorePlugin.debug(NLS.bind("Checking if task with id {0} has changed: repositoryDate is {1} and task modification date is {2}", new Object[] { task.getTaskId(), repositoryDate, taskModDate }), new RuntimeException());
+        TaskAttribute attrModification = taskData.getRoot().getMappedAttribute(TaskAttribute.DATE_MODIFICATION);
 
-        return repositoryDate == null || !repositoryDate.equals(taskModDate) ? true : false;
+        if (!MantisUtils.hasValue(attrModification))
+            return false;
+
+        Date lastKnownUpdated = task.getModificationDate();
+        
+        Date modified = taskData.getAttributeMapper().getDateValue(attrModification);
+        
+        boolean hasChanged = !MantisUtils.equal(lastKnownUpdated, modified);
+
+        MantisCorePlugin.debug(NLS.bind("Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged), new RuntimeException());
+        
+        return hasChanged;
     }
 
     @Override

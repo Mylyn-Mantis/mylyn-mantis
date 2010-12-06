@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -63,6 +64,17 @@ public class MantisUtils {
     public static boolean isEmpty(String value) {
 
         return (value == null || value.length() == 0);
+    }
+    
+    public static boolean hasValue(TaskAttribute taskAttribute) {
+        
+        return (taskAttribute != null && taskAttribute.getValue() != null
+                && taskAttribute.getValue().length() > 0);
+    }
+    
+    public static boolean equal(Object o1, Object o2) {
+        
+        return o1 == o2 || (o1 != null && o1.equals(o2));
     }
 
     public static String getRepositoryBaseUrl(String repositoryUrl) {
@@ -118,7 +130,7 @@ public class MantisUtils {
      * Parser which supports the legacy query format, encoded in the url
      * 
      * @author Robert Munteanu
-     *
+     * 
      */
     private static class MantisSearchFromUrlParser {
 

@@ -735,7 +735,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(taskData, MantisAttributeMapper.Attribute.RESOLUTION).setValue(ticket.getValue(Key.RESOLUTION));
         createAttribute(taskData, MantisAttributeMapper.Attribute.PRIORITY).setValue(ticket.getValue(Key.PRIORITY));
         createAttribute(taskData, MantisAttributeMapper.Attribute.SEVERITY).setValue(ticket.getValue(Key.SEVERITY));
-        createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
+        if ( ticket.getLastChanged() != null ) // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
+            createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
         
         return taskData;
     }
