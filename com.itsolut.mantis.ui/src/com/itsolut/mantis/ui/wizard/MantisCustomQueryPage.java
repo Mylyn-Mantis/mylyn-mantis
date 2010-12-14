@@ -360,6 +360,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             filterCombo.add(pd.getName());
 
         filterCombo.setText(search.getFilterName());
+        searchLimit.setText(String.valueOf(search.getLimit()));
         
     }
 
