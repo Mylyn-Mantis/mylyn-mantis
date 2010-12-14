@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mylyn Mantis Connector Core
 Bundle-SymbolicName: com.itsolut.mantis.core
-Bundle-Version: 3.1.5.qualifier
+Bundle-Version: 3.1.6.qualifier
 Bundle-Vendor: ITSOLUT
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.commons.core;bundle-version="[3.3.0,4.0.0)",
