@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -49,8 +50,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
@@ -273,12 +276,32 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         projectTreeViewer.setInput(getProjects());
     }
 
+    /**
+     * @return a suitable, visible {@link IRunnableContext}
+     */
     private IRunnableContext getRunnableContext() {
 
-        IRunnableContext container = getContainer();
-
-        if (container == null)
-            container = getSearchContainer().getRunnableContext();
+    	
+    	// we trust the search container to always have a runnable context
+    	if ( getSearchContainer() != null )
+    		return getSearchContainer().getRunnableContext();
+    	
+        // task #155 : when 'New query' is invoked from the the repositories page the shell is not visible
+        final boolean[] shellVisibleHolder = new boolean[] { false } ;
+        
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				if  ( getShell() != null )
+					shellVisibleHolder[0] = getShell().isVisible();
+			}
+		});
+        
+		IRunnableContext container = getContainer();
+        
+		// only get the platform service if the shell is invisible or the container is null
+        if ( !shellVisibleHolder[0] || container == null )
+        	container = PlatformUI.getWorkbench().getProgressService();
+        
         return container;
     }
 
@@ -290,18 +313,18 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
                     .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
             final IMantisClient client = connector.getClientManager().getRepository(repository);
+            
 
             CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
 
                 public void run(IProgressMonitor monitor) throws CoreException {
-
+            
                     try {
                         projects.addAll(client.getCache(monitor).getProjects());
                     } catch (MantisException e) {
                         throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID,
                                 "Failed getting projects : " + e.getMessage(), e));
                     }
-
                 }
             });
         } catch (CoreException e) {
