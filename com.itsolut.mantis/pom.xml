@@ -6,7 +6,7 @@
 		<groupId>com.itsolut.mantis</groupId>
 		<artifactId>parent</artifactId>
 		<version>3.1.6-SNAPSHOT</version>
-		<relativePath>../com.itsolut.mantis.parent</relativePath>
+		<relativePath>../com.itsolut.mantis.parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>com.itsolut.mantis</artifactId>
