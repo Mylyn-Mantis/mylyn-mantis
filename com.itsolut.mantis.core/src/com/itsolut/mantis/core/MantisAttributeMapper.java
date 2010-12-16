@@ -69,7 +69,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, true, true),
         PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
-        PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SHORT_TEXT, true, false),
+        PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
         REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
