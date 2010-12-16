@@ -20,6 +20,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
@@ -329,11 +330,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         int id = MantisRepositoryConnector.getTicketId(taskId);
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
-            MantisTicket ticket = client.getTicket(id, monitor);
-            return createTaskDataFromTicket(client, repository, ticket, monitor);
+            MantisTicket ticket = client.getTicket(id, Policy.subMonitorFor(monitor, 50));
+            return createTaskDataFromTicket(client, repository, ticket, Policy.subMonitorFor(monitor, 50));
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
                     + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e, repository));
+        } finally {
+            monitor.done();
         }
     }
 
@@ -709,22 +712,29 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             IProgressMonitor monitor) throws CoreException {
         TaskData taskData = newTaskData(repository, ticket);
         try {
+            
+            monitor.beginTask("Creating task data for ticket " + ticket.getId(), 4);
         	String projectName = ticket.getValue(Key.PROJECT);
             createDefaultAttributes(taskData, client, projectName, monitor, true);
+            Policy.advance(monitor, 1);
             updateTaskData(repository, getAttributeMapper(repository),
                     taskData, client, ticket);
+            Policy.advance(monitor, 1);
             createProjectSpecificAttributes(taskData, client, monitor);
+            Policy.advance(monitor, 1);
             createCustomFieldAttributes(taskData, client, ticket, monitor);
+            Policy.advance(monitor, 1);
 
             return taskData;
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
+        } finally {
+            monitor.done();
         }
     }
     
     public TaskData createTaskDataFromPartialTicket(IMantisClient client,
-            TaskRepository repository, MantisTicket ticket,
-            IProgressMonitor monitor) throws CoreException, MantisException {
+            TaskRepository repository, MantisTicket ticket) throws CoreException, MantisException {
      
         TaskData taskData = newTaskData(repository, ticket);
         taskData.setPartial(true);

@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.*;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.data.*;
@@ -132,21 +133,27 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             ISynchronizationSession event, IProgressMonitor monitor) {
 
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
-        monitor.beginTask("Querying repository", IProgressMonitor.UNKNOWN);
+        
+        monitor.beginTask("Performing query " + query.getSummary(), 1);
 
         IMantisClient client;
         try {
             client = getClientManager().getRepository(repository);
             client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
+            
             for (MantisTicket ticket : tickets) {
                 ticket.setLastChanged(null); // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
-                resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository, ticket, monitor));
+                resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository, ticket));
             }
+            
+            monitor.worked(1);
             
         } catch (MantisException e) {
             return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
         } catch (CoreException e) {
             return e.getStatus();
+        } finally {
+            monitor.done();
         }
 
         return Status.OK_STATUS;
@@ -225,7 +232,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 if (ticket.getLastChanged() != null && ticket.getLastChanged().compareTo(since) > 0)
                     changedTickets.add(Integer.valueOf(ticket.getId()));
         } catch (MantisException e) {
-           throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed getting changed tasks.", e, repository));
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed getting changed tasks.", e, repository));
         }
         
         MantisCorePlugin.debug(NLS.bind("Found {0} changed tickets.", changedTickets.size()), null);
@@ -321,8 +328,11 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public void preSynchronization(ISynchronizationSession event, IProgressMonitor monitor) throws CoreException {
 
+        
         // No Tasks, don't contact the repository
         if (event.getTasks().isEmpty()) {
+            monitor.beginTask("", 0);
+            monitor.done();
             return;
         }
 
@@ -358,7 +368,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         for (IRepositoryQuery query : queries) {
 
-            for (Integer taskId : getChangedTasksByQuery(query, repository, since, monitor)) {
+            for (Integer taskId : getChangedTasksByQuery(query, repository, since, Policy.subMonitorFor(monitor, 1))) {
                 for (ITask task : event.getTasks()) {
                     if (getTicketId(task.getTaskId()) == taskId.intValue()) {
                         event.setNeedsPerformQueries(true);
@@ -368,9 +378,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                     }
                 }
             }
-
-            monitor.worked(1);
         }
+        
+        monitor.done();
     }
 
     private List<IRepositoryQuery> getMantisQueriesFor(TaskRepository taskRespository) {

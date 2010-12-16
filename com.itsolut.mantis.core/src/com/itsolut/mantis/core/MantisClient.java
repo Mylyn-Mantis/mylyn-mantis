@@ -80,15 +80,15 @@ public class MantisClient implements IMantisClient {
 
         // usual case
         AuthenticationCredentials credentials = location.getCredentials(AuthenticationType.REPOSITORY);
-        
+
         // HTTP-only authentication
-        if  ( credentials == null)
+        if (credentials == null)
             credentials = location.getCredentials(AuthenticationType.HTTP);
-        
+
         // no login specified is not supported ATM by the SOAP API, but there's no harm done either
-        if ( credentials == null)
+        if (credentials == null)
             return null;
-        
+
         return credentials.getUserName();
     }
 
@@ -110,17 +110,23 @@ public class MantisClient implements IMantisClient {
 
     public MantisTicket getTicket(int ticketId, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor, location.getUrl());
+        monitor.beginTask("Getting ticket with id " + ticketId, 1);
 
-        IssueData issueData = soapClient.getIssueData(ticketId, monitor);
+        try {
+            cache.refreshIfNeeded(monitor, location.getUrl());
 
-        registerAdditionalReporters(issueData);
+            IssueData issueData = soapClient.getIssueData(ticketId, monitor);
 
-        MantisTicket ticket = MantisConverter.convert(issueData, this, monitor);
+            registerAdditionalReporters(issueData);
 
-        Policy.advance(monitor, 1);
+            MantisTicket ticket = MantisConverter.convert(issueData, this, monitor);
 
-        return ticket;
+            Policy.advance(monitor, 1);
+
+            return ticket;
+        } finally {
+            monitor.done();
+        }
     }
 
     private void registerAdditionalReporters(IssueData issueData) {
@@ -201,7 +207,8 @@ public class MantisClient implements IMantisClient {
         cache.refresh(monitor, location.getUrl());
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    public void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor)
+            throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -215,7 +222,8 @@ public class MantisClient implements IMantisClient {
         soapClient.updateIssue(issue, monitor);
     }
 
-    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor)
+            throws MantisException {
 
         if (MantisUtils.isEmpty(comment) && timeTracking == 0)
             return;
@@ -255,17 +263,17 @@ public class MantisClient implements IMantisClient {
     public boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
-        
-        return cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled(); 
+
+        return cache.getRepositoryVersion().isHasDueDateSupport() && cache.dueDateIsEnabled();
     }
-    
+
     public boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
-        
+
         return cache.getCacheData().timeTrackingEnabled && cache.getRepositoryVersion().isHasTimeTrackingSupport();
     }
-    
+
     public MantisCacheData getCacheData() {
 
         return cache.getCacheData();
