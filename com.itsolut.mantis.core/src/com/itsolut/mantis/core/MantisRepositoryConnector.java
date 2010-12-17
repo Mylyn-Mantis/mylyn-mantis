@@ -153,12 +153,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     }
 
-    protected void updateAttributes(TaskRepository repository, IProgressMonitor monitor) throws CoreException, MantisException {
-
-        IMantisClient client = getClientManager().getRepository(repository);
-        client.updateAttributes(monitor);
-    }
-
     public synchronized MantisClientManager getClientManager() {
 
         File cacheFile = MantisCorePlugin.getDefault().getRepositoryAttributeCachePath().toFile();
@@ -237,11 +231,21 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public void updateRepositoryConfiguration(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
 
         try {
-            updateAttributes(repository, monitor);
+            getClientManager().getRepository(repository).updateAttributes(monitor);
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, repository));
         }
 
+    }
+    
+    @Override
+    public void updateRepositoryConfiguration(TaskRepository taskRepository, ITask task, IProgressMonitor monitor) throws CoreException {
+
+        try {
+            getClientManager().getRepository(taskRepository).updateAttributesForTask(monitor, Integer.valueOf(task.getTaskId()));
+        } catch (MantisException e) {
+            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, taskRepository));
+        }
     }
 
     @Override

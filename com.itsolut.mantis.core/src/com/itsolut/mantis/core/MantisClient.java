@@ -200,6 +200,13 @@ public class MantisClient implements IMantisClient {
 
         cache.refresh(monitor, location.getUrl());
     }
+    
+    public void updateAttributesForTask(IProgressMonitor monitor, Integer ticketId) throws MantisException {
+    	
+    	IssueData issueData = soapClient.getIssueData(ticketId, monitor);
+        
+    	cache.refreshForProject(monitor, location.getUrl(), issueData.getProject().getId().intValue());
+    }
 
     public void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
 

@@ -91,6 +91,15 @@ public interface IMantisClient {
      */
     void updateAttributes(IProgressMonitor monitor) throws MantisException;
 
+	/**
+	 * Updates cached repository details linked to the ticket with the specified id
+	 * 
+	 * @param monitor
+	 * @param ticketId
+	 * @throws MantisException 
+	 */
+	void updateAttributesForTask(IProgressMonitor monitor, Integer ticketId) throws MantisException;
+    
     byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException;
 
     void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException;
@@ -147,5 +156,7 @@ public interface IMantisClient {
     boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException;
     
     boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException;
+
+
 
 }

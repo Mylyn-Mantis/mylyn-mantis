@@ -85,6 +85,8 @@ public class MantisCache {
     
     static final int ACCESS_LEVEL_NOBODY = 100;
 
+	private static final int ALL_PROJECTS = 0;
+
     private final Object sync = new Object();
 
     private MantisAxis1SOAPClient soapClient;
@@ -120,7 +122,12 @@ public class MantisCache {
 
     void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
 
-        synchronized (sync) {
+    	refresh0(monitor, repositoryUrl, ALL_PROJECTS);
+    }
+
+	private void refresh0(IProgressMonitor monitor, String repositoryUrl, int projectId) throws MantisException {
+		
+		synchronized (sync) {
 
             long start = System.currentTimeMillis();
 
@@ -129,7 +136,9 @@ public class MantisCache {
             try {
                 cacheProjects(soapClient.getProjectData(monitor));
 
-                subMonitor.beginTask("Refreshing repository configuration", cacheData.projects.size() * 6 + 16);
+                int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
+                
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 16);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -169,6 +178,10 @@ public class MantisCache {
                 }
                 
                 for (MantisProject project : cacheData.projects) {
+                	
+                	if ( projectId != ALL_PROJECTS && projectId != project.getValue() )
+                		continue;
+                	
                     cacheFilters(project.getValue(), soapClient.getProjectFilters(project.getValue(), monitor));
                     Policy.advance(subMonitor, 1);
 
@@ -238,11 +251,13 @@ public class MantisCache {
                 MantisCorePlugin.debug(NLS.bind("Repository sync for {0} complete in {1} seconds.", repositoryUrl,
                         format(start)), null);
             }
-
         }
-    }
-
-
+	}
+    
+    void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
+    	
+    	refresh0(monitor, url, projectId);
+	}
 
     private void cacheTimeTrackingEnabled(String stringValue) {
         
@@ -858,5 +873,7 @@ public class MantisCache {
         
         return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
     }
+
+
     
 }
