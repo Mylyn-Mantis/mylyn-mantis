@@ -33,6 +33,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
+import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
@@ -349,10 +350,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         Date lastChanged = ticket.getLastChanged();
 
-        Map<String, String> valueByKey = ticket.getValues();
-        for (String key : valueByKey.keySet())
-            if (valueByKey.get(key) != null)
-                getAttribute(data, key).setValue(valueByKey.get(key));
+        copyValuesFromTicket(data, ticket);
 
         addComments(data, ticket);
         addAttachments(repository, data, ticket);
@@ -370,6 +368,28 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     .setValue(MantisUtils.toMantisTime(lastChanged) + "");
 
     }
+
+	private void copyValuesFromTicket(TaskData data, MantisTicket ticket) {
+
+		boolean warningLogged = false;
+		
+		Map<String, String> valueByKey = ticket.getValues();
+        for (String key : valueByKey.keySet()) {
+
+            String value = valueByKey.get(key);
+			if (value == null)
+				continue;
+			
+            TaskAttribute attribute = getAttribute(data, key);
+
+            attribute.setValue(value);
+            
+            if ( !attribute.getOptions().isEmpty() && !attribute.getOptions().containsKey(value) && !warningLogged ) {
+            	MantisCorePlugin.warn(NLS.bind("Task {0} : Unable to find match for {1} value {2} in repository-supplied options {3}. Further similar warnings will be suppressed for this task, but errors may occur when submitting.", new Object[] { ticket.getId(),  key, value, attribute.getOptions() } ));
+				warningLogged = true;
+            }
+        }
+	}
 
 
     private void addOperation(TaskData data, MantisTicket ticket, OperationType operation) {
