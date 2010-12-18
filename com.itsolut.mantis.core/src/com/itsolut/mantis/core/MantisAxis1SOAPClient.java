@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import javax.xml.rpc.Call;
@@ -148,7 +149,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
         MantisException mantisException = (MantisException) exception;
 
         return mantisException.getMessage() != null
-                && mantisException.getMessage().toLowerCase().indexOf("access denied") != -1;
+                && mantisException.getMessage().toLowerCase(Locale.ENGLISH).indexOf("access denied") != -1;
 
     }
 
@@ -190,6 +191,8 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
     private MantisRemoteException wrap(RemoteException e) {
 
+        boolean unexpected = false;
+        
         StringBuilder message = new StringBuilder();
 
         if (isSourceforgeRepoWithoutHttpAuth())
@@ -204,14 +207,16 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
             if (axisFault.getCause() instanceof SAXException)
                 message.append("The repository has returned an invalid XML response : "
-                        + String.valueOf(axisFault.getCause().getMessage()) + " .");
+                        + String.valueOf(axisFault.getCause().getMessage()));
             else if (e.getMessage() != null)
                 message.append(e.getMessage());
+            
+            unexpected = true;
 
         } else if (e.getMessage() != null)
             message.append(e.getMessage());
 
-        return new MantisRemoteException(message.toString(), e);
+        return new MantisRemoteException(message.toString(), e, unexpected);
 
     }
 

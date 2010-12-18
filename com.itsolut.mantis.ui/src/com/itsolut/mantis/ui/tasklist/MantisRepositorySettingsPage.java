@@ -45,7 +45,9 @@ import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
+import com.itsolut.mantis.ui.internal.WikiLinkedErrorDialog;
 
 /**
  * @author Steffen Pingel
@@ -139,11 +141,15 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         if ( validator.getStatus().getSeverity() != IStatus.ERROR)
             return;
         
-        if ( validator.getStatus().getMessage().toLowerCase(Locale.ENGLISH).indexOf("access denied") != -1)
-            return;
+        if ( validator.getStatus() instanceof RepositoryStatus ) {
+            
+            RepositoryStatus status = (RepositoryStatus) validator.getStatus();
+            
+            if ( status.getCode() != RepositoryStatus.ERROR_INTERNAL )
+                return;
+        }
         
-        
-        ErrorDialog.openError(getShell(), "Unexpected repository error", "The repository has returned an unknown error. Most likely there is an error in the repository configuration.\n\nPlease see https://sourceforge.net/apps/mediawiki/mylyn-mantis/index.php?title=Troubleshooting for instructions.\n\nThe actual error message follows.", validator.getStatus());
+        new WikiLinkedErrorDialog(getShell(), "Unexpected repository error", "The repository has returned an unknown error. Most likely there is an error in the repository configuration.", validator.getStatus()).open();
     }
     
     // public for testing
@@ -164,12 +170,10 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
             try {
                 validate(monitor);
-            } catch (MalformedURLException e) {
-                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR,
-                        MantisUIPlugin.PLUGIN_ID, INVALID_REPOSITORY_URL));
             } catch (MantisException e) {
-                throw new CoreException(RepositoryStatus.createStatus(repositoryUrl, IStatus.ERROR,
-                        MantisUIPlugin.PLUGIN_ID, e.getMessage()));
+                throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, taskRepository));
+            } catch (MalformedURLException e) {
+                throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, taskRepository));
             }
         }
 

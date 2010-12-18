@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
@@ -34,6 +36,8 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 
 	private static MantisUIPlugin plugin;
 
+    private FormColors formColors;
+
 	public MantisUIPlugin() {
 		plugin = this;
 	}
@@ -52,6 +56,12 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	    TasksUi.getRepositoryManager().removeListener(MantisCorePlugin.getDefault().getConnector().getClientManager());
 		
 		plugin = null;
+		
+		if ( formColors != null ) {
+		    formColors.dispose();
+		    formColors = null;
+		}
+		
 		super.stop(context);
 	}
 
@@ -68,6 +78,14 @@ public class MantisUIPlugin extends AbstractUIPlugin {
             style |= StatusManager.SHOW;
 
         StatusManager.getManager().handle(status, style);
+    }
+    
+    public FormColors getFormColors(Display display) {
+        if (formColors == null) {
+            formColors = new FormColors(display);
+            formColors.markShared();
+        }
+        return formColors;
     }
 
 }

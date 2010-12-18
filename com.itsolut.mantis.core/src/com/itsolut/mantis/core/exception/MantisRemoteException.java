@@ -21,12 +21,20 @@ package com.itsolut.mantis.core.exception;
 public class MantisRemoteException extends MantisException {
 
 	private static final long serialVersionUID = -6761365344287289624L;
+	
+	private boolean unexpected = false;
 
 	public MantisRemoteException() {
 	}
 
 	public MantisRemoteException(String message) {
 		super(message);
+	}
+	
+	public MantisRemoteException(String message, boolean unexpected) {
+	    
+	    super(message);
+	    this.unexpected = unexpected;
 	}
 
 	public MantisRemoteException(Throwable cause) {
@@ -36,5 +44,17 @@ public class MantisRemoteException extends MantisException {
 	public MantisRemoteException(String message, Throwable cause) {
 		super(message, cause);
 	}
+	
+
+	public MantisRemoteException(String message, Throwable cause, boolean unexpected) {
+	    super(message, cause);
+	    
+	    this.unexpected = unexpected;
+	}
+	
+	public boolean isUnexpected() {
+
+        return unexpected;
+    }
 
 }

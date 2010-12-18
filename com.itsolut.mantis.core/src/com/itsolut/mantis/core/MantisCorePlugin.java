@@ -21,16 +21,17 @@
 package com.itsolut.mantis.core;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Locale;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
+import org.apache.axis.AxisFault;
+import org.eclipse.core.runtime.*;
+import org.eclipse.mylyn.internal.provisional.commons.soap.AxisHttpFault;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
 
+import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisLoginException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
@@ -155,18 +156,33 @@ public class MantisCorePlugin extends Plugin {
             if ( repository == null)
                 return new Status(IStatus.ERROR, PLUGIN_ID, actualMessage, t);
             
-            if ( t instanceof MantisLoginException || "Access Denied".equals(actualMessage))
-                return RepositoryStatus.createLoginError(repository.getRepositoryUrl(), actualMessage);
-            if ( t instanceof MantisRemoteException)
+            if ( t instanceof MantisLoginException || ( actualMessage != null && actualMessage.toLowerCase(Locale.ENGLISH).contains("access denied")) )
+                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, actualMessage);
+            if ( t instanceof MantisRemoteException) {
+                if ( t.getCause() instanceof AxisHttpFault ) 
+                    if  ( ((AxisHttpFault) t.getCause()).getReturnCode() == 404 )
+                        return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
+                if ( t.getCause() instanceof AxisFault ) {
+                    AxisFault fault = (AxisFault) t.getCause();
+                    if ( fault.detail instanceof IOException )
+                        return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "IO Error : " + fault.detail.getMessage() + " .");
+                }
+                
+                if ( ((MantisRemoteException) t).isUnexpected() )
+                    return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
+                
                 return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, actualMessage);
+                
+            }
+            if ( t instanceof MalformedURLException || t.getCause() instanceof MalformedURLException )
+                return RepositoryStatus.createStatus(repository, RepositoryStatus.ERROR_REPOSITORY_NOT_FOUND, PLUGIN_ID, t.getMessage());
             if ( t instanceof MantisLocalException)
                 return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
-            if ( t instanceof IOException)
+            if ( t instanceof IOException || t.getCause() instanceof IOException )
                 return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_IO, actualMessage);
             
             return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
             
         }
-        
     }
 }
