@@ -17,6 +17,7 @@ import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 
+import com.itsolut.mantis.binding.ObjectRef;
 import com.itsolut.mantis.core.exception.MantisException;
 
 final class MantisTaskMapper extends TaskMapper {
@@ -56,8 +57,16 @@ final class MantisTaskMapper extends TaskMapper {
 
     @Override
     public PriorityLevel getPriorityLevel() {
+        
+        try {
+            ObjectRef priorityObject = getClient().getCache(new NullProgressMonitor()).getPriorityAsObjectRef(getPriority());
 
-        return MantisPriorityLevel.fromPriority(getPriority());
+            return MantisPriorityLevel.fromPriorityId(priorityObject.getId().intValue());
+        } catch (MantisException e) {
+            
+            MantisCorePlugin.warn("Failed getting the priority level", e);
+            return null;
+        }
     }
 
     private IMantisClient getClient() throws MantisException {

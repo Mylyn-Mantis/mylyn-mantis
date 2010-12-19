@@ -47,4 +47,21 @@ interface DefaultConstantValues {
         }
     }
 
+    public enum Priority {
+        
+        IMMEDIATE(60), URGENT(50), HIGH(40), NORMAL(30), LOW(20), NONE(10);
+
+        private final int value;
+
+        private Priority(int value) {
+
+            this.value = value;
+        }
+
+        public int getValue() {
+
+            return value;
+        }
+
+    }
 }

@@ -10,7 +10,6 @@ package com.itsolut.mantis.tests;
 
 import junit.framework.TestCase;
 
-import com.itsolut.mantis.core.MantisPriorityLevel;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -19,19 +18,6 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisUtilsTest extends TestCase {
 
-	/**
-	 * Return the priorities as stored in Mantis.  Currently works with
-	 * the Priority Enums in the MantisTask class.
-	 * @author David Carver
-	 */
-	public void testGetMylynPriority() {
-		assertEquals("P1", MantisPriorityLevel.getMylynPriority("immediate").toString());
-		assertEquals("P2", MantisPriorityLevel.getMylynPriority("urgent").toString());
-		assertEquals("P2", MantisPriorityLevel.getMylynPriority("high").toString());
-		assertEquals("P3", MantisPriorityLevel.getMylynPriority("normal").toString());
-		assertEquals("P4", MantisPriorityLevel.getMylynPriority("low").toString());
-	}
-	
 	/**
 	 * Test to make sure the base url is being returned as expected.
 	 * @author David Carver
