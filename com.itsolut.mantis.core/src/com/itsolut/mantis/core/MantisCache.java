@@ -43,6 +43,7 @@ import com.itsolut.mantis.core.model.MantisTicketAttribute;
 import com.itsolut.mantis.core.model.MantisTicketStatus;
 import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.model.MantisViewState;
+import com.itsolut.mantis.core.model.MantisTicket.Key;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -78,9 +79,13 @@ public class MantisCache {
     private static final String DUE_DATE_UPDATE_THRESOLD = "due_date_update_threshold";
     
     private static final String TIME_TRACKING_ENABLED = "time_tracking_enabled";
+
+    private static final String BUG_SUBMIT_STATUS = "bug_submit_status";
     
     private static final String BUG_ASSIGNED_STATUS = "bug_assigned_status";
     
+    static final int STATUS_NEW = 10;
+
     static final int STATUS_ASSIGNED = 50;
     
     static final int ACCESS_LEVEL_NOBODY = 100;
@@ -138,7 +143,7 @@ public class MantisCache {
 
                 int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 16);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 24);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -149,6 +154,9 @@ public class MantisCache {
                 cacheAssignedStatus(soapClient.getStringConfiguration(monitor, BUG_ASSIGNED_STATUS));
                 Policy.advance(subMonitor, 1);
 
+                cacheSubmitStatus(soapClient.getStringConfiguration(monitor, BUG_SUBMIT_STATUS));
+                Policy.advance(subMonitor, 1);
+                
                 try {
                     cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
                 } catch (MantisException e) {
@@ -217,10 +225,10 @@ public class MantisCache {
 
                 cacheResolvedStatus(soapClient.getStringConfiguration(monitor, RESOLVED_STATUS_THRESHOLD));
                 Policy.advance(subMonitor, 1);
-
+                
                 cacheRepositoryVersion(soapClient.getVersion(monitor));
                 Policy.advance(subMonitor, 1);
-
+                
                 cachePriorities(soapClient.getPriorities(monitor));
                 Policy.advance(subMonitor, 1);
 
@@ -244,7 +252,28 @@ public class MantisCache {
 
                 cacheViewStates(soapClient.getViewStates(monitor));
                 Policy.advance(subMonitor, 1);
+                
+                cacheDefaultAttributeValue(Key.SEVERITY, soapClient.getStringConfiguration(monitor, "default_bug_severity"), DefaultConstantValues.Attribute.BUG_SEVERITY);
+                Policy.advance(subMonitor, 1);
 
+                cacheDefaultAttributeValue(Key.PRIORITY, soapClient.getStringConfiguration(monitor, "default_bug_priority"), DefaultConstantValues.Attribute.BUG_PRIORITY);
+                Policy.advance(subMonitor, 1);
+
+                cacheDefaultAttributeValue(Key.ETA, soapClient.getStringConfiguration(monitor, "default_bug_eta"), DefaultConstantValues.Attribute.BUG_ETA);
+                Policy.advance(subMonitor, 1);
+
+                cacheDefaultAttributeValue(Key.REPRODUCIBILITY, soapClient.getStringConfiguration(monitor, "default_bug_reproducibility"), DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY);
+                Policy.advance(subMonitor, 1);
+
+                cacheDefaultAttributeValue(Key.RESOLUTION, soapClient.getStringConfiguration(monitor, "default_bug_resolution"), DefaultConstantValues.Attribute.BUG_RESOLUTION);
+                Policy.advance(subMonitor, 1);
+
+                cacheDefaultAttributeValue(Key.PROJECTION, soapClient.getStringConfiguration(monitor, "default_bug_projection"), DefaultConstantValues.Attribute.BUG_PROJECTION);
+                Policy.advance(subMonitor, 1);
+                
+                cacheDefaultAttributeValue(Key.VIEW_STATE, soapClient.getStringConfiguration(monitor, "default_bug_view_status"), DefaultConstantValues.Attribute.BUG_VIEW_STATUS);
+                Policy.advance(subMonitor, 1);
+                
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
                 subMonitor.done();
@@ -254,6 +283,7 @@ public class MantisCache {
         }
 	}
     
+
     void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
     	
     	refresh0(monitor, url, projectId);
@@ -282,7 +312,11 @@ public class MantisCache {
     private void cacheAssignedStatus(String stringValue) {
 
         cacheData.bugAssignedStatus = safeGetInt(stringValue, STATUS_ASSIGNED);
+    }
+
+    private void cacheSubmitStatus(String stringValue) {
         
+        cacheData.bugSubmitStatus = safeGetInt(stringValue, STATUS_NEW);
     }
 
     private String format(long start) {
@@ -507,6 +541,11 @@ public class MantisCache {
         this.cacheData.repositoryVersion = RepositoryVersion.fromVersionString(version);
     }
 
+    private void cacheDefaultAttributeValue(Key attribute, String readValue, DefaultConstantValues.Attribute defaultValue) {
+
+        cacheData.defaultValuesForAttributes.put(attribute, safeGetInt(readValue, defaultValue.getValue()));
+    }
+    
     public RepositoryVersion getRepositoryVersion() {
 
         return cacheData.repositoryVersion;
@@ -616,6 +655,15 @@ public class MantisCache {
         throw new MantisException("No reproducibility with name " + reproducibilityName + " .");
     }
 
+    public MantisReproducibility getReproducibility(int reproducibilityId) throws MantisException {
+        
+        for (MantisReproducibility reproducibility : cacheData.reproducibilities)
+            if (reproducibility.getValue() == reproducibilityId )
+                return reproducibility;
+        
+        throw new MantisException("No reproducibility with id " + reproducibilityId + " .");
+    }
+
     public ObjectRef getProjectionAsObjectRef(String projectionName) throws MantisException {
 
         for (MantisProjection projection : cacheData.projections)
@@ -623,6 +671,15 @@ public class MantisCache {
                 return toObjectRef(projection);
 
         throw new MantisException("No projection with name " + projectionName + " .");
+    }
+
+    public MantisProjection getProjection(int projectionId) throws MantisException {
+        
+        for (MantisProjection projection : cacheData.projections)
+            if (projection.getValue() == projectionId )
+                return projection;
+        
+        throw new MantisException("No projection with id " + projectionId + " .");
     }
 
     public ObjectRef getEtaAsObjectRef(String etaName) throws MantisException {
@@ -634,6 +691,15 @@ public class MantisCache {
         throw new MantisException("No eta with name " + etaName + " .");
     }
 
+    public MantisETA getETA(int etaId) throws MantisException {
+        
+        for (MantisETA eta : cacheData.etas)
+            if (eta.getValue() == etaId )
+                return eta;
+        
+        throw new MantisException("No eta with id " + etaId + " .");
+    }
+
     public ObjectRef getViewStateAsObjectRef(String viewStateName) throws MantisException {
 
         for (MantisViewState viewState : cacheData.viewStates)
@@ -641,6 +707,15 @@ public class MantisCache {
                 return toObjectRef(viewState);
 
         throw new MantisException("No viewState with name " + viewStateName + " .");
+    }
+
+    public MantisViewState getViewState(int viewStateId) throws MantisException {
+        
+        for (MantisViewState viewState : cacheData.viewStates)
+            if (viewState.getValue() == viewStateId)
+                return viewState;
+        
+        throw new MantisException("No viewState with name " + viewStateId + " .");
     }
 
     public ObjectRef getStatusAsObjectRef(String statusName) throws MantisException {
@@ -802,14 +877,15 @@ public class MantisCache {
         return versions.toArray(new MantisVersion[versions.size()]);
     }
     
+    public String getSubmitStatus() throws MantisException {
+
+        return getStatus(cacheData.bugSubmitStatus).getName();
+    }
+    
     public String getAssignedStatus() throws MantisException {
 
-        for ( MantisTicketStatus status : cacheData.statuses)
-            if ( status.getValue() == cacheData.bugAssignedStatus)
-                return status.getName();
-        
-        throw new MantisException("No status with id " + cacheData.bugAssignedStatus + " .");
-    }
+        return getStatus(cacheData.bugAssignedStatus).getName();
+    }        
 
     public String getResolvedStatusName() throws MantisException {
         
@@ -820,6 +896,41 @@ public class MantisCache {
         throw new MantisException("No status with id " + cacheData.resolvedStatus + " .");
     }
 
+    public String getDefaultSeverityName() throws MantisException {
+        
+        return getSeverity(cacheData.defaultValuesForAttributes.get(Key.SEVERITY)).getName();
+    }
+    
+    public String getDefaultPriorityName() throws MantisException {
+        
+        return getPriority(cacheData.defaultValuesForAttributes.get(Key.PRIORITY)).getName();
+    }
+    
+    public String getDefaultEtaName() throws MantisException {
+        
+        return getETA(cacheData.defaultValuesForAttributes.get(Key.ETA)).getName();
+    }
+
+    public String getDefaultProjectionName() throws MantisException {
+
+        return getProjection(cacheData.defaultValuesForAttributes.get(Key.PROJECTION)).getName();
+    }
+    
+    public String getDefaultResolutionName() throws MantisException {
+        
+        return getResolution(cacheData.defaultValuesForAttributes.get(Key.RESOLUTION)).getName();
+    }
+    
+    public String getDefaultReproducibilityName() throws MantisException {
+        
+        return getReproducibility(cacheData.defaultValuesForAttributes.get(Key.REPRODUCIBILITY)).getName();
+    }
+    
+    public String getDefaultViewStateName() throws MantisException {
+        
+        return getViewState(cacheData.defaultValuesForAttributes.get(Key.VIEW_STATE)).getName();
+    }
+    
     MantisCacheData getCacheData() {
 
         synchronized (sync) {

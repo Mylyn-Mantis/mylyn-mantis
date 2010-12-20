@@ -530,25 +530,24 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
-                    cache.getTicketResolutions(), cache.getTicketResolutions()[0].getName());
+                    cache.getTicketResolutions(), cache.getDefaultResolutionName());
             createAttribute(data, MantisAttributeMapper.Attribute.STATUS, cache
-                    .getTicketStatus(), cache.getTicketStatus()[0].getName());
+                    .getTicketStatus(), cache.getSubmitStatus());
             createAttribute(data, MantisAttributeMapper.Attribute.PRIORITY, cache
-                    .getPriorities(), cache.getPriorities()[0].getName());
+                    .getPriorities(), cache.getDefaultPriorityName());
             createAttribute(data, MantisAttributeMapper.Attribute.SEVERITY, cache
-                    .getSeverities(), cache.getSeverities()[0].getName());
+                    .getSeverities(), cache.getDefaultSeverityName());
             createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY,
-                    cache.getReproducibility(), cache.getReproducibility()[0]
-                                                                             .getName());
+                    cache.getReproducibility(), cache.getDefaultReproducibilityName());
             createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
             createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             
             createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
-                    cache.getProjection(), cache.getProjection()[0].getName());
+                    cache.getProjection(), cache.getDefaultProjectionName());
             createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache
-                    .getETA(), cache.getETA()[0].getName());
+                    .getETA(), cache.getDefaultEtaName());
             
             if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
@@ -567,7 +566,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
-                    cache.getViewState(), cache.getViewState()[0].getName());
+                    cache.getViewState(), cache.getDefaultViewStateName());
 
             createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, cache.getDevelopersByProjectName(projectName, monitor), true);
             if (existingTask)

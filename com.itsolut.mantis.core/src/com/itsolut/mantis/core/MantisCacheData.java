@@ -12,24 +12,9 @@
 package com.itsolut.mantis.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
-import com.itsolut.mantis.core.model.MantisSeverity;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisViewState;
+import com.itsolut.mantis.core.model.*;
 
 /**
  * @author Robert Munteanu
@@ -38,7 +23,7 @@ import com.itsolut.mantis.core.model.MantisViewState;
 public class MantisCacheData implements Serializable {
 
     // increment when structure changes
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
     
     long lastUpdate = 0;
 
@@ -86,7 +71,11 @@ public class MantisCacheData implements Serializable {
 
     boolean timeTrackingEnabled;
 
+    int bugSubmitStatus;
+    
     int bugAssignedStatus;
+    
+    Map<MantisTicket.Key, Integer> defaultValuesForAttributes = new EnumMap<MantisTicket.Key, Integer>(MantisTicket.Key.class);
 
 
 }

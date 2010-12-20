@@ -64,4 +64,30 @@ interface DefaultConstantValues {
         }
 
     }
+
+    
+    /**
+     * Contains default values for bug, bug note and bug operations attributes.
+     * 
+     * @author Robert Munteanu
+     *
+     */
+    public enum Attribute {
+        
+        BUG_SEVERITY(50), BUG_PRIORITY(Priority.NORMAL.getValue()), BUG_RESOLUTION(10), BUG_REPRODUCIBILITY(70), BUG_PROJECTION(10), BUG_ETA(10), BUG_VIEW_STATUS(10), BUG_RESOLUTION_FIXED_THRESHOLD(20); 
+
+        private final int value;
+
+        private Attribute(int value) {
+
+            this.value = value;
+        }
+
+        public int getValue() {
+
+            return value;
+        }
+
+
+    }
 }

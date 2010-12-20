@@ -156,7 +156,5 @@ public interface IMantisClient {
     boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException;
     
     boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException;
-
-
-
+    
 }
