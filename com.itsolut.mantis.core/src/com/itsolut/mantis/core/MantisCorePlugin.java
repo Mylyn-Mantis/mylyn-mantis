@@ -31,7 +31,6 @@ import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
 
-import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisLoginException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
