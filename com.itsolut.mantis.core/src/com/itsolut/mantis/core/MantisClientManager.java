@@ -132,7 +132,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
     }
 
-    public synchronized void repositorySettingsChanged(TaskRepository repository) {
+    public void repositorySettingsChanged(TaskRepository repository) {
 
         // handled in repositoryChanged
 
