@@ -21,6 +21,7 @@ public class AbstractRichTextPart extends TaskEditorRichTextPart {
             boolean expandedByDefault) {
 
         setPartName(label);
+        setExpandVertically(true);
 
         if (!expandedByDefault)
             collapse();
@@ -48,7 +49,7 @@ public class AbstractRichTextPart extends TaskEditorRichTextPart {
     
     private void expand() {
     	
-    	setSectionStyle(getSectionStyle() & ExpandableComposite.EXPANDED);
+    	setSectionStyle(getSectionStyle() | ExpandableComposite.EXPANDED);
     }
 
 }

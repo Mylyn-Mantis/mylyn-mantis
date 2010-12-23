@@ -284,7 +284,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             String value = valueByKey.get(key);
 			if (value == null)
-				continue;
+				value = "";
 			
             TaskAttribute attribute = getAttribute(data, key);
 

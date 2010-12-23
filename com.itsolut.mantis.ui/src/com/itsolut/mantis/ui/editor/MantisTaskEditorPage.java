@@ -40,9 +40,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisStepsToReproducePart part = new MantisStepsToReproducePart(taskIsSubmitted);
-				part.setExpandVertically(true);
-				return part;
+				return new MantisStepsToReproducePart(false);
 			}
 		}.setPath(PATH_COMMENTS),
 		     ID_PART_DESCRIPTION);
@@ -51,9 +49,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_ADDITIONALINFO) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				MantisAdditionalInformationPart part = new MantisAdditionalInformationPart(taskIsSubmitted);
-				part.setExpandVertically(true);
-				return part;
+				return new MantisAdditionalInformationPart(false);
 			}
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
