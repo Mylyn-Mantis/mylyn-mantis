@@ -100,7 +100,6 @@ public class MantisCache {
 
     private final NumberFormat formatter = new DecimalFormat("#.#");
 
-
     public MantisCache(MantisAxis1SOAPClient soapClient) {
 
         this.soapClient = soapClient;
@@ -143,7 +142,7 @@ public class MantisCache {
 
                 int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 24);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 26);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -272,6 +271,12 @@ public class MantisCache {
                 Policy.advance(subMonitor, 1);
                 
                 cacheDefaultAttributeValue(Key.VIEW_STATE, soapClient.getStringConfiguration(monitor, "default_bug_view_status"), DefaultConstantValues.Attribute.BUG_VIEW_STATUS);
+                Policy.advance(subMonitor, 1);
+                
+                cacheData.defaultStringValuesForAttributes.put(Key.STEPS_TO_REPRODUCE, soapClient.getStringConfiguration(monitor, "default_bug_steps_to_reproduce"));
+                Policy.advance(subMonitor, 1);
+                
+                cacheData.defaultStringValuesForAttributes.put(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
                 Policy.advance(subMonitor, 1);
                 
                 cacheData.lastUpdate = System.currentTimeMillis();
@@ -929,6 +934,16 @@ public class MantisCache {
     public String getDefaultViewStateName() throws MantisException {
         
         return getViewState(cacheData.defaultValuesForAttributes.get(Key.VIEW_STATE)).getName();
+    }
+    
+    public String getDefaultStepsToReproduce() {
+    	
+    	return cacheData.defaultStringValuesForAttributes.get(Key.STEPS_TO_REPRODUCE);
+    }
+    
+    public String getDefaultAdditionalInfo() {
+    	
+    	return cacheData.defaultStringValuesForAttributes.get(Key.ADDITIONAL_INFO);
     }
     
     MantisCacheData getCacheData() {

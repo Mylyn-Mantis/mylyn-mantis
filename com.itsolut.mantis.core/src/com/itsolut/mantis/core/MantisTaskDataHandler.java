@@ -561,8 +561,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             createAttribute(data, MantisAttributeMapper.Attribute.DESCRIPTION);
             createAttribute(data,
-                    MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE);
-            createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO);
+                    MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE).setValue(cache.getDefaultStepsToReproduce());
+            createAttribute(data, MantisAttributeMapper.Attribute.ADDITIONAL_INFO).setValue(cache.getDefaultAdditionalInfo());
             createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,

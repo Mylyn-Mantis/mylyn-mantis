@@ -6,6 +6,7 @@ import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
+import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * @author Robert Munteanu
@@ -25,7 +26,6 @@ public class AbstractRichTextPart extends TaskEditorRichTextPart {
             collapse();
 
         _key = attribute.getKey();
-
     }
 
     @Override
@@ -36,14 +36,19 @@ public class AbstractRichTextPart extends TaskEditorRichTextPart {
         TaskAttribute attribute = getTaskData().getRoot().getAttribute(_key);
         setAttribute(attribute);
 
-        if (attribute.getValue() == null || attribute.getValue().length() == 0)
-            collapse();
+        if ( MantisUtils.hasValue (attribute) )
+            expand();
 
     }
 
     private void collapse() {
 
         setSectionStyle(getSectionStyle() & ~ExpandableComposite.EXPANDED);
+    }
+    
+    private void expand() {
+    	
+    	setSectionStyle(getSectionStyle() & ExpandableComposite.EXPANDED);
     }
 
 }
