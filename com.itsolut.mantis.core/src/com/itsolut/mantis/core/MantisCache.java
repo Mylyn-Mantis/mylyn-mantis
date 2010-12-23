@@ -142,7 +142,7 @@ public class MantisCache {
 
                 int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 26);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 27);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -278,6 +278,8 @@ public class MantisCache {
                 
                 cacheData.defaultStringValuesForAttributes.put(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
                 Policy.advance(subMonitor, 1);
+                
+                cacheData.bugResolutionFixedThreshold = safeGetInt(soapClient.getStringConfiguration(monitor, "bug_resolution_fixed_threshold"), DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD.getValue());
                 
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
@@ -944,6 +946,11 @@ public class MantisCache {
     public String getDefaultAdditionalInfo() {
     	
     	return cacheData.defaultStringValuesForAttributes.get(Key.ADDITIONAL_INFO);
+    }
+    
+    public MantisResolution getBugResolutionFixedThreshold() throws MantisException {
+    	
+    	return getResolution(cacheData.bugResolutionFixedThreshold);
     }
     
     MantisCacheData getCacheData() {
