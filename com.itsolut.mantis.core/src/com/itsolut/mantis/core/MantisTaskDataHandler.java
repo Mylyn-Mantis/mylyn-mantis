@@ -55,114 +55,6 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
-    private static enum OperationType {
-        LEAVE("Leave as ", null, null),
-
-        RESOLVE_AS("Resolve as ", TaskAttribute.TYPE_SINGLE_SELECT, null) {
-        	
-        	@Override
-			public void preOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
-			
-        		try {
-        			
-					TaskAttribute resolution = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.RESOLUTION.getKey());
-					if ( !MantisUtils.hasValue(resolution) )
-						return;
-					
-        			TaskAttribute resolveAs = taskData.getRoot().createAttribute(getAttributeId());
-        			resolveAs.getMetaData().setType(resolution.getMetaData().getType());
-        			resolveAs.getMetaData().setReadOnly(true);
-        			
-        			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, resolveAs.getId());
-
-					for ( Map.Entry<String, String> option : resolution.getOptions().entrySet() )
-						resolveAs.putOption(option.getKey(), option.getValue());
-					
-					resolveAs.setValue(client.getCache(monitor).getBugResolutionFixedThreshold().getName());
-				} catch (MantisException e) {
-					MantisCorePlugin.warn("Unable to preselect bug fixed threshold.", e);
-				}
-			}
-        	
-        	private String getAttributeId() {
-        		
-        		return TaskAttribute.PREFIX_OPERATION + "virtual-" + toString();
-        	}
-        	
-            @Override
-            public void performPostOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
-           
-                String resolvedStatus;
-                try {
-                    resolvedStatus = client.getCache(monitor).getResolvedStatusName();
-                } catch (MantisException e) {
-                    resolvedStatus = "resolved";
-                    MantisCorePlugin.warn("Failed retrieving customised resolved bug status. Using default.", e);
-                }
-                
-                taskData.getRoot().getAttribute(Attribute.RESOLUTION.getKey()).setValue(taskData.getRoot().getAttribute(TaskAttribute.PREFIX_OPERATION + "virtual-" + toString()).getValue());
-                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(resolvedStatus);
-           }
-        },
-        
-        TRACK_TIME("Track time ", TaskAttribute.TYPE_SHORT_TEXT, MantisAttributeMapper.Attribute.TIME_SPENT_NEW),
-
-        ASSIGN_TO("Assign to ", TaskAttribute.TYPE_PERSON, MantisAttributeMapper.Attribute.ASSIGNED_TO) {
-
-            @Override
-            public void performPostOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
-
-                String assignedStatus;
-                try {
-                    assignedStatus = client.getCache(monitor).getAssignedStatus();
-                } catch (MantisException e) {
-                    assignedStatus = "assigned";
-                    MantisCorePlugin.warn("Failed retrieving customised assigned bug status. Using default.", e);
-                }
-                
-                taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(assignedStatus);
-            }
-        };
-
-        private final String                          label;
-
-        private final String                          operationType;
-
-        private final MantisAttributeMapper.Attribute attribute;
-
-        private OperationType(String label, String operationType, MantisAttributeMapper.Attribute attribute) {
-
-            this.label = label;
-            this.operationType = operationType;
-            this.attribute = attribute;
-        }
-
-        public String getLabel() {
-
-            return label;
-        }
-
-        public String getOperationType() {
-
-            return operationType;
-        }
-
-        public MantisAttributeMapper.Attribute getAttribute() {
-
-            return attribute;
-        }
-
-        public void preOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
-        	
-        	if ( getOperationType() != null )
-        		attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, getAttribute().getKey());
-        }
-        
-        public void performPostOperation(TaskData taskData,TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor)  {
-        	
-        }
-    }
-
     private final MantisRepositoryConnector connector;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
@@ -286,7 +178,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         if ( attributeOperation == null || "".equals(attributeOperation.getValue()))
             return; // i.e. no operation
 
-        OperationType type = OperationType.valueOf(attributeOperation.getValue());
+        MantisOperation type = MantisOperation.valueOf(attributeOperation.getValue());
 
         type.performPostOperation(taskData, attributeOperation, client, monitor);
     }
@@ -370,11 +262,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addComments(data, ticket);
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
-        addOperation(data, ticket, OperationType.LEAVE, client, monitor);
+        addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
         if ( client.isTimeTrackingEnabled(new NullProgressMonitor()))
-            addOperation(data, ticket, OperationType.TRACK_TIME, client, monitor);
-        addOperation(data, ticket, OperationType.RESOLVE_AS, client, monitor);
-        addOperation(data, ticket, OperationType.ASSIGN_TO, client, monitor);
+            addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
+        addOperation(data, ticket, MantisOperation.RESOLVE_AS, client, monitor);
+        addOperation(data, ticket, MantisOperation.ASSIGN_TO, client, monitor);
 
         if (lastChanged != null)
             data.getRoot().getAttribute(
@@ -405,11 +297,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
 	}
 
-    private void addOperation(TaskData data, MantisTicket ticket, OperationType operation, IMantisClient client, IProgressMonitor monitor) {
+    private void addOperation(TaskData data, MantisTicket ticket, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
 
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
 
-        String label = operation != OperationType.LEAVE ? operation.getLabel() : operation.getLabel() + " " + data.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()).getValue();
+        String label = operation != MantisOperation.LEAVE ? operation.getLabel() : operation.getLabel() + " " + data.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()).getValue();
 
         TaskOperation.applyTo(operationAttribute, operation.toString(), label);
 
