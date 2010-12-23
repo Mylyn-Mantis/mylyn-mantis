@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-import java.util.Date;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
@@ -27,29 +25,7 @@ final class MantisTaskMapper extends TaskMapper {
         super(taskData);
     }
 
-    @Override
-    public Date getCompletionDate() {
-
-        try {
-            boolean completed = getClient().isCompleted(getTaskData(), new NullProgressMonitor());
-
-            if (completed)
-                return getModificationDate();
-
-            return null;
-        } catch (MantisException e) {
-            MantisCorePlugin.error("Failed determining the completed status.",e);
-            return null;
-        }
-    }
-
-    @Override
-    public void setCompletionDate(Date dateCompleted) {
-
-        // ignore
-    }
-
-    @Override
+	@Override
     public void setProduct(String product) {
 
         // ignore, set during task data initialization

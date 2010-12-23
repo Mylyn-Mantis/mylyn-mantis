@@ -39,8 +39,8 @@ import com.itsolut.mantis.core.model.MantisCustomField;
 import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisTicket;
-import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
+import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -97,6 +97,9 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
         if (mantisClient.isDueDateEnabled(monitor) && issue.getDue_date() != null)
             ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
+        
+        if ( issue.getStatus().getId().intValue() >= mantisClient.getCache(monitor).getResolvedStatus() )
+        	ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(issue.getLast_updated().getTimeInMillis()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
@@ -183,6 +186,9 @@ public class MantisConverter {
             ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
             ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
             ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
+            
+            if ( ihd.getStatus().intValue() >= cache.getResolvedStatus() )
+            	ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(ihd.getLast_updated().getTimeInMillis()));
             
 
             // DC: Added so that it isn't necessary to retrieve all tasks one at time

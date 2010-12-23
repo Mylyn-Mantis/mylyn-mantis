@@ -281,11 +281,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         TaskMapper scheme = getTaskMapper(taskData);
         scheme.applyTo(task);
 
-        boolean completed = isCompleted(taskData);
-
-        Date completionDate = completed ? scheme.getModificationDate() : null;
-
-        task.setCompletionDate(completionDate);
+        task.setCompletionDate(scheme.getCompletionDate());
 
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
                 .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
@@ -296,19 +292,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(supportsSubtasks));
 
-    }
-
-    private boolean isCompleted(TaskData taskData) {
-
-        boolean completed = false;
-
-        try {
-            IMantisClient client = getClientManager().getRepository(taskData.getAttributeMapper().getTaskRepository());
-            completed = client.isCompleted(taskData, new NullProgressMonitor());
-        } catch (MantisException e) {
-            MantisCorePlugin.error("Failed determining the completed status", e);
-        }
-        return completed;
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {

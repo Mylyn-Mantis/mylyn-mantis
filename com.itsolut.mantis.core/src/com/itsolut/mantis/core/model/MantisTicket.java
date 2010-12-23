@@ -76,7 +76,8 @@ public class MantisTicket {
         DUPLICATE_OF("duplicate_of"),
         RELATED_TO("related_to"), 
         TIME_SPENT("time_spent"), 
-        TIME_SPENT_NEW("time_spent_new");
+        TIME_SPENT_NEW("time_spent_new"),
+        COMPLETION_DATE("completion_date");
 
 
         public static Key fromKey(String name) {

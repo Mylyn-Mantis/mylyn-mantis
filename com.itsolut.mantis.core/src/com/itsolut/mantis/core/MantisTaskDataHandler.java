@@ -575,6 +575,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
             createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
+            createAttribute(data, MantisAttributeMapper.Attribute.COMPLETION_DATE);
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
@@ -756,6 +757,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         createAttribute(taskData, MantisAttributeMapper.Attribute.SEVERITY).setValue(ticket.getValue(Key.SEVERITY));
         if ( ticket.getLastChanged() != null ) // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
             createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
+        if ( ticket.getValue(Key.COMPLETION_DATE) != null )
+        	createAttribute(taskData, MantisAttributeMapper.Attribute.COMPLETION_DATE).setValue(ticket.getValue(Key.COMPLETION_DATE));
         
         return taskData;
     }

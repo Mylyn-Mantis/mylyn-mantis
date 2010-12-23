@@ -94,7 +94,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
         // virtual keys
         TIME_SPENT(Key.TIME_SPENT, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, false, ReadOnly.ALWAYS_READ_ONLY),
-        TIME_SPENT_NEW(Key.TIME_SPENT_NEW, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, true, ReadOnly.NEVER_READ_ONLY);
+        TIME_SPENT_NEW(Key.TIME_SPENT_NEW, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, true, ReadOnly.NEVER_READ_ONLY),
+        COMPLETION_DATE(Key.COMPLETION_DATE, "Completion date", TaskAttribute.TYPE_DATE, true, ReadOnly.ALWAYS_READ_ONLY);
 
         private final boolean isHidden;
 
@@ -210,6 +211,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     	taskAttributeToMantisAttributes.put(TaskAttribute.VERSION, Attribute.VERSION);
     	taskAttributeToMantisAttributes.put(TaskAttribute.SEVERITY, Attribute.SEVERITY);
     	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_DUE, Attribute.DUE_DATE);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_COMPLETION, Attribute.COMPLETION_DATE);
     }
 
     @Override

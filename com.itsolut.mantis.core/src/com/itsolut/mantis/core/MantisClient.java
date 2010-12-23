@@ -135,27 +135,6 @@ public class MantisClient implements IMantisClient {
 
     }
 
-    public boolean isCompleted(TaskData taskData, IProgressMonitor progressMonitor) throws MantisException {
-
-        cache.refreshIfNeeded(progressMonitor, location.getUrl());
-
-        TaskAttribute status = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
-        String statusName = status.getValue();
-        try {
-
-            MantisTicketStatus mantisStatus = cache.getStatusByName(statusName);
-
-            int resolvedStatusThreshold = cache.getResolvedStatus();
-
-            return mantisStatus.getValue() >= resolvedStatusThreshold;
-
-        } catch (MantisException e) {
-            MantisCorePlugin.warn("Unable to find the level for the status named " + statusName + " .");
-            return false;
-        }
-
-    }
-
     public void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
