@@ -1,5 +1,8 @@
 package com.itsolut.mantis.core;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
@@ -17,7 +20,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * does not require attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_6_OR_LOWER(false, false, false, false, false), 
+    VERSION_1_1_6_OR_LOWER(EnumSet.noneOf(Capability.class)), 
 
     /**
      * Versions 1.1.7 or higher
@@ -26,7 +29,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * requires attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_7_OR_HIGHER(false, false, true, false, false), 
+    VERSION_1_1_7_OR_HIGHER(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS)), 
 
     /**
      * Version 1.2 alpha 3 or previous
@@ -34,7 +37,7 @@ public enum RepositoryVersion {
      * <p>Has target_version and proper task relation support, introduced 
      * after 1.2.0a2. Does not require attachments to be Base64-Encoded.</p>
      */
-    VERSION_1_2_A3_OR_LOWER(true, true, false, false, false),
+    VERSION_1_2_A3_OR_LOWER(EnumSet.of(Capability.TARGET_VERSION, Capability.TASK_RELATIONS)),
     
     /**
      * Versions 1.2 rc1 or newwer
@@ -43,7 +46,7 @@ public enum RepositoryVersion {
      * , do not have proper task relations support ( usually reversed ) and
      * requires attachments to be Base64-encoded</p>
      */
-    VERSION_1_2_RC1_OR_HIGHER(true, true, true, false, false),
+    VERSION_1_2_RC1_OR_HIGHER(EnumSet.of(Capability.TARGET_VERSION, Capability.TASK_RELATIONS, Capability.BASE64_ENCODE_ATTACHMENTS)),
     
     /**
      * Versions 1.2.0 or newer.
@@ -51,7 +54,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_OR_HIGHER(true, true, true, true, true),
+    VERSION_1_2_OR_HIGHER(EnumSet.allOf(Capability.class)),
     
     /**
      * Versions 1.2.2 or newer.
@@ -59,7 +62,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, does not require
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_2_OR_HIGHER(true, true, false, true, true),
+    VERSION_1_2_2_OR_HIGHER(EnumSet.complementOf(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS))),
     
     /**
      * Versions 1.3 or newer.
@@ -69,8 +72,32 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_3_DEV(true, true, true, true, true);
+    VERSION_1_3_DEV(EnumSet.complementOf(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS)));
     
+    
+    private enum Capability {
+        
+        /**
+         * The target version is properly supported, i.e. not erased when using the SOAP API
+         */
+        TARGET_VERSION, 
+        /**
+         * Task relations are properly sent and received.
+         */
+        TASK_RELATIONS, 
+        /**
+         * Attachments need to be double-encoded with Base64
+         */
+        BASE64_ENCODE_ATTACHMENTS, 
+        /**
+         * Due date is supported
+         */
+        DUE_DATE, 
+        /**
+         * Time tracking is supported 
+         */
+        TIME_TRACKING;
+    }
 
     
     public static RepositoryVersion fromVersionString(String versionString) throws MantisException{
@@ -146,13 +173,13 @@ public enum RepositoryVersion {
     private final boolean hasDueDateSupport;
     private final boolean hasTimeTrackingSupport;
     
-    private RepositoryVersion(boolean hasProperTaskRelations, boolean hasTargetVersionSupport, boolean requiresBase64EncodedAttachment, boolean hasDueDateSupport, boolean hasTimeTrackingSupport) {
+    private RepositoryVersion(Set<Capability> capabilities) {
 
-        this.hasProperTaskRelations = hasProperTaskRelations;
-        this.hasTargetVersionSupport = hasTargetVersionSupport;
-        this.requiresBase64EncodedAttachment = requiresBase64EncodedAttachment;
-        this.hasDueDateSupport = hasDueDateSupport;
-        this.hasTimeTrackingSupport = hasTimeTrackingSupport;
+        this.hasProperTaskRelations = capabilities.contains(Capability.TASK_RELATIONS);
+        this.hasTargetVersionSupport = capabilities.contains(Capability.TARGET_VERSION);
+        this.requiresBase64EncodedAttachment = capabilities.contains(Capability.BASE64_ENCODE_ATTACHMENTS);
+        this.hasDueDateSupport = capabilities.contains(Capability.DUE_DATE);
+        this.hasTimeTrackingSupport = capabilities.contains(Capability.TIME_TRACKING);
     }
     
     
