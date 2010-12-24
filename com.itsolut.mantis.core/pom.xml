@@ -12,5 +12,51 @@
 	<artifactId>com.itsolut.mantis.core</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Mylyn Mantis Connector core plugin</name>
+	
+	<profiles>
+		<profile>
+			<id>wsdl2java</id>
+			<build>
+				<plugins>
+					<plugin>
+				        <groupId>org.codehaus.mojo</groupId>
+				        <artifactId>axistools-maven-plugin</artifactId>
+				        <version>1.4</version>
+				        <configuration>
+				          <inputFiles>
+				          	<inputFile>mantisconnect.wsdl</inputFile>
+				          </inputFiles>
+				          <sourceDirectory>wsdl</sourceDirectory>
+				          <packageSpace>com.itsolut.mantis.binding</packageSpace>
+				          <testCases>false</testCases>
+				          <serverSide>false</serverSide>
+				          <outputDirectory>${project.basedir}/src</outputDirectory>
+				          <typeMappingVersion>1.2</typeMappingVersion> <!-- corresponds to what the ant build was generating -->
+				        </configuration>
+				        <executions>
+				          <execution>
+				            <goals>
+				              <goal>wsdl2java</goal>
+				            </goals>
+				          </execution>
+				        </executions>
+				        <dependencies>
+				        	<dependency>
+				        		<groupId>javax.mail</groupId>
+				        		<artifactId>mail</artifactId>
+				        		<version>1.4</version>
+				        	</dependency>
+				        	<dependency>
+				        		<groupId>javax.activation</groupId>
+				        		<artifactId>activation</artifactId>
+				        		<version>1.1</version>
+				        	</dependency>
+				        </dependencies>
+				      </plugin>		
+				</plugins>
+			</build>
+			</profile>
+	</profiles>
+	
 </project>
 

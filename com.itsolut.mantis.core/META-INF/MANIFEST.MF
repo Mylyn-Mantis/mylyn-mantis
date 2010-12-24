@@ -22,8 +22,4 @@ Export-Package:
  com.itsolut.mantis.core.util
 Bundle-Activator: com.itsolut.mantis.core.MantisCorePlugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: .,
- lib/client-config.wsdd,
- lib/activation.jar,
- lib/saaj.jar,
- lib/mail.jar
+Bundle-ClassPath: .
