@@ -23,7 +23,7 @@ import com.itsolut.mantis.core.model.*;
 public class MantisCacheData implements Serializable {
 
     // increment when structure changes
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
     
     long lastUpdate = 0;
 
