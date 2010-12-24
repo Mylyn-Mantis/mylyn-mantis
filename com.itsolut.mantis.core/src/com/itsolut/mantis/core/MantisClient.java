@@ -21,8 +21,6 @@ import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.IssueHeaderData;
@@ -31,7 +29,6 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
