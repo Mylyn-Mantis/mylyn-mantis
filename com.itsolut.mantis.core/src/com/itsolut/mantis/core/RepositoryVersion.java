@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2010 Robert Munteanu and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Robert Munteanu - initial API and implementation
+ *******************************************************************************/
+
 package com.itsolut.mantis.core;
 
 import java.util.EnumSet;
@@ -15,38 +26,23 @@ public enum RepositoryVersion {
     
     /**
      * Versions 0.0.5 or 1.1.x up to 1.1.6
-     * 
-     * <p>Do not support target_version ( it is erased when using the SOAP API)
-     * , do not have proper task relations support ( usually reversed ) and
-     * does not require attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_6_OR_LOWER(EnumSet.noneOf(Capability.class)), 
+    VERSION_1_1_6_OR_LOWER("0.0.5 through 1.1.6", EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING)), 
 
     /**
      * Versions 1.1.7 or higher
-     * 
-     * <p>Do not support target_version ( it is erased when using the SOAP API)
-     * , do not have proper task relations support ( usually reversed ) and
-     * requires attachments to be Base64-encoded</p>
      */
-    VERSION_1_1_7_OR_HIGHER(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS)), 
+    VERSION_1_1_7_OR_HIGHER("1.1.7 or higher in the 1.1.x stream", EnumSet.noneOf(RepositoryCapability.class)), 
 
     /**
      * Version 1.2 alpha 3 or previous
-     * 
-     * <p>Has target_version and proper task relation support, introduced 
-     * after 1.2.0a2. Does not require attachments to be Base64-Encoded.</p>
      */
-    VERSION_1_2_A3_OR_LOWER(EnumSet.of(Capability.TARGET_VERSION, Capability.TASK_RELATIONS)),
+    VERSION_1_2_A3_OR_LOWER("1.2.0 alpha 3 or previous in the 1.2.x stream", EnumSet.of(RepositoryCapability.TARGET_VERSION, RepositoryCapability.TASK_RELATIONS, RepositoryCapability.CORRECT_BASE64_ENCODING)),
     
     /**
-     * Versions 1.2 rc1 or newwer
-     * 
-     * <p>Do not support target_version ( it is erased when using the SOAP API)
-     * , do not have proper task relations support ( usually reversed ) and
-     * requires attachments to be Base64-encoded</p>
+     * Versions 1.2 rc1 or newwe
      */
-    VERSION_1_2_RC1_OR_HIGHER(EnumSet.of(Capability.TARGET_VERSION, Capability.TASK_RELATIONS, Capability.BASE64_ENCODE_ATTACHMENTS)),
+    VERSION_1_2_RC1_OR_HIGHER("1.2.0 rc1 to 1.2.0 (not inclusive)", EnumSet.of(RepositoryCapability.TARGET_VERSION, RepositoryCapability.TASK_RELATIONS)),
     
     /**
      * Versions 1.2.0 or newer.
@@ -54,7 +50,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_OR_HIGHER(EnumSet.allOf(Capability.class)),
+    VERSION_1_2_OR_HIGHER("1.2.0 to 1.2.1", EnumSet.complementOf(EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING))),
     
     /**
      * Versions 1.2.2 or newer.
@@ -62,7 +58,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, does not require
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_2_OR_HIGHER(EnumSet.complementOf(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS))),
+    VERSION_1_2_2_OR_HIGHER("1.2.2 or higher in the 1.2.x stream", EnumSet.allOf(RepositoryCapability.class)),
     
     /**
      * Versions 1.3 or newer.
@@ -72,33 +68,8 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_3_DEV(EnumSet.complementOf(EnumSet.of(Capability.BASE64_ENCODE_ATTACHMENTS)));
+    VERSION_1_3_DEV("1.3.x development version", EnumSet.allOf(RepositoryCapability.class));
     
-    
-    private enum Capability {
-        
-        /**
-         * The target version is properly supported, i.e. not erased when using the SOAP API
-         */
-        TARGET_VERSION, 
-        /**
-         * Task relations are properly sent and received.
-         */
-        TASK_RELATIONS, 
-        /**
-         * Attachments need to be double-encoded with Base64
-         */
-        BASE64_ENCODE_ATTACHMENTS, 
-        /**
-         * Due date is supported
-         */
-        DUE_DATE, 
-        /**
-         * Time tracking is supported 
-         */
-        TIME_TRACKING;
-    }
-
     
     public static RepositoryVersion fromVersionString(String versionString) throws MantisException{
         
@@ -167,44 +138,48 @@ public enum RepositoryVersion {
 	}
     
 
-    private final boolean hasProperTaskRelations;
-    private final boolean hasTargetVersionSupport;
-    private final boolean requiresBase64EncodedAttachment;
-    private final boolean hasDueDateSupport;
-    private final boolean hasTimeTrackingSupport;
+	private final EnumSet<RepositoryCapability> capabilities;
+	private final String description;
     
-    private RepositoryVersion(Set<Capability> capabilities) {
-
-        this.hasProperTaskRelations = capabilities.contains(Capability.TASK_RELATIONS);
-        this.hasTargetVersionSupport = capabilities.contains(Capability.TARGET_VERSION);
-        this.requiresBase64EncodedAttachment = capabilities.contains(Capability.BASE64_ENCODE_ATTACHMENTS);
-        this.hasDueDateSupport = capabilities.contains(Capability.DUE_DATE);
-        this.hasTimeTrackingSupport = capabilities.contains(Capability.TIME_TRACKING);
+    private RepositoryVersion(String description, EnumSet<RepositoryCapability> capabilities) {
+    	
+    	this.capabilities = capabilities;
+    	this.description = description;
     }
     
     
     public boolean isHasProperTaskRelations() {
 
-        return hasProperTaskRelations;
+        return  capabilities.contains(RepositoryCapability.TASK_RELATIONS);
     }
     
     public boolean isHasTargetVersionSupport() {
 
-        return hasTargetVersionSupport;
+        return capabilities.contains(RepositoryCapability.TARGET_VERSION);
     }
  
-    public boolean isRequiresBase64EncodedAttachment() {
+    public boolean hasCorrectBase64Encoding() {
     	
-		return requiresBase64EncodedAttachment;
+		return capabilities.contains(RepositoryCapability.CORRECT_BASE64_ENCODING);
 	}
     
     public boolean isHasDueDateSupport() {
 
-        return hasDueDateSupport;
+        return capabilities.contains(RepositoryCapability.DUE_DATE);
     }
     
     public boolean isHasTimeTrackingSupport() {
 
-        return hasTimeTrackingSupport;
+        return capabilities.contains(RepositoryCapability.TIME_TRACKING);
     }
+    
+    public Set<RepositoryCapability> getMissingCapabilities() {
+    	
+    	return EnumSet.complementOf(capabilities);
+    }
+    
+    public String getDescription() {
+    	
+		return description;
+	}
 }

@@ -1,13 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2009 IT Solutions, Inc.
+ * Copyright (c) 2004, 2010 Robert Munteanu and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
- *     Robert Munteanu
+ *     Robert Munteanu - initial API and implementation
  *******************************************************************************/
+
 
 package com.itsolut.mantis.core;
 
@@ -136,9 +137,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        boolean requiresBase64EncodedAttachment = cache.getRepositoryVersion().isRequiresBase64EncodedAttachment();
-
-        final byte[] encoded = requiresBase64EncodedAttachment ? Base64.encode(data).getBytes() : data;
+        final byte[] encoded = cache.getRepositoryVersion().hasCorrectBase64Encoding() ?  data : Base64.encode(data).getBytes();
 
         soapClient.addIssueAttachment(id, name, encoded, monitor);
     }
@@ -213,7 +212,7 @@ public class MantisClient implements IMantisClient {
         soapClient.addNote(issueId, ind, monitor);
     }
 
-    public void validate(IProgressMonitor monitor) throws MantisException {
+    public RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException {
 
         monitor.beginTask("Validating", 2);
 
@@ -221,13 +220,16 @@ public class MantisClient implements IMantisClient {
 
             // get and validate remote version
             String remoteVersion = soapClient.getVersion(monitor);
-            RepositoryVersion.fromVersionString(remoteVersion);
+            RepositoryVersion version = RepositoryVersion.fromVersionString(remoteVersion);
             Policy.advance(monitor, 1);
 
             // test to see if the current user has proper access privileges,
             // since getVersion() does not require a valid user
             soapClient.getProjectData(monitor);
             Policy.advance(monitor, 1);
+            
+            return new RepositoryValidationResult(version);
+            
         } finally {
 
             monitor.done();

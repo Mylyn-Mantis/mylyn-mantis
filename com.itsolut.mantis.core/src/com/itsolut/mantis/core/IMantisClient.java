@@ -80,7 +80,7 @@ public interface IMantisClient {
      * @throws MantisException
      *             thrown in case of a connection error
      */
-    void validate(IProgressMonitor monitor) throws MantisException;
+    RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException;
 
     /**
      * Updates cached repository details: milestones, versions etc.
