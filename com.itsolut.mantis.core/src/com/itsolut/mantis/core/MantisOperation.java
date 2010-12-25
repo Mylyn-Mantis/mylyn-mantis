@@ -25,6 +25,8 @@ import com.itsolut.mantis.core.util.MantisUtils;
  *
  */
 enum MantisOperation {
+    
+    
     LEAVE("Leave as ", null, null),
 
     RESOLVE_AS("Resolve as ", TaskAttribute.TYPE_SINGLE_SELECT, null) {
@@ -86,18 +88,24 @@ enum MantisOperation {
         }
     };
     
+    private static final String PREFIX_VIRTUAL_ATTRIBUTE = TaskAttribute.PREFIX_OPERATION + "virtual-";
+    
     private static String getAttributeId(MantisOperation mantisOperation) {
 		
-		return TaskAttribute.PREFIX_OPERATION + "virtual-" + mantisOperation.toString();
+		return PREFIX_VIRTUAL_ATTRIBUTE + mantisOperation.toString();
 	}
     
     private static TaskAttribute createTaskAttributeFrom(TaskData taskData, TaskAttribute from, String attributeId) {
     	
 		TaskAttribute attribute = taskData.getRoot().createAttribute(attributeId);
 		attribute.getMetaData().setType(from.getMetaData().getType());
-		attribute.getMetaData().setReadOnly(true);
 		
 		return attribute;
+    }
+    
+    public static boolean isOperationRelated(TaskAttribute attribute) {
+        
+        return attribute.getId().startsWith(PREFIX_VIRTUAL_ATTRIBUTE);
     }
 
 	private final String label;

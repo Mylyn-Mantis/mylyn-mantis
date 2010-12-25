@@ -200,7 +200,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 continue;
             }
 
-            if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly())
+            if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly() || MantisOperation.isOperationRelated(attribute))
                 continue;
 
             ticket.putValue(attribute.getId(), attribute.getValue());
