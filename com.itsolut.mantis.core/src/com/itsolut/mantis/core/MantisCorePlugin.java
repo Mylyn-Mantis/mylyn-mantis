@@ -167,6 +167,7 @@ public class MantisCorePlugin extends Plugin {
                 		case 404:
                 			return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
                 		case 302:
+                		case 301:
                 			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + httpFault.getLocation() + ", please update the server location.");
                 	}
                 	
