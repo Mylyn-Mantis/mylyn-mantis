@@ -57,7 +57,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String TITLE = "Mantis Repository Settings";
 
-    private static final String DESCRIPTION = "Example: http://mylyn-mantis.sourceforge.net/MantisTest/mc/mantisconnect.php";
+    private static final String DESCRIPTION = "Example: http://www.example.com/mantis/\nDo not enter the path to the SOAP API.";
 
     private Button retrieveSubTasksButton;
 
