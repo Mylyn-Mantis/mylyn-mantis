@@ -53,7 +53,12 @@ import com.itsolut.mantis.core.exception.MantisRemoteException;
 @SuppressWarnings("restriction")
 public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
-    private transient MantisConnectPortType soap;
+    /**
+     * The default location of the SOAP API entry point, as of Mantis 1.1
+     */
+    private static final String SOAP_API_LOCATION = "/api/soap/mantisconnect.php";
+
+	private transient MantisConnectPortType soap;
 
     private AbstractWebLocation location;
 
@@ -121,7 +126,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
                 CustomMantisConnectLocator locator = new CustomMantisConnectLocator(provider);
                 locator.setLocation(getLocation());
 
-                soap = locator.getMantisConnectPort(new URL(location.getUrl()));
+                soap = locator.getMantisConnectPort(new URL(location.getUrl() + SOAP_API_LOCATION));
             } catch (ServiceException e) {
                 throw new MantisRemoteException(e);
             } catch (MalformedURLException e) {
