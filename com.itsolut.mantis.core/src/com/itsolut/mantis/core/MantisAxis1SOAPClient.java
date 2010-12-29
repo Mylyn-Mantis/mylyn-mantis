@@ -56,7 +56,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
     /**
      * The default location of the SOAP API entry point, as of Mantis 1.1
      */
-    private static final String SOAP_API_LOCATION = "/api/soap/mantisconnect.php";
+    static final String SOAP_API_LOCATION = "/api/soap/mantisconnect.php";
 
 	private transient MantisConnectPortType soap;
 

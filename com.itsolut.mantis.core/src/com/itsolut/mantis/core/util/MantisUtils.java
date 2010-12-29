@@ -77,20 +77,6 @@ public class MantisUtils {
         return o1 == o2 || (o1 != null && o1.equals(o2));
     }
 
-    public static String getRepositoryBaseUrl(String repositoryUrl) {
-
-        String baseUrl = repositoryUrl;
-
-        // get the base url of the installation (located in mc / as of version 1.1.0 its located in
-        // api/soap)
-        if (repositoryUrl.toLowerCase().contains("mc/mantisconnect.php"))
-            baseUrl = repositoryUrl.substring(0, repositoryUrl.toLowerCase().indexOf("mc/mantisconnect.php"));
-        else if (repositoryUrl.toLowerCase().contains("api/soap/mantisconnect.php"))
-            baseUrl = repositoryUrl.substring(0, repositoryUrl.toLowerCase().indexOf("api/soap/mantisconnect.php"));
-
-        return baseUrl;
-    }
-
     /**
      * Creates a <code>MantisSearch</code> object from this query.
      */

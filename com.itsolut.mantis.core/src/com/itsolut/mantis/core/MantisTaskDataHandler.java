@@ -381,9 +381,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             taskAttachment.setLength(Long.parseLong(Integer.toString(attachment
                     .getSize())));
             taskAttachment.setCreationDate(attachment.getCreated());
-            taskAttachment.setUrl(MantisUtils.getRepositoryBaseUrl(repository
-                    .getRepositoryUrl())
-                    + IMantisClient.TICKET_ATTACHMENT_URL + attachment.getId());
+            taskAttachment.setUrl(MantisRepositoryLocations.create(repository
+                    .getRepositoryUrl()).getAttachmentDownloadLocation(attachment.getId()));
             taskAttachment
             .setAttachmentId(Integer.toString(attachment.getId()));
             taskAttachment.applyTo(attribute);

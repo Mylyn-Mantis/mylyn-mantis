@@ -31,11 +31,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.ITaskComment;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.LegendElement;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
@@ -43,8 +39,8 @@ import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryLocations;
 import com.itsolut.mantis.core.SourceForgeConstants;
-import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
@@ -119,13 +115,13 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
         if (taskRepository.getUrl().startsWith(SourceForgeConstants.NEW_SF_NET_URL))
             return SourceForgeConstants.SIGNUP_URL;
 
-        return MantisUtils.getRepositoryBaseUrl(taskRepository.getRepositoryUrl()) + "signup_page.php";
+        return MantisRepositoryLocations.create(taskRepository.getRepositoryUrl()).getSignupLocation();
     }
 
     @Override
     public String getAccountManagementUrl(TaskRepository taskRepository) {
 
-        return MantisUtils.getRepositoryBaseUrl(taskRepository.getRepositoryUrl()) + "account_page.php";
+        return MantisRepositoryLocations.create(taskRepository.getRepositoryUrl()).getAccountManagementLocation();
     }
 
     @Override

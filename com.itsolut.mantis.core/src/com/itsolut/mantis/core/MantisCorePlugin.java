@@ -168,11 +168,8 @@ public class MantisCorePlugin extends Plugin {
                 			return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
                 		case 302:
                 		case 301:
-                			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + httpFault.getLocation() + ", please update the server location.");
+                			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + MantisRepositoryLocations.create(httpFault.getLocation()).getBaseRepositoryLocation() + ", please update the server location.");
                 	}
-                	
-                    if  ( ((AxisHttpFault) t.getCause()).getReturnCode() == 404 )
-                        return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
                 }
                 if ( t.getCause() instanceof AxisFault ) {
                     AxisFault fault = (AxisFault) t.getCause();

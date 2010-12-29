@@ -92,27 +92,33 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         // There is no way of knowing the proper URL for the repository
         // so we return at least a common prefix which should be good
         // enough for TaskRepositoryManager#getConnectorForRepositoryTaskUrl
-        if (url == null) {
+        if (url == null)
             return null;
-        }
-        int index = url.lastIndexOf(IMantisClient.URL_SHOW_BUG);
-        return index == -1 ? null : url.substring(0, index);
+        
+        return MantisRepositoryLocations.create(url).getBaseRepositoryLocation();
     }
 
     @Override
     public String getTaskIdFromTaskUrl(String url) {
 
-        if (url == null) {
+        if (url == null)
             return null;
-        }
-        int index = url.lastIndexOf(IMantisClient.URL_SHOW_BUG);
-        return index == -1 ? null : url.substring(index + IMantisClient.URL_SHOW_BUG.length());
+        
+        Integer taskId = MantisRepositoryLocations.extractTaskId(url);
+        
+        if ( taskId == null )
+            return null;
+        
+        return taskId.toString();
     }
 
     @Override
     public String getTaskUrl(String repositoryUrl, String taskId) {
-
-        return MantisUtils.getRepositoryBaseUrl(repositoryUrl) + IMantisClient.URL_SHOW_BUG + taskId.toString();
+        
+        if ( repositoryUrl == null || taskId == null )
+            return null;
+        
+        return MantisRepositoryLocations.create(repositoryUrl).getTaskLocation(Integer.valueOf(taskId));
     }
 
     @Override
