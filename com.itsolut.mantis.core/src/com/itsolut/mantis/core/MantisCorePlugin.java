@@ -166,6 +166,10 @@ public class MantisCorePlugin extends Plugin {
                 	
                 		case 404:
                 			return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
+                		case 403:
+                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Access denied by server configuration. Please contact your server administrator.");
+                		case 401:
+                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Server requested authentication, but none was given. Please provide HTTP credentials.");
                 		case 302:
                 		case 301:
                 			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + MantisRepositoryLocations.create(httpFault.getLocation()).getBaseRepositoryLocation() + ", please update the server location.");
