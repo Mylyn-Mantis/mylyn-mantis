@@ -4,7 +4,7 @@
       label="Mylyn Connector: Mantis"
       version="3.2.0.qualifier"
       provider-name="ITSOLUT"
-      plugin="com.itsolut.mantis">
+      plugin="com.itsolut.mantis.ui">
 
    <description>
       Mylyn connector for Mantis.

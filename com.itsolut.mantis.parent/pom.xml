@@ -7,7 +7,6 @@
 	<packaging>pom</packaging>
 	<name>Mylyn Mantis Connector</name>
 	<modules>
-		<module>../com.itsolut.mantis</module>
 		<module>../com.itsolut.mantis.core</module>
 		<module>../com.itsolut.mantis.ui</module>
 		<module>../com.itsolut.mantis.tests</module>
