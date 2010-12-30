@@ -1,14 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2006 Mylar eclipse.org project and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Mylar project committers - initial API and implementation
- *******************************************************************************/
-/*******************************************************************************
  * Copyright (c) 2007 - 2007 IT Solutions, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -17,6 +7,7 @@
  * 
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
+ *     Robert Munteanu - various changes
  *******************************************************************************/
 
 package com.itsolut.mantis.ui.tasklist;
@@ -57,7 +48,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String TITLE = "Mantis Repository Settings";
 
-    private static final String DESCRIPTION = "Example: http://www.example.com/mantis/\nDo not enter the path to the SOAP API.";
+    private static final String DESCRIPTION = "Enter the path to your repository, for example : http://www.example.com/mantis/\nPlease validate the settings to ensure they are correct.";
 
     private Button retrieveSubTasksButton;
 
@@ -193,7 +184,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 		private void setStatusFromMissingCapabilities( RepositoryValidationResult validate) {
 			
 			StringBuilder message = new StringBuilder();
-			message.append("You are using version ").append(validate.getVersion().getDescription()).append(" which has known problems : ");
+			message.append("You are using a version in the range ").append(validate.getVersion().getDescription()).append(" which has known problems : ");
 			for ( RepositoryCapability capability : validate.getVersion().getMissingCapabilities() )
 				message.append(capability.getDescriptionForMissingCapability()).append(" ,");
 			message.deleteCharAt(message.length() -1);
