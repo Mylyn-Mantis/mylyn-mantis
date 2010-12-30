@@ -12,8 +12,20 @@
 		<module>../com.itsolut.mantis.tests</module>
 		<module>../com.itsolut.mantis-feature</module>
 		<module>../com.itsolut.mantis-site</module>
-		<module>../com.itsolut.mantis.target</module>
 	</modules>
+	
+	<repositories>
+		<repository>
+			<id>eclipse</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/eclipse/updates/3.4</url>
+		</repository>
+		<repository>
+			<id>mylyn</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/tools/mylyn/update-archive/3.4.2/v20100916-0100/e3.4</url>
+		</repository>
+	</repositories>
 
 	<properties>
 		<tycho-version>0.10.0</tycho-version>
@@ -38,14 +50,6 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
-					<target>
-						<artifact>
-							<groupId>com.itsolut.mantis</groupId>
-							<artifactId>com.itsolut.mantis.target</artifactId>
-							<version>${project.version}</version>
-							<classifier>e34-mylyn34</classifier>
-						</artifact>
-					</target>
 				</configuration>
 			</plugin>
 		</plugins>
