@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mylyn Mantis Connector Tests
 Bundle-SymbolicName: com.itsolut.mantis.tests
-Bundle-Version: 3.2.0.qualifier
+Bundle-Version: 3.3.0.qualifier
 Require-Bundle: org.junit,
  org.eclipse.core.runtime,
  org.eclipse.mylyn.tasks.core,
