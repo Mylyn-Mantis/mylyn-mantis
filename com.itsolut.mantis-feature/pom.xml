@@ -35,9 +35,19 @@
 				</executions>
 				<configuration>
 					<transformationSets>
+					
+						<!-- Is there a more compact way generate the release notes without copying the 
+							same transformationSet over and over and then changing the stylesheet and outputDir value ? -->
 						<transformationSet>
 							<dir>src/changes</dir>
 							<stylesheet>src/xsl/changes-to-mediawiki.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/mediawiki</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
 							<outputProperties>
 								<outputProperty>
 									<name>omit-xml-declaration</name>
@@ -45,6 +55,42 @@
 								</outputProperty>
 							</outputProperties>
 						</transformationSet>
+						
+						<transformationSet>
+							<dir>src/changes</dir>
+							<stylesheet>src/xsl/changes-to-phpbb.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/phpbb</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
+							<outputProperties>
+								<outputProperty>
+									<name>omit-xml-declaration</name>
+									<value>yes</value>
+								</outputProperty>
+							</outputProperties>
+						</transformationSet>
+						
+						<transformationSet>
+							<dir>src/changes</dir>
+							<stylesheet>src/xsl/changes-to-text.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/text</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
+							<outputProperties>
+								<outputProperty>
+									<name>omit-xml-declaration</name>
+									<value>yes</value>
+								</outputProperty>
+							</outputProperties>
+						</transformationSet>						
 					</transformationSets>
 				</configuration>
 			</plugin>
