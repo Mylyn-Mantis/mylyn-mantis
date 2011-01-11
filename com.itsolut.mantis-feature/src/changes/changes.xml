@@ -1,0 +1,17 @@
+<document >
+	<body>
+		<release version="3.2.0" date="2010-01-15">
+			<action type="add" issue="163" dev="rombert">[User Interface] Do not require the user to enter the location to the mantisconnect.php file</action>
+			<action type="add" issue="160" dev="rombert">[Core] Preselect fixed status in 'Resolve as' operation</action>
+			<action type="add" issue="161" dev="rombert">[Build] Move WSDL generation into maven build</action>
+			<action type="add" issue="15" dev="rombert">[Core] National Langugage Support</action>
+			<action type="add" issue="100" dev="rombert">[Core] Support localized priority text</action>
+			<action type="add" issue="93" dev="rombert">[Core] icons in mylyn task-list depend on english terms</action>
+			<action type="add" issue="149" dev="rombert">[Core] Problem with I18N</action>
+			<action type="add" issue="156" dev="rombert">[Core] Preselect default values for fields as configured in MantisBT</action>
+			<action type="add" issue="159" dev="rombert">[Core] Tasks come up as not completed after a restart</action>
+			<action type="add" issue="157" dev="rombert">[User Interface] Refine 'unknown error' popup</action>
+			<action type="add" issue="135" dev="rombert">[Core] Implement partial updating of repository configuration</action>
+		</release>
+	</body>
+</document>
