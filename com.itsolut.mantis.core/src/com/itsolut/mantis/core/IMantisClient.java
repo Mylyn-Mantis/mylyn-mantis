@@ -41,10 +41,6 @@ public interface IMantisClient {
 
     public static final String TIME_ZONE = "UTC";
 
-    public static final String TICKET_ATTACHMENT_URL = "file_download.php?type=bug&file_id=";
-
-    public static final String URL_SHOW_BUG = "view.php?id=";
-
     public static final String SEARCH_LIMIT = "searchLimit";
     
     public static final String PROJECT_NAME = "projectName";
@@ -80,7 +76,7 @@ public interface IMantisClient {
      * @throws MantisException
      *             thrown in case of a connection error
      */
-    void validate(IProgressMonitor monitor) throws MantisException;
+    RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException;
 
     /**
      * Updates cached repository details: milestones, versions etc.

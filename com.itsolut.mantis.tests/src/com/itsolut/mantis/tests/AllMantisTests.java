@@ -24,8 +24,8 @@ public class AllMantisTests {
 		TestSuite suite = new TestSuite("Test for com.itsolut.mantis.tests");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(Mantis12TaskDataHandlerTest.class);
+		suite.addTestSuite(MantisRepositoryLocationsTest.class);
 		suite.addTestSuite(RepositoryVersionTest.class);
-		suite.addTestSuite(MantisUtilsTest.class);
 		suite.addTestSuite(MantisRepositoryConnector12IntegrationTest.class);
 		suite.addTestSuite(MantisRepositoryConnectorTest.class);
 		suite.addTestSuite(MantisRelationshipTest.class);

@@ -30,22 +30,15 @@
       <repository
             addAutomatically="false"
             anonymous="true"
-            label="Mantis Connector 1.0a5"
+            label="MantisBT 1.1 or later"
             repositoryKind="mantis"
-            urlRepository="http://your.domain.com/mc/mantisconnect.php"/>
-      <repository
-            addAutomatically="false"
-            anonymous="false"
-            label="Mantis Connector 1.1.0 or greater"
-            repositoryKind="mantis"
-            urlRepository="http://your.domain.com/api/soap/mantisconnect.php">
-      </repository>
+            urlRepository="http://www.example.com/mantisbt/"/>
       <repository
             addAutomatically="true"
             anonymous="true"
             label="Mylyn-Mantis Support"
             repositoryKind="mantis"
-            urlRepository="https://sourceforge.net/apps/mantisbt/mylyn-mantis/api/soap/mantisconnect.php">
+            urlRepository="https://sourceforge.net/apps/mantisbt/mylyn-mantis/">
       </repository>
    </extension> 
      <extension

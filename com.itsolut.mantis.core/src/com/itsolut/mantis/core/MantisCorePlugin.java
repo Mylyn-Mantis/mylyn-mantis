@@ -158,9 +158,23 @@ public class MantisCorePlugin extends Plugin {
             if ( t instanceof MantisLoginException || ( actualMessage != null && actualMessage.toLowerCase(Locale.ENGLISH).contains("access denied")) )
                 return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, actualMessage);
             if ( t instanceof MantisRemoteException) {
-                if ( t.getCause() instanceof AxisHttpFault ) 
-                    if  ( ((AxisHttpFault) t.getCause()).getReturnCode() == 404 )
-                        return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
+                if ( t.getCause() instanceof AxisHttpFault )  {
+                	
+                	AxisHttpFault httpFault = (AxisHttpFault) t.getCause();
+                	
+                	switch ( httpFault.getReturnCode() ) {
+                	
+                		case 404:
+                			return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
+                		case 403:
+                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Access denied by server configuration. Please contact your server administrator.");
+                		case 401:
+                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Server requested authentication, but none was given. Please provide HTTP credentials.");
+                		case 302:
+                		case 301:
+                			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + MantisRepositoryLocations.create(httpFault.getLocation()).getBaseRepositoryLocation() + ", please update the server location.");
+                	}
+                }
                 if ( t.getCause() instanceof AxisFault ) {
                     AxisFault fault = (AxisFault) t.getCause();
                     if ( fault.detail instanceof IOException )

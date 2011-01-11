@@ -1,14 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2006 Mylar eclipse.org project and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Mylar project committers - initial API and implementation
- *******************************************************************************/
-/*******************************************************************************
  * Copyright (c) 2007 - 2007 IT Solutions, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -17,18 +7,17 @@
  * 
  * Contributors:
  *     Chris Hane - adapted Trac implementation for Mantis
+ *     Robert Munteanu - various changes
  *******************************************************************************/
 
 package com.itsolut.mantis.ui.tasklist;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
@@ -44,8 +33,9 @@ import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
+import com.itsolut.mantis.core.RepositoryCapability;
+import com.itsolut.mantis.core.RepositoryValidationResult;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.internal.WikiLinkedErrorDialog;
 
@@ -58,7 +48,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String TITLE = "Mantis Repository Settings";
 
-    private static final String DESCRIPTION = "Example: http://mylyn-mantis.sourceforge.net/MantisTest/mc/mantisconnect.php";
+    private static final String DESCRIPTION = "Enter the path to your repository, for example : http://www.example.com/mantis/\nPlease validate the settings to ensure they are correct.";
 
     private Button retrieveSubTasksButton;
 
@@ -152,7 +142,6 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         new WikiLinkedErrorDialog(getShell(), "Unexpected repository error", "The repository has returned an unknown error. Most likely there is an error in the repository configuration.", validator.getStatus()).open();
     }
     
-    // public for testing
     public class MantisValidator extends Validator {
 
         private final String repositoryUrl;
@@ -182,10 +171,27 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
             AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
 
             IMantisClient client = MantisClientFactory.getDefault().createClient(location);
-            client.validate(monitor);
+            RepositoryValidationResult validate = client.validate(monitor);
+            if ( !validate.getVersion().getMissingCapabilities().isEmpty() ) {
+            	setStatusFromMissingCapabilities(validate);
+            	return;
+            	
+            }
             setStatus(RepositoryStatus.createStatus(repositoryUrl, IStatus.INFO, MantisUIPlugin.PLUGIN_ID,
                     "Authentication credentials are valid."));
         }
+
+		private void setStatusFromMissingCapabilities( RepositoryValidationResult validate) {
+			
+			StringBuilder message = new StringBuilder();
+			message.append("You are using a version in the range ").append(validate.getVersion().getDescription()).append(" which has known problems : ");
+			for ( RepositoryCapability capability : validate.getVersion().getMissingCapabilities() )
+				message.append(capability.getDescriptionForMissingCapability()).append(" ,");
+			message.deleteCharAt(message.length() -1);
+			message.append(". Please consider upgrading to the latest stable version.");
+			
+			setStatus(RepositoryStatus.createStatus(repositoryUrl, WARNING, MantisUIPlugin.PLUGIN_ID, message.toString()));
+		}
     }
 
 }

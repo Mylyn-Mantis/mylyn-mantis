@@ -4,7 +4,7 @@
       label="Mylyn Connector: Mantis"
       version="3.2.0.qualifier"
       provider-name="ITSOLUT"
-      plugin="com.itsolut.mantis">
+      plugin="com.itsolut.mantis.ui">
 
    <description>
       Mylyn connector for Mantis.
@@ -214,82 +214,12 @@ litigation.
    </url>
 
    <requires>
-      <import plugin="javax.xml.rpc" version="1.1.0" match="compatible"/>
-      <import plugin="javax.xml.soap" version="1.2.0" match="compatible"/>
-      <import plugin="org.apache.ant" version="1.6.5" match="compatible"/>
-      <import plugin="org.apache.commons.logging" version="1.0.4" match="compatible"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ui.forms"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import feature="org.eclipse.mylyn_feature" version="2.0.0.v20070627-1400" match="greaterOrEqual"/>
-      <import plugin="javax.wsdl" version="1.5.1" match="compatible"/>
-      <import plugin="org.apache.commons.discovery" version="0.2.0" match="compatible"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.mylyn" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.commons.core" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.context.core" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.tasks.core" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.tasks.ui" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.commons.net" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.monitor.core" version="3.1.0" match="compatible"/>
-      <import plugin="org.apache.axis" version="1.4.0" match="greaterOrEqual"/>
-      <import plugin="javax.wsdl" version="1.5.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.mylyn.commons.ui"/>
-      <import plugin="org.eclipse.mylyn.commons.soap" version="3.2.0" match="compatible"/>
-      <import feature="org.eclipse.mylyn_feature" version="3.2.0" match="compatible"/>
+      <import feature="org.eclipse.mylyn_feature" version="3.4.0" match="compatible"/>
+
+      <import plugin="org.eclipse.mylyn.commons.net" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.soap" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.ui" version="3.4.0" match="compatible"/>
    </requires>
-
-   <plugin
-         id="org.apache.commons.httpclient"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.codec"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.axis"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.discovery"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.commons.logging"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.xml.rpc"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.xml.soap"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="com.itsolut.mantis.core"
@@ -300,27 +230,6 @@ litigation.
 
    <plugin
          id="com.itsolut.mantis.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.wsdl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.servlet"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.itsolut.mantis"
          download-size="0"
          install-size="0"
          version="0.0.0"

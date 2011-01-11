@@ -25,7 +25,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -85,9 +88,9 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private static final String DESCRIPTION = "Select a project and a filter to populate the task list. Custom filters can be created from the web interface.";
 
-    private static final String TITLE_QUERY_TITLE = "Query Title:";
+    private static final String TITLE_QUERY_TITLE = "Query title";
 
-    private static final String MAX_SEARCH_RESULTS = "Maximum results";
+    private static final String MAX_SEARCH_RESULTS = "Result limit";
 
     private IRepositoryQuery query;
 
@@ -122,24 +125,24 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     public void createControl(Composite parent) {
 
         Composite control = new Composite(parent, SWT.NONE);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
-        control.setLayoutData(gd);
-        GridLayout layout = new GridLayout(2, false);
-        control.setLayout(layout);
+        control.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+        control.setLayout(new GridLayout(2, false));
 
         createTitleGroup(control);
 
         Label projectLabel = new Label(control, SWT.NONE);
-        projectLabel.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
+        GridDataFactory.defaultsFor(projectLabel).align(SWT.FILL, SWT.BEGINNING).applyTo(projectLabel);
         projectLabel.setText("Select project");
 
         createProjectTree(control);
 
         try {
             Label comboLabel = new Label(control, SWT.NONE);
+            GridDataFactory.defaultsFor(comboLabel).applyTo(comboLabel);
             comboLabel.setText("Select filter");
 
             filterCombo = new Combo(control, SWT.READ_ONLY);
+            GridDataFactory.defaultsFor(filterCombo).applyTo(filterCombo);
             filterCombo.add(SELECT_FILTER_IN_PROJECT);
             filterCombo.setText(filterCombo.getItem(0));
 
@@ -187,15 +190,19 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             });
 
             Label titleLabel = new Label(control, SWT.NONE);
+            GridDataFactory.defaultsFor(titleLabel).applyTo(titleLabel);
             titleLabel.setText(MAX_SEARCH_RESULTS);
 
             searchLimit = new Text(control, SWT.BORDER);
+            GridDataFactory.defaultsFor(searchLimit).applyTo(searchLimit);
             searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
 
             updateRepository = new Button(control, SWT.PUSH);
-            GridData buttonGridData = new GridData(SWT.LEFT, SWT.NULL, false, false);
-            buttonGridData.horizontalSpan = 2;
-            updateRepository.setLayoutData(buttonGridData);
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.FILL).grab(false, false).applyTo(updateRepository);
+
+//            GridData buttonGridData = new GridData(SWT.LEFT, SWT.NULL, false, false);
+//            buttonGridData.horizontalSpan = 2;
+//            updateRepository.setLayoutData(buttonGridData);
             updateRepository.setText("Update Repository Configuration");
             updateRepository.addSelectionListener(new SelectionListener() {
 
@@ -231,6 +238,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         }
 
         setControl(control);
+        
+        Dialog.applyDialogFont(control);
     }
 
     private IMantisClient getMantisClient() throws MantisException {
@@ -369,11 +378,11 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             return;
 
         Label titleLabel = new Label(control, SWT.NONE);
+        GridDataFactory.defaultsFor(titleLabel).applyTo(titleLabel);
         titleLabel.setText(TITLE_QUERY_TITLE);
 
         titleText = new Text(control, SWT.BORDER);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-        titleText.setLayoutData(gd);
+        GridDataFactory.defaultsFor(titleText).applyTo(titleText);
         titleText.addKeyListener(new KeyListener() {
             public void keyPressed(KeyEvent e) {
 
