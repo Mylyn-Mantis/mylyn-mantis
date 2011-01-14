@@ -252,25 +252,25 @@ public class MantisCache {
                 cacheViewStates(soapClient.getViewStates(monitor));
                 Policy.advance(subMonitor, 1);
                 
-                cacheDefaultAttributeValue(Key.SEVERITY, soapClient.getStringConfiguration(monitor, "default_bug_severity"), DefaultConstantValues.Attribute.BUG_SEVERITY);
+                cacheDefaultAttributeValue(Key.SEVERITY, safeGetThreshold(monitor, "default_bug_severity", DefaultConstantValues.Attribute.BUG_SEVERITY));
                 Policy.advance(subMonitor, 1);
 
-                cacheDefaultAttributeValue(Key.PRIORITY, soapClient.getStringConfiguration(monitor, "default_bug_priority"), DefaultConstantValues.Attribute.BUG_PRIORITY);
+                cacheDefaultAttributeValue(Key.PRIORITY, safeGetThreshold(monitor, "default_bug_priority", DefaultConstantValues.Attribute.BUG_PRIORITY));
                 Policy.advance(subMonitor, 1);
 
-                cacheDefaultAttributeValue(Key.ETA, soapClient.getStringConfiguration(monitor, "default_bug_eta"), DefaultConstantValues.Attribute.BUG_ETA);
+                cacheDefaultAttributeValue(Key.ETA, safeGetThreshold(monitor, "default_bug_eta", DefaultConstantValues.Attribute.BUG_ETA));
                 Policy.advance(subMonitor, 1);
 
-                cacheDefaultAttributeValue(Key.REPRODUCIBILITY, soapClient.getStringConfiguration(monitor, "default_bug_reproducibility"), DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY);
+                cacheDefaultAttributeValue(Key.REPRODUCIBILITY, safeGetThreshold(monitor, "default_bug_reproducibility", DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY));
                 Policy.advance(subMonitor, 1);
 
-                cacheDefaultAttributeValue(Key.RESOLUTION, soapClient.getStringConfiguration(monitor, "default_bug_resolution"), DefaultConstantValues.Attribute.BUG_RESOLUTION);
+                cacheDefaultAttributeValue(Key.RESOLUTION, safeGetThreshold(monitor, "default_bug_resolution", DefaultConstantValues.Attribute.BUG_RESOLUTION));
                 Policy.advance(subMonitor, 1);
 
-                cacheDefaultAttributeValue(Key.PROJECTION, soapClient.getStringConfiguration(monitor, "default_bug_projection"), DefaultConstantValues.Attribute.BUG_PROJECTION);
+                cacheDefaultAttributeValue(Key.PROJECTION, safeGetThreshold(monitor, "default_bug_projection", DefaultConstantValues.Attribute.BUG_PROJECTION));
                 Policy.advance(subMonitor, 1);
                 
-                cacheDefaultAttributeValue(Key.VIEW_STATE, soapClient.getStringConfiguration(monitor, "default_bug_view_status"), DefaultConstantValues.Attribute.BUG_VIEW_STATUS);
+                cacheDefaultAttributeValue(Key.VIEW_STATE, safeGetThreshold(monitor, "default_bug_view_status", DefaultConstantValues.Attribute.BUG_VIEW_STATUS));
                 Policy.advance(subMonitor, 1);
                 
                 cacheData.defaultStringValuesForAttributes.put(Key.STEPS_TO_REPRODUCE, soapClient.getStringConfiguration(monitor, "default_bug_steps_to_reproduce"));
@@ -279,7 +279,7 @@ public class MantisCache {
                 cacheData.defaultStringValuesForAttributes.put(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
                 Policy.advance(subMonitor, 1);
                 
-                cacheData.bugResolutionFixedThreshold = safeGetInt(soapClient.getStringConfiguration(monitor, "bug_resolution_fixed_threshold"), DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD.getValue());
+                cacheData.bugResolutionFixedThreshold = safeGetThreshold(monitor, "bug_resolution_fixed_threshold", DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD);
                 
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
@@ -288,6 +288,16 @@ public class MantisCache {
                         format(start)), null);
             }
         }
+	}
+	
+	private int safeGetThreshold(IProgressMonitor monitor, String configName, DefaultConstantValues.Attribute attribute) {
+	    
+	    try {
+	        return safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
+	    } catch ( MantisException e ) {
+	        MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");
+	        return attribute.getValue();
+	    }
 	}
     
 
@@ -548,9 +558,9 @@ public class MantisCache {
         this.cacheData.repositoryVersion = RepositoryVersion.fromVersionString(version);
     }
 
-    private void cacheDefaultAttributeValue(Key attribute, String readValue, DefaultConstantValues.Attribute defaultValue) {
+    private void cacheDefaultAttributeValue(Key attribute, int readValue) {
 
-        cacheData.defaultValuesForAttributes.put(attribute, safeGetInt(readValue, defaultValue.getValue()));
+        cacheData.defaultValuesForAttributes.put(attribute, readValue);
     }
     
     public RepositoryVersion getRepositoryVersion() {
