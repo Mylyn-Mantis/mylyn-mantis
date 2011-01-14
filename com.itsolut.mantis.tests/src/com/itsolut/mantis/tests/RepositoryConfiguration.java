@@ -30,7 +30,13 @@ public enum RepositoryConfiguration {
 	 * 
 	 * <p>Must not contain any customisation.</p>
 	 */
-	MANTIS_12_BASIC("http://localhost/mantis-1.2/api/soap/mantisconnect.php");
+	MANTIS_12_BASIC("http://localhost/mantis-1.2/api/soap/mantisconnect.php"), 
+	/**
+	 * A basic Mantis 1.1.x installation of the most recently released version.
+	 * 
+	 * <p>Must not contain any customisation.</p>
+	 */
+	MANTIS_11_BASIC("http://localhost/mantis-1.2/api/soap/mantisconnect.php");
 	
 	private String defaultUrl;
 

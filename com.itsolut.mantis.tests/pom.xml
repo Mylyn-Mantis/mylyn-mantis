@@ -15,6 +15,7 @@
 	
 	<properties>
 		<mantis.test.MANTIS_12_BASIC.url>http://localhost/mantis-1.2/api/soap/mantisconnect.php</mantis.test.MANTIS_12_BASIC.url>
+		<mantis.test.MANTIS_11_BASIC.url>http://localhost/mantis-1.1/api/soap/mantisconnect.php</mantis.test.MANTIS_11_BASIC.url>
 	</properties>
 
 	<build>
@@ -27,10 +28,27 @@
 					<useUIHarness>true</useUIHarness> 
 					<systemProperties>
 						<mantis.test.MANTIS_12_BASIC.url>${mantis.test.MANTIS_12_BASIC.url}</mantis.test.MANTIS_12_BASIC.url>
+						<mantis.test.MANTIS_11_BASIC.url>${mantis.test.MANTIS_11_BASIC.url}</mantis.test.MANTIS_11_BASIC.url>
 					</systemProperties>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>ci</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>ci</value>
+				</property>
+			</activation>
+			<properties>
+				<mantis.test.MANTIS_12_BASIC.url>http://mylyn-mantis.sourceforge.net/it/mantis/mantisbt-1.2/api/soap/mantisconnect.php</mantis.test.MANTIS_12_BASIC.url>
+				<mantis.test.MANTIS_11_BASIC.url>http://mylyn-mantis.sourceforge.net/it/mantis/mantisbt-1.1/api/soap/mantisconnect.php</mantis.test.MANTIS_11_BASIC.url>			
+			</properties>
+		</profile>
+	</profiles>
 </project>
 
