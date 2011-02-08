@@ -87,11 +87,11 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         DUE_DATE(Key.DUE_DATE, "Due date", TaskAttribute.TYPE_DATETIME, false, false),
         // task relations
         // read-only for existing tasks. see https://bugs.eclipse.org/bugs/show_bug.cgi?id=269407
-        PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
-        CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
-        DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
-        HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING), //
-        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.READ_ONLY_FOR_EXISTING),
+        PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY),
+        CHILD_OF(Key.CHILD_OF, "Child of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY),
+        DUPLICATE_OF(Key.DUPLICATE_OF, "Duplicate of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY),
+        HAS_DUPLICATE(Key.HAS_DUPLICATE, "Has duplicate", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY), //
+        RELATED_TO(Key.RELATED_TO, "Related to", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY),
         // virtual keys
         TIME_SPENT(Key.TIME_SPENT, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, false, ReadOnly.ALWAYS_READ_ONLY),
         TIME_SPENT_NEW(Key.TIME_SPENT_NEW, "Time spent", TaskAttribute.TYPE_SHORT_TEXT, true, ReadOnly.NEVER_READ_ONLY),
