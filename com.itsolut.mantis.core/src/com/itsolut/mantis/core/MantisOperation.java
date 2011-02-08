@@ -105,7 +105,7 @@ enum MantisOperation {
     
     public static boolean isOperationRelated(TaskAttribute attribute) {
         
-        return attribute.getId().startsWith(PREFIX_VIRTUAL_ATTRIBUTE);
+        return attribute.getId().startsWith(TaskAttribute.PREFIX_OPERATION);
     }
 
 	private final String label;
