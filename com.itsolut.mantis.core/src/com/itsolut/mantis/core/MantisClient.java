@@ -27,7 +27,6 @@ import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.IssueHeaderData;
 import com.itsolut.mantis.binding.IssueNoteData;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -59,7 +58,7 @@ public class MantisClient implements IMantisClient {
         return cache;
     }
 
-    public int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+    public int createTicket(MantisTicket ticket, IProgressMonitor monitor, List<TaskRelationshipChange> relationshipChanges) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -69,7 +68,7 @@ public class MantisClient implements IMantisClient {
 
         ticket.setId(issueId);
 
-        addRelationsIfApplicable(ticket, monitor);
+        updateRelationsIfApplicable(ticket, relationshipChanges, monitor);
 
         return issueId;
     }
@@ -90,13 +89,24 @@ public class MantisClient implements IMantisClient {
         return credentials.getUserName();
     }
 
-    private void addRelationsIfApplicable(MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+    private void updateRelationsIfApplicable(MantisTicket ticket, List<TaskRelationshipChange> relationshipChanges, IProgressMonitor monitor) throws MantisException {
 
         if (!cache.getRepositoryVersion().isHasProperTaskRelations())
             return;
 
-        for (MantisRelationship relationship : ticket.getRelationships())
-            soapClient.addRelationship(ticket.getId(), MantisConverter.convert(relationship), monitor);
+        for ( TaskRelationshipChange relationshipChange : relationshipChanges) {
+            
+            switch ( relationshipChange.getDirection() ) {
+                
+                case Removed:
+                    soapClient.deleteRelationship(ticket.getId(), relationshipChange.getRelationship().getId(), monitor);
+                    break;
+                case Added:
+                    soapClient.addRelationship(ticket.getId(), MantisConverter.convert(relationshipChange.getRelationship()), monitor);
+                    break;
+            }
+            
+        }
     }
 
     public byte[] getAttachmentData(int id, IProgressMonitor monitor) throws MantisException {
@@ -183,7 +193,7 @@ public class MantisClient implements IMantisClient {
     	cache.refreshForProject(monitor, location.getUrl(), issueData.getProject().getId().intValue());
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    public void updateTicket(MantisTicket ticket, String comment, int timeTracking,  List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
@@ -193,6 +203,7 @@ public class MantisClient implements IMantisClient {
         // add comment first because when updating the issue to resolved
         // comments can't be added
         addCommentIfApplicable(ticket.getId(), comment, timeTracking, monitor);
+        updateRelationsIfApplicable(ticket, changes, monitor);
 
         soapClient.updateIssue(issue, monitor);
     }

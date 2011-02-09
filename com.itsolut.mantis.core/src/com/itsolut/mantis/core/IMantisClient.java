@@ -101,11 +101,12 @@ public interface IMantisClient {
 
     /**
      * @param monitor
+     * @param changes 
      * @return the id of the created ticket
      */
-    int createTicket(MantisTicket ticket, IProgressMonitor monitor) throws MantisException;
+    int createTicket(MantisTicket ticket, IProgressMonitor monitor, List<TaskRelationshipChange> changes) throws MantisException;
 
-    void updateTicket(MantisTicket ticket, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException;
+    void updateTicket(MantisTicket ticket, String comment, int timeTracking, List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException;
 
     MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException;
 

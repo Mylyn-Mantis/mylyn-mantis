@@ -295,6 +295,7 @@ public class MantisConverter {
 
         ObjectRef relationType = new ObjectRef(BigInteger.valueOf(relationship.getType().getMantisConstant()), "");
         RelationshipData relationshipData = new RelationshipData();
+        relationshipData.setId(BigInteger.valueOf(relationship.getId()));
         relationshipData.setType(relationType);
         relationshipData.setTarget_id(BigInteger.valueOf(relationship.getTargetId()));
         return relationshipData;

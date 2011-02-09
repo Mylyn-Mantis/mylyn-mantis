@@ -42,7 +42,17 @@ public class TaskRelationshipChangeFinder {
         for (Attribute relationAttribute : MantisAttributeMapper.taskRelationAttributes()) {
 
             TaskAttribute parentAttribute = taskData.getRoot().getAttribute(relationAttribute.getKey());
-            List<String> newValues = parentAttribute != null ? parentAttribute.getValues() : new ArrayList<String>();
+            boolean attributeHasChanged = false;
+            for (TaskAttribute attribute : changedAttributes) {
+                if (attribute.getId().equals(relationAttribute.getKey())) {
+                    attributeHasChanged = true;
+                    break;
+                }
+            }
+            if (!attributeHasChanged)
+                continue;
+            
+            List<String> newValues = parentAttribute != null ? fromCsvString(parentAttribute.getValue()) : new ArrayList<String>();
             List<String> oldValues = findOldValues(relationAttribute, changedAttributes);
 
             changes.addAll(findRemovedValues(taskId, relationAttribute, newValues, oldValues));
@@ -50,6 +60,16 @@ public class TaskRelationshipChangeFinder {
         }
 
         return changes;
+    }
+
+    private List<String> fromCsvString(String value) {
+
+        String[] raw = value.split("\\,");
+        List<String> values = new ArrayList<String>(raw.length);
+        for (String rawValue : raw)
+            values.add(rawValue.trim());
+
+        return values;
     }
 
     private List<String> findOldValues(Attribute relationAttribute, Set<TaskAttribute> changedAttributes) {
@@ -60,7 +80,7 @@ public class TaskRelationshipChangeFinder {
             if (MantisUtils.isEmpty(oldAttribute.getValue()))
                 continue;
             if (oldAttribute.getId().equals(relationAttribute.getKey())) {
-                oldValues.addAll(oldAttribute.getValues());
+                oldValues.addAll(fromCsvString(oldAttribute.getValue()));
                 break;
             }
         }
@@ -77,7 +97,7 @@ public class TaskRelationshipChangeFinder {
             List<String> fromValues, Direction direction) {
 
         List<TaskRelationshipChange> changed = new ArrayList<TaskRelationshipChange>();
-        
+
         for (String fromValue : fromValues) {
 
             if (MantisUtils.isEmpty(fromValue))
@@ -94,7 +114,7 @@ public class TaskRelationshipChangeFinder {
     private MantisRelationship createRelationship(Attribute relationAttribute, int taskId, String targetId) {
 
         MantisRelationship relationship = new MantisRelationship();
-        
+
         relationship.setType(_mantisTaskDataHandler.getRelationTypeForAttribute(relationAttribute));
         relationship.setTargetId(Integer.parseInt(targetId));
         relationship.setId(taskId);
@@ -105,7 +125,7 @@ public class TaskRelationshipChangeFinder {
 
     private List<TaskRelationshipChange> findAddedValues(int taskId, Attribute relationAttribute,
             List<String> newValues, List<String> oldValues) {
-        
+
         return findChanges(taskId, relationAttribute, oldValues, newValues, Direction.Added);
     }
 

@@ -337,6 +337,21 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
         });
     }
 
+    public void deleteRelationship(final int ticketId, final int relationshipId, IProgressMonitor monitor)
+        throws MantisException {
+        
+        call(monitor, new Callable<Void>() {
+            
+            public Void call() throws Exception {
+                
+                getSOAP().mc_issue_relationship_delete(getUsername(), getPassword(), BigInteger.valueOf(ticketId),
+                        BigInteger.valueOf(relationshipId));
+                return null;
+                
+            }
+        });
+    }
+
     public void addNote(final int issueId, final IssueNoteData ind, IProgressMonitor monitor) throws MantisException {
 
         call(monitor, new Callable<Void>() {

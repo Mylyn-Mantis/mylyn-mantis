@@ -137,13 +137,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskRelationshipChangeFinder changeFinder = new TaskRelationshipChangeFinder(this);
             List<TaskRelationshipChange> changes = changeFinder.findChanges(taskData, oldAttributes);
             
-            System.out.println(changes);
-            
-            if ( true )
-                return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
-
             if (taskData.isNew()) {
-                int id = client.createTicket(ticket, monitor);
+                int id = client.createTicket(ticket, monitor, changes);
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, id
                         + "");
             } else {
@@ -161,7 +156,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 }
                 
                 
-                client.updateTicket(ticket, newComment, timeTracking, monitor);
+                client.updateTicket(ticket, newComment, timeTracking, changes, monitor);
                 
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
