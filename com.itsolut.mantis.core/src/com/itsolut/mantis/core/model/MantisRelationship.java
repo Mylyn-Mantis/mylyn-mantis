@@ -96,4 +96,9 @@ public class MantisRelationship {
         return type;
     }
 
+    @Override
+    public String toString() {
+    
+        return "[" + getClass().getSimpleName() + "# type: " + type + ", id : " + id + ", targetId: " + targetId + " ]";
+    }
 }

@@ -21,6 +21,7 @@ import org.eclipse.mylyn.tasks.core.ITaskAttachment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 
@@ -44,6 +45,22 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     public static final Set<Key> taskRelationKeys() {
         
         return Collections.unmodifiableSet(_taskRelationKeys);
+    }
+    
+    /**
+     * Calculates which of the attributes are related to tasks 
+     * 
+     * @return a set of attributes related to tasks
+     */
+    public static Set<Attribute> taskRelationAttributes() {
+        
+        Set<Attribute> attributes = EnumSet.noneOf(Attribute.class);
+        
+        for ( Attribute candidate : EnumSet.allOf(Attribute.class) )
+            if ( candidate.getType().equals(TaskAttribute.TYPE_TASK_DEPENDENCY))
+                attributes.add(candidate);
+        
+        return attributes;
     }
     
 

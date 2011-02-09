@@ -11,11 +11,7 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,6 +70,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         attributeToRelationType.put(Attribute.PARENT_OF, RelationType.PARENT);
         attributeToRelationType.put(Attribute.CHILD_OF, RelationType.CHILD);
     }
+    
+    private static final Map<RelationType, Attribute> relationTypeToAttribute = new EnumMap<RelationType, Attribute>(RelationType.class);
+    {
+        for ( Map.Entry<Attribute, RelationType> entry : attributeToRelationType.entrySet() )
+            relationTypeToAttribute.put(entry.getValue(), entry.getKey());
+    }
 
     
     private final static Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
@@ -129,8 +131,16 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     repository);
 
             processOperation(taskData, client, monitor);
-
+            
             MantisTicket ticket = getMantisTicket(repository, taskData);
+           
+            TaskRelationshipChangeFinder changeFinder = new TaskRelationshipChangeFinder(this);
+            List<TaskRelationshipChange> changes = changeFinder.findChanges(taskData, oldAttributes);
+            
+            System.out.println(changes);
+            
+            if ( true )
+                return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
 
             if (taskData.isNew()) {
                 int id = client.createTicket(ticket, monitor);
@@ -766,5 +776,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         TaskAttribute attribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.CHILD_OF.getKey());
         attribute.setValue(parentTaskData.getTaskId());
+    }
+
+    public RelationType getRelationTypeForAttribute(Attribute attribute) {
+        
+        RelationType relationType = attributeToRelationType.get(attribute);
+        
+        if ( relationType == null )
+            throw new RuntimeException("No relationType for attribute " + attribute);
+        
+        return relationType;
     }
 }

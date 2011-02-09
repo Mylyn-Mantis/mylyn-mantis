@@ -37,5 +37,11 @@ public class TaskRelationshipChange {
 
         return _relationship;
     }
+    
+    @Override
+    public String toString() {
+    
+        return "[" + getClass().getSimpleName() + ": " + _direction + " " + _relationship + " ]";
+    }
 
 }
