@@ -35,6 +35,11 @@ import com.itsolut.mantis.core.model.MantisTicket.Key;
  */
 public class MantisAttributeMapper extends TaskAttributeMapper {
     
+    /**
+     * The relationship id as stored in a TaskAttribute of type {@link TaskAttribute#TYPE_TASK_DEPENDENCY}.
+     */
+    public static final String TASK_ATTRIBUTE_RELATIONSHIP_IDS = "relationship_ids";
+    
     private final static Set<Key> _taskRelationKeys = EnumSet.of(Key.PARENT_OF, Key.CHILD_OF, Key.RELATED_TO, Key.HAS_DUPLICATE, Key.DUPLICATE_OF);
 
     private static final long serialVersionUID = 5333211422546115138L;
