@@ -13,6 +13,8 @@
 package com.itsolut.mantis.core;
 
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import org.eclipse.mylyn.commons.net.Policy;
 import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.IssueHeaderData;
 import com.itsolut.mantis.binding.IssueNoteData;
+import com.itsolut.mantis.core.TaskRelationshipChange.Direction;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
@@ -93,7 +96,7 @@ public class MantisClient implements IMantisClient {
 
         if (!cache.getRepositoryVersion().isHasProperTaskRelations())
             return;
-
+        
         for ( TaskRelationshipChange relationshipChange : relationshipChanges) {
             
             switch ( relationshipChange.getDirection() ) {

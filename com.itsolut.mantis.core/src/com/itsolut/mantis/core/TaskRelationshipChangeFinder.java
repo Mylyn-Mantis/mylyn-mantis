@@ -21,6 +21,10 @@ import com.itsolut.mantis.core.TaskRelationshipChange.Direction;
 import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.util.MantisUtils;
 
+/**
+ * 
+ * @author Robert Munteanu
+ */
 public class TaskRelationshipChangeFinder {
 
     private final MantisTaskDataHandler _mantisTaskDataHandler;
@@ -30,6 +34,16 @@ public class TaskRelationshipChangeFinder {
         _mantisTaskDataHandler = mantisTaskDataHandler;
     }
 
+    /**
+     * Returns a sorted list of detected changes, possibly empty
+     * 
+     * <p>The list will contain all the found deletions and then all the found additions. This will
+     * insure that the change list can be processed as-is, without additional sorting.</p>
+     * 
+     * @param taskData
+     * @param changedAttributes
+     * @return a sorted list of detected changes, possibly empty
+     */
     public List<TaskRelationshipChange> findChanges(TaskData taskData, Set<TaskAttribute> changedAttributes) {
 
         Assert.isNotNull(taskData);
@@ -52,13 +66,28 @@ public class TaskRelationshipChangeFinder {
             if (oldAttribute == null)
                 continue;
             
-            List<String> newValues = parentAttribute != null ? fromCsvString(parentAttribute.getValue()) : Collections.<String> emptyList();
+            List<String> newValues = parentAttribute != null ? parentAttribute.getValues() : Collections.<String> emptyList();
             Map<String,String> oldIdToValues = findOldValues(oldAttribute);
 
             changes.addAll(findRemovedValues(taskId, relationAttribute, newValues, oldIdToValues));
             changes.addAll(findAddedValues(taskId, relationAttribute, newValues, new ArrayList<String>(oldIdToValues.values())));
         }
 
+        // place deletions first, as this is the natural processing order 
+        Collections.sort(changes, new Comparator<TaskRelationshipChange>() {
+
+            public int compare(TaskRelationshipChange o1, TaskRelationshipChange o2) {
+
+                if ( o1.getDirection() == o2.getDirection() )
+                    return 0;
+                
+                if ( o1.getDirection() == Direction.Added )
+                    return 1;
+                
+                return -1;
+            }
+        });
+        
         return changes;
     }
 
@@ -77,7 +106,7 @@ public class TaskRelationshipChangeFinder {
     
     private Map<String,String> findOldValues(TaskAttribute oldAttribute) {
         
-        List<String> oldValues = fromCsvString(oldAttribute.getValue());
+        List<String> oldValues = oldAttribute.getValues();
         List<String> oldIds = fromCsvString(oldAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS));
 
         Assert.isTrue(oldValues.size() == oldIds.size(), NLS.bind("Inconsistency when reading old attribute values. oldValues: {0}, oldIds: {1}.", oldValues, oldIds));

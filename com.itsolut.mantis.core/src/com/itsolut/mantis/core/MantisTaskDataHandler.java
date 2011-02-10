@@ -212,30 +212,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
 
 
-        addRelations(data, ticket);
-
         return ticket;
-    }
-
-    private void addRelations(TaskData data, MantisTicket ticket) throws MantisException {
-        
-        connector.getClientManager().getRepository(data.getRepositoryUrl());
-
-        for ( Map.Entry<Attribute, RelationType> entry : attributeToRelationType.entrySet()) {
-
-            TaskAttribute attribute = data.getRoot().getAttribute(entry.getKey().getKey());
-
-            if ( attribute == null || attribute.getValue().length() == 0)
-                continue;
-
-            // parse for each attribute
-            for ( String value : attribute.getValue().split(",")) {
-                MantisRelationship rel = new MantisRelationship();
-                rel.setTargetId(Integer.parseInt(value));
-                rel.setType(entry.getValue());
-                ticket.addRelationship(rel);
-            }
-        }
     }
 
     public TaskData getTaskData(TaskRepository repository, String taskId,
@@ -321,7 +298,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         MantisRelationship[] relationsShips = ticket.getRelationships();
         for (MantisRelationship mantisRelationship : relationsShips) {
 
-            int targetId = mantisRelationship.getTargetId();
             Attribute attribute = null;
 
             switch (mantisRelationship.getType()) {
@@ -353,18 +329,20 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if (attribute == null)
                 continue;
 
+            int targetId = mantisRelationship.getTargetId();
             TaskAttribute taskAttribute = data.getRoot().getAttribute(attribute.getKey());
             String storedRelationshipIds;
-            if ( taskAttribute == null) {
+            if ( taskAttribute == null)
                 taskAttribute = data.getRoot().createAttribute(attribute.getKey());
+            
+            if ( MantisUtils.isEmpty(taskAttribute.getValue()) )
+                taskAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, "");
+            
+            storedRelationshipIds = taskAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS);
+            if ( MantisUtils.isEmpty(storedRelationshipIds) )
                 storedRelationshipIds = String.valueOf(mantisRelationship.getId());
-            } else {
-                storedRelationshipIds = taskAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS);
-                if ( storedRelationshipIds != null )
-                    storedRelationshipIds += "," + mantisRelationship.getId();
-                else 
-                    storedRelationshipIds = String.valueOf(mantisRelationship.getId());
-            }
+            else 
+                storedRelationshipIds += "," + mantisRelationship.getId();                    
             
             taskAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, storedRelationshipIds);
             

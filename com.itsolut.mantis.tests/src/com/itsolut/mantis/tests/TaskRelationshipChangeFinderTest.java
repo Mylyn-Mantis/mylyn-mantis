@@ -9,6 +9,7 @@
 
 package com.itsolut.mantis.tests;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,19 @@ import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.model.MantisRelationship;
 
 public class TaskRelationshipChangeFinderTest extends TestCase {
+	
+	private static final String RELATED_TASK_ID_1 = "55";
+	private static final String RELATED_TASK_ID_2 = "56";
+	
+	private static final List<String> RELATED_TASK_IDS_1_2 = Arrays.asList(RELATED_TASK_ID_1, RELATED_TASK_ID_2);
+	
+	private static final String RELATED_TASK_ID_3 = "57";
+	private static final String RELATED_TASK_ID_4 = "58";
+	
+	private static final List<String> RELATED_TASK_IDS_3_4 = Arrays.asList(RELATED_TASK_ID_3, RELATED_TASK_ID_4);
+	
+	private static final String OLD_RELATION_ID = "22";
+	private static final String OLD_RELATION_IDS = "22,23";
 	
 	public void testNullArguments() {
 		
@@ -53,23 +67,29 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	public void testEmptyChangedAttributeDetectsNoChanges() {
 		
 		TaskData taskData = newTaskData();
-		TaskAttribute summary = taskData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		summary.setValue("55");
+		newParentOfAttribute(taskData, Arrays.asList(RELATED_TASK_ID_1), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(taskData, Collections.<TaskAttribute> emptySet());
 		
 		assertEquals(0, changes.size());
 	}
 	
+	private TaskAttribute newParentOfAttribute(TaskData taskData, List<String> values, String relationshipIdsMetaValue) {
+		
+		TaskAttribute attribute = taskData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
+		attribute.setValues(values);
+		attribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, relationshipIdsMetaValue);
+		
+		return attribute; 
+	}
+	
 	public void testUpdatedSummaryDetectsNoChanges() {
 
-		TaskData oldData = newTaskData();
-		TaskAttribute oldSummary = oldData.getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
+		TaskAttribute oldSummary = newTaskData().getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
 		oldSummary.setValue("Old status value");
 
 		TaskData newData = newTaskData();
-		TaskAttribute summary = newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
-		summary.setValue("New status value");
+		newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey()).setValue("New");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldSummary));
 		
@@ -78,35 +98,28 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testNewParentDetectsChanges() {
 
-		TaskData oldData = newTaskData();
-		TaskAttribute oldParent = oldData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		oldParent.setValue("");
+		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Collections. <String> emptyList(), "");
 
 		TaskData newData = newTaskData();
-		TaskAttribute parent = newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		parent.setValue("55");
+		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
 		
 		assertEquals(1, changes.size());
 		
 		TaskRelationshipChange newParent = changes.get(0);
-		assertEquals( TaskRelationshipChange.Direction.Added, newParent.getDirection());
+		assertEquals(TaskRelationshipChange.Direction.Added, newParent.getDirection());
 		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
 		assertEquals(0, newParent.getRelationship().getId());
-		assertEquals(55, newParent.getRelationship().getTargetId());
+		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
 	}
 	
 	public void testRemovedParentDetectsChanges() {
 		
-		TaskData oldData = newTaskData();
-		TaskAttribute oldParent = oldData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		oldParent.setValue("55");
-		oldParent.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, "22");
+		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Arrays.asList(RELATED_TASK_ID_1)	, OLD_RELATION_ID);
 
 		TaskData newData = newTaskData();
-		TaskAttribute parent = newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		parent.setValue("");
+		newParentOfAttribute(newData, Collections. <String> emptyList(), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
 		
@@ -115,16 +128,13 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		TaskRelationshipChange newParent = changes.get(0);
 		assertEquals( TaskRelationshipChange.Direction.Removed, newParent.getDirection());
 		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
-		assertEquals(22, newParent.getRelationship().getId());
-		assertEquals(55, newParent.getRelationship().getTargetId());
+		assertEquals(OLD_RELATION_ID, String.valueOf(newParent.getRelationship().getId()));
+		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
 	}
 	
 	public void testRemovedParentWithNoAttributeParentDetectsChanges() {
 		
-		TaskData oldData = newTaskData();
-		TaskAttribute oldParent = oldData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		oldParent.setValue("55");
-		oldParent.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, "22");
+		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
 
 		TaskData newData = newTaskData();
 		
@@ -135,20 +145,16 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		TaskRelationshipChange newParent = changes.get(0);
 		assertEquals( TaskRelationshipChange.Direction.Removed, newParent.getDirection());
 		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
-		assertEquals(22, newParent.getRelationship().getId());
-		assertEquals(55, newParent.getRelationship().getTargetId());		
+		assertEquals(OLD_RELATION_ID, String.valueOf(newParent.getRelationship().getId()));
+		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));		
 	}
 	
 	public void testParentChangeWithFourValuesIsDetected() {
 		
-		TaskData oldData = newTaskData();
-		TaskAttribute oldParent = oldData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		oldParent.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS, "22,23");
-		oldParent.setValue("55, 56");
+		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), RELATED_TASK_IDS_1_2, OLD_RELATION_IDS);
 
 		TaskData newData = newTaskData();
-		TaskAttribute parent = newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey());
-		parent.setValue("57, 58");
+		newParentOfAttribute(newData, RELATED_TASK_IDS_3_4, "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
 		
