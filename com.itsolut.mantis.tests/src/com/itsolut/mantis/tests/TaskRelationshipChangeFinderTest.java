@@ -45,7 +45,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		} catch (RuntimeException e) {
 		}
 		
-		TaskData taskData = newTaskData();
+		TaskData taskData = newExistingTaskData();
 		
 		try {
 
@@ -59,14 +59,19 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null));
 	}
 
-	private TaskData newTaskData() {
+	private TaskData newExistingTaskData() {
 	
 		return new TaskData(new MantisAttributeMapper(new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, "http://localhost")), MantisCorePlugin.REPOSITORY_KIND, "http://localhost", "-1");
+	}
+
+	private TaskData newUnsubmittedTaskData() {
+		
+		return new TaskData(new MantisAttributeMapper(new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, "http://localhost")), MantisCorePlugin.REPOSITORY_KIND, "http://localhost", "");
 	}
 	
 	public void testEmptyChangedAttributeDetectsNoChanges() {
 		
-		TaskData taskData = newTaskData();
+		TaskData taskData = newExistingTaskData();
 		newParentOfAttribute(taskData, Arrays.asList(RELATED_TASK_ID_1), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(taskData, Collections.<TaskAttribute> emptySet());
@@ -85,10 +90,10 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testUpdatedSummaryDetectsNoChanges() {
 
-		TaskAttribute oldSummary = newTaskData().getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
+		TaskAttribute oldSummary = newExistingTaskData().getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
 		oldSummary.setValue("Old status value");
 
-		TaskData newData = newTaskData();
+		TaskData newData = newExistingTaskData();
 		newData.getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey()).setValue("New");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldSummary));
@@ -98,9 +103,9 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testNewParentDetectsChanges() {
 
-		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Collections. <String> emptyList(), "");
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Collections. <String> emptyList(), "");
 
-		TaskData newData = newTaskData();
+		TaskData newData = newExistingTaskData();
 		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
@@ -116,9 +121,9 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testRemovedParentDetectsChanges() {
 		
-		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Arrays.asList(RELATED_TASK_ID_1)	, OLD_RELATION_ID);
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1)	, OLD_RELATION_ID);
 
-		TaskData newData = newTaskData();
+		TaskData newData = newExistingTaskData();
 		newParentOfAttribute(newData, Collections. <String> emptyList(), "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
@@ -134,9 +139,9 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testRemovedParentWithNoAttributeParentDetectsChanges() {
 		
-		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
 
-		TaskData newData = newTaskData();
+		TaskData newData = newExistingTaskData();
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
 		
@@ -151,9 +156,9 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testParentChangeWithFourValuesIsDetected() {
 		
-		TaskAttribute oldParent = newParentOfAttribute(newTaskData(), RELATED_TASK_IDS_1_2, OLD_RELATION_IDS);
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), RELATED_TASK_IDS_1_2, OLD_RELATION_IDS);
 
-		TaskData newData = newTaskData();
+		TaskData newData = newExistingTaskData();
 		newParentOfAttribute(newData, RELATED_TASK_IDS_3_4, "");
 		
 		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
@@ -164,4 +169,22 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(TaskRelationshipChange.Direction.Added, changes.get(2).getDirection());
 		assertEquals(TaskRelationshipChange.Direction.Added, changes.get(3).getDirection());
 	}
+	
+	public void testNewTaskWithParentDetectsChanges() {
+
+
+		TaskData newData = newUnsubmittedTaskData();
+		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1), "");
+		
+		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> emptySet());
+		
+		assertEquals(1, changes.size());
+		
+		TaskRelationshipChange newParent = changes.get(0);
+		assertEquals(TaskRelationshipChange.Direction.Added, newParent.getDirection());
+		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
+		assertEquals(0, newParent.getRelationship().getId());
+		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
+	}	
+	
 }

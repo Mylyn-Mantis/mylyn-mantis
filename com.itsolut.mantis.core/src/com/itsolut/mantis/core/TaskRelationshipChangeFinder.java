@@ -50,7 +50,6 @@ public class TaskRelationshipChangeFinder {
         Assert.isNotNull(changedAttributes);
 
         List<TaskRelationshipChange> changes = new ArrayList<TaskRelationshipChange>();
-        int taskId = Integer.parseInt(taskData.getTaskId());
 
         for (Attribute relationAttribute : MantisAttributeMapper.taskRelationAttributes()) {
 
@@ -63,14 +62,14 @@ public class TaskRelationshipChangeFinder {
                 }
             }
             
-            if (oldAttribute == null)
+            if (oldAttribute == null && !taskData.isNew())
                 continue;
             
             List<String> newValues = parentAttribute != null ? parentAttribute.getValues() : Collections.<String> emptyList();
-            Map<String,String> oldIdToValues = findOldValues(oldAttribute);
+            Map<String,String> oldIdToValues = taskData.isNew() ? Collections.<String, String> emptyMap() : findOldValues(oldAttribute);
 
-            changes.addAll(findRemovedValues(taskId, relationAttribute, newValues, oldIdToValues));
-            changes.addAll(findAddedValues(taskId, relationAttribute, newValues, new ArrayList<String>(oldIdToValues.values())));
+            changes.addAll(findRemovedValues(relationAttribute, newValues, oldIdToValues));
+            changes.addAll(findAddedValues(relationAttribute, newValues, new ArrayList<String>(oldIdToValues.values())));
         }
 
         // place deletions first, as this is the natural processing order 
@@ -120,8 +119,8 @@ public class TaskRelationshipChangeFinder {
         
     }
 
-    private List<TaskRelationshipChange> findRemovedValues(int taskId, Attribute relationAttribute,
-            List<String> newValues, Map<String, String> oldIdToValues) {
+    private List<TaskRelationshipChange> findRemovedValues(Attribute relationAttribute, List<String> newValues,
+            Map<String, String> oldIdToValues) {
 
         List<TaskRelationshipChange> changed = new ArrayList<TaskRelationshipChange>();
 
@@ -132,23 +131,6 @@ public class TaskRelationshipChangeFinder {
                         oldValueEntry.getValue())));
         }
         
-        return changed;
-    }
-
-    private List<TaskRelationshipChange> findChanges(int taskId, Attribute relationAttribute, List<String> toValues,
-            List<String> fromValues, Direction direction) {
-
-        List<TaskRelationshipChange> changed = new ArrayList<TaskRelationshipChange>();
-
-        for (String fromValue : fromValues) {
-
-            if (MantisUtils.isEmpty(fromValue))
-                continue;
-
-            if (!(toValues.contains(fromValue)))
-                changed.add(new TaskRelationshipChange(direction, createRelationship(relationAttribute, 0,
-                        fromValue)));
-        }
         return changed;
     }
 
@@ -164,10 +146,21 @@ public class TaskRelationshipChangeFinder {
 
     }
 
-    private List<TaskRelationshipChange> findAddedValues(int taskId, Attribute relationAttribute,
-            List<String> newValues, List<String> oldValues) {
+    private List<TaskRelationshipChange> findAddedValues(Attribute relationAttribute, List<String> newValues,
+            List<String> oldValues) {
 
-        return findChanges(taskId, relationAttribute, oldValues, newValues, Direction.Added);
+        List<TaskRelationshipChange> changed = new ArrayList<TaskRelationshipChange>();
+		
+		for (String fromValue : newValues) {
+		
+		    if (MantisUtils.isEmpty(fromValue))
+		        continue;
+		
+		    if (!(oldValues.contains(fromValue)))
+		        changed.add(new TaskRelationshipChange(Direction.Added, createRelationship(relationAttribute, 0,
+		                fromValue)));
+		}
+		return changed;
     }
 
 }
