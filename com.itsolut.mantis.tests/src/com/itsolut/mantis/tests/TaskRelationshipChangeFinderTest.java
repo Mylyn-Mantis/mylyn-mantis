@@ -69,6 +69,20 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		return new TaskData(new MantisAttributeMapper(new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, "http://localhost")), MantisCorePlugin.REPOSITORY_KIND, "http://localhost", "");
 	}
 	
+	public void testInconsistentTaskStatusAndAttributes() {
+		
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
+
+		TaskData newData = newUnsubmittedTaskData();
+		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1 + "," + RELATED_TASK_ID_2), "");
+		
+		try {
+			newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
+			fail("Should have thrown a RuntimeException");
+		} catch (RuntimeException e) {
+		}
+	}
+	
 	public void testEmptyChangedAttributeDetectsNoChanges() {
 		
 		TaskData taskData = newExistingTaskData();
@@ -121,7 +135,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testRemovedParentDetectsChanges() {
 		
-		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1)	, OLD_RELATION_ID);
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
 
 		TaskData newData = newExistingTaskData();
 		newParentOfAttribute(newData, Collections. <String> emptyList(), "");
@@ -172,7 +186,6 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 	public void testNewTaskWithParentDetectsChanges() {
 
-
 		TaskData newData = newUnsubmittedTaskData();
 		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1), "");
 		
@@ -185,6 +198,23 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
 		assertEquals(0, newParent.getRelationship().getId());
 		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
-	}	
-	
+	}
+
+	public void testParentChangeWithCSVValueDetectsChanges() {
+		
+		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
+
+		TaskData newData = newExistingTaskData();
+		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1 + "," + RELATED_TASK_ID_2), "");
+		
+		List<TaskRelationshipChange> changes = newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
+		
+		assertEquals(1, changes.size());
+		
+		TaskRelationshipChange newParent = changes.get(0);
+		assertEquals(TaskRelationshipChange.Direction.Added, newParent.getDirection());
+		assertEquals(MantisRelationship.RelationType.PARENT, newParent.getRelationship().getType());
+		assertEquals(0, newParent.getRelationship().getId());
+		assertEquals(RELATED_TASK_ID_2, String.valueOf(newParent.getRelationship().getTargetId()));
+	}
 }

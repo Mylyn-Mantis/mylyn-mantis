@@ -48,6 +48,10 @@ public class TaskRelationshipChangeFinder {
 
         Assert.isNotNull(taskData);
         Assert.isNotNull(changedAttributes);
+        
+        if ( changedAttributes.size() > 0 && taskData.isNew() )
+            throw new RuntimeException(NLS.bind("Task data is new but changedAttributes.size is {0}.", changedAttributes.size()));
+
 
         List<TaskRelationshipChange> changes = new ArrayList<TaskRelationshipChange>();
 
@@ -65,7 +69,7 @@ public class TaskRelationshipChangeFinder {
             if (oldAttribute == null && !taskData.isNew())
                 continue;
             
-            List<String> newValues = parentAttribute != null ? parentAttribute.getValues() : Collections.<String> emptyList();
+            List<String> newValues = parentAttribute != null ? unwrapValues(parentAttribute.getValues()) : Collections.<String> emptyList();
             Map<String,String> oldIdToValues = taskData.isNew() ? Collections.<String, String> emptyMap() : findOldValues(oldAttribute);
 
             changes.addAll(findRemovedValues(relationAttribute, newValues, oldIdToValues));
@@ -88,6 +92,23 @@ public class TaskRelationshipChangeFinder {
         });
         
         return changes;
+    }
+
+    /**
+     * This method works around the fact that we sometimes receive values a CSV strings, 
+     * and sometimes as lists of strings
+     */
+    private List<String> unwrapValues(List<String> values) {
+
+        List<String> results = new ArrayList<String>();
+
+        for (String value : values)
+            if (value.indexOf(',') == -1)
+                results.add(value);
+            else
+                results.addAll(fromCsvString(value));
+        
+        return results;
     }
 
     private List<String> fromCsvString(String value) {
