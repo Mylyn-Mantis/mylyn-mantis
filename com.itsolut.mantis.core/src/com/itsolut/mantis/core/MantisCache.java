@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
+import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.ETA_ENABLED;
+import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.PROJECTION_ENABLED;
+
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -39,11 +42,11 @@ import com.itsolut.mantis.core.model.MantisProjection;
 import com.itsolut.mantis.core.model.MantisReproducibility;
 import com.itsolut.mantis.core.model.MantisResolution;
 import com.itsolut.mantis.core.model.MantisSeverity;
+import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.model.MantisTicketAttribute;
 import com.itsolut.mantis.core.model.MantisTicketStatus;
 import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.model.MantisViewState;
-import com.itsolut.mantis.core.model.MantisTicket.Key;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -142,7 +145,7 @@ public class MantisCache {
 
                 int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 27);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 29);
 
                 cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
                 Policy.advance(subMonitor, 1);
@@ -281,6 +284,10 @@ public class MantisCache {
                 
                 cacheData.bugResolutionFixedThreshold = safeGetThreshold(monitor, "bug_resolution_fixed_threshold", DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD);
                 
+                cacheData.etaEnabled = safeGetBoolean(subMonitor, "enable_eta", ETA_ENABLED );
+                
+                cacheData.projectionEnabled = safeGetBoolean(subMonitor, "enable_projection", PROJECTION_ENABLED );
+                
                 cacheData.lastUpdate = System.currentTimeMillis();
             } finally {
                 subMonitor.done();
@@ -299,7 +306,18 @@ public class MantisCache {
 	        return attribute.getValue();
 	    }
 	}
-    
+
+	
+	private boolean safeGetBoolean(IProgressMonitor monitor, String configName, DefaultConstantValues.Attribute attribute) {
+	    
+	    try {
+	        int intValue = safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
+	        return intValue == 1;
+	    } catch ( MantisException e ) {
+	        MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");
+	        return attribute.getValue() == 1;
+	    }
+	}
 
     void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
     	
@@ -961,6 +979,16 @@ public class MantisCache {
     public MantisResolution getBugResolutionFixedThreshold() throws MantisException {
     	
     	return getResolution(cacheData.bugResolutionFixedThreshold);
+    }
+    
+    public boolean isEtaEnabled() {
+    	
+    	return cacheData.etaEnabled;
+    }
+    
+    public boolean isProjectionEnabled() {
+    	
+    	return cacheData.projectionEnabled;
     }
     
     MantisCacheData getCacheData() {

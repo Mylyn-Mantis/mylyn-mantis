@@ -167,8 +167,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-
-
     /**
      * Apply the effects of the operation (if any) to an existing task data
      * 
@@ -437,10 +435,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             
-            createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION,
-                    cache.getProjection(), cache.getDefaultProjectionName());
-            createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache
-                    .getETA(), cache.getDefaultEtaName());
+            if ( cache.isProjectionEnabled())
+            	createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION, cache.getProjection(), cache.getDefaultProjectionName());
+            if ( cache.isEtaEnabled() )
+            	createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache.getETA(), cache.getDefaultEtaName());
             
             if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);

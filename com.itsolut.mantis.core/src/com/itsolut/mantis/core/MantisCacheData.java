@@ -80,4 +80,8 @@ public class MantisCacheData implements Serializable {
     Map<MantisTicket.Key, String> defaultStringValuesForAttributes = new EnumMap<MantisTicket.Key, String>(MantisTicket.Key.class);
 
 	int bugResolutionFixedThreshold;
+	
+	boolean etaEnabled;
+	
+	boolean projectionEnabled;
 }
