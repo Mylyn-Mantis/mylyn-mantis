@@ -154,30 +154,27 @@ public class MantisClient implements IMantisClient {
 
     public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException {
 
-        cache.refreshIfNeeded(monitor, location.getUrl());
-
-        String projectName = query.getProjectName();
-        String filterName = query.getFilterName();
-
-        int projectId = cache.getProjectId(projectName);
-        int filterId = cache.getProjectFilterId(projectId, filterName);
-
-        IProgressMonitor subMonitor = Policy.subMonitorFor(monitor, 1);
-        subMonitor.beginTask("Retrieving issue headers", 1);
-
+        monitor.beginTask("", IProgressMonitor.UNKNOWN);
         try {
+            cache.refreshIfNeeded(monitor, location.getUrl());
+
+            String projectName = query.getProjectName();
+            String filterName = query.getFilterName();
+
+            int projectId = cache.getProjectId(projectName);
+            int filterId = cache.getProjectFilterId(projectId, filterName);
+
             IssueHeaderData[] issueHeaders;
 
             if (filterId == MantisCache.BUILT_IN_PROJECT_TASKS_FILTER_ID)
-                issueHeaders = soapClient.getIssueHeaders(projectId, query.getLimit(), subMonitor);
+                issueHeaders = soapClient.getIssueHeaders(projectId, query.getLimit(), monitor);
             else
                 issueHeaders = soapClient.getIssueHeaders(projectId, filterId, query.getLimit(), monitor);
 
             for (IssueHeaderData issueHeader : issueHeaders)
                 result.add(MantisConverter.convert(issueHeader, cache, projectName));
-
         } finally {
-            subMonitor.done();
+            monitor.done();
         }
     }
 

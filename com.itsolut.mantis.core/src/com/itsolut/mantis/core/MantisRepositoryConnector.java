@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.*;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.data.*;
@@ -137,25 +138,32 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public IStatus performQuery(TaskRepository repository, IRepositoryQuery query, TaskDataCollector resultCollector,
             ISynchronizationSession event, IProgressMonitor monitor) {
 
-        final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
-        monitor.beginTask("Querying repository", IProgressMonitor.UNKNOWN);
-
-        IMantisClient client;
         try {
-            client = getClientManager().getRepository(repository);
-            client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
-            for (MantisTicket ticket : tickets) {
-                ticket.setLastChanged(null); // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
-                resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository, ticket, monitor));
+        
+            final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
+            IMantisClient client;
+            try {
+                client = getClientManager().getRepository(repository);
+                client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
+                for (MantisTicket ticket : tickets) {
+                    ticket.setLastChanged(null); // XXX Remove once we have a fix for
+                                                 // https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
+                    resultCollector.accept(offlineTaskHandler.createTaskDataFromPartialTicket(client, repository,
+                            ticket, monitor));
+                }
+
+            } catch (MantisException e) {
+                return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
+            } catch (CoreException e) {
+                return e.getStatus();
             }
             
-        } catch (MantisException e) {
-            return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
-        } catch (CoreException e) {
-            return e.getStatus();
+            return Status.OK_STATUS;
+        } finally {
+            monitor.done();
         }
 
-        return Status.OK_STATUS;
+       
 
     }
 
@@ -219,7 +227,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         IMantisClient client;
         try {
             client = getClientManager().getRepository(repository);
-            client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
+            client.search(MantisUtils.getMantisSearch(query), tickets, Policy.subMonitorFor(monitor, 1));
 
             for (MantisTicket ticket : tickets)
                 if (ticket.getLastChanged() != null && ticket.getLastChanged().compareTo(since) > 0)
@@ -258,7 +266,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public TaskData getTaskData(TaskRepository repository, String taskId, IProgressMonitor monitor)
             throws CoreException {
 
-        return offlineTaskHandler.getTaskData(repository, taskId, monitor);
+        try {
+            monitor.beginTask("", IProgressMonitor.UNKNOWN);
+            return offlineTaskHandler.getTaskData(repository, taskId, monitor);    
+        } finally {
+            monitor.done();
+        }
     }
 
     // Based off of Trac Implementation.
@@ -346,9 +359,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         // synchronization.
         event.setNeedsPerformQueries(false);
         List<IRepositoryQuery> queries = getMantisQueriesFor(repository);
-
-        monitor.beginTask("Retrieving queries for repository", queries.size());
-
+        
+        monitor.beginTask("", queries.size() * 2); // 1 for query, 1 for search call
+        
         for (IRepositoryQuery query : queries) {
 
             for (Integer taskId : getChangedTasksByQuery(query, repository, since, monitor)) {
@@ -361,9 +374,11 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                     }
                 }
             }
-
+            
             monitor.worked(1);
         }
+        
+        monitor.done();
     }
 
     private List<IRepositoryQuery> getMantisQueriesFor(TaskRepository taskRespository) {
