@@ -131,6 +131,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     repository);
 
             processOperation(taskData, client, monitor);
+
+            // https://bugs.eclipse.org/bugs/show_bug.cgi?id=337251
+            if ( taskData.isNew() ) 
+                oldAttributes = Collections.emptySet();
             
             TaskRelationshipChangeFinder changeFinder = new TaskRelationshipChangeFinder(this);
             List<TaskRelationshipChange> changes = changeFinder.findChanges(taskData, oldAttributes);
@@ -743,7 +747,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         TaskMapper mapper = new TaskMapper(taskData);
         mapper.merge(new TaskMapper(parentTaskData));
-        mapper.setDescription(""); 
+        mapper.setDescription("");
         mapper.setSummary("");
     }
     
