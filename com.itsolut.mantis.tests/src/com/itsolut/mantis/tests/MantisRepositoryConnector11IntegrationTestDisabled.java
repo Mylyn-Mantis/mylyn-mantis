@@ -11,11 +11,11 @@ package com.itsolut.mantis.tests;
 
 import static com.itsolut.mantis.tests.RepositoryConfiguration.MANTIS_11_BASIC;
 
-public class Mantis11TaskDataHandlerTest extends AbstractMantisTaskDataHandlerTest {
+public class MantisRepositoryConnector11IntegrationTestDisabled extends AbstractMantisRepositoryConnectorIntegrationTest {
 
 	@Override
 	protected RepositoryConfiguration getRepositoryConfiguration() {
-		
+
 		return MANTIS_11_BASIC;
 	}
 
