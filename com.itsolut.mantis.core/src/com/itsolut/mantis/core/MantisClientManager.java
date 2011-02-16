@@ -27,10 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
+import org.eclipse.mylyn.internal.tasks.core.*;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
