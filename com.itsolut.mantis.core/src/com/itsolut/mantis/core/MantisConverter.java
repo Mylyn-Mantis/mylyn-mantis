@@ -214,8 +214,10 @@ public class MantisConverter {
         issue.setResolution(cache.getResolutionAsObjectRef(ticket.getValue(Key.RESOLUTION)));
         issue.setPriority(cache.getPriorityAsObjectRef(ticket.getValue(Key.PRIORITY)));
         issue.setReproducibility(cache.getReproducibilityAsObjectRef(ticket.getValue(Key.REPRODUCIBILITY)));
-        issue.setProjection(cache.getProjectionAsObjectRef(ticket.getValue(Key.PROJECTION)));
-        issue.setEta(cache.getEtaAsObjectRef(ticket.getValue(Key.ETA)));
+        if ( cache.isProjectionEnabled() )
+        	issue.setProjection(cache.getProjectionAsObjectRef(ticket.getValue(Key.PROJECTION)));
+        if ( cache.isEtaEnabled() )
+        	issue.setEta(cache.getEtaAsObjectRef(ticket.getValue(Key.ETA)));
         issue.setView_state(cache.getViewStateAsObjectRef(ticket.getValue(Key.VIEW_STATE)));
 
         issue.setProject(project);
