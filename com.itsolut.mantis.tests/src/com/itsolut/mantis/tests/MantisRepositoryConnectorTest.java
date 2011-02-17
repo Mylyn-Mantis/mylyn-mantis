@@ -32,15 +32,7 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 	}
 
-	public void testGetUrl10x() {
-
-		assertEquals("Wrong url for Mantis 1.0.x", expectedUrl, connector.getTaskUrl(
-				REPOSITORY_ROOT + "mc/mantisconnect.php", taskId));
-	}
-
 	public void testGetUrl11x() {
-
-
 
 		assertEquals("Wrong url for Mantis 1.1.x", expectedUrl, connector.getTaskUrl(
 				REPOSITORY_ROOT + "api/soap/mantisconnect.php", taskId));

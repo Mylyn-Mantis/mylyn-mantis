@@ -8,7 +8,6 @@
 
 package com.itsolut.mantis.tests;
 
-import com.itsolut.mantis.core.RepositoryVersionTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

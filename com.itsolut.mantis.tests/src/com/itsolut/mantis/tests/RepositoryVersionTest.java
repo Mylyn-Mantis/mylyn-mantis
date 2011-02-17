@@ -6,8 +6,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.tests;
 
+import com.itsolut.mantis.core.RepositoryVersion;
 import com.itsolut.mantis.core.exception.MantisException;
 
 import junit.framework.TestCase;
