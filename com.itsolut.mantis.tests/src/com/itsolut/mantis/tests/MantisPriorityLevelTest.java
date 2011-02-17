@@ -8,7 +8,9 @@
 
 package com.itsolut.mantis.tests;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisPriorityLevel;
 
@@ -16,8 +18,9 @@ import com.itsolut.mantis.core.MantisPriorityLevel;
  * @author David Carver
  * @author Robert Munteanu
  */
-public class MantisPriorityLevelTest extends TestCase {
+public class MantisPriorityLevelTest {
 
+	@Test
 	public void testGetMylynPriority() {
 		
 		assertEquals("P1", MantisPriorityLevel.fromPriorityId(70).toString());

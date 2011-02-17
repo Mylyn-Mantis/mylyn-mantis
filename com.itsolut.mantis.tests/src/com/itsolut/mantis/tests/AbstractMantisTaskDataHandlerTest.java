@@ -10,13 +10,18 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 
 public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrationTest {
 
+	@Test
 	public void testUnableToCloneNullTask() {
 		
 		AbstractTaskDataHandler taskDataHandler = newTaskDataHandler();
@@ -30,11 +35,13 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 		return taskDataHandler;
 	}
 	
+	@Test
 	public void testUnableToCloneTaskWithoutProperKey() {
 		
 		assertFalse(newTaskDataHandler().canInitializeSubTaskData(repositoryAccessor.getRepository(), getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), "1")));
 	}
 
+	@Test
 	public void testAbleToCloneTaskWithProperKey() {
 		
 		ITask task = getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), "1");

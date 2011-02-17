@@ -8,9 +8,11 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.MalformedURLException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.itsolut.mantis.ui.internal.MantisImages;
 
@@ -18,13 +20,15 @@ import com.itsolut.mantis.ui.internal.MantisImages;
  * @author Robert Munteanu
  */
 @SuppressWarnings("restriction")
-public class MantisImagesTest extends TestCase {
+public class MantisImagesTest {
 
+	@Test
 	public void testPrefixedIconUrl() throws MalformedURLException {
 
 		assertTrue(MantisImages.makeIconFileURL("prefix", "name").toString().endsWith("/icons/prefix/name"));
 	}
 
+	@Test
 	public void testNonPrefixedIconUrl() throws MalformedURLException {
 
 		assertTrue(MantisImages.makeIconFileURL("", "name").toString().endsWith("/icons/name"));

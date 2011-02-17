@@ -9,6 +9,9 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -18,6 +21,7 @@ import java.util.List;
 import javax.xml.rpc.ServiceException;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -31,16 +35,19 @@ public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegr
 
 	private static final String UTF8 = "UTF-8";
 
+	@Test
 	public void testValidate() throws MantisException {
 
 		repositoryAccessor.getClient().validate(new NullProgressMonitor());
 	}
 
+	@Test
 	public void testRefreshAttributes() throws MantisException {
 
 		repositoryAccessor.getClient().updateAttributes(new NullProgressMonitor());
 	}
 
+	@Test
 	public void testGetExistingTask() throws MantisException, MalformedURLException, RemoteException, ServiceException {
 
 		String summary = "Summary";
@@ -54,6 +61,7 @@ public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegr
 		assertEquals(description, ticket.getValue(Key.DESCRIPTION));
 	}
 	
+	@Test
 	public void testRetrieveIssuesUsingBuiltInFilter() throws MalformedURLException, RemoteException, ServiceException, MantisException {
 		
 		int firstTaskId = createTask("First task", "Description");
@@ -88,6 +96,7 @@ public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegr
 		
 	}
 	
+	@Test
 	public void testUploadAndDownload() throws MalformedURLException, RemoteException, ServiceException, UnsupportedEncodingException, MantisException {
 
 		String attachmentContents = "Sample attachment";

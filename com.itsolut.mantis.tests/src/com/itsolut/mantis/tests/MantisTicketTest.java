@@ -8,14 +8,17 @@
 
 package com.itsolut.mantis.tests;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 import com.itsolut.mantis.core.model.MantisComment;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 
-public class MantisTicketTest extends TestCase {
+public class MantisTicketTest {
 	
+	@Test
 	public void testTimeTrackingValueWithPadding() {
 		
 		MantisComment comment = new MantisComment();
@@ -27,6 +30,7 @@ public class MantisTicketTest extends TestCase {
 		assertEquals("2:00", ticket.getValue(Key.TIME_SPENT));		
 	}
 
+	@Test
 	public void testTimeTrackingValue() {
 		
 		MantisComment comment = new MantisComment();

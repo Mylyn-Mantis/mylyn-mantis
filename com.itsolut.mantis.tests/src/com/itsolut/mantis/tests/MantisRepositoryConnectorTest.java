@@ -9,11 +9,14 @@
 
 package com.itsolut.mantis.tests;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 
-public class MantisRepositoryConnectorTest extends TestCase {
+public class MantisRepositoryConnectorTest  {
 
 	private static final String REPOSITORY_ROOT = "http://mylyn-mantis.sourceforge.net/MantisTest/";
 
@@ -23,21 +26,21 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 	private final String expectedUrl = REPOSITORY_ROOT + "view.php?id=" + taskId;
 
-	@Override
-	protected void setUp() throws Exception {
-
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		connector = new MantisRepositoryConnector();
 
 	}
 
+	@Test
 	public void testGetUrl11x() {
 
 		assertEquals("Wrong url for Mantis 1.1.x", expectedUrl, connector.getTaskUrl(
 				REPOSITORY_ROOT + "api/soap/mantisconnect.php", taskId));
 	}
 
+	@Test
 	public void testGetTaskIdFromTaskUrl() {
 
 		String taskId = "84";
@@ -48,6 +51,7 @@ public class MantisRepositoryConnectorTest extends TestCase {
 
 	}
 
+	@Test
 	public void testGetRepositoryUrlFromTaskUrl() {
 
 		String taskId = "84";

@@ -9,14 +9,19 @@
 package com.itsolut.mantis.tests;
 
 
+import static org.junit.Assert.assertNotNull;
+
 import java.math.BigInteger;
+
+import org.junit.Test;
 
 import junit.framework.TestCase;
 
 import com.itsolut.mantis.core.model.MantisRelationship;
 
-public class MantisRelationshipTest extends TestCase {
+public class MantisRelationshipTest {
 	
+	@Test
 	public void testRelationTypeNotNull() {
 		
 		assertNotNull(MantisRelationship.RelationType.fromRelationId(BigInteger.valueOf(99)));

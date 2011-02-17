@@ -9,6 +9,10 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -28,6 +32,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
+import org.junit.Test;
 
 import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.ObjectRef;
@@ -43,6 +48,7 @@ import com.itsolut.mantis.core.model.MantisRelationship;
 
 public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends AbstractIntegrationTest {
 
+	@Test
 	public void testGetTaskData() throws MalformedURLException, RemoteException, ServiceException, CoreException {
 
 		int firstTaskId = createTask("First task", "Description");
@@ -58,6 +64,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 	}
 
+	@Test
 	public void testPerformQuery() throws MantisException, MalformedURLException, RemoteException, ServiceException {
 
 		createTask("First task", "Description");
@@ -100,6 +107,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		}
 	}
 
+	@Test
 	public void testPerformQueryAfterUpdate() throws MantisException, MalformedURLException, RemoteException,
 			ServiceException {
 
@@ -156,6 +164,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		assertEquals("First task - updated", hits.get(0).getRoot().getMappedAttribute(TaskAttribute.SUMMARY).getValue());
 	}
 
+	@Test
 	public void testGetTaskRelations() throws MalformedURLException, RemoteException, ServiceException,
 			MantisException, CoreException {
 

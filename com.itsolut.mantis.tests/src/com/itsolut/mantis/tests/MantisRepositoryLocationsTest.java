@@ -11,25 +11,24 @@
 
 package com.itsolut.mantis.tests;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisRepositoryLocations;
 
 /**
  * @author Robert Munteanu
  */
-public class MantisRepositoryLocationsTest extends TestCase {
+public class MantisRepositoryLocationsTest {
 
+	@Test(expected=RuntimeException.class)
 	public void testInvalidValue() {
-		
-		try {
-			MantisRepositoryLocations.create(null);
-			fail("Should have failed");
-		} catch (RuntimeException e) {
-			// expected
-		}
+
+		MantisRepositoryLocations.create(null);
 	}
 	
+	@Test
 	public void testParseFromBaseUrl() {
 		
 		String baseUrl = "http://mylyn-mantis.sourceforge.net/Mantis/";
@@ -37,6 +36,7 @@ public class MantisRepositoryLocationsTest extends TestCase {
 		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/", MantisRepositoryLocations.create(baseUrl).getBaseRepositoryLocation());
 	}
 	
+	@Test
 	public void testParseFromSoapUrl() {
 		
 		String baseUrl = "http://mylyn-mantis.sourceforge.net/Mantis/api/soap/mantisconnect.php";
@@ -44,6 +44,7 @@ public class MantisRepositoryLocationsTest extends TestCase {
 		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/", MantisRepositoryLocations.create(baseUrl).getBaseRepositoryLocation());
 	}
 
+	@Test
 	public void testParseFromIssueUrl() {
 		
 		String baseUrl = "http://mylyn-mantis.sourceforge.net/Mantis/view.php?id=163";
@@ -51,6 +52,7 @@ public class MantisRepositoryLocationsTest extends TestCase {
 		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/", MantisRepositoryLocations.create(baseUrl).getBaseRepositoryLocation());
 	}
 	
+	@Test
 	public void testGetUrlWhenBaseHasTrailingSlash() {
 		
 		verifyLocationsAreCorrect("http://mylyn-mantis.sourceforge.net/Mantis/");
@@ -67,21 +69,19 @@ public class MantisRepositoryLocationsTest extends TestCase {
 		assertEquals("http://mylyn-mantis.sourceforge.net/Mantis/account_page.php", locations.getAccountManagementLocation());
 	}
 
+	@Test
 	public void testGetUrlWhenBaseDoesNotHaveTrailingSlash() {
 		
 		verifyLocationsAreCorrect("http://mylyn-mantis.sourceforge.net/Mantis");
 	}
 	
+	@Test(expected = RuntimeException.class )
 	public void testInvalidTaskUrl () {
 
-		try {
-			MantisRepositoryLocations.extractTaskId(null);
-			fail("Should have failed.");
-		} catch (RuntimeException e) {
-			// expected
-		}
+		MantisRepositoryLocations.extractTaskId(null);
 	}
 
+	@Test
 	public void testGetTaskIdFromUrl() {
 		
 		assertEquals(MantisRepositoryLocations.extractTaskId("http://mylyn-mantis.sourceforge.net/Mantis/view.php?id=1"), Integer.valueOf(1));

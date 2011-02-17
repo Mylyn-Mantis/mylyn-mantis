@@ -9,6 +9,8 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
+import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisAttachmentHandler;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
@@ -29,6 +32,7 @@ import com.itsolut.mantis.core.MantisRepositoryConnector;
  */
 public abstract class AbstractMantisAttachmentHandlerIntegrationTest extends AbstractIntegrationTest {
 
+	@Test
 	public void testAddAndGetAttachment() throws ServiceException, CoreException, IOException {
 
 		int taskId = createTask("Upload task", "Description");

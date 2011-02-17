@@ -16,17 +16,17 @@ import java.rmi.RemoteException;
 import javax.xml.rpc.ServiceException;
 
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+import org.junit.After;
+import org.junit.Before;
 
 import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.ObjectRef;
 import com.itsolut.mantis.core.MantisClientFactory;
 
-import junit.framework.TestCase;
-
 /**
  * @author Robert Munteanu
  */
-public abstract class AbstractIntegrationTest extends TestCase {
+public abstract class AbstractIntegrationTest  {
 
 	protected static final BigInteger DEFAULT_PROJECT_ID = BigInteger.ONE;
 	protected static final String DEFAULT_CATEGORY_NAME = "General";
@@ -54,7 +54,8 @@ public abstract class AbstractIntegrationTest extends TestCase {
 		return "administrator";
 	}
 
-	protected final void setUp() throws Exception {
+	@Before
+	public final void setUp() throws Exception {
 
 		MantisClientFactory.getDefault().setTaskRepositoryLocationFactory(new TaskRepositoryLocationFactory());
 
@@ -70,7 +71,8 @@ public abstract class AbstractIntegrationTest extends TestCase {
 		
 	}
 
-	protected final void tearDown() throws Exception {
+	@After
+	public final void tearDown() throws Exception {
 
 		try {
 			preTearDown();

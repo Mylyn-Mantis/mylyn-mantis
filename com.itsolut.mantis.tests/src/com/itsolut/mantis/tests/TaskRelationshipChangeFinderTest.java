@@ -9,20 +9,25 @@
 
 package com.itsolut.mantis.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
+import org.junit.Test;
 
-import com.itsolut.mantis.core.*;
+import com.itsolut.mantis.core.MantisAttributeMapper;
+import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.TaskRelationshipChange;
+import com.itsolut.mantis.core.TaskRelationshipChangeFinder;
 import com.itsolut.mantis.core.model.MantisRelationship;
 
-public class TaskRelationshipChangeFinderTest extends TestCase {
+public class TaskRelationshipChangeFinderTest {
 	
 	private static final String RELATED_TASK_ID_1 = "55";
 	private static final String RELATED_TASK_ID_2 = "56";
@@ -37,25 +42,14 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	private static final String OLD_RELATION_ID = "22";
 	private static final String OLD_RELATION_IDS = "22,23";
 	
-	public void testNullArguments() {
+	@Test(expected = RuntimeException.class)
+	public void testNullTaskData() {
 		
-		try {
 			newChangeFinder().findChanges(null, Collections.<TaskAttribute> emptySet());
-			fail("Should have thrown a RuntimeException");
-		} catch (RuntimeException e) {
-		}
-		
-		TaskData taskData = newExistingTaskData();
-		
-		try {
-
-			newChangeFinder().findChanges(taskData, null);
-			fail("Should have thrown a RuntimeException");
-		} catch (RuntimeException e) {
-		}
 	}
-
+	
 	private TaskRelationshipChangeFinder newChangeFinder() {
+		
 		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null));
 	}
 
@@ -63,12 +57,19 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 	
 		return new TaskData(new MantisAttributeMapper(new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, "http://localhost")), MantisCorePlugin.REPOSITORY_KIND, "http://localhost", "-1");
 	}
+	
+	@Test(expected = RuntimeException.class)
+	public void testNullChangedAttributes() {
+		
+		newChangeFinder().findChanges(newExistingTaskData(), null);
+	}
 
 	private TaskData newUnsubmittedTaskData() {
 		
 		return new TaskData(new MantisAttributeMapper(new TaskRepository(MantisCorePlugin.REPOSITORY_KIND, "http://localhost")), MantisCorePlugin.REPOSITORY_KIND, "http://localhost", "");
 	}
 	
+	@Test(expected=RuntimeException.class)
 	public void testInconsistentTaskStatusAndAttributes() {
 		
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
@@ -76,13 +77,10 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		TaskData newData = newUnsubmittedTaskData();
 		newParentOfAttribute(newData, Arrays.asList(RELATED_TASK_ID_1 + "," + RELATED_TASK_ID_2), "");
 		
-		try {
-			newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
-			fail("Should have thrown a RuntimeException");
-		} catch (RuntimeException e) {
-		}
+		newChangeFinder().findChanges(newData, Collections.<TaskAttribute> singleton(oldParent));
 	}
 	
+	@Test
 	public void testEmptyChangedAttributeDetectsNoChanges() {
 		
 		TaskData taskData = newExistingTaskData();
@@ -102,6 +100,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		return attribute; 
 	}
 	
+	@Test
 	public void testUpdatedSummaryDetectsNoChanges() {
 
 		TaskAttribute oldSummary = newExistingTaskData().getRoot().createAttribute(MantisAttributeMapper.Attribute.SUMMARY.getKey());
@@ -115,6 +114,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(0, changes.size());
 	}
 	
+	@Test
 	public void testNewParentDetectsChanges() {
 
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Collections. <String> emptyList(), "");
@@ -133,6 +133,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
 	}
 	
+	@Test
 	public void testRemovedParentDetectsChanges() {
 		
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
@@ -151,6 +152,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
 	}
 	
+	@Test
 	public void testRemovedParentWithNoAttributeParentDetectsChanges() {
 		
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
@@ -168,6 +170,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));		
 	}
 	
+	@Test
 	public void testParentChangeWithFourValuesIsDetected() {
 		
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), RELATED_TASK_IDS_1_2, OLD_RELATION_IDS);
@@ -184,6 +187,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(TaskRelationshipChange.Direction.Added, changes.get(3).getDirection());
 	}
 	
+	@Test
 	public void testNewTaskWithParentDetectsChanges() {
 
 		TaskData newData = newUnsubmittedTaskData();
@@ -200,6 +204,7 @@ public class TaskRelationshipChangeFinderTest extends TestCase {
 		assertEquals(RELATED_TASK_ID_1, String.valueOf(newParent.getRelationship().getTargetId()));
 	}
 
+	@Test
 	public void testParentChangeWithCSVValueDetectsChanges() {
 		
 		TaskAttribute oldParent = newParentOfAttribute(newExistingTaskData(), Arrays.asList(RELATED_TASK_ID_1), OLD_RELATION_ID);
