@@ -39,7 +39,6 @@ import com.itsolut.mantis.binding.ObjectRef;
 import com.itsolut.mantis.binding.RelationshipData;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
-import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
@@ -178,7 +177,6 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		repositoryAccessor.getMantisConnectPort().mc_issue_relationship_add(getUsername(), getPassword(),
 				BigInteger.valueOf(taskId), relation);
-		MantisRepositoryConfiguration.setDownloadSubTasks(repositoryAccessor.getRepository(), true);
 
 		MantisRepositoryConnector connector = new MantisRepositoryConnector();
 

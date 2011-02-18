@@ -14,9 +14,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.junit.Test;
 
+import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 
 public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrationTest {
@@ -45,8 +47,13 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 	public void testAbleToCloneTaskWithProperKey() {
 		
 		ITask task = getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), "1");
-		task.setAttribute(MantisRepositoryConnector.TASK_KEY_SUPPORTS_SUBTASKS, Boolean.TRUE.toString());
-		assertTrue(newTaskDataHandler().canInitializeSubTaskData(repositoryAccessor.getRepository(), task));
+		TaskRepository repository = repositoryAccessor.getRepository();
+		MantisRepositoryConfiguration.setSupportsSubTasks(repository, true);
+		try {
+			assertTrue(newTaskDataHandler().canInitializeSubTaskData(repository, task));
+		} finally {
+			MantisRepositoryConfiguration.setSupportsSubTasks(repository, false);
+		}
 	}
 
 }

@@ -6,11 +6,11 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 @SuppressWarnings("restriction")
 public class MantisRepositoryConfiguration {
 
-    private static String DOWNLOAD_SUBTASKS_PROPERTY = "mantis.download.subtasks";
-
-    public static boolean isDownloadSubTasks(TaskRepository repository) {
-
-        String property = repository.getProperty(DOWNLOAD_SUBTASKS_PROPERTY);
+    private static final String SUPPORTS_SUBTASKS = "supports_subtasks";
+    
+    public static boolean isSupportsSubTasks(TaskRepository repository) {
+        
+        String property = repository.getProperty(SUPPORTS_SUBTASKS);
 
         if (property == null) // default value
             return false;
@@ -18,9 +18,9 @@ public class MantisRepositoryConfiguration {
         return Boolean.parseBoolean(property);
     }
 
-    public static void setDownloadSubTasks(TaskRepository repository, boolean downloadSubTasks) {
+    public static void setSupportsSubTasks(TaskRepository repository, boolean downloadSubTasks) {
 
-        repository.setProperty(DOWNLOAD_SUBTASKS_PROPERTY, String.valueOf(downloadSubTasks));
+        repository.setProperty(SUPPORTS_SUBTASKS, String.valueOf(downloadSubTasks));
     }
     
 	/**

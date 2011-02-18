@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.*;
@@ -677,11 +678,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     @Override
     public boolean canInitializeSubTaskData(TaskRepository taskRepository,
     		ITask task) {
-    	
-    	if ( task == null)
-    		return false;
-    	
-    	return Boolean.parseBoolean(task.getAttribute(MantisRepositoryConnector.TASK_KEY_SUPPORTS_SUBTASKS));
+        
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=337619
+        if ( taskRepository == null )
+            taskRepository = TasksUiPlugin.getRepositoryManager().getRepository(task.getRepositoryUrl());
+        
+        return MantisRepositoryConfiguration.isSupportsSubTasks(taskRepository);
     }
     
     @Override

@@ -24,17 +24,9 @@ import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
-import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisClientFactory;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConfiguration;
-import com.itsolut.mantis.core.RepositoryCapability;
-import com.itsolut.mantis.core.RepositoryValidationResult;
+import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.internal.WikiLinkedErrorDialog;
@@ -50,32 +42,26 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String DESCRIPTION = "Enter the path to your repository, for example : http://www.example.com/mantis/\nPlease validate the settings to ensure they are correct.";
 
-    private Button retrieveSubTasksButton;
-
     public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository) {
 
         super(TITLE, DESCRIPTION, taskRepository);
-        setNeedsAnonymousLogin(true);
+        setNeedsAnonymousLogin(false);
         setNeedsEncoding(false);
         setNeedsTimeZone(false);
         setNeedsValidation(true);
-        setNeedsAdvanced(true);
         setNeedsHttpAuth(true);
+        setNeedsAdvanced(false);
+    }
+    
+    @Override
+    protected void createSettingControls(Composite parent) {
+    
+        super.createSettingControls(parent);
+        addRepositoryTemplatesToServerUrlCombo();
     }
 
     @Override
     protected void createAdditionalControls(final Composite parent) {
-
-        addRepositoryTemplatesToServerUrlCombo();
-
-        Label downloadAttachmentsLabel = new Label(parent, SWT.NONE);
-        downloadAttachmentsLabel.setText("Group sub-tasks");
-        retrieveSubTasksButton = new Button(parent, SWT.CHECK | SWT.LEFT);
-        retrieveSubTasksButton.setText("Enabled");
-        if (repository != null)
-            retrieveSubTasksButton.setSelection(MantisRepositoryConfiguration.isDownloadSubTasks(repository));
-        else
-            retrieveSubTasksButton.setSelection(true);
 
     }
 
@@ -113,7 +99,6 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
         super.applyTo(repository);
 
-        MantisRepositoryConfiguration.setDownloadSubTasks(repository, retrieveSubTasksButton.getSelection());
         MantisRepositoryConfiguration.setCategoryIfNotSet(repository);
     }
 

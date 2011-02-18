@@ -50,7 +50,6 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private final static String CLIENT_LABEL = "Mantis (supports connector 0.0.5 or 1.1.0a4 or greater only)";
-    public static final String TASK_KEY_SUPPORTS_SUBTASKS = "SupportsSubtasks";
 
     private MantisClientManager clientManager;
 
@@ -245,7 +244,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public void updateRepositoryConfiguration(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
 
         try {
-            getClientManager().getRepository(repository).updateAttributes(monitor);
+            IMantisClient client = getClientManager().getRepository(repository);
+            client.updateAttributes(monitor);
+            MantisRepositoryConfiguration.setSupportsSubTasks(repository, client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations());
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, repository));
         }
@@ -306,11 +307,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 
         task.setUrl(connector.getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
-
-        boolean supportsSubtasks = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) != null;
-
-        task.setAttribute(TASK_KEY_SUPPORTS_SUBTASKS, Boolean.toString(supportsSubtasks));
-
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {
@@ -445,9 +441,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public Collection<TaskRelation> getTaskRelations(TaskData taskData) {
 
-        if (!MantisRepositoryConfiguration.isDownloadSubTasks(taskData.getAttributeMapper().getTaskRepository()))
-            return null;
-
         TaskAttribute parentTasksAttribute = taskData.getRoot().getAttribute(
                 MantisAttributeMapper.Attribute.PARENT_OF.getKey());
 
@@ -468,7 +461,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 relations.add(TaskRelation.parentTask(taskId));
 
         return relations;
-
     }
 
     @Override
