@@ -474,11 +474,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public boolean hasRepositoryDueDate(TaskRepository taskRepository, ITask task, TaskData taskData) {
         
-        try {
-            return getClientManager().getRepository(taskRepository).isDueDateEnabled(new NullProgressMonitor());
-        } catch (MantisException e) {
-            MantisCorePlugin.error("Failed determining if the due date is enabled", e);
-            return false;
-        }
+    	return taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.DUE_DATE.getKey()) != null;
     }
 }
