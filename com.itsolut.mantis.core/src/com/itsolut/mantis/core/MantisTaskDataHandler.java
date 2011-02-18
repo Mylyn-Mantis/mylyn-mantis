@@ -13,6 +13,7 @@ package com.itsolut.mantis.core;
 
 import java.util.*;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -97,7 +98,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			
 			createDefaultAttributes(data, client, projectName, monitor, false);
             createProjectSpecificAttributes(data, client, monitor);
-            createCustomFieldAttributes(data, client, null, monitor);
+            createCustomFieldAttributes(data, client, new DefaultCustomFieldValueSource(), monitor);
             return true;
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
@@ -611,7 +612,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             updateTaskData(repository, getAttributeMapper(repository),
                     taskData, client, ticket, monitor);
             createProjectSpecificAttributes(taskData, client, monitor);
-            createCustomFieldAttributes(taskData, client, ticket, monitor);
+            createCustomFieldAttributes(taskData, client, new MantisTicketCustomFieldValueSource(ticket), monitor);
 
             return taskData;
         } catch (MantisException e) {
@@ -653,7 +654,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
      * @throws MantisException
      */
     private void createCustomFieldAttributes(TaskData taskData, IMantisClient client,
-            MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+            CustomFieldValueSource customFieldValueSource, IProgressMonitor monitor) throws MantisException {
         
         TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
 
@@ -664,11 +665,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
             customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
             
-            String valueToSet = ticket != null ? ticket.getCustomFieldValue(customField.getName()) : customField.getDefaultValue();
-            if ( valueToSet == null)
-                valueToSet = "";
-            
-            customAttribute.setValue(valueToSet);
+            customAttribute.setValue(customFieldValueSource.getCustomFieldValue(customField));
             
             if ( customField.getPossibleValues() != null)
                 for ( String possibleValue : customField.getPossibleValues())
@@ -699,6 +696,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			copyAttributesFromParent(taskData, parentTaskData); 
 			clearTaskRelations(taskData);
 			setChildAttribute(taskData, parentTaskData);
+			createCustomFieldAttributes(taskData, connector.getClientManager().getRepository(
+	                repository), new TaskDataCustomFieldValueSource(parentTaskData), monitor);
 
 			return true;
 		} catch (MantisException e) {
@@ -754,5 +753,55 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             throw new RuntimeException("No relationType for attribute " + attribute);
         
         return relationType;
+    }
+    
+    private static interface CustomFieldValueSource {
+        
+        String getCustomFieldValue(MantisCustomField customField);
+    }
+    
+    private static class MantisTicketCustomFieldValueSource implements CustomFieldValueSource {
+
+        private final MantisTicket ticket;
+        
+        public MantisTicketCustomFieldValueSource(MantisTicket ticket) {
+
+            this.ticket = ticket;
+        }
+
+        public String getCustomFieldValue(MantisCustomField customField) {
+
+            String valueToSet = ticket != null ? ticket.getCustomFieldValue(customField.getName()) : customField.getDefaultValue();
+            if ( valueToSet == null)
+                valueToSet = "";
+
+            return valueToSet;
+        }
+    }
+    
+    private static class TaskDataCustomFieldValueSource implements CustomFieldValueSource {
+        
+        private final TaskData taskData;
+
+        public TaskDataCustomFieldValueSource(TaskData taskData) {
+
+            Assert.isNotNull(taskData);
+            
+            this.taskData = taskData;
+        }
+        
+        public String getCustomFieldValue(MantisCustomField customField) {
+        
+            return taskData.getRoot().getAttribute(customField.getName()).getValue();
+        }
+    }
+    
+    private static class DefaultCustomFieldValueSource implements CustomFieldValueSource {
+        
+        public String getCustomFieldValue(MantisCustomField customField) {
+
+            return customField.getDefaultValue();
+        }
+        
     }
 }
