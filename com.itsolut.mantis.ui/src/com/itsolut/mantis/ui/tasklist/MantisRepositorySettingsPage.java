@@ -45,7 +45,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
     public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository) {
 
         super(TITLE, DESCRIPTION, taskRepository);
-        setNeedsAnonymousLogin(false);
+        setNeedsAnonymousLogin(true);
         setNeedsEncoding(false);
         setNeedsTimeZone(false);
         setNeedsValidation(true);
