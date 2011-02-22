@@ -31,12 +31,15 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.mylyn.tasks.core.*;
+import org.eclipse.mylyn.tasks.core.data.TaskAttachmentModel;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.LegendElement;
 import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
+import org.eclipse.mylyn.tasks.ui.wizards.TaskAttachmentPage;
 
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryLocations;
@@ -83,6 +86,14 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
 
         return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository);
+    }
+    
+    @Override
+    public IWizardPage getTaskAttachmentPage(TaskAttachmentModel model) {
+    
+        TaskAttachmentPage taskAttachmentPage = new TaskAttachmentPage(model);
+        taskAttachmentPage.setNeedsDescription(false);
+        return taskAttachmentPage;
     }
 
     @Override
