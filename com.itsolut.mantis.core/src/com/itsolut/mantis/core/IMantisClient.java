@@ -108,6 +108,8 @@ public interface IMantisClient {
 
     void updateTicket(MantisTicket ticket, String comment, int timeTracking, List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException;
 
+    void addIssueComment(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException;
+    
     MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException;
 
     /**
@@ -130,5 +132,6 @@ public interface IMantisClient {
     boolean isTimeTrackingEnabled(IProgressMonitor monitor) throws MantisException;
     
     boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException;
+
     
 }

@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
@@ -29,6 +30,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * 
@@ -103,6 +105,8 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             AbstractTaskAttachmentSource source, String comment,
             TaskAttribute attachmentAttribute, IProgressMonitor monitor)
     throws CoreException {
+        
+        monitor.beginTask("Uploading attachment", 2);        
 
         try {
             IMantisClient client = connector.getClientManager().getRepository(repository);
@@ -119,13 +123,20 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
                 if ( mapper.getFileName() != null)
                     filename = mapper.getFileName();
             }
-            
-            
+        
             client.putAttachmentData(id, filename, data, monitor);
+            Policy.advance(monitor, 1);
+            
+            if  ( !MantisUtils.isEmpty(comment) )
+                client.addIssueComment(id, comment, 0, monitor);
+            Policy.advance(monitor, 1);
+            
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
         } catch (IOException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
+        } finally {
+            monitor.done();
         }
     }
 

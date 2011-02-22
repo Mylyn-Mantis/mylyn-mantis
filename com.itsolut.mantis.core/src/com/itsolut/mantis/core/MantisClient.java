@@ -205,12 +205,10 @@ public class MantisClient implements IMantisClient {
         soapClient.updateIssue(issue, monitor);
     }
 
-    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    public void addIssueComment(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
 
-        if (MantisUtils.isEmpty(comment) && timeTracking == 0)
-            return;
-
-        final IssueNoteData ind = new IssueNoteData();
+        IssueNoteData ind = new IssueNoteData();
+        
         ind.setDate_submitted(MantisUtils.transform(new Date()));
         ind.setLast_modified(MantisUtils.transform(new Date()));
         ind.setReporter(MantisConverter.convert(getUserName()));
@@ -218,6 +216,14 @@ public class MantisClient implements IMantisClient {
         ind.setText(comment);
 
         soapClient.addNote(issueId, ind, monitor);
+    }
+    
+    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+
+        if (MantisUtils.isEmpty(comment) && timeTracking == 0)
+            return;
+
+        addIssueComment(issueId, comment, timeTracking, monitor);
     }
 
     public RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException {
