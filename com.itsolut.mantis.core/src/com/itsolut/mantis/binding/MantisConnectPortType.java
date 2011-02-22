@@ -156,6 +156,16 @@ public interface MantisConnectPortType extends java.rmi.Remote {
     public boolean mc_project_delete(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException;
 
     /**
+     * Update a specific project to the tracker (must have admin privileges)
+     */
+    public boolean mc_project_update(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, com.itsolut.mantis.binding.ProjectData project) throws java.rmi.RemoteException;
+
+    /**
+     * Get the id of the project with the specified name.
+     */
+    public java.math.BigInteger mc_project_get_id_from_name(java.lang.String username, java.lang.String password, java.lang.String project_name) throws java.rmi.RemoteException;
+
+    /**
      * Get the issues that match the specified project id and paging
      * details.
      */
@@ -182,6 +192,21 @@ public interface MantisConnectPortType extends java.rmi.Remote {
      * Get the categories belonging to the specified project.
      */
     public java.lang.String[] mc_project_get_categories(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException;
+
+    /**
+     * Add a category of specific project.
+     */
+    public java.math.BigInteger mc_project_add_category(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name) throws java.rmi.RemoteException;
+
+    /**
+     * Delete a category of specific project.
+     */
+    public java.math.BigInteger mc_project_delete_category(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name) throws java.rmi.RemoteException;
+
+    /**
+     * Rename a category of specific project.
+     */
+    public java.math.BigInteger mc_project_rename_category_by_name(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name, java.lang.String p_category_name_new, java.math.BigInteger p_assigned_to) throws java.rmi.RemoteException;
 
     /**
      * Get the versions belonging to the specified project.
@@ -237,6 +262,11 @@ public interface MantisConnectPortType extends java.rmi.Remote {
      * Delete the project attachment with the specified id.
      */
     public boolean mc_project_attachment_delete(java.lang.String username, java.lang.String password, java.math.BigInteger project_attachment_id) throws java.rmi.RemoteException;
+
+    /**
+     * Get the subprojects ID of a specific project.
+     */
+    public java.lang.String[] mc_project_get_all_subprojects(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException;
 
     /**
      * Get the filters defined for the specified project.

@@ -142,6 +142,7 @@
    <xsd:element name="notes" type="tns:IssueNoteDataArray" minOccurs="0"/>
    <xsd:element name="custom_fields" type="tns:CustomFieldValueForIssueDataArray" minOccurs="0"/>
    <xsd:element name="due_date" type="xsd:dateTime" minOccurs="0"/>
+   <xsd:element name="monitors" type="tns:AccountDataArray" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="IssueDataArray">
@@ -222,6 +223,7 @@
    <xsd:element name="is_public" type="xsd:boolean" minOccurs="0"/>
    <xsd:element name="name" type="xsd:string" minOccurs="0"/>
    <xsd:element name="filter_string" type="xsd:string" minOccurs="0"/>
+   <xsd:element name="url" type="xsd:string" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="FilterDataArray">
@@ -460,6 +462,19 @@
   <part name="project_id" type="xsd:integer" /></message>
 <message name="mc_project_deleteResponse">
   <part name="return" type="xsd:boolean" /></message>
+<message name="mc_project_updateRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_id" type="xsd:integer" />
+  <part name="project" type="tns:ProjectData" /></message>
+<message name="mc_project_updateResponse">
+  <part name="return" type="xsd:boolean" /></message>
+<message name="mc_project_get_id_from_nameRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_name" type="xsd:string" /></message>
+<message name="mc_project_get_id_from_nameResponse">
+  <part name="return" type="xsd:integer" /></message>
 <message name="mc_project_get_issuesRequest">
   <part name="username" type="xsd:string" />
   <part name="password" type="xsd:string" />
@@ -494,6 +509,29 @@
   <part name="project_id" type="xsd:integer" /></message>
 <message name="mc_project_get_categoriesResponse">
   <part name="return" type="tns:StringArray" /></message>
+<message name="mc_project_add_categoryRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_id" type="xsd:integer" />
+  <part name="p_category_name" type="xsd:string" /></message>
+<message name="mc_project_add_categoryResponse">
+  <part name="return" type="xsd:integer" /></message>
+<message name="mc_project_delete_categoryRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_id" type="xsd:integer" />
+  <part name="p_category_name" type="xsd:string" /></message>
+<message name="mc_project_delete_categoryResponse">
+  <part name="return" type="xsd:integer" /></message>
+<message name="mc_project_rename_category_by_nameRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_id" type="xsd:integer" />
+  <part name="p_category_name" type="xsd:string" />
+  <part name="p_category_name_new" type="xsd:string" />
+  <part name="p_assigned_to" type="xsd:integer" /></message>
+<message name="mc_project_rename_category_by_nameResponse">
+  <part name="return" type="xsd:integer" /></message>
 <message name="mc_project_get_versionsRequest">
   <part name="username" type="xsd:string" />
   <part name="password" type="xsd:string" />
@@ -566,6 +604,12 @@
   <part name="project_attachment_id" type="xsd:integer" /></message>
 <message name="mc_project_attachment_deleteResponse">
   <part name="return" type="xsd:boolean" /></message>
+<message name="mc_project_get_all_subprojectsRequest">
+  <part name="username" type="xsd:string" />
+  <part name="password" type="xsd:string" />
+  <part name="project_id" type="xsd:integer" /></message>
+<message name="mc_project_get_all_subprojectsResponse">
+  <part name="return" type="tns:StringArray" /></message>
 <message name="mc_filter_getRequest">
   <part name="username" type="xsd:string" />
   <part name="password" type="xsd:string" />
@@ -754,6 +798,16 @@
     <input message="tns:mc_project_deleteRequest"/>
     <output message="tns:mc_project_deleteResponse"/>
   </operation>
+  <operation name="mc_project_update">
+    <documentation>Update a specific project to the tracker (must have admin privileges)</documentation>
+    <input message="tns:mc_project_updateRequest"/>
+    <output message="tns:mc_project_updateResponse"/>
+  </operation>
+  <operation name="mc_project_get_id_from_name">
+    <documentation>Get the id of the project with the specified name.</documentation>
+    <input message="tns:mc_project_get_id_from_nameRequest"/>
+    <output message="tns:mc_project_get_id_from_nameResponse"/>
+  </operation>
   <operation name="mc_project_get_issues">
     <documentation>Get the issues that match the specified project id and paging details.</documentation>
     <input message="tns:mc_project_get_issuesRequest"/>
@@ -778,6 +832,21 @@
     <documentation>Get the categories belonging to the specified project.</documentation>
     <input message="tns:mc_project_get_categoriesRequest"/>
     <output message="tns:mc_project_get_categoriesResponse"/>
+  </operation>
+  <operation name="mc_project_add_category">
+    <documentation>Add a category of specific project.</documentation>
+    <input message="tns:mc_project_add_categoryRequest"/>
+    <output message="tns:mc_project_add_categoryResponse"/>
+  </operation>
+  <operation name="mc_project_delete_category">
+    <documentation>Delete a category of specific project.</documentation>
+    <input message="tns:mc_project_delete_categoryRequest"/>
+    <output message="tns:mc_project_delete_categoryResponse"/>
+  </operation>
+  <operation name="mc_project_rename_category_by_name">
+    <documentation>Rename a category of specific project.</documentation>
+    <input message="tns:mc_project_rename_category_by_nameRequest"/>
+    <output message="tns:mc_project_rename_category_by_nameResponse"/>
   </operation>
   <operation name="mc_project_get_versions">
     <documentation>Get the versions belonging to the specified project.</documentation>
@@ -833,6 +902,11 @@
     <documentation>Delete the project attachment with the specified id.</documentation>
     <input message="tns:mc_project_attachment_deleteRequest"/>
     <output message="tns:mc_project_attachment_deleteResponse"/>
+  </operation>
+  <operation name="mc_project_get_all_subprojects">
+    <documentation>Get the subprojects ID of a specific project.</documentation>
+    <input message="tns:mc_project_get_all_subprojectsRequest"/>
+    <output message="tns:mc_project_get_all_subprojectsResponse"/>
   </operation>
   <operation name="mc_filter_get">
     <documentation>Get the filters defined for the specified project.</documentation>
@@ -1012,6 +1086,16 @@
     <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
     <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
   </operation>
+  <operation name="mc_project_update">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_update" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="mc_project_get_id_from_name">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_id_from_name" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
   <operation name="mc_project_get_issues">
     <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_issues" style="rpc"/>
     <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -1034,6 +1118,21 @@
   </operation>
   <operation name="mc_project_get_categories">
     <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_categories" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="mc_project_add_category">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_add_category" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="mc_project_delete_category">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_delete_category" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="mc_project_rename_category_by_name">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_rename_category_by_name" style="rpc"/>
     <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
     <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
   </operation>
@@ -1089,6 +1188,11 @@
   </operation>
   <operation name="mc_project_attachment_delete">
     <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_attachment_delete" style="rpc"/>
+    <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="mc_project_get_all_subprojects">
+    <soap:operation soapAction="http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_all_subprojects" style="rpc"/>
     <input><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
     <output><soap:body use="encoded" namespace="http://futureware.biz/mantisconnect" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
   </operation>

@@ -7,7 +7,6 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"serial", "unused", "rawtypes"})
 public class FilterData  implements java.io.Serializable {
     private java.math.BigInteger id;
 
@@ -21,6 +20,8 @@ public class FilterData  implements java.io.Serializable {
 
     private java.lang.String filter_string;
 
+    private java.lang.String url;
+
     public FilterData() {
     }
 
@@ -30,13 +31,15 @@ public class FilterData  implements java.io.Serializable {
            java.math.BigInteger project_id,
            java.lang.Boolean is_public,
            java.lang.String name,
-           java.lang.String filter_string) {
+           java.lang.String filter_string,
+           java.lang.String url) {
            this.id = id;
            this.owner = owner;
            this.project_id = project_id;
            this.is_public = is_public;
            this.name = name;
            this.filter_string = filter_string;
+           this.url = url;
     }
 
 
@@ -159,6 +162,26 @@ public class FilterData  implements java.io.Serializable {
         this.filter_string = filter_string;
     }
 
+
+    /**
+     * Gets the url value for this FilterData.
+     * 
+     * @return url
+     */
+    public java.lang.String getUrl() {
+        return url;
+    }
+
+
+    /**
+     * Sets the url value for this FilterData.
+     * 
+     * @param url
+     */
+    public void setUrl(java.lang.String url) {
+        this.url = url;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof FilterData)) return false;
@@ -188,7 +211,10 @@ public class FilterData  implements java.io.Serializable {
               this.name.equals(other.getName()))) &&
             ((this.filter_string==null && other.getFilter_string()==null) || 
              (this.filter_string!=null &&
-              this.filter_string.equals(other.getFilter_string())));
+              this.filter_string.equals(other.getFilter_string()))) &&
+            ((this.url==null && other.getUrl()==null) || 
+             (this.url!=null &&
+              this.url.equals(other.getUrl())));
         __equalsCalc = null;
         return _equals;
     }
@@ -217,6 +243,9 @@ public class FilterData  implements java.io.Serializable {
         }
         if (getFilter_string() != null) {
             _hashCode += getFilter_string().hashCode();
+        }
+        if (getUrl() != null) {
+            _hashCode += getUrl().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -266,6 +295,13 @@ public class FilterData  implements java.io.Serializable {
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("filter_string");
         elemField.setXmlName(new javax.xml.namespace.QName("", "filter_string"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("url");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "url"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

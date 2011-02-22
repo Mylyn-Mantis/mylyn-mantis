@@ -7,7 +7,6 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"serial", "unused", "rawtypes"})
 public class IssueData  implements java.io.Serializable {
     private java.math.BigInteger id;
 
@@ -73,6 +72,8 @@ public class IssueData  implements java.io.Serializable {
 
     private java.util.Calendar due_date;
 
+    private com.itsolut.mantis.binding.AccountData[] monitors;
+
     public IssueData() {
     }
 
@@ -108,7 +109,8 @@ public class IssueData  implements java.io.Serializable {
            com.itsolut.mantis.binding.RelationshipData[] relationships,
            com.itsolut.mantis.binding.IssueNoteData[] notes,
            com.itsolut.mantis.binding.CustomFieldValueForIssueData[] custom_fields,
-           java.util.Calendar due_date) {
+           java.util.Calendar due_date,
+           com.itsolut.mantis.binding.AccountData[] monitors) {
            this.id = id;
            this.view_state = view_state;
            this.last_updated = last_updated;
@@ -141,6 +143,7 @@ public class IssueData  implements java.io.Serializable {
            this.notes = notes;
            this.custom_fields = custom_fields;
            this.due_date = due_date;
+           this.monitors = monitors;
     }
 
 
@@ -783,6 +786,26 @@ public class IssueData  implements java.io.Serializable {
         this.due_date = due_date;
     }
 
+
+    /**
+     * Gets the monitors value for this IssueData.
+     * 
+     * @return monitors
+     */
+    public com.itsolut.mantis.binding.AccountData[] getMonitors() {
+        return monitors;
+    }
+
+
+    /**
+     * Sets the monitors value for this IssueData.
+     * 
+     * @param monitors
+     */
+    public void setMonitors(com.itsolut.mantis.binding.AccountData[] monitors) {
+        this.monitors = monitors;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof IssueData)) return false;
@@ -890,7 +913,10 @@ public class IssueData  implements java.io.Serializable {
               java.util.Arrays.equals(this.custom_fields, other.getCustom_fields()))) &&
             ((this.due_date==null && other.getDue_date()==null) || 
              (this.due_date!=null &&
-              this.due_date.equals(other.getDue_date())));
+              this.due_date.equals(other.getDue_date()))) &&
+            ((this.monitors==null && other.getMonitors()==null) || 
+             (this.monitors!=null &&
+              java.util.Arrays.equals(this.monitors, other.getMonitors())));
         __equalsCalc = null;
         return _equals;
     }
@@ -1029,6 +1055,17 @@ public class IssueData  implements java.io.Serializable {
         }
         if (getDue_date() != null) {
             _hashCode += getDue_date().hashCode();
+        }
+        if (getMonitors() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getMonitors());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getMonitors(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -1261,6 +1298,13 @@ public class IssueData  implements java.io.Serializable {
         elemField.setFieldName("due_date");
         elemField.setXmlName(new javax.xml.namespace.QName("", "due_date"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("monitors");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "monitors"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "AccountData"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

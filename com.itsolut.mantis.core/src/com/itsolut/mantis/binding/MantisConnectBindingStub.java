@@ -7,7 +7,6 @@
 
 package com.itsolut.mantis.binding;
 
-@SuppressWarnings({"unchecked", "unused", "rawtypes"})
 public class MantisConnectBindingStub extends org.apache.axis.client.Stub implements com.itsolut.mantis.binding.MantisConnectPortType {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -17,7 +16,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
     static org.apache.axis.description.OperationDesc [] _operations;
 
     static {
-        _operations = new org.apache.axis.description.OperationDesc[51];
+        _operations = new org.apache.axis.description.OperationDesc[57];
         _initOperationDesc1();
         _initOperationDesc2();
         _initOperationDesc3();
@@ -479,6 +478,38 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_update");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "ProjectData"), com.itsolut.mantis.binding.ProjectData.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        oper.setReturnClass(boolean.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[30] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_get_id_from_name");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_name"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        oper.setReturnClass(java.math.BigInteger.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[31] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_issues");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -495,7 +526,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[30] = oper;
+        _operations[32] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_issue_headers");
@@ -514,7 +545,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[31] = oper;
+        _operations[33] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_users");
@@ -531,7 +562,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[32] = oper;
+        _operations[34] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_projects_get_user_accessible");
@@ -544,7 +575,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[33] = oper;
+        _operations[35] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_categories");
@@ -559,8 +590,68 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[34] = oper;
+        _operations[36] = oper;
 
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_add_category");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "p_category_name"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        oper.setReturnClass(java.math.BigInteger.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[37] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_delete_category");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "p_category_name"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        oper.setReturnClass(java.math.BigInteger.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[38] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_rename_category_by_name");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "p_category_name"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "p_category_name_new"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "p_assigned_to"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        oper.setReturnClass(java.math.BigInteger.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[39] = oper;
+
+    }
+
+    private static void _initOperationDesc5(){
+        org.apache.axis.description.OperationDesc oper;
+        org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_versions");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
@@ -574,7 +665,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[35] = oper;
+        _operations[40] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_version_add");
@@ -589,7 +680,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[36] = oper;
+        _operations[41] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_version_update");
@@ -606,7 +697,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[37] = oper;
+        _operations[42] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_version_delete");
@@ -621,7 +712,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[38] = oper;
+        _operations[43] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_released_versions");
@@ -636,13 +727,8 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[39] = oper;
+        _operations[44] = oper;
 
-    }
-
-    private static void _initOperationDesc5(){
-        org.apache.axis.description.OperationDesc oper;
-        org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_unreleased_versions");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
@@ -656,7 +742,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[40] = oper;
+        _operations[45] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_attachments");
@@ -671,7 +757,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[41] = oper;
+        _operations[46] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_get_custom_fields");
@@ -686,7 +772,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[42] = oper;
+        _operations[47] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_attachment_get");
@@ -701,7 +787,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[43] = oper;
+        _operations[48] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_attachment_add");
@@ -726,8 +812,13 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[44] = oper;
+        _operations[49] = oper;
 
+    }
+
+    private static void _initOperationDesc6(){
+        org.apache.axis.description.OperationDesc oper;
+        org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_project_attachment_delete");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
@@ -741,7 +832,22 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[45] = oper;
+        _operations[50] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("mc_project_get_all_subprojects");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "project_id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "StringArray"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+        _operations[51] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_filter_get");
@@ -756,7 +862,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[46] = oper;
+        _operations[52] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_filter_get_issues");
@@ -777,7 +883,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[47] = oper;
+        _operations[53] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_filter_get_issue_headers");
@@ -798,7 +904,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[48] = oper;
+        _operations[54] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_config_get_string");
@@ -813,13 +919,8 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[49] = oper;
+        _operations[55] = oper;
 
-    }
-
-    private static void _initOperationDesc6(){
-        org.apache.axis.description.OperationDesc oper;
-        org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("mc_issue_checkin");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
@@ -837,7 +938,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
         oper.setReturnQName(new javax.xml.namespace.QName("", "return"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
-        _operations[50] = oper;
+        _operations[56] = oper;
 
     }
 
@@ -2084,12 +2185,74 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
 }
     }
 
-    public com.itsolut.mantis.binding.IssueData[] mc_project_get_issues(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.math.BigInteger page_number, java.math.BigInteger per_page) throws java.rmi.RemoteException {
+    public boolean mc_project_update(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, com.itsolut.mantis.binding.ProjectData project) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[30]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_update");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_update"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_id, project});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return ((java.lang.Boolean) _resp).booleanValue();
+            } catch (java.lang.Exception _exception) {
+                return ((java.lang.Boolean) org.apache.axis.utils.JavaUtils.convert(_resp, boolean.class)).booleanValue();
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public java.math.BigInteger mc_project_get_id_from_name(java.lang.String username, java.lang.String password, java.lang.String project_name) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[31]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_id_from_name");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_get_id_from_name"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_name});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.math.BigInteger) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.math.BigInteger) org.apache.axis.utils.JavaUtils.convert(_resp, java.math.BigInteger.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public com.itsolut.mantis.binding.IssueData[] mc_project_get_issues(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.math.BigInteger page_number, java.math.BigInteger per_page) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[32]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_issues");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2120,7 +2283,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[31]);
+        _call.setOperation(_operations[33]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_issue_headers");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2151,7 +2314,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[32]);
+        _call.setOperation(_operations[34]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_users");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2182,7 +2345,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[33]);
+        _call.setOperation(_operations[35]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_projects_get_user_accessible");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2213,7 +2376,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[34]);
+        _call.setOperation(_operations[36]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_categories");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2239,12 +2402,105 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
 }
     }
 
+    public java.math.BigInteger mc_project_add_category(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[37]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_add_category");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_add_category"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_id, p_category_name});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.math.BigInteger) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.math.BigInteger) org.apache.axis.utils.JavaUtils.convert(_resp, java.math.BigInteger.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public java.math.BigInteger mc_project_delete_category(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[38]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_delete_category");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_delete_category"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_id, p_category_name});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.math.BigInteger) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.math.BigInteger) org.apache.axis.utils.JavaUtils.convert(_resp, java.math.BigInteger.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public java.math.BigInteger mc_project_rename_category_by_name(java.lang.String username, java.lang.String password, java.math.BigInteger project_id, java.lang.String p_category_name, java.lang.String p_category_name_new, java.math.BigInteger p_assigned_to) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[39]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_rename_category_by_name");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_rename_category_by_name"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_id, p_category_name, p_category_name_new, p_assigned_to});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.math.BigInteger) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.math.BigInteger) org.apache.axis.utils.JavaUtils.convert(_resp, java.math.BigInteger.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
     public com.itsolut.mantis.binding.ProjectVersionData[] mc_project_get_versions(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[35]);
+        _call.setOperation(_operations[40]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_versions");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2275,7 +2531,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[36]);
+        _call.setOperation(_operations[41]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_version_add");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2306,7 +2562,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[37]);
+        _call.setOperation(_operations[42]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_version_update");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2337,7 +2593,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[38]);
+        _call.setOperation(_operations[43]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_version_delete");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2368,7 +2624,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[39]);
+        _call.setOperation(_operations[44]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_released_versions");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2399,7 +2655,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[40]);
+        _call.setOperation(_operations[45]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_unreleased_versions");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2430,7 +2686,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[41]);
+        _call.setOperation(_operations[46]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_attachments");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2461,7 +2717,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[42]);
+        _call.setOperation(_operations[47]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_custom_fields");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2492,7 +2748,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[43]);
+        _call.setOperation(_operations[48]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_attachment_get");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2523,7 +2779,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[44]);
+        _call.setOperation(_operations[49]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_attachment_add");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2554,7 +2810,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[45]);
+        _call.setOperation(_operations[50]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_attachment_delete");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2580,12 +2836,43 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
 }
     }
 
+    public java.lang.String[] mc_project_get_all_subprojects(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[51]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_project_get_all_subprojects");
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://futureware.biz/mantisconnect", "mc_project_get_all_subprojects"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {username, password, project_id});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
     public com.itsolut.mantis.binding.FilterData[] mc_filter_get(java.lang.String username, java.lang.String password, java.math.BigInteger project_id) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[46]);
+        _call.setOperation(_operations[52]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_filter_get");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2616,7 +2903,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[47]);
+        _call.setOperation(_operations[53]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_filter_get_issues");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2647,7 +2934,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[48]);
+        _call.setOperation(_operations[54]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_filter_get_issue_headers");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2678,7 +2965,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[49]);
+        _call.setOperation(_operations[55]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_config_get_string");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
@@ -2709,7 +2996,7 @@ public class MantisConnectBindingStub extends org.apache.axis.client.Stub implem
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[50]);
+        _call.setOperation(_operations[56]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://www.mantisbt.org/bugs/api/soap/mantisconnect.php/mc_issue_checkin");
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
