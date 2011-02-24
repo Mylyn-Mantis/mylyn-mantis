@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.exception.TicketNotFoundException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
@@ -59,6 +60,12 @@ public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegr
 
 		assertEquals(summary, ticket.getValue(Key.SUMMARY));
 		assertEquals(description, ticket.getValue(Key.DESCRIPTION));
+	}
+	
+	@Test(expected = TicketNotFoundException.class)
+	public void testGetInexistentTask() throws MantisException, MalformedURLException, RemoteException, ServiceException {
+
+		repositoryAccessor.getClient().getTicket(-500, new NullProgressMonitor());
 	}
 	
 	@Test

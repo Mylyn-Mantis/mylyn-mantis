@@ -44,6 +44,7 @@ import com.itsolut.mantis.binding.RelationshipData;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
+import com.itsolut.mantis.core.exception.TicketNotFoundException;
 
 /**
  * Represents a Mantis repository that is accessed through the MantisConnect SOAP Interface.
@@ -236,7 +237,15 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
             public IssueData call() throws MantisException, RemoteException {
 
-                return getSOAP().mc_issue_get(getUsername(), getPassword(), BigInteger.valueOf(issueId));
+                try {
+					return getSOAP().mc_issue_get(getUsername(), getPassword(), BigInteger.valueOf(issueId));
+				} catch (RemoteException e) {
+					if ( e.getMessage().equals("Issue does not exist."))
+						throw new TicketNotFoundException(issueId);
+					
+					throw e;
+
+				}
             }
 
         });

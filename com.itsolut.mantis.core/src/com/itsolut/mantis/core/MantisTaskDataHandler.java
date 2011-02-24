@@ -25,6 +25,7 @@ import org.eclipse.osgi.util.NLS;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.exception.TicketNotFoundException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
@@ -209,6 +210,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             IMantisClient client = connector.getClientManager().getRepository(repository);
             MantisTicket ticket = client.getTicket(id, monitor);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
+        } catch ( TicketNotFoundException e) {
+        	return null;
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
                     + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e, repository));
