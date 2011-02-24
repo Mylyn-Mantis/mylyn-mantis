@@ -2,16 +2,14 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.3.0" date="2011-02-17">
-			<action type="add" issue="40" dev="rombert">[Core] [mylyn 3.2] Update the relations logic to work for all cases</action>
-			<action type="add" issue="34" dev="rombert">[User Interface] Progress Bar does not indicate Percentages</action>
-			<action type="add" issue="173" dev="rombert">[Core] Hide ETA and projection if disabled in Mantis</action>
-			<action type="add" issue="167" dev="rombert">[User Interface] Improve repository creation dialog</action>
-			<action type="add" issue="162" dev="rombert">Warn the user if the repository has known problems</action>
-			<action type="add" issue="163" dev="rombert">Do not require the user to enter the location to the mantisconnect.php file</action>
-			<action type="add" issue="164" dev="rombert">[User Interface] Handle common HTTP responses</action>
-			<action type="add" issue="165" dev="rombert">[Core] feature.xml cleanup</action>
-			<action type="add" issue="166" dev="rombert">[Build] Reduce the number of projects</action>
+		<release version="3.3.1" date="2011-02-25">
+			<action type="add" issue="181" dev="rombert">[User Interface] Search for a nonexistent ticket produces a scary error dialog</action>
+			<action type="add" issue="180" dev="rombert">[Core] Regenerate SOAP stubs in preparation for 1.2.5</action>
+			<action type="add" issue="179" dev="rombert">[Core] Comments are not created if specified in the attachment page</action>
+			<action type="add" issue="178" dev="rombert">[User Interface] Do not ask for a description when uploading attachments</action>
+			<action type="add" issue="172" dev="rombert">[Core] Activating a task blocks the main thread if the due date needs to be read and the configuration is stale</action>
+			<action type="add" issue="167" dev="rombert">[Core] Need to manually sync task to enable creation of sub tasks</action>
+			<action type="add" issue="168" dev="rombert">[Core] Custom fields are not created when creating a sub-task</action>
 		</release>
 	</body>
 </document>
