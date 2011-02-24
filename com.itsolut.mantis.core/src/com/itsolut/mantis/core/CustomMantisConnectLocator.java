@@ -11,6 +11,7 @@ import org.apache.axis.EngineConfiguration;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
+import org.osgi.framework.Version;
 
 import com.itsolut.mantis.binding.MantisConnectLocator;
 
@@ -19,51 +20,62 @@ import com.itsolut.mantis.binding.MantisConnectLocator;
  * Custom locator for preparing the connection
  * 
  * @author Robert Munteanu
- *
+ * 
  */
 @SuppressWarnings("restriction")
 public class CustomMantisConnectLocator extends MantisConnectLocator {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private AbstractWebLocation location;
-    
+
     public CustomMantisConnectLocator() {
 
     }
-    
+
     public CustomMantisConnectLocator(EngineConfiguration config) {
 
         super(config);
     }
-    
+
     public CustomMantisConnectLocator(String wsdlLoc, QName name) throws ServiceException {
 
         super(wsdlLoc, name);
     }
-    
+
     public void setLocation(AbstractWebLocation location) {
 
         this.location = location;
     }
-    
+
     public AbstractWebLocation getLocation() {
 
         return location;
     }
-    
-    @Override public Call createCall() throws ServiceException {
+
+    @Override
+    public Call createCall() throws ServiceException {
 
         Call call = super.createCall();
+        
+        String userAgent = createUserAgent();
 
         call.setProperty(SoapHttpSender.LOCATION, location);
-        call.setProperty(SoapHttpSender.USER_AGENT, "Mylyn-Mantis Connector Apache Axis/1.4");
-        
+
         // The Squid proxy server seems to choke unless this is set
-        Map<String, Boolean> headers = new Hashtable<String, Boolean>();
+        Map<String, Object> headers = new Hashtable<String, Object>();
         headers.put(HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED, Boolean.FALSE);
+        headers.put(HTTPConstants.HEADER_USER_AGENT, userAgent);
         call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
-        
+
         return call;
+    }
+
+    private String createUserAgent() {
+
+        Version version = MantisCorePlugin.getDefault().getBundle().getVersion();
+        
+        return "Mylyn-Mantis Connector/" + version.getMajor()+"."+version.getMinor()+"."+version.getMicro()
+                + " Apache Axis/1.4";
     }
 }
