@@ -10,6 +10,7 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.commons.net.WebUtil;
 import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
 import org.osgi.framework.Version;
 
@@ -73,6 +74,6 @@ public class CustomMantisConnectLocator extends MantisConnectLocator {
 
     private String createUserAgent() {
 
-        return "Mylyn-Mantis Connector/" + MantisCorePlugin.getVersionString() + " Apache Axis/1.4";
+        return WebUtil.getUserAgent("Mylyn-Mantis Connector/" + MantisCorePlugin.getVersionString() + " Apache Axis/1.4");
     }
 }
