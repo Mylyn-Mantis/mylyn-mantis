@@ -73,9 +73,6 @@ public class CustomMantisConnectLocator extends MantisConnectLocator {
 
     private String createUserAgent() {
 
-        Version version = MantisCorePlugin.getDefault().getBundle().getVersion();
-        
-        return "Mylyn-Mantis Connector/" + version.getMajor()+"."+version.getMinor()+"."+version.getMicro()
-                + " Apache Axis/1.4";
+        return "Mylyn-Mantis Connector/" + MantisCorePlugin.getVersionString() + " Apache Axis/1.4";
     }
 }

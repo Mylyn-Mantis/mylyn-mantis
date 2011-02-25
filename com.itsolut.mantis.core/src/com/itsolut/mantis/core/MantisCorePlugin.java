@@ -22,6 +22,7 @@ package com.itsolut.mantis.core;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Dictionary;
 import java.util.Locale;
 
 import org.apache.axis.AxisFault;
@@ -30,6 +31,7 @@ import org.eclipse.mylyn.internal.provisional.commons.soap.AxisHttpFault;
 import org.eclipse.mylyn.tasks.core.RepositoryStatus;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisLoginException;
@@ -62,6 +64,20 @@ public class MantisCorePlugin extends Plugin {
         return plugin;
     }
 
+    public static String getVersionString() {
+        
+        // XXX: unable to use getVersion()
+        // [ERROR] Version version = MantisCorePlugin.getDefault().getBundle().getVersion();
+        // [ERROR] ^^^^^^^^^^
+        // [ERROR] The method getVersion() is undefined for the type Bundle
+        // [ERROR] -> [Help 1]
+
+        Dictionary<?,?> headers = MantisCorePlugin.getDefault().getBundle().getHeaders();
+        String rawVersion = String.valueOf(headers.get("Bundle-Version"));
+
+        return rawVersion.substring(0, rawVersion.lastIndexOf('.'));
+    }
+    
     @Override
     public void start(BundleContext context) throws Exception {
 
