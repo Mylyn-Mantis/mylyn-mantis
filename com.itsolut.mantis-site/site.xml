@@ -3,7 +3,7 @@
    <description url="http://mylyn-mantis.sourceforge.net/eclipse/update">
       This is the Eclipse 3.4 and Mylyn Mantis Connector update site.  This connector allows integration with Mylyn and Mantis Bug Tracker within eclipse.   You must be using version 1.0.5a or greater of the Mantis Connector with this plugin. For older versions of the plugin please visit https://sourceforge.net/projects/mylyn-mantis/files/.
    </description>
-   <feature url="features/com.itsolut.mantis_feature_3.3.1.qualifier" id="com.itsolut.mantis_feature" version="3.3.1.qualifier">
+   <feature url="features/com.itsolut.mantis_feature_3.3.2.qualifier" id="com.itsolut.mantis_feature" version="3.3.2.qualifier">
       <category name="Mylyn Mantis Connector (Mylyn 3.x)"/>
    </feature>
    <category-def name="Mylyn Mantis Connector (Mylyn 3.x)" label="Mylyn Connector (Mylyn 3.x)"/>
