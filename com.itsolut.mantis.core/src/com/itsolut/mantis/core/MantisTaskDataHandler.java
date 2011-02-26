@@ -236,7 +236,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
         addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
-        if ( client.isTimeTrackingEnabled(new NullProgressMonitor()))
+        if ( client.isTimeTrackingEnabled(monitor))
             addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
         addOperation(data, ticket, MantisOperation.RESOLVE_AS, client, monitor);
         addOperation(data, ticket, MantisOperation.ASSIGN_TO, client, monitor);
@@ -466,7 +466,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
-            .setType(TaskAttribute.TYPE_OPERATION);
+                .setType(TaskAttribute.TYPE_OPERATION);
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, null));
         }
