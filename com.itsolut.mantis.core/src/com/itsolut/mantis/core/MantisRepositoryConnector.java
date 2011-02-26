@@ -49,7 +49,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
 @SuppressWarnings("restriction")
 public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
-    private final static String CLIENT_LABEL = "Mantis (supports connector 0.0.5 or 1.1.0a4 or greater only)";
+    private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
 
     private MantisClientManager clientManager;
 
