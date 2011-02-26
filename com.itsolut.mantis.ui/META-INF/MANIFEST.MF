@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mylyn Mantis Connector UI
 Bundle-SymbolicName: com.itsolut.mantis.ui;singleton:=true
-Bundle-Version: 3.3.1.qualifier
+Bundle-Version: 3.4.0.qualifier
 Bundle-Activator: com.itsolut.mantis.ui.MantisUIPlugin
 Bundle-Vendor: ITSOLUT
 Bundle-Localization: plugin
