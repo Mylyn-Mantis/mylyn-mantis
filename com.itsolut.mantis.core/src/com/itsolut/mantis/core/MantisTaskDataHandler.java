@@ -13,10 +13,7 @@ package com.itsolut.mantis.core;
 
 import java.util.*;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.*;
 import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
@@ -211,7 +208,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             MantisTicket ticket = client.getTicket(id, monitor);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
         } catch ( TicketNotFoundException e) {
-        	return null;
+        	throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(e.getMessage(), e, repository));
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
                     + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e, repository));

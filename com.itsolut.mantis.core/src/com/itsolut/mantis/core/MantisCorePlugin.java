@@ -36,6 +36,7 @@ import org.osgi.framework.Version;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisLoginException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
+import com.itsolut.mantis.core.exception.TicketNotFoundException;
 
 /**
  * The headless Trac plug-in class.
@@ -167,6 +168,9 @@ public class MantisCorePlugin extends Plugin {
         public Status toStatus( String message, Throwable t, TaskRepository repository) {
             
             String actualMessage = message == null ? t.getMessage() : message;
+            
+            if ( t instanceof TicketNotFoundException )
+                return new Status(IStatus.WARNING, PLUGIN_ID, actualMessage, t);
             
             if ( repository == null)
                 return new Status(IStatus.ERROR, PLUGIN_ID, actualMessage, t);
