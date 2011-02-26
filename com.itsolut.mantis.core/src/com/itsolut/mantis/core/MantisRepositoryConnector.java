@@ -118,7 +118,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         if ( repositoryUrl == null || taskId == null )
             return null;
         
-        return MantisRepositoryLocations.create(repositoryUrl).getTaskLocation(Integer.valueOf(taskId));
+        try {
+            return MantisRepositoryLocations.create(repositoryUrl).getTaskLocation(Integer.valueOf(taskId));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        
     }
 
     @Override
