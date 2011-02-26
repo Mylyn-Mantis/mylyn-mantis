@@ -240,7 +240,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
                 try {
 					return getSOAP().mc_issue_get(getUsername(), getPassword(), BigInteger.valueOf(issueId));
 				} catch (RemoteException e) {
-					if ( e.getMessage().equals("Issue does not exist."))
+					if ( e.getMessage().startsWith("Issue does not exist"))
 						throw new TicketNotFoundException(issueId);
 					
 					throw e;
