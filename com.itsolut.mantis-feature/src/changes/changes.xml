@@ -2,14 +2,8 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.3.1" date="2011-02-25">
+		<release version="3.3.2" date="2011-02-28">
 			<action type="add" issue="181" dev="rombert">[User Interface] Search for a nonexistent ticket produces a scary error dialog</action>
-			<action type="add" issue="180" dev="rombert">[Core] Regenerate SOAP stubs in preparation for 1.2.5</action>
-			<action type="add" issue="179" dev="rombert">[Core] Comments are not created if specified in the attachment page</action>
-			<action type="add" issue="178" dev="rombert">[User Interface] Do not ask for a description when uploading attachments</action>
-			<action type="add" issue="172" dev="rombert">[Core] Activating a task blocks the main thread if the due date needs to be read and the configuration is stale</action>
-			<action type="add" issue="167" dev="rombert">[Core] Need to manually sync task to enable creation of sub tasks</action>
-			<action type="add" issue="168" dev="rombert">[Core] Custom fields are not created when creating a sub-task</action>
 		</release>
 	</body>
 </document>
