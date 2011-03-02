@@ -7,10 +7,16 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 public class MantisRepositoryConfiguration {
 
     private static final String SUPPORTS_SUBTASKS = "supports_subtasks";
+    private static final String USE_RICH_TEXT_EDITOR = "use_rich_text_editor";
     
     public static boolean isSupportsSubTasks(TaskRepository repository) {
         
-        String property = repository.getProperty(SUPPORTS_SUBTASKS);
+        return getBooleanProperty(repository, SUPPORTS_SUBTASKS);
+    }
+
+    private static boolean getBooleanProperty(TaskRepository repository, String propertyName) {
+
+        String property = repository.getProperty(propertyName);
 
         if (property == null) // default value
             return false;
@@ -38,6 +44,17 @@ public class MantisRepositoryConfiguration {
     	repository.setProperty(IRepositoryConstants.PROPERTY_CATEGORY, IRepositoryConstants.CATEGORY_BUGS);
     	
     	return true;
+    }
+
+
+	public static void setUseRichTextEditor(TaskRepository repository, boolean useRichTextEditor) {
+
+	    repository.setProperty(USE_RICH_TEXT_EDITOR, String.valueOf(useRichTextEditor));
+        
+    }
+    public static boolean isUseRichTextEditor(TaskRepository repository) {
+
+        return getBooleanProperty(repository, USE_RICH_TEXT_EDITOR);
     }
 
 }

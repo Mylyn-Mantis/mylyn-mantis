@@ -24,7 +24,10 @@ import org.eclipse.mylyn.tasks.core.RepositoryTemplate;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -42,6 +45,8 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String DESCRIPTION = "Enter the path to your repository, for example : http://www.example.com/mantis/\nPlease validate the settings to ensure they are correct.";
 
+    private Button useRichTextEditor;
+
     public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository) {
 
         super(TITLE, DESCRIPTION, taskRepository);
@@ -50,12 +55,12 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         setNeedsTimeZone(false);
         setNeedsValidation(true);
         setNeedsHttpAuth(true);
-        setNeedsAdvanced(false);
+        setNeedsAdvanced(true);
     }
     
     @Override
     protected void createSettingControls(Composite parent) {
-    
+
         super.createSettingControls(parent);
         addRepositoryTemplatesToServerUrlCombo();
     }
@@ -63,6 +68,14 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
     @Override
     protected void createAdditionalControls(final Composite parent) {
 
+        Label downloadAttachmentsLabel = new Label(parent, SWT.NONE);
+        downloadAttachmentsLabel.setText("Use rich text editor (EXPERIMENTAL)");
+        useRichTextEditor = new Button(parent, SWT.CHECK | SWT.LEFT);
+        
+        if ( getRepository() != null )
+            useRichTextEditor.setSelection(MantisRepositoryConfiguration.isUseRichTextEditor(repository));
+        else
+            useRichTextEditor.setSelection(false);
     }
 
     @Override
@@ -100,6 +113,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         super.applyTo(repository);
 
         MantisRepositoryConfiguration.setCategoryIfNotSet(repository);
+        MantisRepositoryConfiguration.setUseRichTextEditor(repository, useRichTextEditor.getSelection());
     }
 
     @Override
