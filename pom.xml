@@ -24,7 +24,7 @@
 		<repository>
 			<id>mylyn</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/mylyn/update-archive/3.4.2/v20100916-0100/e3.4</url>
+			<url>http://download.eclipse.org/mylyn/snapshots/weekly</url>
 		</repository>
 	</repositories>
 
