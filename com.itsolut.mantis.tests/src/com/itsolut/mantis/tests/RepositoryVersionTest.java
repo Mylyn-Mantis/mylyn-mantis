@@ -18,12 +18,6 @@ import com.itsolut.mantis.core.exception.MantisException;
 public class RepositoryVersionTest {
 
 	@Test
-	public void testVersion005Recognized() throws MantisException {
-
-		assertEquals(RepositoryVersion.VERSION_1_1_6_OR_LOWER, RepositoryVersion.fromVersionString("0.0.5"));
-	}
-
-	@Test
 	public void testVersion116Recognized() throws MantisException {
 
 		assertEquals(RepositoryVersion.VERSION_1_1_6_OR_LOWER, RepositoryVersion.fromVersionString("1.1.6"));

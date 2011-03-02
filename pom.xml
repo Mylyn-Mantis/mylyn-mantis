@@ -3,12 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.itsolut.mantis</groupId>
 	<artifactId>parent</artifactId>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>3.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Mylyn Mantis Connector</name>
 	<modules>
 		<module>com.itsolut.mantis.core</module>
 		<module>com.itsolut.mantis.ui</module>
+		<module>com.itsolut.mantis.eclemma</module>
 		<module>com.itsolut.mantis.tests</module>
 		<module>com.itsolut.mantis-feature</module>
 		<module>com.itsolut.mantis-site</module>
@@ -18,7 +19,7 @@
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/eclipse/updates/3.4</url>
+			<url>http://download.eclipse.org/eclipse/updates/3.5</url>
 		</repository>
 		<repository>
 			<id>mylyn</id>
@@ -77,6 +78,65 @@
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>coverage</id>
+			<activation>
+				<property>
+					<name>coverage</name>
+				</property>
+			</activation>
+			<properties>
+				<emma.session.out.file>${project.build.directory}/emma/${project.artifactId}.es</emma.session.out.file>
+				<emma.filter>com.itsolut.mantis.*</emma.filter>
+				<eclemma.instrument.bundles>com.itsolut.mantis.core,com.itsolut.mantis.ui</eclemma.instrument.bundles>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>attach-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>attach-artifact</goal>
+								</goals>
+								<configuration>
+									<artifacts>
+										<artifact>
+											<file>${emma.session.out.file}</file>
+											<type>es</type>
+										</artifact>
+									</artifacts>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+		
+					<plugin>
+						<groupId>org.sonatype.tycho</groupId>
+						<artifactId>maven-osgi-test-plugin</artifactId>
+						<version>${tycho-version}</version>
+						<configuration>
+							<systemProperties combine.children="append">
+								<emma.session.out.file>${emma.session.out.file}</emma.session.out.file>
+								<emma.filter>${emma.filter}</emma.filter>
+								<eclemma.instrument.bundles>${eclemma.instrument.bundles}</eclemma.instrument.bundles>
+							</systemProperties>
+							<frameworkExtensions>
+								<frameworkExtension>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>com.itsolut.mantis.eclemma</artifactId>
+									<version>${project.version}</version>
+								</frameworkExtension>
+							</frameworkExtensions>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

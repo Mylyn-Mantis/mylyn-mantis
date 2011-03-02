@@ -25,9 +25,9 @@ import com.itsolut.mantis.core.exception.MantisException;
 public enum RepositoryVersion {
     
     /**
-     * Versions 0.0.5 or 1.1.x up to 1.1.6
+     * Versions 1.1.x up to 1.1.6
      */
-    VERSION_1_1_6_OR_LOWER("0.0.5 through 1.1.6", EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING)), 
+    VERSION_1_1_6_OR_LOWER("1.1.0 through 1.1.6", EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING)), 
 
     /**
      * Versions 1.1.7 or higher
@@ -73,9 +73,6 @@ public enum RepositoryVersion {
     
     public static RepositoryVersion fromVersionString(String versionString) throws MantisException{
         
-        if ( "0.0.5".equals(versionString))
-            return VERSION_1_1_6_OR_LOWER;
-        
         if ( versionString.startsWith("1.1"))
 			return extractMantisMinorVersion(versionString) > 6 ? VERSION_1_1_7_OR_HIGHER : VERSION_1_1_6_OR_LOWER;
         
@@ -103,9 +100,7 @@ public enum RepositoryVersion {
             
         
         throw new MantisException("Unknown version " + versionString + " .");
-            
     }
-
 
 	private static int extractMantisMinorVersion(String versionString) {
 
@@ -136,7 +131,6 @@ public enum RepositoryVersion {
 		
 		return versionString.substring("1.2.".length()+1);
 	}
-    
 
 	private final EnumSet<RepositoryCapability> capabilities;
 	private final String description;
@@ -146,7 +140,6 @@ public enum RepositoryVersion {
     	this.capabilities = capabilities;
     	this.description = description;
     }
-    
     
     public boolean isHasProperTaskRelations() {
 

@@ -376,22 +376,28 @@ public class MantisCache {
 
         List<String> reporters = new ArrayList<String>();
 
-        for (AccountData accountData : projectUsers)
-            reporters.add(accountData.getName());
+        for (AccountData accountData : projectUsers) {
+            String username = accountData.getName();
+            reporters.add(username);
+            User user = new User(username, accountData.getReal_name(), accountData.getEmail());
+            cacheData.allUsers.put(username, user);
+        }
 
         cacheData.reportersByProjectId.put(projectId, reporters);
-
     }
 
     private void cacheProjectDevelopers(int projectId, AccountData[] projectDevelopers) {
 
         List<String> developers = new ArrayList<String>();
 
-        for (AccountData accountData : projectDevelopers)
-            developers.add(accountData.getName());
+        for (AccountData accountData : projectDevelopers) {
+            String username = accountData.getName();
+            developers.add(username);
+            User user = new User(username, accountData.getReal_name(), accountData.getEmail());
+            cacheData.allUsers.put(username, user);
+        }
 
         cacheData.developersByProjectId.put(projectId, developers);
-
     }
 
     private void cacheReporterThreshold(String stringConfiguration) {
@@ -898,6 +904,11 @@ public class MantisCache {
             throw new MantisException("No reporters for project with id " + projectId + " ");
 
         return reporters.toArray(new String[reporters.size()]);
+    }
+    
+    public User getUserByUserId(String userId) {
+        
+        return cacheData.allUsers.get(userId);
     }
 
     public MantisVersion[] getVersionsByProjectName(String projectName) throws MantisException {

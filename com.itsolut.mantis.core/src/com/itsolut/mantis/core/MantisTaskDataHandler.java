@@ -229,11 +229,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         copyValuesFromTicket(data, ticket);
 
-        addComments(data, ticket);
+        addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
         addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
-        if ( client.isTimeTrackingEnabled(new NullProgressMonitor()))
+        if ( client.isTimeTrackingEnabled(monitor))
             addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
         addOperation(data, ticket, MantisOperation.RESOLVE_AS, client, monitor);
         addOperation(data, ticket, MantisOperation.ASSIGN_TO, client, monitor);
@@ -370,30 +370,35 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
     }
 
-    private void addComments(TaskData data, MantisTicket ticket) {
+    private void addComments(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
         int i = 1;
         if (ticket.getComments() == null)
             return;
         for (MantisComment comment : ticket.getComments()) {
             TaskAttribute attribute = data.getRoot().createAttribute(
                     TaskAttribute.PREFIX_COMMENT + i);
-            TaskCommentMapper taskComment = TaskCommentMapper
-            .createFrom(attribute);
-            String report = comment.getReporter();
-            if (report == null)
-                taskComment.setAuthor(data.getAttributeMapper()
-                        .getTaskRepository().createPerson("unknown"));
-            else
-                taskComment.setAuthor(data.getAttributeMapper()
-                        .getTaskRepository()
-                        .createPerson(comment.getReporter()));
+            TaskCommentMapper taskComment = TaskCommentMapper .createFrom(attribute);
+            taskComment.setAuthor(newPerson(data.getAttributeMapper().getTaskRepository(), comment.getReporter(), client, monitor));
             taskComment.setNumber(i);
+            
             String commentText = comment.getText();
             taskComment.setText(commentText);
             taskComment.setCreationDate(comment.getDateSubmitted());
             taskComment.applyTo(attribute);
             i++;
         }
+    }
+
+    private IRepositoryPerson newPerson(TaskRepository repository, String personId, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+
+        if ( personId == null )
+            return repository.createPerson("unknown");
+        
+        IRepositoryPerson person = repository.createPerson(personId);
+        User user = client.getCache(monitor).getUserByUserId(personId);
+        if ( user != null )
+            person.setName(user.getRealName());
+        return person;
     }
 
     private void createDefaultAttributes(TaskData data,
@@ -458,7 +463,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
-            .setType(TaskAttribute.TYPE_OPERATION);
+                .setType(TaskAttribute.TYPE_OPERATION);
         } catch (MantisException e) {
             throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, null));
         }
