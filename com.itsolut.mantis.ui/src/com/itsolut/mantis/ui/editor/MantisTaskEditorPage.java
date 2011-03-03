@@ -9,7 +9,9 @@ import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 
+import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
@@ -30,6 +32,8 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		Set<TaskEditorPartDescriptor> descriptors = super
 				.createPartDescriptors();
 		
+		final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
+		
 		// expand only on edited tasks
 		final boolean taskIsSubmitted = getModel().getTaskData().getTaskId().length() != 0;
 		
@@ -40,7 +44,11 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				return new MantisStepsToReproducePart(false);
+                if ( useRichTextEditor )
+                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey());
+
+                return new MantisStepsToReproducePart(false);
+
 			}
 		}.setPath(PATH_COMMENTS),
 		     ID_PART_DESCRIPTION);
@@ -49,7 +57,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_ADDITIONALINFO) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-				return new MantisAdditionalInformationPart(false);
+			    
+			    if ( useRichTextEditor )
+			        return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey());
+
+			    return new MantisAdditionalInformationPart(false);
+			    
 			}
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
