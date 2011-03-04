@@ -1,9 +1,8 @@
 package com.itsolut.mantis.ui.editor;
 
-import org.eclipse.mylyn.htmltext.HtmlComposer;
 import org.eclipse.mylyn.internal.tasks.ui.editors.EditorUtil;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -13,7 +12,6 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
     
     private Composite composite;
     private String attributeName;
-    private HtmlComposer composer;
     
     public HtmlTextTaskEditorPart(String partName, String attributeName) {
 
@@ -29,25 +27,16 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
         composite = toolkit.createComposite(section);
         composite.setLayout(EditorUtil.createSectionClientLayout());
 
-        String attributeValue = getTaskData().getRoot().getAttribute(attributeName).getValue();
+        AbstractAttributeEditor attributeEditor = createAttributeEditor(getTaskData().getRoot().getAttribute(attributeName));
         
-        composer = new HtmlComposer(composite, SWT.None);
-        composer.setHtml(attributeValue);
+        attributeEditor.createControl(composite, toolkit);
         
-        composer.getBrowser().setLayoutData(
-                EditorUtil.getTextControlLayoutData(getTaskEditorPage(), composer.getBrowser(), getExpandVertically()));
-        composer.getBrowser().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TREE_BORDER);
+        attributeEditor.getControl().setLayoutData(
+                EditorUtil.getTextControlLayoutData(getTaskEditorPage(), composite, getExpandVertically()));
+        attributeEditor.getControl().setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TREE_BORDER);
         
         toolkit.paintBordersFor(composite);
         section.setClient(composite);
         setSection(toolkit, section);
-    }
-    
-    @Override
-    public void dispose() {
-    
-        super.dispose();
-        
-        composer.dispose();
     }
 }

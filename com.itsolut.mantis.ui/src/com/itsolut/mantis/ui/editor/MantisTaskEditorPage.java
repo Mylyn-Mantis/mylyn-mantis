@@ -4,10 +4,16 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
-import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
-import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
-import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.mylyn.htmltext.HtmlComposer;
+import org.eclipse.mylyn.htmltext.commands.Command;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.ui.editors.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -69,6 +75,46 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 		return descriptors;
 		
+	}
+	
+	@Override
+	protected AttributeEditorFactory createAttributeEditorFactory() {
+
+	    final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
+	    
+	    return new AttributeEditorFactory(getModel(), getTaskRepository(), getEditorSite()) {
+	        
+	        @Override
+	        public AbstractAttributeEditor createEditor(String type, final TaskAttribute taskAttribute) {
+
+	            if ( useRichTextEditor && TaskAttribute.TYPE_LONG_RICH_TEXT.equals(type) && !taskAttribute.getId().equals(MantisAttributeMapper.Attribute.DESCRIPTION.getKey()) )
+	                return new AbstractAttributeEditor(getModel(), taskAttribute) {
+                        
+                        private HtmlComposer composer;
+
+                        @Override
+                        public void createControl(Composite parent, FormToolkit toolkit) {
+                            
+                            composer = new HtmlComposer(parent, SWT.None);
+                            composer.setHtml(getTaskAttribute().getValue());
+
+                            composer.addModifyListener(new ModifyListener() {
+                                
+                                public void modifyText(ModifyEvent e) {
+
+                                    getAttributeMapper().setValue(getTaskAttribute(), composer.getHtml());
+                                    attributeChanged();
+                                    
+                                }
+                            });
+                            
+                            setControl(parent);
+                        }
+                    };
+	            
+	            return super.createEditor(type, taskAttribute);
+	        }
+	    };
 	}
 	
 	private void removeNewCommentPart(Set<TaskEditorPartDescriptor> descriptors) {
