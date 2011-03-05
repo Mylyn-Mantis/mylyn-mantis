@@ -684,10 +684,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     public boolean canInitializeSubTaskData(TaskRepository taskRepository,
     		ITask task) {
         
-        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=337619
-        if ( taskRepository == null )
-            taskRepository = TasksUiPlugin.getRepositoryManager().getRepository(task.getRepositoryUrl());
-        
         return MantisRepositoryConfiguration.isSupportsSubTasks(taskRepository);
     }
     
