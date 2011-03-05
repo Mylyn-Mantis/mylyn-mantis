@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.itsolut.mantis_feature"
-      label="Mylyn Connector: Mantis"
+      label="Mylyn Tasks Connector: Mantis"
       version="3.4.0.qualifier"
       provider-name="ITSOLUT"
       plugin="com.itsolut.mantis.ui">
 
    <description>
-      Mylyn connector for Mantis.
+      The Mylyn connector for MantisBT allows you to manage your bugs straight from Eclipse. Supported features include creating and updating tasks, synchronizing tasks, commenting and uploading and downloading attachments.
    </description>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -215,7 +215,6 @@ litigation.
 
    <requires>
       <import feature="org.eclipse.mylyn_feature" version="3.5.0" match="compatible"/>
-
       <import plugin="org.eclipse.mylyn.commons.net" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.mylyn.commons.soap" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.mylyn.commons.ui" version="3.5.0" match="compatible"/>

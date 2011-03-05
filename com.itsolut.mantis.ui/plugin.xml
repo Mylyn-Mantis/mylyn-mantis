@@ -19,11 +19,6 @@
    <repositoryMigrator
          class="com.itsolut.mantis.ui.internal.MantisRepositoryMigrator">
    </repositoryMigrator>
-<!--      <taskListFactory
-            class="com.itsolut.mantis.ui.tasklist.MantisTaskListFactory"
-            id="com.itsolut.mantis.ui.tasklist.MantisTaskList"
-            name="Mantis Externalizer"/>
- -->
    </extension>
    <extension
          point="org.eclipse.mylyn.tasks.core.templates">
@@ -48,7 +43,4 @@
             id="com.itsolut.mantis.ui.pageFactory">
       </pageFactory>            
    </extension>
-   <extension
-       point="org.eclipse.mylyn.tasks.ui.projectLinkProviders">
- </extension>
 </plugin>
