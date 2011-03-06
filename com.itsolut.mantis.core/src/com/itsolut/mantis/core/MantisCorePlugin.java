@@ -22,7 +22,6 @@ package com.itsolut.mantis.core;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Dictionary;
 import java.util.Locale;
 
 import org.apache.axis.AxisFault;
@@ -67,16 +66,9 @@ public class MantisCorePlugin extends Plugin {
 
     public static String getVersionString() {
         
-        // XXX: unable to use getVersion()
-        // [ERROR] Version version = MantisCorePlugin.getDefault().getBundle().getVersion();
-        // [ERROR] ^^^^^^^^^^
-        // [ERROR] The method getVersion() is undefined for the type Bundle
-        // [ERROR] -> [Help 1]
+        Version version = getDefault().getBundle().getVersion();
 
-        Dictionary<?,?> headers = MantisCorePlugin.getDefault().getBundle().getHeaders();
-        String rawVersion = String.valueOf(headers.get("Bundle-Version"));
-
-        return rawVersion.substring(0, rawVersion.lastIndexOf('.'));
+        return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
     }
     
     @Override
