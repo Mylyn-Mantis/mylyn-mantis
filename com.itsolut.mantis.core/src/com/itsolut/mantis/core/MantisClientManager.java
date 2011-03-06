@@ -24,7 +24,9 @@ package com.itsolut.mantis.core;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.internal.tasks.core.*;
@@ -42,6 +44,13 @@ import com.itsolut.mantis.core.exception.MantisException;
  */
 public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
 
+    private static final Set<String> NO_REFRESH_PROPERTIES = new HashSet<String>();
+    static {
+        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP);
+        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_LABEL);
+        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_CATEGORY);
+    }
+    
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private PersistedState state;
 
@@ -122,6 +131,9 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         // do not refresh on sync time stamp updates, it's not relevant
         if (delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP))
+            return;
+        
+        if ( delta.getType() == Type.OFFLINE)
             return;
 
         clientByUrl.remove(repository.getRepositoryUrl());
