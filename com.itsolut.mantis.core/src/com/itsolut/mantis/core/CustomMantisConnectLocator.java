@@ -12,7 +12,6 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.WebUtil;
 import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
-import org.osgi.framework.Version;
 
 import com.itsolut.mantis.binding.MantisConnectLocator;
 
