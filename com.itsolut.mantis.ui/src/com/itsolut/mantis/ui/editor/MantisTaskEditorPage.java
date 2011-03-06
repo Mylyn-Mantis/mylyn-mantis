@@ -97,6 +97,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                             
                             composer = new HtmlComposer(parent, SWT.None);
                             composer.setHtml(getTaskAttribute().getValue());
+                            GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
 
                             composer.addModifyListener(new ModifyListener() {
                                 
@@ -108,7 +109,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                                 }
                             });
                             
-                            setControl(parent);
+                            setControl(composer.getBrowser());
                         }
                     };
 	            
