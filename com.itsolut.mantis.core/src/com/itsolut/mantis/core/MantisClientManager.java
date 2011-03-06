@@ -130,7 +130,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         MantisCorePlugin.debug(NLS.bind("repositoryChanged : {0} , {1} = {2} .",  new Object[] {repository.getUrl(), delta.getType(), delta.getKey()}), null);
 
         // do not refresh on sync time stamp updates, it's not relevant
-        if (delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP))
+        if (delta.getType() == Type.PROPERTY && NO_REFRESH_PROPERTIES.contains(delta.getKey()))
             return;
         
         if ( delta.getType() == Type.OFFLINE)
