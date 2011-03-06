@@ -103,9 +103,14 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                                 
                                 public void modifyText(ModifyEvent e) {
 
-                                    getAttributeMapper().setValue(getTaskAttribute(), composer.getHtml());
-                                    attributeChanged();
+                                    String initialValue = getAttributeMapper().getValue(getTaskAttribute());
                                     
+                                    getAttributeMapper().setValue(getTaskAttribute(), composer.getHtml());
+
+                                    // we have no way of knowing when the initial value is set
+                                    // so we consider that 'empty' means that no value is set
+                                    if ( initialValue != "")
+                                        attributeChanged();
                                 }
                             });
                             
