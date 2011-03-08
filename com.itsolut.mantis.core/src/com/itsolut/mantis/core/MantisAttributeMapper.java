@@ -35,6 +35,11 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
      */
     public static final String TASK_ATTRIBUTE_RELATIONSHIP_IDS = "mantis.task.relationship_ids";
     
+    /**
+     * The repository priority id
+     */
+    public static final String TASK_ATTRIBUTE_PRIORITY_ID = "mantis.task.priority_id";
+    
     private final static Set<Key> _taskRelationKeys = EnumSet.of(Key.PARENT_OF, Key.CHILD_OF, Key.RELATED_TO, Key.HAS_DUPLICATE, Key.DUPLICATE_OF);
 
     private static final long serialVersionUID = 5333211422546115138L;

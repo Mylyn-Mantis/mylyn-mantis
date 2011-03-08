@@ -13,8 +13,9 @@ package com.itsolut.mantis.core;
 
 import java.util.*;
 
-import org.eclipse.core.runtime.*;
-import org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.*;
@@ -228,6 +229,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Date lastChanged = ticket.getLastChanged();
 
         copyValuesFromTicket(data, ticket);
+        
+        // copy priority id
+        TaskAttribute priorityAttribute = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PRIORITY.getKey());
+        String priority = ticket.getValue(Key.PRIORITY);
+        int priorityId = client.getCache(monitor).getPriorityAsObjectRef(priority).getId().intValue();
+        priorityAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID, String.valueOf(priorityId));
 
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);

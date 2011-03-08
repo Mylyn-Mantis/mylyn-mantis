@@ -10,13 +10,13 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 
-import com.itsolut.mantis.binding.ObjectRef;
-import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
+
 
 final class MantisTaskMapper extends TaskMapper {
 
@@ -35,19 +35,22 @@ final class MantisTaskMapper extends TaskMapper {
     public PriorityLevel getPriorityLevel() {
         
         try {
-            ObjectRef priorityObject = getClient().getCache(new NullProgressMonitor()).getPriorityAsObjectRef(getPriority());
-
-            return MantisPriorityLevel.fromPriorityId(priorityObject.getId().intValue());
-        } catch (MantisException e) {
+            
+            TaskAttribute priorityAttribute = getTaskData().getRoot().getAttribute(Attribute.PRIORITY.getKey());
+            
+            String value = priorityAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID);
+            
+            if ( value == null ) // task was not refreshed since we introduced the new meta attribute
+                return null;
+            
+            int priorityLevel = Integer.parseInt(value);
+            
+            return MantisPriorityLevel.fromPriorityId(priorityLevel);
+            
+        } catch (NumberFormatException e) {
             
             MantisCorePlugin.warn("Failed getting the priority level", e);
             return null;
         }
-    }
-
-    private IMantisClient getClient() throws MantisException {
-
-        return MantisCorePlugin.getDefault().getConnector().getClientManager().getRepository(
-                getTaskData().getAttributeMapper().getTaskRepository());
     }
 }
