@@ -29,7 +29,7 @@
 	</repositories>
 
 	<properties>
-		<tycho-version>0.10.0</tycho-version>
+		<tycho-version>0.11.0</tycho-version>
 	</properties>
 
 	<build>
