@@ -25,6 +25,8 @@ public class ProjectAttachmentData  implements java.io.Serializable {
 
     private org.apache.axis.types.URI download_url;
 
+    private java.math.BigInteger user_id;
+
     public ProjectAttachmentData() {
     }
 
@@ -36,7 +38,8 @@ public class ProjectAttachmentData  implements java.io.Serializable {
            java.math.BigInteger size,
            java.lang.String content_type,
            java.util.Calendar date_submitted,
-           org.apache.axis.types.URI download_url) {
+           org.apache.axis.types.URI download_url,
+           java.math.BigInteger user_id) {
            this.id = id;
            this.filename = filename;
            this.title = title;
@@ -45,6 +48,7 @@ public class ProjectAttachmentData  implements java.io.Serializable {
            this.content_type = content_type;
            this.date_submitted = date_submitted;
            this.download_url = download_url;
+           this.user_id = user_id;
     }
 
 
@@ -207,6 +211,26 @@ public class ProjectAttachmentData  implements java.io.Serializable {
         this.download_url = download_url;
     }
 
+
+    /**
+     * Gets the user_id value for this ProjectAttachmentData.
+     * 
+     * @return user_id
+     */
+    public java.math.BigInteger getUser_id() {
+        return user_id;
+    }
+
+
+    /**
+     * Sets the user_id value for this ProjectAttachmentData.
+     * 
+     * @param user_id
+     */
+    public void setUser_id(java.math.BigInteger user_id) {
+        this.user_id = user_id;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ProjectAttachmentData)) return false;
@@ -242,7 +266,10 @@ public class ProjectAttachmentData  implements java.io.Serializable {
               this.date_submitted.equals(other.getDate_submitted()))) &&
             ((this.download_url==null && other.getDownload_url()==null) || 
              (this.download_url!=null &&
-              this.download_url.equals(other.getDownload_url())));
+              this.download_url.equals(other.getDownload_url()))) &&
+            ((this.user_id==null && other.getUser_id()==null) || 
+             (this.user_id!=null &&
+              this.user_id.equals(other.getUser_id())));
         __equalsCalc = null;
         return _equals;
     }
@@ -277,6 +304,9 @@ public class ProjectAttachmentData  implements java.io.Serializable {
         }
         if (getDownload_url() != null) {
             _hashCode += getDownload_url().hashCode();
+        }
+        if (getUser_id() != null) {
+            _hashCode += getUser_id().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -341,6 +371,13 @@ public class ProjectAttachmentData  implements java.io.Serializable {
         elemField.setFieldName("download_url");
         elemField.setXmlName(new javax.xml.namespace.QName("", "download_url"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("user_id");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "user_id"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

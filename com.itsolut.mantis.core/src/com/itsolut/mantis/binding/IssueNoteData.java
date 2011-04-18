@@ -23,6 +23,10 @@ public class IssueNoteData  implements java.io.Serializable {
 
     private java.math.BigInteger time_tracking;
 
+    private java.math.BigInteger note_type;
+
+    private java.lang.String note_attr;
+
     public IssueNoteData() {
     }
 
@@ -33,7 +37,9 @@ public class IssueNoteData  implements java.io.Serializable {
            com.itsolut.mantis.binding.ObjectRef view_state,
            java.util.Calendar date_submitted,
            java.util.Calendar last_modified,
-           java.math.BigInteger time_tracking) {
+           java.math.BigInteger time_tracking,
+           java.math.BigInteger note_type,
+           java.lang.String note_attr) {
            this.id = id;
            this.reporter = reporter;
            this.text = text;
@@ -41,6 +47,8 @@ public class IssueNoteData  implements java.io.Serializable {
            this.date_submitted = date_submitted;
            this.last_modified = last_modified;
            this.time_tracking = time_tracking;
+           this.note_type = note_type;
+           this.note_attr = note_attr;
     }
 
 
@@ -183,6 +191,46 @@ public class IssueNoteData  implements java.io.Serializable {
         this.time_tracking = time_tracking;
     }
 
+
+    /**
+     * Gets the note_type value for this IssueNoteData.
+     * 
+     * @return note_type
+     */
+    public java.math.BigInteger getNote_type() {
+        return note_type;
+    }
+
+
+    /**
+     * Sets the note_type value for this IssueNoteData.
+     * 
+     * @param note_type
+     */
+    public void setNote_type(java.math.BigInteger note_type) {
+        this.note_type = note_type;
+    }
+
+
+    /**
+     * Gets the note_attr value for this IssueNoteData.
+     * 
+     * @return note_attr
+     */
+    public java.lang.String getNote_attr() {
+        return note_attr;
+    }
+
+
+    /**
+     * Sets the note_attr value for this IssueNoteData.
+     * 
+     * @param note_attr
+     */
+    public void setNote_attr(java.lang.String note_attr) {
+        this.note_attr = note_attr;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof IssueNoteData)) return false;
@@ -215,7 +263,13 @@ public class IssueNoteData  implements java.io.Serializable {
               this.last_modified.equals(other.getLast_modified()))) &&
             ((this.time_tracking==null && other.getTime_tracking()==null) || 
              (this.time_tracking!=null &&
-              this.time_tracking.equals(other.getTime_tracking())));
+              this.time_tracking.equals(other.getTime_tracking()))) &&
+            ((this.note_type==null && other.getNote_type()==null) || 
+             (this.note_type!=null &&
+              this.note_type.equals(other.getNote_type()))) &&
+            ((this.note_attr==null && other.getNote_attr()==null) || 
+             (this.note_attr!=null &&
+              this.note_attr.equals(other.getNote_attr())));
         __equalsCalc = null;
         return _equals;
     }
@@ -247,6 +301,12 @@ public class IssueNoteData  implements java.io.Serializable {
         }
         if (getTime_tracking() != null) {
             _hashCode += getTime_tracking().hashCode();
+        }
+        if (getNote_type() != null) {
+            _hashCode += getNote_type().hashCode();
+        }
+        if (getNote_attr() != null) {
+            _hashCode += getNote_attr().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -304,6 +364,20 @@ public class IssueNoteData  implements java.io.Serializable {
         elemField.setFieldName("time_tracking");
         elemField.setXmlName(new javax.xml.namespace.QName("", "time_tracking"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("note_type");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "note_type"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("note_attr");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "note_attr"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

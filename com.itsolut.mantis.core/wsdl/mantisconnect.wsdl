@@ -48,6 +48,7 @@
    <xsd:element name="content_type" type="xsd:string" minOccurs="0"/>
    <xsd:element name="date_submitted" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="download_url" type="xsd:anyURI" minOccurs="0"/>
+   <xsd:element name="user_id" type="xsd:integer" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="AttachmentDataArray">
@@ -67,6 +68,7 @@
    <xsd:element name="content_type" type="xsd:string" minOccurs="0"/>
    <xsd:element name="date_submitted" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="download_url" type="xsd:anyURI" minOccurs="0"/>
+   <xsd:element name="user_id" type="xsd:integer" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="ProjectAttachmentDataArray">
@@ -99,6 +101,8 @@
    <xsd:element name="date_submitted" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="last_modified" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="time_tracking" type="xsd:integer" minOccurs="0"/>
+   <xsd:element name="note_type" type="xsd:integer" minOccurs="0"/>
+   <xsd:element name="note_attr" type="xsd:string" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="IssueNoteDataArray">
@@ -206,6 +210,7 @@
    <xsd:element name="date_order" type="xsd:dateTime" minOccurs="0"/>
    <xsd:element name="description" type="xsd:string" minOccurs="0"/>
    <xsd:element name="released" type="xsd:boolean" minOccurs="0"/>
+   <xsd:element name="obsolete" type="xsd:boolean" minOccurs="0"/>
   </xsd:all>
  </xsd:complexType>
  <xsd:complexType name="ProjectVersionDataArray">

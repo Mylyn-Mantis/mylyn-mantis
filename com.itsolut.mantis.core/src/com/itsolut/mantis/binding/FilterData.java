@@ -7,6 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
+@SuppressWarnings({"serial", "unused", "rawtypes"})
 public class FilterData  implements java.io.Serializable {
     private java.math.BigInteger id;
 

@@ -7,6 +7,7 @@
 
 package com.itsolut.mantis.binding;
 
+@SuppressWarnings({"serial", "unused", "rawtypes", "unchecked"})
 public class MantisConnectBindingStub extends org.apache.axis.client.Stub implements com.itsolut.mantis.binding.MantisConnectPortType {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
