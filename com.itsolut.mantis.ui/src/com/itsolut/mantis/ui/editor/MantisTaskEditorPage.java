@@ -124,13 +124,13 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                                     
                                     getAttributeMapper().setValue(getTaskAttribute(), newValue);
 
-                                    boolean attributeChanged = oldValue != "" && !(newValue.equals(oldValue)); 
+                                    boolean attributeChanged = !newValue.equals(oldValue); 
                                     
                                     MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue , attributeChanged}), new RuntimeException());
                                     
-                                    
-                                    // we have no way of knowing when the initial value is set
-                                    // so we consider that 'empty' means that no value is set
+                                    // HtmlText 0.7.0 does not properly fire change events
+                                    // 340938: Spurious change events fired by the HtmlComposer
+                                   // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
                                     if ( attributeChanged  )
                                         attributeChanged();
                                 }
