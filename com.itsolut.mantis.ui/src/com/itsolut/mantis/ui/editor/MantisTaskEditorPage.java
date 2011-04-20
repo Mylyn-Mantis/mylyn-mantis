@@ -4,20 +4,27 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.mylyn.htmltext.HtmlComposer;
+import org.eclipse.mylyn.htmltext.events.NodeSelectionEvent;
+import org.eclipse.mylyn.htmltext.listener.NodeSelectionChangeListener;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.editors.*;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
+import com.itsolut.mantis.ui.editor.actions.*;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
@@ -108,11 +115,45 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                         private HtmlComposer composer;
 
                         @Override
-                        public void createControl(Composite parent, FormToolkit toolkit) {
+                        public void createControl(final Composite parent, FormToolkit toolkit) {
+                            
+                            
+                            CoolBar coolbar = new CoolBar(parent, SWT.NONE);
+                            GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+                            coolbar.setLayoutData(gd);
+
+//                            coolbar.addListener(SWT.Resize, new Listener() {
+//                                public void handleEvent(Event event) {
+//                                    parent.getShell().layout();
+//                                }
+//                            });
+                            
+                            ToolBar menu = new ToolBar(coolbar, SWT.HORIZONTAL | SWT.FLAT);
+                            ToolBarManager manager = new ToolBarManager(menu);
+                            CoolItem item = new CoolItem(coolbar, SWT.NONE);
+                            item.setControl(menu);
                             
                             composer = new HtmlComposer(parent, SWT.None);
+                            
+                            manager.add(new BoldAction(composer));
+                            manager.add(new ItalicAction(composer));
+                            manager.add(new UnderlineAction(composer));
+                            manager.add(new Separator());
+                            manager.add(new BulletlistAction(composer));
+                            manager.add(new NumlistAction(composer));
+                            
+                            manager.update(true);
+                            
                             composer.setHtml(getTaskAttribute().getValue());
                             GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
+                            
+                            composer.addNodeSelectionChangeListener(new NodeSelectionChangeListener() {
+                                
+                                public void selectedNodeChanged(NodeSelectionEvent event) {
+                            
+                                    MantisCorePlugin.debug("Selected html changed : " + event.getSelectedHtml(), null);
+                                }
+                            });
 
                             composer.addModifyListener(new ModifyListener() {
                                 
