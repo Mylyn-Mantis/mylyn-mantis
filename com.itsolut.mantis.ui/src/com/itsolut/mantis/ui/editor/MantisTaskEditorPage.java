@@ -122,12 +122,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                             GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
                             coolbar.setLayoutData(gd);
 
-//                            coolbar.addListener(SWT.Resize, new Listener() {
-//                                public void handleEvent(Event event) {
-//                                    parent.getShell().layout();
-//                                }
-//                            });
-                            
                             ToolBar menu = new ToolBar(coolbar, SWT.HORIZONTAL | SWT.FLAT);
                             ToolBarManager manager = new ToolBarManager(menu);
                             CoolItem item = new CoolItem(coolbar, SWT.NONE);
@@ -146,14 +140,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                             
                             composer.setHtml(getTaskAttribute().getValue());
                             GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
-                            
-                            composer.addNodeSelectionChangeListener(new NodeSelectionChangeListener() {
-                                
-                                public void selectedNodeChanged(NodeSelectionEvent event) {
-                            
-                                    MantisCorePlugin.debug("Selected html changed : " + event.getSelectedHtml(), null);
-                                }
-                            });
 
                             composer.addModifyListener(new ModifyListener() {
                                 
