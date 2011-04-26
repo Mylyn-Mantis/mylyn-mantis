@@ -135,6 +135,8 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                             manager.add(new Separator());
                             manager.add(new BulletlistAction(composer));
                             manager.add(new NumlistAction(composer));
+                            manager.add(new Separator());
+                            manager.add(new PreformatAction(composer));
                             
                             manager.update(true);
                             

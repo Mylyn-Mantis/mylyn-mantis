@@ -24,7 +24,7 @@ import org.eclipse.mylyn.htmltext.commands.basicstyle.ItalicCommand;
 public class ItalicAction extends AbstractCommandWrapper {
 
 	public ItalicAction(HtmlComposer composer) {
-		super("", IAction.AS_CHECK_BOX, composer); //$NON-NLS-1$
+		super("Italic", IAction.AS_CHECK_BOX, composer); //$NON-NLS-1$
 		setImageDescriptor(ImageDescriptor.createFromImage(images.get(19)));
 
 	}
