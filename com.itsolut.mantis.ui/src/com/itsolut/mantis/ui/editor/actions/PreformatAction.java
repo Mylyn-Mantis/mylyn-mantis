@@ -3,7 +3,6 @@ package com.itsolut.mantis.ui.editor.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.mylyn.htmltext.HtmlComposer;
 import org.eclipse.mylyn.htmltext.commands.Command;
-import org.eclipse.mylyn.htmltext.commands.formatting.PreformatCommand;
 
 import com.itsolut.mantis.ui.internal.MantisImages;
 
