@@ -24,9 +24,7 @@ package com.itsolut.mantis.core;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.internal.tasks.core.*;
@@ -40,17 +38,10 @@ import com.itsolut.mantis.core.exception.MantisException;
 /**
  * Caches {@link IMantisClient} objects.
  * 
- * @author Steffen Pingel
+ * @author Robert Mutneanu
  */
 public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
 
-    private static final Set<String> NO_REFRESH_PROPERTIES = new HashSet<String>();
-    static {
-        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_SYNCTIMESTAMP);
-        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_LABEL);
-        NO_REFRESH_PROPERTIES.add(IRepositoryConstants.PROPERTY_CATEGORY);
-    }
-    
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private PersistedState state;
 
@@ -123,19 +114,20 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         TaskRepository repository = event.getRepository();
         TaskRepositoryDelta delta = event.getDelta();
-
+        
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
         
         MantisCorePlugin.debug(NLS.bind("repositoryChanged : {0} , {1} = {2} .",  new Object[] {repository.getUrl(), delta.getType(), delta.getKey()}), null);
 
-        // do not refresh on sync time stamp updates, it's not relevant
-        if (delta.getType() == Type.PROPERTY && NO_REFRESH_PROPERTIES.contains(delta.getKey()))
+        boolean credentialsChanged = delta.getType() == Type.CREDENTIALS;
+        boolean urlChanged = delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_URL);
+
+        if ( !credentialsChanged && !urlChanged )
             return;
         
-        if ( delta.getType() == Type.OFFLINE)
-            return;
-
+        MantisCorePlugin.debug(NLS.bind("Clearing repository state; credentialsChanged: {0}, urlChanged: {1}", credentialsChanged, urlChanged), null);
+        
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());
 
@@ -149,6 +141,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
     public void repositoryUrlChanged(TaskRepository repository, String oldUrl) {
 
+        // handled in repositoryChanged
     }
 
     private static class PersistedState implements Serializable {
