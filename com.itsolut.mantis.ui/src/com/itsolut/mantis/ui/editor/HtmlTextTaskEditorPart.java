@@ -1,6 +1,7 @@
 package com.itsolut.mantis.ui.editor;
 
 import org.eclipse.mylyn.internal.tasks.ui.editors.EditorUtil;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.swt.widgets.Composite;
@@ -8,29 +9,37 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import com.itsolut.mantis.core.MantisCorePlugin;
+
 public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
     
     private Composite composite;
     private String attributeName;
     private int style = ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED;
     
-    public HtmlTextTaskEditorPart(String partName, String attributeName) {
+    public HtmlTextTaskEditorPart(String partName, String attributeName, boolean expandedByDefault) {
 
         setPartName(partName);
-        this.attributeName = attributeName; 
+        this.attributeName = attributeName;
+        if ( !expandedByDefault )
+            collapse();
         
     }
     
     @Override
     public void createControl(Composite parent, FormToolkit toolkit) {
         
-
+        TaskAttribute attribute = getTaskData().getRoot().getAttribute(attributeName);
+        
+        if ( getModel().hasIncomingChanges(attribute))
+            expand();
+        
         Section section = createSection(parent, toolkit, style);
 
         composite = toolkit.createComposite(section);
         composite.setLayout(EditorUtil.createSectionClientLayout());
 
-        AbstractAttributeEditor attributeEditor = createAttributeEditor(getTaskData().getRoot().getAttribute(attributeName));
+        AbstractAttributeEditor attributeEditor = createAttributeEditor(attribute);
         
         attributeEditor.createControl(composite, toolkit);
         
@@ -44,13 +53,13 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
      
     }
     
-    public void collapse() {
-
+    private void collapse() {
+        
         style = style & ~ExpandableComposite.EXPANDED;
     }
     
-    public void expand() {
+    private void expand() {
         
-        style = style | ~ExpandableComposite.EXPANDED;
+        style = style | ExpandableComposite.EXPANDED;
     }
 }

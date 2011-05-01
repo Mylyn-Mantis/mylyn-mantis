@@ -53,11 +53,8 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-                if ( useRichTextEditor ) {
-                    HtmlTextTaskEditorPart editorPart = new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey());
-                    editorPart.collapse();
-                    return editorPart;
-                }
+                if ( useRichTextEditor )
+                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey(), false);
                     
                 return new MantisStepsToReproducePart(false);
 
@@ -70,12 +67,8 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			@Override
 			public AbstractTaskEditorPart createPart() {
 			    
-			    if ( useRichTextEditor ) {
-			        HtmlTextTaskEditorPart editorPart = new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey());
-			        editorPart.collapse();
-                    return editorPart;
-			        
-			    }
+			    if ( useRichTextEditor )
+                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey(), false);
 
 			    return new MantisAdditionalInformationPart(false);
 			    
@@ -108,7 +101,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
             @Override
             public AbstractTaskEditorPart createPart() {
                 
-                return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.DESCRIPTION.toString(), MantisAttributeMapper.Attribute.DESCRIPTION.getKey());
+                return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.DESCRIPTION.toString(), MantisAttributeMapper.Attribute.DESCRIPTION.getKey(), true);
             }
         }.setPath(PATH_COMMENTS), toInsertAfter);
     }
