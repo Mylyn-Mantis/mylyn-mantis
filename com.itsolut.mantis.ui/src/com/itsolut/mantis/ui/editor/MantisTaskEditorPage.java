@@ -82,10 +82,16 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 	
 	private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
 	    
-        for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
+	    String toInsertAfter = null;
+        
+	    for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
             TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
-            if (taskEditorPartDescriptor.getId().equals(ID_PART_DESCRIPTION))
+            if (taskEditorPartDescriptor.getId().equals(ID_PART_DESCRIPTION)) {
                 it.remove();
+                break;
+            } else {
+                toInsertAfter = taskEditorPartDescriptor.getId();
+            }
         }
         
         return insertPart(descriptors, new TaskEditorPartDescriptor(ID_PART_DESCRIPTION) {
@@ -94,7 +100,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                 
                 return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.DESCRIPTION.toString(), MantisAttributeMapper.Attribute.DESCRIPTION.getKey());
             }
-        }.setPath(PATH_COMMENTS), ID_PART_ATTACHMENTS);
+        }.setPath(PATH_COMMENTS), toInsertAfter);
     }
 
     @Override
@@ -176,12 +182,20 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 	protected Set<TaskEditorPartDescriptor> insertPart(Set<TaskEditorPartDescriptor> originalDescriptors, TaskEditorPartDescriptor newDescriptor, String insertAfterId ) {
 		
 	    Set<TaskEditorPartDescriptor> newDescriptors = new LinkedHashSet<TaskEditorPartDescriptor>();
+	    
+	    boolean added = false;
+	    
 		for (TaskEditorPartDescriptor taskEditorPartDescriptor : originalDescriptors) {
 			newDescriptors.add(taskEditorPartDescriptor);
 			if (taskEditorPartDescriptor.getId().equals(insertAfterId)) {
 				newDescriptors.add(newDescriptor);
+				added = true;
+				break;
 			}
 		}
+		
+		if ( !added )
+		    throw new IllegalArgumentException("Did not find a part with id " + insertAfterId + " to insert the newDescriptor after");
 		
 		return newDescriptors;
 	}
