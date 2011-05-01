@@ -53,9 +53,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
 			@Override
 			public AbstractTaskEditorPart createPart() {
-                if ( useRichTextEditor )
-                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey());
-
+                if ( useRichTextEditor ) {
+                    HtmlTextTaskEditorPart editorPart = new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey());
+                    editorPart.collapse();
+                    return editorPart;
+                }
+                    
                 return new MantisStepsToReproducePart(false);
 
 			}
@@ -67,8 +70,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			@Override
 			public AbstractTaskEditorPart createPart() {
 			    
-			    if ( useRichTextEditor )
-			        return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey());
+			    if ( useRichTextEditor ) {
+			        HtmlTextTaskEditorPart editorPart = new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey());
+			        editorPart.collapse();
+                    return editorPart;
+			        
+			    }
 
 			    return new MantisAdditionalInformationPart(false);
 			    
@@ -76,11 +83,14 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
 		
+		logDescriptors(descriptors);
+		
 		return descriptors;
 		
 	}
 	
-	private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
+
+    private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
 	    
 	    String toInsertAfter = null;
         
@@ -164,7 +174,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                                     
                                     // HtmlText 0.7.0 does not properly fire change events
                                     // 340938: Spurious change events fired by the HtmlComposer
-                                   // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
+                                    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
                                     if ( attributeChanged  )
                                         attributeChanged();
                                 }
@@ -190,7 +200,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			if (taskEditorPartDescriptor.getId().equals(insertAfterId)) {
 				newDescriptors.add(newDescriptor);
 				added = true;
-				break;
 			}
 		}
 		
@@ -199,5 +208,18 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 		return newDescriptors;
 	}
-	
+
+    private void logDescriptors(Set<TaskEditorPartDescriptor> descriptors) {
+        
+        StringBuilder output = new StringBuilder();
+        
+        for ( TaskEditorPartDescriptor descriptor : descriptors )
+            output.append(descriptor.getId()).append(" - ").append(descriptor.getPath()).append('\n');
+        
+        output.deleteCharAt(output.length() - 1);
+        
+        MantisCorePlugin.debug("Generated descriptor list : " + output, null);
+        
+    }
+
 }

@@ -12,17 +12,20 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
     
     private Composite composite;
     private String attributeName;
+    private int style = ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED;
     
     public HtmlTextTaskEditorPart(String partName, String attributeName) {
 
         setPartName(partName);
         this.attributeName = attributeName; 
+        
     }
     
     @Override
     public void createControl(Composite parent, FormToolkit toolkit) {
+        
 
-        Section section = createSection(parent, toolkit, ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
+        Section section = createSection(parent, toolkit, style);
 
         composite = toolkit.createComposite(section);
         composite.setLayout(EditorUtil.createSectionClientLayout());
@@ -38,5 +41,16 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
         toolkit.paintBordersFor(composite);
         section.setClient(composite);
         setSection(toolkit, section);
+     
+    }
+    
+    public void collapse() {
+
+        style = style & ~ExpandableComposite.EXPANDED;
+    }
+    
+    public void expand() {
+        
+        style = style | ~ExpandableComposite.EXPANDED;
     }
 }
