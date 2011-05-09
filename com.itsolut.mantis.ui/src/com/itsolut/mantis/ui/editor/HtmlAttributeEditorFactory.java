@@ -101,12 +101,6 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
 
             setControl(composer.getBrowser());
         }
-
-        @Override
-        protected void decorateIncoming(Color color) {
-            
-            composer.getParent().setBackground(color);
-        }
     }
 
     private final boolean _useRichTextEditor;
