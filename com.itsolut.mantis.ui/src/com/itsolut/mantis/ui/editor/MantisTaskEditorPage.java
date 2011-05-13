@@ -4,16 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.mylyn.htmltext.HtmlComposer;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.editors.*;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -47,8 +38,8 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			@Override
 			public AbstractTaskEditorPart createPart() {
                 if ( useRichTextEditor )
-                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey());
-
+                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.toString(), MantisAttributeMapper.Attribute.STEPS_TO_REPRODUCE.getKey(), false);
+                    
                 return new MantisStepsToReproducePart(false);
 
 			}
@@ -61,7 +52,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 			public AbstractTaskEditorPart createPart() {
 			    
 			    if ( useRichTextEditor )
-			        return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey());
+                    return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.ADDITIONAL_INFO.toString(), MantisAttributeMapper.Attribute.ADDITIONAL_INFO.getKey(), false);
 
 			    return new MantisAdditionalInformationPart(false);
 			    
@@ -69,25 +60,34 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
 		
+		logDescriptors(descriptors);
+		
 		return descriptors;
 		
 	}
 	
-	private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
+
+    private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
 	    
-        for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
+	    String toInsertAfter = null;
+        
+	    for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
             TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
-            if (taskEditorPartDescriptor.getId().equals(ID_PART_DESCRIPTION))
+            if (taskEditorPartDescriptor.getId().equals(ID_PART_DESCRIPTION)) {
                 it.remove();
+                break;
+            } else {
+                toInsertAfter = taskEditorPartDescriptor.getId();
+            }
         }
         
         return insertPart(descriptors, new TaskEditorPartDescriptor(ID_PART_DESCRIPTION) {
             @Override
             public AbstractTaskEditorPart createPart() {
                 
-                return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.DESCRIPTION.toString(), MantisAttributeMapper.Attribute.DESCRIPTION.getKey());
+                return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.DESCRIPTION.toString(), MantisAttributeMapper.Attribute.DESCRIPTION.getKey(), true);
             }
-        }.setPath(PATH_COMMENTS), ID_PART_ATTACHMENTS);
+        }.setPath(PATH_COMMENTS), toInsertAfter);
     }
 
     @Override
@@ -95,67 +95,40 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
 	    final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
 	    
-	    return new AttributeEditorFactory(getModel(), getTaskRepository(), getEditorSite()) {
-	        
-	        @Override
-	        public AbstractAttributeEditor createEditor(String type, final TaskAttribute taskAttribute) {
-
-	            if ( useRichTextEditor && TaskAttribute.TYPE_LONG_RICH_TEXT.equals(type) && 
-	                    !taskAttribute.getId().equals(MantisAttributeMapper.Attribute.NEW_COMMENT.getKey()) &&
-	                    !taskAttribute.getId().equals(TaskAttribute.COMMENT_TEXT))
-	                return new AbstractAttributeEditor(getModel(), taskAttribute) {
-                        
-                        private HtmlComposer composer;
-
-                        @Override
-                        public void createControl(Composite parent, FormToolkit toolkit) {
-                            
-                            composer = new HtmlComposer(parent, SWT.None);
-                            composer.setHtml(getTaskAttribute().getValue());
-                            GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
-
-                            composer.addModifyListener(new ModifyListener() {
-                                
-                                public void modifyText(ModifyEvent e) {
-
-                                    String oldValue = getAttributeMapper().getValue(getTaskAttribute());
-                                    
-                                    String newValue = composer.getHtml();
-                                    
-                                    getAttributeMapper().setValue(getTaskAttribute(), newValue);
-
-                                    boolean attributeChanged = oldValue != "" && !(newValue.equals(oldValue)); 
-                                    
-                                    MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue , attributeChanged}), new RuntimeException());
-                                    
-                                    
-                                    // we have no way of knowing when the initial value is set
-                                    // so we consider that 'empty' means that no value is set
-                                    if ( attributeChanged  )
-                                        attributeChanged();
-                                }
-                            });
-                            
-                            setControl(composer.getBrowser());
-                        }
-                    };
-	            
-	            return super.createEditor(type, taskAttribute);
-	        }
-	    };
+	    return new HtmlAttributeEditorFactory(getModel(), getTaskRepository(), getEditorSite(), useRichTextEditor);
 	}
     
 	protected Set<TaskEditorPartDescriptor> insertPart(Set<TaskEditorPartDescriptor> originalDescriptors, TaskEditorPartDescriptor newDescriptor, String insertAfterId ) {
 		
 	    Set<TaskEditorPartDescriptor> newDescriptors = new LinkedHashSet<TaskEditorPartDescriptor>();
+	    
+	    boolean added = false;
+	    
 		for (TaskEditorPartDescriptor taskEditorPartDescriptor : originalDescriptors) {
 			newDescriptors.add(taskEditorPartDescriptor);
 			if (taskEditorPartDescriptor.getId().equals(insertAfterId)) {
 				newDescriptors.add(newDescriptor);
+				added = true;
 			}
 		}
 		
+		if ( !added )
+		    throw new IllegalArgumentException("Did not find a part with id " + insertAfterId + " to insert the newDescriptor after");
+		
 		return newDescriptors;
 	}
-	
+
+    private void logDescriptors(Set<TaskEditorPartDescriptor> descriptors) {
+        
+        StringBuilder output = new StringBuilder();
+        
+        for ( TaskEditorPartDescriptor descriptor : descriptors )
+            output.append(descriptor.getId()).append(" - ").append(descriptor.getPath()).append('\n');
+        
+        output.deleteCharAt(output.length() - 1);
+        
+        MantisCorePlugin.debug("Generated descriptor list : " + output, null);
+        
+    }
+
 }

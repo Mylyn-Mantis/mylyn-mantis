@@ -552,7 +552,7 @@ public class MantisCache {
         filters.add(addDefaultFilters(projectId));
 
         for (FilterData filter : projectFilters)
-            filters.add(new MantisProjectFilter(filter.getName(), filter.getId().intValue()));
+            filters.add(new MantisProjectFilter(filter.getName(), filter.getId().intValue(), filter.getUrl()));
 
         cacheData.projectFiltersById.put(projectId, filters);
 

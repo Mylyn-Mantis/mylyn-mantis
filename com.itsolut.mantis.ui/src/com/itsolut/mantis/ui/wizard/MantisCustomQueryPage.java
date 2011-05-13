@@ -19,7 +19,9 @@ import static com.itsolut.mantis.ui.util.MantisUIUtil.newEnhancedFilteredTree;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -102,6 +104,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     protected Button updateRepository;
 
     private EnhancedFilteredTree tree;
+
+    private final Map<FilterKey, String> filterKeyToUrl = new HashMap<FilterKey, String>();
 
     public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query) {
 
@@ -280,27 +284,27 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
      */
     private IRunnableContext getRunnableContext() {
 
-    	
-    	// we trust the search container to always have a runnable context
-    	if ( getSearchContainer() != null )
-    		return getSearchContainer().getRunnableContext();
-    	
+        // we trust the search container to always have a runnable context
+        if (getSearchContainer() != null)
+            return getSearchContainer().getRunnableContext();
+
         // task #155 : when 'New query' is invoked from the the repositories page the shell is not visible
-        final boolean[] shellVisibleHolder = new boolean[] { false } ;
-        
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				if  ( getShell() != null )
-					shellVisibleHolder[0] = getShell().isVisible();
-			}
-		});
-        
-		IRunnableContext container = getContainer();
-        
-		// only get the platform service if the shell is invisible or the container is null
-        if ( !shellVisibleHolder[0] || container == null )
-        	container = PlatformUI.getWorkbench().getProgressService();
-        
+        final boolean[] shellVisibleHolder = new boolean[] { false };
+
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+
+                if (getShell() != null)
+                    shellVisibleHolder[0] = getShell().isVisible();
+            }
+        });
+
+        IRunnableContext container = getContainer();
+
+        // only get the platform service if the shell is invisible or the container is null
+        if (!shellVisibleHolder[0] || container == null)
+            container = PlatformUI.getWorkbench().getProgressService();
+
         return container;
     }
 
@@ -312,12 +316,11 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
                     .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
             final IMantisClient client = connector.getClientManager().getRepository(repository);
-            
 
             CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
 
                 public void run(IProgressMonitor monitor) throws CoreException {
-            
+
                     try {
                         projects.addAll(client.getCache(monitor).getProjects());
                     } catch (MantisException e) {
@@ -354,13 +357,17 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         MantisSearch search = MantisUtils.getMantisSearch(query);
 
         tree.getViewer().setSelection(new StructuredSelection(cache.getProjectByName(search.getProjectName())));
-        
-        for (MantisProjectFilter pd : cache.getProjectFilters(getSelectedProject().getValue()))
+
+        int selectedProjectId = getSelectedProject().getValue();
+
+        for (MantisProjectFilter pd : cache.getProjectFilters(selectedProjectId)) {
             filterCombo.add(pd.getName());
+            filterKeyToUrl.put(new FilterKey(selectedProjectId, pd.getName()), pd.getUrl());
+        }
 
         filterCombo.setText(search.getFilterName());
         searchLimit.setText(String.valueOf(search.getLimit()));
-        
+
     }
 
     private void createTitleGroup(Composite control) {
@@ -444,7 +451,8 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     @Override
     public void applyTo(IRepositoryQuery query) {
 
-        query.setSummary(this.getQueryTitle());
+        query.setSummary(getQueryTitle());
+        query.setUrl(filterKeyToUrl.get(new FilterKey(getSelectedProject().getValue(), filterCombo.getText()))); // possibly null
         query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
         query.setAttribute(IMantisClient.PROJECT_NAME, getSelectedProject().getName());
         query.setAttribute(IMantisClient.FILTER_NAME, filterCombo.getText());
@@ -467,8 +475,11 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             if (getSelectedProject() == null)
                 return;
 
-            for (MantisProjectFilter pd : cache.getProjectFilters(getSelectedProject().getValue()))
+            int selectedProjectId = getSelectedProject().getValue();
+            for (MantisProjectFilter pd : cache.getProjectFilters(selectedProjectId)) {
                 filterCombo.add(pd.getName());
+                filterKeyToUrl.put(new FilterKey(selectedProjectId, pd.getName()), pd.getUrl());
+            }
 
             if (valueToSet != null)
                 filterCombo.setText(valueToSet);
@@ -489,6 +500,50 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             getContainer().updateButtons();
 
         setPageComplete(isPageComplete());
+    }
+
+    private static final class FilterKey {
+
+        private int projectId;
+        private String filterName;
+
+        public FilterKey(int projectId, String filterName) {
+
+            this.projectId = projectId;
+            this.filterName = filterName;
+        }
+
+        @Override
+        public int hashCode() {
+
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((filterName == null) ? 0 : filterName.hashCode());
+            result = prime * result + projectId;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            FilterKey other = (FilterKey) obj;
+            if (filterName == null) {
+                if (other.filterName != null)
+                    return false;
+            } else if (!filterName.equals(other.filterName))
+                return false;
+            if (projectId != other.projectId)
+                return false;
+            return true;
+        }
+        
+        
     }
 
 }

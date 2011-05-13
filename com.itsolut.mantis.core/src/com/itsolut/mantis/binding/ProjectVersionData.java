@@ -21,6 +21,8 @@ public class ProjectVersionData  implements java.io.Serializable {
 
     private java.lang.Boolean released;
 
+    private java.lang.Boolean obsolete;
+
     public ProjectVersionData() {
     }
 
@@ -30,13 +32,15 @@ public class ProjectVersionData  implements java.io.Serializable {
            java.math.BigInteger project_id,
            java.util.Calendar date_order,
            java.lang.String description,
-           java.lang.Boolean released) {
+           java.lang.Boolean released,
+           java.lang.Boolean obsolete) {
            this.id = id;
            this.name = name;
            this.project_id = project_id;
            this.date_order = date_order;
            this.description = description;
            this.released = released;
+           this.obsolete = obsolete;
     }
 
 
@@ -159,6 +163,26 @@ public class ProjectVersionData  implements java.io.Serializable {
         this.released = released;
     }
 
+
+    /**
+     * Gets the obsolete value for this ProjectVersionData.
+     * 
+     * @return obsolete
+     */
+    public java.lang.Boolean getObsolete() {
+        return obsolete;
+    }
+
+
+    /**
+     * Sets the obsolete value for this ProjectVersionData.
+     * 
+     * @param obsolete
+     */
+    public void setObsolete(java.lang.Boolean obsolete) {
+        this.obsolete = obsolete;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ProjectVersionData)) return false;
@@ -188,7 +212,10 @@ public class ProjectVersionData  implements java.io.Serializable {
               this.description.equals(other.getDescription()))) &&
             ((this.released==null && other.getReleased()==null) || 
              (this.released!=null &&
-              this.released.equals(other.getReleased())));
+              this.released.equals(other.getReleased()))) &&
+            ((this.obsolete==null && other.getObsolete()==null) || 
+             (this.obsolete!=null &&
+              this.obsolete.equals(other.getObsolete())));
         __equalsCalc = null;
         return _equals;
     }
@@ -217,6 +244,9 @@ public class ProjectVersionData  implements java.io.Serializable {
         }
         if (getReleased() != null) {
             _hashCode += getReleased().hashCode();
+        }
+        if (getObsolete() != null) {
+            _hashCode += getObsolete().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -266,6 +296,13 @@ public class ProjectVersionData  implements java.io.Serializable {
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("released");
         elemField.setXmlName(new javax.xml.namespace.QName("", "released"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("obsolete");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "obsolete"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

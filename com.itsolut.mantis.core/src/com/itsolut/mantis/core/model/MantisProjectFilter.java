@@ -14,11 +14,31 @@ package com.itsolut.mantis.core.model;
  * @author Chris Hane
  */
 public class MantisProjectFilter extends MantisTicketAttribute {
-	
-	private static final long serialVersionUID = 2392206019389785563L;
 
-	public MantisProjectFilter(String name, int value) {
-		super(name, value);
-	}
-	
+    private static final long serialVersionUID = 2392206019389785563L;
+
+    private String url;
+
+    public MantisProjectFilter(String name, int value) {
+
+        this(name, value, null);
+    }
+
+    public MantisProjectFilter(String name, int value, String url) {
+
+        super(name, value);
+
+        this.url = url;
+    }
+
+    public String getUrl() {
+
+        return url;
+    }
+
+    public void setUrl(String url) {
+
+        this.url = url;
+    }
+
 }
