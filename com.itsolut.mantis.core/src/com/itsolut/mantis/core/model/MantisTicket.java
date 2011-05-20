@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**
@@ -56,6 +57,8 @@ public class MantisTicket {
         PROJECT("project"),
         PROJECTION("projection"),
         REPORTER("reporter"),
+        MONITORS("monitors"),
+        ADD_SELF_TO_MONITORS("add_self_to_monitors"),
         REPRODUCIBILITY("reproducibility"),
         RESOLUTION("resolution"),
         SEVERITY("severity"),
@@ -120,6 +123,8 @@ public class MantisTicket {
     private List<MantisAttachment> attachments;
 
     private List<MantisRelationship> relationships;
+    
+    private List<AccountData> monitors;
     
     private Map<String, String> customFieldValues = new HashMap<String, String>(); 
 
@@ -269,6 +274,14 @@ public class MantisTicket {
         relationships.add(relationship);
     }
 
+    public void addMonitor(AccountData accountData) {
+        
+        if ( monitors == null )
+            monitors = new ArrayList<AccountData>();
+        
+        monitors.add(accountData);
+    }
+    
     public MantisRelationship[] getRelationships() {
         return relationships != null ? relationships.toArray(new MantisRelationship[relationships.size()]) : new MantisRelationship[0];
     }
@@ -277,7 +290,11 @@ public class MantisTicket {
         return (attachments != null) ? attachments.toArray(new MantisAttachment[0]) : null;
     }
 
-
+    public AccountData[] getMonitors() {
+        
+        return monitors != null ? monitors.toArray(new AccountData[monitors.size()]) : null; 
+    }
+    
     @Override
     public String toString() {
     

@@ -93,6 +93,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
         PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
+        MONITORS(Key.MONITORS, "Monitors\n(select to remove)", TaskAttribute.TYPE_MULTI_SELECT, true, false),
+        ADD_SELF_TO_MONITORS(Key.ADD_SELF_TO_MONITORS, "Monitor issue", TaskAttribute.TYPE_BOOLEAN, true, false),
         REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -226,6 +228,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     	taskAttributeToMantisAttributes.put(TaskAttribute.USER_ASSIGNED, Attribute.ASSIGNED_TO);
     	taskAttributeToMantisAttributes.put(TaskAttribute.TASK_KEY, Attribute.ID);
     	taskAttributeToMantisAttributes.put(TaskAttribute.USER_REPORTER, Attribute.REPORTER);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.USER_CC, Attribute.MONITORS);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.ADD_SELF_CC, Attribute.ADD_SELF_TO_MONITORS);
     	taskAttributeToMantisAttributes.put(TaskAttribute.STATUS, Attribute.STATUS);
     	taskAttributeToMantisAttributes.put(TaskAttribute.RESOLUTION, Attribute.RESOLUTION);
     	taskAttributeToMantisAttributes.put(TaskAttribute.PRIORITY, Attribute.PRIORITY);

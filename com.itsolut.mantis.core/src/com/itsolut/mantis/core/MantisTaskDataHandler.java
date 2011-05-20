@@ -21,6 +21,7 @@ import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.osgi.util.NLS;
 
+import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
@@ -239,6 +240,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
+        addMonitors(data, ticket);
         addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
         if ( client.isTimeTrackingEnabled(monitor))
             addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
@@ -252,7 +254,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
-	private void copyValuesFromTicket(TaskData data, MantisTicket ticket) {
+    private void copyValuesFromTicket(TaskData data, MantisTicket ticket) {
 
 		boolean warningLogged = false;
 		
@@ -344,6 +346,18 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
+    private void addMonitors(TaskData data, MantisTicket ticket) {
+
+        if ( ticket.getMonitors() == null )
+            return;
+        
+        TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
+        
+        for ( AccountData monitor: ticket.getMonitors() )
+            attribute.putOption(monitor.getName(), monitor.getReal_name());
+    }
+
+    
     private void addAttachments(TaskRepository repository,
             TaskData data, MantisTicket ticket) {
 
@@ -467,6 +481,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
             createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
             createAttribute(data, MantisAttributeMapper.Attribute.COMPLETION_DATE);
+            createAttribute(data, MantisAttributeMapper.Attribute.ADD_SELF_TO_MONITORS);
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
