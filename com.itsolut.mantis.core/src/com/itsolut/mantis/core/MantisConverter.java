@@ -126,9 +126,13 @@ public class MantisConverter {
             for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
                 ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
         
-        if ( issue.getMonitors() != null )
+        if ( issue.getMonitors() != null ) {
+            List<AccountData> monitors = new ArrayList<AccountData>();
             for ( AccountData issueMonitor : issue.getMonitors() )
-                ticket.addMonitor(issueMonitor);
+                monitors.add(issueMonitor);
+            
+            ticket.setMonitors(monitors);
+        }
         
         MantisCorePlugin.debug(NLS.bind("Converted IssueData to {0}." , ticket), null);
 

@@ -363,6 +363,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         if ( ticket.getMonitors() == null )
             return;
         
+        createAttribute(data, MantisAttributeMapper.Attribute.ADD_SELF_TO_MONITORS);
+        
+        if ( ticket.getMonitors().length == 0 )
+            return;
+        
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
         List<String> originalValues = new ArrayList<String>();
         
@@ -499,7 +504,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
             createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
             createAttribute(data, MantisAttributeMapper.Attribute.COMPLETION_DATE);
-            createAttribute(data, MantisAttributeMapper.Attribute.ADD_SELF_TO_MONITORS);
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()

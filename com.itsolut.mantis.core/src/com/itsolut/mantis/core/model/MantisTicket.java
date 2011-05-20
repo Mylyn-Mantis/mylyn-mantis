@@ -274,14 +274,6 @@ public class MantisTicket {
         relationships.add(relationship);
     }
 
-    public void addMonitor(AccountData accountData) {
-        
-        if ( monitors == null )
-            monitors = new ArrayList<AccountData>();
-        
-        monitors.add(accountData);
-    }
-    
     public MantisRelationship[] getRelationships() {
         return relationships != null ? relationships.toArray(new MantisRelationship[relationships.size()]) : new MantisRelationship[0];
     }
@@ -290,6 +282,20 @@ public class MantisTicket {
         return (attachments != null) ? attachments.toArray(new MantisAttachment[0]) : null;
     }
 
+    public void setMonitors(List<AccountData> monitors) {
+
+        this.monitors = monitors;
+    }
+    
+    /**
+     * Returns the list of monitors
+     * 
+     *  <p>If the list is <code>null</code>, the repository does not support getting and setting
+     *  issue monitors. If the repository supports monitors but the issue has none, the list
+     *  will be empty.</p>
+     * 
+     * @return the list of monitors, possibly <code>null</code>
+     */
     public AccountData[] getMonitors() {
         
         return monitors != null ? monitors.toArray(new AccountData[monitors.size()]) : null; 
@@ -314,4 +320,8 @@ public class MantisTicket {
         
         return toString.toString();
     }
+
+    /**
+     * @param monitors2
+     */
 }
