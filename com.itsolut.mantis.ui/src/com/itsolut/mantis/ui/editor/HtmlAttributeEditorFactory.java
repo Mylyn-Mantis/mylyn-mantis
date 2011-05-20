@@ -32,6 +32,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.*;
 
 /**
@@ -74,7 +75,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             
             manager.update(true);
             
-            composer.setHtml(getTaskAttribute().getValue());
+            composer.setHtml(HtmlFormatter.convertToDisplayHtml(getTaskAttribute().getValue()));
             GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
 
             composer.addModifyListener(new ModifyListener() {
@@ -83,7 +84,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
 
                     String oldValue = getAttributeMapper().getValue(getTaskAttribute());
                     
-                    String newValue = composer.getHtml();
+                    String newValue = HtmlFormatter.convertFromDisplayHtml(composer.getHtml());
                     
                     getAttributeMapper().setValue(getTaskAttribute(), newValue);
 
