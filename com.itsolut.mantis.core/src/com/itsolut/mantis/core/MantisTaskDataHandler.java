@@ -353,8 +353,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
         
+        // real name can be null if the user did not specify it
         for ( AccountData monitor: ticket.getMonitors() )
-            attribute.putOption(monitor.getName(), monitor.getReal_name());
+            attribute.putOption(monitor.getName(), monitor.getReal_name() == null ? monitor.getName() : monitor.getReal_name());
     }
 
     
