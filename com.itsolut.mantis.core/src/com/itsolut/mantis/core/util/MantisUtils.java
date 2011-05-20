@@ -20,8 +20,12 @@ package com.itsolut.mantis.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
@@ -154,4 +158,24 @@ public class MantisUtils {
         }
     }
 
+    public static String toCsvString(List<String> values) {
+        
+        if ( values == null || values.isEmpty() )
+            return "";
+        
+        StringBuilder builder = new StringBuilder();
+        for ( String value : values )
+            builder.append(value).append(',');
+        builder.deleteCharAt(builder.length() - 1);
+
+        return builder.toString();
+    }
+
+    public static List<String> fromCsvString(String value) {
+
+        if ( isEmpty(value) )
+            return new ArrayList<String>();
+        
+        return new ArrayList<String>(Arrays.asList(value.split(",")));
+    }   
 }

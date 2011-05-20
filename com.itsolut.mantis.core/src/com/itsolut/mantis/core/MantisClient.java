@@ -23,6 +23,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
 
+import com.itsolut.mantis.binding.AccountData;
 import com.itsolut.mantis.binding.IssueData;
 import com.itsolut.mantis.binding.IssueHeaderData;
 import com.itsolut.mantis.binding.IssueNoteData;
@@ -135,11 +136,14 @@ public class MantisClient implements IMantisClient {
 
         int projectId = issueData.getProject().getId().intValue();
         cache.registerAdditionalReporter(projectId, issueData.getReporter());
-        if (issueData.getNotes() == null)
-            return;
-
-        for (IssueNoteData note : issueData.getNotes())
-            cache.registerAdditionalReporter(projectId, note.getReporter());
+        
+        if (issueData.getNotes() != null)
+            for (IssueNoteData note : issueData.getNotes())
+                cache.registerAdditionalReporter(projectId, note.getReporter());
+        
+        if ( issueData.getMonitors() != null )
+            for ( AccountData issueMonitor : issueData.getMonitors() )
+                cache.registerAdditionalReporter(projectId, issueMonitor);
 
     }
 
@@ -211,7 +215,7 @@ public class MantisClient implements IMantisClient {
         
         ind.setDate_submitted(MantisUtils.transform(new Date()));
         ind.setLast_modified(MantisUtils.transform(new Date()));
-        ind.setReporter(MantisConverter.convert(getUserName()));
+        ind.setReporter(MantisConverter.convert(getUserName(), cache));
         ind.setTime_tracking(BigInteger.valueOf(timeTracking));
         ind.setText(comment);
 

@@ -185,9 +185,22 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Collection<TaskAttribute> attributes = data.getRoot().getAttributes().values();
 
         for (TaskAttribute attribute : attributes) {
-
+            
             if ( attribute.getId().equals("project")) {
                 ticket.putValue(attribute.getId(), attribute.getValue());
+                continue;
+            }
+            
+            if ( attribute.getId().equals(Key.MONITORS.toString())) {
+                
+                List<String> monitorsToRemove = new ArrayList<String>(attribute.getValues());
+                List<String> originalMonitors = MantisUtils.fromCsvString(attribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS));
+                
+                originalMonitors.removeAll(monitorsToRemove);
+                
+                System.out.println("Final value of monitors is " + originalMonitors);
+                
+                ticket.putValue(attribute.getId(), MantisUtils.toCsvString(originalMonitors));
                 continue;
             }
 
@@ -196,7 +209,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             ticket.putValue(attribute.getId(), attribute.getValue());
         }
-
 
         return ticket;
     }
@@ -352,12 +364,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             return;
         
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
+        List<String> originalValues = new ArrayList<String>();
         
         for ( AccountData issueMonitor: ticket.getMonitors() ) {
             IRepositoryPerson person = newPerson(repository, issueMonitor.getName() , client, monitor);
             attribute.putOption(person.getPersonId(), person.toString());
+            originalValues.add(person.getPersonId());
         }
-            
+        
+        attribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS, MantisUtils.toCsvString(originalValues));
     }
 
     

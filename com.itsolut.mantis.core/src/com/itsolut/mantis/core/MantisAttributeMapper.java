@@ -40,6 +40,8 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
      */
     public static final String TASK_ATTRIBUTE_PRIORITY_ID = "mantis.task.priority_id";
     
+    public static final String TASK_ATTRIBUTE_ORIGINAL_MONITORS = "mantis.task.original_monitors";
+    
     private final static Set<Key> _taskRelationKeys = EnumSet.of(Key.PARENT_OF, Key.CHILD_OF, Key.RELATED_TO, Key.HAS_DUPLICATE, Key.DUPLICATE_OF);
 
     private static final long serialVersionUID = 5333211422546115138L;
@@ -217,6 +219,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     private Map<String, Attribute> taskAttributeToMantisAttributes = new HashMap<String, Attribute>();
 
     public static final String METADATA_SEARCH_ID = "mantis.search.id";
+    
     {
     	taskAttributeToMantisAttributes.put(TaskAttribute.PRODUCT, Attribute.PROJECT);
     	taskAttributeToMantisAttributes.put(TaskAttribute.COMMENT_NEW, Attribute.NEW_COMMENT);

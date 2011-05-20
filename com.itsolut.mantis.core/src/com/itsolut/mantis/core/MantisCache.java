@@ -379,7 +379,7 @@ public class MantisCache {
         for (AccountData accountData : projectUsers) {
             String username = accountData.getName();
             reporters.add(username);
-            User user = new User(username, accountData.getReal_name(), accountData.getEmail());
+            User user = new User(accountData.getId().intValue(), username, accountData.getReal_name(), accountData.getEmail());
             cacheData.allUsers.put(username, user);
         }
 
@@ -393,7 +393,7 @@ public class MantisCache {
         for (AccountData accountData : projectDevelopers) {
             String username = accountData.getName();
             developers.add(username);
-            User user = new User(username, accountData.getReal_name(), accountData.getEmail());
+            User user = new User(accountData.getId().intValue(), username, accountData.getReal_name(), accountData.getEmail());
             cacheData.allUsers.put(username, user);
         }
 
@@ -906,6 +906,7 @@ public class MantisCache {
         return reporters.toArray(new String[reporters.size()]);
     }
     
+    // FIXME: rename to getUserByUsername
     public User getUserByUserId(String userId) {
         
         return cacheData.allUsers.get(userId);
@@ -1043,7 +1044,7 @@ public class MantisCache {
             cacheData.reportersByProjectId.put(projectId, reporters);
         }
         
-        cacheData.allUsers.put(accountData.getName(), new User(accountData.getName(), accountData.getReal_name(), accountData.getEmail()));
+        cacheData.allUsers.put(accountData.getName(), new User(accountData.getId().intValue(), accountData.getName(), accountData.getReal_name(), accountData.getEmail()));
         
 		if (reporters.contains(accountData.getName()))
             return;

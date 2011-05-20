@@ -250,26 +250,45 @@ public class MantisConverter {
         issue.setStatus(cache.getStatusAsObjectRef(ticket.getValue(Key.STATUS)));
 
         if (MantisUtils.isEmpty(ticket.getValue(Key.REPORTER))) {
-            issue.setReporter(convert(username));
+            issue.setReporter(convert(username, cache));
         } else {
-            issue.setReporter(convert(ticket.getValue(Key.REPORTER)));
+            issue.setReporter(convert(ticket.getValue(Key.REPORTER), cache));
         }
 
-        issue.setHandler(convert(ticket.getValue(Key.ASSIGNED_TO)));
+        issue.setHandler(convert(ticket.getValue(Key.ASSIGNED_TO), cache));
         issue.setLast_updated(MantisUtils.transform(new Date()));
 
+        setIssueMonitors(ticket, project, issue, cache, username);
         setCustomFields(ticket, project, issue, cache);
 
         return issue;
     }
-    
-    public static AccountData convert(String username) {
+
+    public static AccountData convert(String username, MantisCache cache) {
         
         AccountData accountData = new AccountData();
         accountData.setName(username);
+        User user = cache.getUserByUserId(username);
+        if ( user != null ) {
+            accountData.setId(BigInteger.valueOf(user.getId()));
+            accountData.setEmail(user.getEmail());
+            accountData.setReal_name(user.getRealName());
+        }
         
         return accountData;
-        
+    }
+
+    private static void setIssueMonitors(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache, String username) {
+
+        boolean addSelf = Boolean.valueOf(ticket.getValue(Key.ADD_SELF_TO_MONITORS));
+        List<String> monitorList = MantisUtils.fromCsvString(ticket.getValue(Key.MONITORS));
+        if ( addSelf && !monitorList.contains(username) )
+            monitorList.add(username);
+
+        List<AccountData> monitors = new ArrayList<AccountData>();
+        for ( String monitorUsername : monitorList )
+            monitors.add(convert(monitorUsername, cache));
+        issue.setMonitors(monitors.toArray(new AccountData[monitors.size()]));
     }
     
     private static void setCustomFields(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache) throws MantisException {
