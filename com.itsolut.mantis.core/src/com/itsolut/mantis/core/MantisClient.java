@@ -134,12 +134,12 @@ public class MantisClient implements IMantisClient {
     private void registerAdditionalReporters(IssueData issueData) {
 
         int projectId = issueData.getProject().getId().intValue();
-        cache.registerAdditionalReporter(projectId, issueData.getReporter().getName());
+        cache.registerAdditionalReporter(projectId, issueData.getReporter());
         if (issueData.getNotes() == null)
             return;
 
         for (IssueNoteData note : issueData.getNotes())
-            cache.registerAdditionalReporter(projectId, note.getReporter().getName());
+            cache.registerAdditionalReporter(projectId, note.getReporter());
 
     }
 

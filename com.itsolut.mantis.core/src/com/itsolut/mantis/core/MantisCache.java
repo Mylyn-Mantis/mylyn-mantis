@@ -1024,10 +1024,10 @@ public class MantisCache {
      * 
      * @param projectId
      *            the project id
-     * @param reporterName
+     * @param accountData
      *            the name of the reporter
      */
-    void registerAdditionalReporter(int projectId, String reporterName) {
+    void registerAdditionalReporter(int projectId, AccountData accountData) {
 
     	// debug for issue #119
     	if ( cacheData.reportersByProjectId == null) {
@@ -1043,12 +1043,12 @@ public class MantisCache {
             cacheData.reportersByProjectId.put(projectId, reporters);
         }
         
+        cacheData.allUsers.put(accountData.getName(), new User(accountData.getName(), accountData.getReal_name(), accountData.getEmail()));
         
-		if (reporters.contains(reporterName))
+		if (reporters.contains(accountData.getName()))
             return;
 
-        reporters.add(reporterName);
-
+        reporters.add(accountData.getName());
     }
 
     boolean dueDateIsEnabled() {
