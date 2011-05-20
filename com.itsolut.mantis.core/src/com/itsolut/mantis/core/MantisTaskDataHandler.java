@@ -240,7 +240,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);
         addRelationships(data, ticket);
-        addMonitors(data, ticket);
+        addMonitors(data, ticket, client, repository, monitor);
         addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
         if ( client.isTimeTrackingEnabled(monitor))
             addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
@@ -346,16 +346,18 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
-    private void addMonitors(TaskData data, MantisTicket ticket) {
+    private void addMonitors(TaskData data, MantisTicket ticket, IMantisClient client, TaskRepository repository, IProgressMonitor monitor) throws MantisException {
 
         if ( ticket.getMonitors() == null )
             return;
         
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
         
-        // real name can be null if the user did not specify it
-        for ( AccountData monitor: ticket.getMonitors() )
-            attribute.putOption(monitor.getName(), monitor.getReal_name() == null ? monitor.getName() : monitor.getReal_name());
+        for ( AccountData issueMonitor: ticket.getMonitors() ) {
+            IRepositoryPerson person = newPerson(repository, issueMonitor.getName() , client, monitor);
+            attribute.putOption(person.getPersonId(), person.toString());
+        }
+            
     }
 
     
