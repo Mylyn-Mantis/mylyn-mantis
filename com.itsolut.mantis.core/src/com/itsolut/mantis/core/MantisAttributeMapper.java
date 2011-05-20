@@ -93,7 +93,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
         PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
-        MONITORS(Key.MONITORS, "Monitors\n(select to remove)", TaskAttribute.TYPE_MULTI_SELECT, true, false),
+        MONITORS(Key.MONITORS, "Monitors:\n(select to remove)", TaskAttribute.TYPE_MULTI_SELECT, true, false),
         ADD_SELF_TO_MONITORS(Key.ADD_SELF_TO_MONITORS, "Monitor issue", TaskAttribute.TYPE_BOOLEAN, true, false),
         REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
