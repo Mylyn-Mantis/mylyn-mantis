@@ -268,7 +268,7 @@ public class MantisConverter {
         
         AccountData accountData = new AccountData();
         accountData.setName(username);
-        User user = cache.getUserByUserId(username);
+        User user = cache.getUserByUsername(username);
         if ( user != null ) {
             accountData.setId(BigInteger.valueOf(user.getId()));
             accountData.setEmail(user.getEmail());

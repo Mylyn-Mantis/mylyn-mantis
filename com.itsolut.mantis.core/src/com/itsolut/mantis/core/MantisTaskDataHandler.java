@@ -434,7 +434,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             return repository.createPerson("unknown");
         
         IRepositoryPerson person = repository.createPerson(personId);
-        User user = client.getCache(monitor).getUserByUserId(personId);
+        User user = client.getCache(monitor).getUserByUsername(personId);
         if ( user != null )
             person.setName(user.getRealName());
         return person;

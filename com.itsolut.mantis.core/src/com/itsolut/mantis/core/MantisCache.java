@@ -905,11 +905,16 @@ public class MantisCache {
 
         return reporters.toArray(new String[reporters.size()]);
     }
-    
-    // FIXME: rename to getUserByUsername
-    public User getUserByUserId(String userId) {
+
+    /**
+     * Returns a user by the specified <tt>userName</tt>
+     * 
+     * @param userName
+     * @return the matching user, possibly <code>null</code>
+     */
+    public User getUserByUsername(String userName) {
         
-        return cacheData.allUsers.get(userId);
+        return cacheData.allUsers.get(userName);
     }
 
     public MantisVersion[] getVersionsByProjectName(String projectName) throws MantisException {
