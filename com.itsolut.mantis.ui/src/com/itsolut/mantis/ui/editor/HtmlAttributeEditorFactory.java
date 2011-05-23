@@ -22,7 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -35,7 +34,12 @@ import org.eclipse.ui.services.IServiceLocator;
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
-import com.itsolut.mantis.ui.editor.actions.*;
+import com.itsolut.mantis.ui.editor.actions.BoldAction;
+import com.itsolut.mantis.ui.editor.actions.BulletlistAction;
+import com.itsolut.mantis.ui.editor.actions.ItalicAction;
+import com.itsolut.mantis.ui.editor.actions.NumlistAction;
+import com.itsolut.mantis.ui.editor.actions.PreformatAction;
+import com.itsolut.mantis.ui.editor.actions.UnderlineAction;
 
 /**
  * @author Robert Munteanu
