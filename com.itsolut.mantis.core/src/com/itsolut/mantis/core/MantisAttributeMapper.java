@@ -107,7 +107,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         TARGET_VERSION(Key.TARGET_VERSION, "Target version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         VIEW_STATE(Key.VIEW_STATE, "View State:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-        NEW_COMMENT(Key.NEW_COMMENT, "new_comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+        NEW_COMMENT(Key.NEW_COMMENT, "New Comment",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
         DUE_DATE(Key.DUE_DATE, "Due date", TaskAttribute.TYPE_DATETIME, false, false),
