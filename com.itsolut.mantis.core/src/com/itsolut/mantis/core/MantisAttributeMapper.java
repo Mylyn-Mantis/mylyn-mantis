@@ -84,11 +84,11 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
      */
     public enum Attribute {
         ID(Key.ID, "<used by search engine>", MantisAttributeMapper.METADATA_SEARCH_ID, true),
-        ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information:",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+        ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
         CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, true, true),
-        DESCRIPTION(Key.DESCRIPTION, "Description:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+        DESCRIPTION(Key.DESCRIPTION, "Description", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ETA(Key.ETA, "ETA:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         LAST_UPDATED(Key.LAST_UPDATED, "Last Modification:", TaskAttribute.TYPE_DATE, true, true),
         PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -101,7 +101,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         RESOLUTION(Key.RESOLUTION, "Resolution:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         SEVERITY(Key.SEVERITY, "Severity:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         STATUS(Key.STATUS, "Status:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-        STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce:", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
+        STEPS_TO_REPRODUCE(Key.STEPS_TO_REPRODUCE, "Steps To Reproduce", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         SUMMARY(Key.SUMMARY, "Summary:", TaskAttribute.TYPE_SHORT_RICH_TEXT, true, false),
         VERSION(Key.VERSION, "Version:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         FIXED_IN(Key.FIXED_IN, "Fixed In:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
