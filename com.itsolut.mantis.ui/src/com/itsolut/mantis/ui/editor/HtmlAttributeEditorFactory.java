@@ -19,11 +19,13 @@ import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
@@ -42,7 +44,6 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
     
     public static final class HtmlAttributeEditor extends AbstractAttributeEditor {
         
-        private HtmlComposer composer;
 
         public HtmlAttributeEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
 
@@ -53,54 +54,69 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
         @Override
         public void createControl(final Composite parent, FormToolkit toolkit) {
             
-            
-            CoolBar coolbar = new CoolBar(parent, SWT.NONE);
-            GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-            coolbar.setLayoutData(gd);
+            Control control;
+            String value = HtmlFormatter.convertToDisplayHtml(getTaskAttribute().getValue());
 
-            ToolBar menu = new ToolBar(coolbar, SWT.HORIZONTAL | SWT.FLAT);
-            ToolBarManager manager = new ToolBarManager(menu);
-            CoolItem item = new CoolItem(coolbar, SWT.NONE);
-            item.setControl(menu);
-            
-            composer = new HtmlComposer(parent, SWT.None);
-            
-            manager.add(new BoldAction(composer));
-            manager.add(new ItalicAction(composer));
-            manager.add(new PreformatAction(composer));
-            manager.add(new UnderlineAction(composer));
-            manager.add(new Separator());
-            manager.add(new BulletlistAction(composer));
-            manager.add(new NumlistAction(composer));
-            
-            manager.update(true);
-            
-            composer.setHtml(HtmlFormatter.convertToDisplayHtml(getTaskAttribute().getValue()));
-            GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
-
-            composer.addModifyListener(new ModifyListener() {
+            if (isReadOnly()) {
                 
-                public void modifyText(ModifyEvent e) {
+                Browser browser = new Browser(parent, SWT.None);
+                GridDataFactory.fillDefaults().applyTo(browser);
+                browser.setText(value);
+                
+                control = browser;
 
-                    String oldValue = getAttributeMapper().getValue(getTaskAttribute());
-                    
-                    String newValue = HtmlFormatter.convertFromDisplayHtml(composer.getHtml());
-                    
-                    getAttributeMapper().setValue(getTaskAttribute(), newValue);
+            } else {
+                
+                CoolBar coolbar = new CoolBar(parent, SWT.NONE);
+                GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+                coolbar.setLayoutData(gd);
 
-                    boolean attributeChanged = !newValue.equals(oldValue); 
-                    
-                    MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue , attributeChanged}), new RuntimeException());
-                    
-                    // HtmlText 0.7.0 does not properly fire change events
-                    // 340938: Spurious change events fired by the HtmlComposer
-                    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
-                    if ( attributeChanged  )
-                        attributeChanged();
-                }
-            });
+                ToolBar menu = new ToolBar(coolbar, SWT.HORIZONTAL | SWT.FLAT);
+                ToolBarManager manager = new ToolBarManager(menu);
+                CoolItem item = new CoolItem(coolbar, SWT.NONE);
+                item.setControl(menu);
 
-            setControl(composer.getBrowser());
+                final HtmlComposer composer = new HtmlComposer(parent, SWT.None);
+
+                manager.add(new BoldAction(composer));
+                manager.add(new ItalicAction(composer));
+                manager.add(new PreformatAction(composer));
+                manager.add(new UnderlineAction(composer));
+                manager.add(new Separator());
+                manager.add(new BulletlistAction(composer));
+                manager.add(new NumlistAction(composer));
+
+                manager.update(true);
+
+                composer.setHtml(value);
+                GridDataFactory.fillDefaults().applyTo(composer.getBrowser());
+
+                composer.addModifyListener(new ModifyListener() {
+
+                    public void modifyText(ModifyEvent e) {
+
+                        String oldValue = getAttributeMapper().getValue(getTaskAttribute());
+
+                        String newValue = HtmlFormatter.convertFromDisplayHtml(composer.getHtml());
+
+                        getAttributeMapper().setValue(getTaskAttribute(), newValue);
+
+                        boolean attributeChanged = !newValue.equals(oldValue);
+
+                        MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue, attributeChanged }), new RuntimeException());
+
+                        // HtmlText 0.7.0 does not properly fire change events
+                        // 340938: Spurious change events fired by the HtmlComposer
+                        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
+                        if (attributeChanged)
+                            attributeChanged();
+                    }
+                });
+
+                control = composer.getBrowser();
+            }
+            
+            setControl(control);
         }
     }
 
@@ -120,8 +136,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
     public AbstractAttributeEditor createEditor(String type, final TaskAttribute taskAttribute) {
         
         if ( _useRichTextEditor && TaskAttribute.TYPE_LONG_RICH_TEXT.equals(type) && 
-                !taskAttribute.getId().equals(MantisAttributeMapper.Attribute.NEW_COMMENT.getKey()) &&
-                !taskAttribute.getId().equals(TaskAttribute.COMMENT_TEXT)) {
+                !taskAttribute.getId().equals(MantisAttributeMapper.Attribute.NEW_COMMENT.getKey())) {
 
             return new HtmlAttributeEditor(_model, taskAttribute);
         }
