@@ -12,6 +12,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.mylyn.htmltext.HtmlComposer;
+import org.eclipse.mylyn.htmltext.commands.GetHtmlCommand;
+import org.eclipse.mylyn.htmltext.commands.SetHtmlCommand;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
@@ -49,6 +51,8 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
     public static final class HtmlAttributeEditor extends AbstractAttributeEditor {
         
 
+        private HtmlComposer composer;
+
         public HtmlAttributeEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
 
             super(manager, taskAttribute);
@@ -80,7 +84,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
                 CoolItem item = new CoolItem(coolbar, SWT.NONE);
                 item.setControl(menu);
 
-                final HtmlComposer composer = new HtmlComposer(parent, SWT.None);
+                composer = new HtmlComposer(parent, SWT.None);
 
                 manager.add(new BoldAction(composer));
                 manager.add(new ItalicAction(composer));
@@ -122,6 +126,18 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             
             setControl(control);
         }
+        
+        public void appendRawText(String rawText) {
+            
+            if ( composer == null )
+                return;
+            
+            String value = (String) composer.executeWithReturn(new GetHtmlCommand());
+            String newValue = value + rawText;
+            SetHtmlCommand command = new SetHtmlCommand();
+            command.setHtml(newValue);
+            composer.execute(command);
+        }
     }
 
     private final boolean _useRichTextEditor;
@@ -139,11 +155,8 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
     @Override
     public AbstractAttributeEditor createEditor(String type, final TaskAttribute taskAttribute) {
         
-        if ( _useRichTextEditor && TaskAttribute.TYPE_LONG_RICH_TEXT.equals(type) && 
-                !taskAttribute.getId().equals(MantisAttributeMapper.Attribute.NEW_COMMENT.getKey())) {
-
+        if ( _useRichTextEditor && TaskAttribute.TYPE_LONG_RICH_TEXT.equals(type) ) 
             return new HtmlAttributeEditor(_model, taskAttribute);
-        }
         
         return super.createEditor(type, taskAttribute);
     }

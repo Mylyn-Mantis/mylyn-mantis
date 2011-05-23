@@ -10,18 +10,20 @@ package com.itsolut.mantis.ui.editor;
 
 import org.eclipse.mylyn.internal.tasks.ui.editors.EditorUtil;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import com.itsolut.mantis.ui.editor.HtmlAttributeEditorFactory.HtmlAttributeEditor;
+
 public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
     
     private Composite composite;
     private String attributeName;
     private int style = ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED;
+    private HtmlAttributeEditor attributeEditor;
     
     public HtmlTextTaskEditorPart(String partName, String attributeName, boolean expandedByDefault) {
 
@@ -45,7 +47,7 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
         composite = toolkit.createComposite(section);
         composite.setLayout(EditorUtil.createSectionClientLayout());
 
-        AbstractAttributeEditor attributeEditor = createAttributeEditor(attribute);
+        attributeEditor = (HtmlAttributeEditor) createAttributeEditor(attribute);
         
         attributeEditor.createControl(composite, toolkit);
         
@@ -69,5 +71,11 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
     private void expand() {
         
         style = style | ExpandableComposite.EXPANDED;
+    }
+
+
+    public void appendRawText(String toAppend) {
+
+        attributeEditor.appendRawText(toAppend);
     }
 }

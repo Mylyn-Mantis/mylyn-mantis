@@ -9,6 +9,7 @@ import org.eclipse.mylyn.tasks.ui.editors.*;
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
+import com.itsolut.mantis.ui.MantisUIPlugin;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
@@ -30,8 +31,10 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		
 		final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
 		
-		if ( useRichTextEditor )
+		if ( useRichTextEditor ) {
 		    descriptors = replaceDescriptionPart(descriptors);
+		    descriptors = replaceNewCommentPart(descriptors);
+		}
 		
 		descriptors = insertPart(descriptors,
 				new TaskEditorPartDescriptor(ID_MANTIS_PART_STEPSTOREPRODUCE) {
@@ -89,6 +92,29 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
             }
         }.setPath(PATH_COMMENTS), toInsertAfter);
     }
+    
+    private Set<TaskEditorPartDescriptor> replaceNewCommentPart(Set<TaskEditorPartDescriptor> descriptors) {
+        
+        String toInsertAfter = null;
+        
+        for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
+            TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
+            if (taskEditorPartDescriptor.getId().equals(ID_PART_NEW_COMMENT)) {
+                it.remove();
+                break;
+            } else {
+                toInsertAfter = taskEditorPartDescriptor.getId();
+            }
+        }
+        
+        return insertPart(descriptors, new TaskEditorPartDescriptor(ID_PART_NEW_COMMENT) {
+            @Override
+            public AbstractTaskEditorPart createPart() {
+                
+                return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.NEW_COMMENT.toString(), MantisAttributeMapper.Attribute.NEW_COMMENT.getKey(), true);
+            }
+        }.setPath(PATH_COMMENTS), toInsertAfter);
+    }
 
     @Override
 	protected AttributeEditorFactory createAttributeEditorFactory() {
@@ -131,4 +157,22 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
         
     }
 
+    @Override
+    public void appendTextToNewComment(String text) {
+    
+        final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
+        
+        if ( !useRichTextEditor ) {
+            
+            super.appendTextToNewComment(text);
+            return;
+        }
+        
+        AbstractTaskEditorPart newCommentPart = getPart(ID_PART_NEW_COMMENT);
+        if ( ! ( newCommentPart instanceof HtmlTextTaskEditorPart ))
+            return;
+        
+        HtmlTextTaskEditorPart editorPart = (HtmlTextTaskEditorPart) newCommentPart;
+        editorPart.appendRawText("<p>" + text + "</p>");
+    }
 }
