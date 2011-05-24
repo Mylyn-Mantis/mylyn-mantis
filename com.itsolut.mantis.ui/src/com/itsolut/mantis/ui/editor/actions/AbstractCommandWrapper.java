@@ -98,10 +98,8 @@ public abstract class AbstractCommandWrapper extends Action implements
 
 	@Override
 	public void run() {
-	    
-	    System.out.println("Executing " + getClass().getSimpleName());
-	    
-		wrappedCommand.execute();
+
+	    wrappedCommand.execute();
 	}
 
 	protected abstract Command getWrappedCommand();
