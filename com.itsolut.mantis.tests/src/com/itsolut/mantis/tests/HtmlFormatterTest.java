@@ -31,6 +31,8 @@ public class HtmlFormatterTest {
 	private static final String INPUT_MIXED = "first\nsecond\n<pre>pre\nformatted</pre>third\nfourth";
 
 	private static final String OUTPUT_MIXED = "first<br/>second<br/><pre>pre\nformatted</pre>third<br/>fourth";
+	
+	private static final String OUTPUT_MIXED_SPACES = "first<br/>second<br/><pre>pre\nformatted</pre>third<br />fourth";
 
 	@Test
 	public void linesHaveBrAppended() {
@@ -64,6 +66,6 @@ public class HtmlFormatterTest {
 	@Test
 	public void linesWithBrBeforeAndAfterPreAreConvertedToNewlines() {
 
-		assertThat(HtmlFormatter.convertFromDisplayHtml(OUTPUT_MIXED), is(INPUT_MIXED));
+		assertThat(HtmlFormatter.convertFromDisplayHtml(OUTPUT_MIXED_SPACES), is(INPUT_MIXED));
 	}
 }
