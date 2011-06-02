@@ -162,7 +162,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
     @Override
     public void appendTextToNewComment(String text) {
-    
+
         final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
         
         if ( !useRichTextEditor ) {
@@ -175,7 +175,10 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
         if ( ! ( newCommentPart instanceof HtmlTextTaskEditorPart ))
             return;
         
+        if ( text == null )
+            text = "";
+        
         HtmlTextTaskEditorPart editorPart = (HtmlTextTaskEditorPart) newCommentPart;
-        editorPart.appendRawText(text + "<br />");
+        editorPart.appendRawText(text.replace("\n", "") + "<br />");
     }
 }
