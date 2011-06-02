@@ -81,4 +81,10 @@ public class HtmlFormatterTest {
 		
 		assertThat(HtmlFormatter.convertFromDisplayHtml(""), is(""));
 	}
+	
+	@Test
+	public void brWithNewLineIsConvertedToPlainNewline() {
+		
+		assertThat(HtmlFormatter.convertFromDisplayHtml("<br/>\n"), is("\n"));
+	}
 }

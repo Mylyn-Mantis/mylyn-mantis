@@ -11,6 +11,8 @@ package com.itsolut.mantis.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.itsolut.mantis.core.MantisCorePlugin;
+
 /**
  * @author Robert Munteanu
  */
@@ -73,13 +75,12 @@ public abstract class HtmlFormatter {
 		}
 
 		
-		
 		return output.toString();
 	}
 	
 	public static String convertFromDisplayHtml(String input) {
 		
-		return input.replaceAll("<br\\s?/>", "\n");
+		return input.replaceAll("<br\\s?/>\\n?", "\n");
 	}
 
 	private static String nl2br(String input, boolean applyFinalBr) {
