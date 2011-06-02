@@ -66,10 +66,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
 		
-		logDescriptors(descriptors);
-		
 		return descriptors;
-		
 	}
 	
 
@@ -147,26 +144,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		return newDescriptors;
 	}
 
-    private void logDescriptors(Set<TaskEditorPartDescriptor> descriptors) {
-        
-        StringBuilder output = new StringBuilder();
-        
-        for ( TaskEditorPartDescriptor descriptor : descriptors )
-            output.append(descriptor.getId()).append(" - ").append(descriptor.getPath()).append('\n');
-        
-        output.deleteCharAt(output.length() - 1);
-        
-        MantisCorePlugin.debug("Generated descriptor list : " + output, null);
-        
-    }
-
     @Override
     public void appendTextToNewComment(String text) {
 
         final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
         
         if ( !useRichTextEditor ) {
-            
             super.appendTextToNewComment(text);
             return;
         }
