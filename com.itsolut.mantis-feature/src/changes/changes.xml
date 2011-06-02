@@ -2,12 +2,11 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.4.1" date="2011-05-13">
-			<action type="add" issue="195" dev="rombert">Html editor not shown for unsubmitted tasks</action>
-			<action type="add" issue="196" dev="rombert">Collapse HTML editors unless interesting</action>
-			<action type="add" issue="197" dev="rombert">Highlight HTML editors with incoming changes</action>
-			<action type="add" issue="200" dev="rombert">Enabling the HTML editor should not clear the configuration</action>
-			<action type="add" issue="006" dev="rombert">Open in browser do not work with queries</action>
+		<release version="3.5.0" date="2011-06-05">
+			<action type="add" issue="201" dev="rombert">Normalise newlines between MantisBT and text editor</action>
+			<action type="add" issue="198" dev="rombert">Enable HTML editing for the new comment part as well</action>
+			<action type="add" issue="199" dev="rombert">Display comments as HTML if html editor is enabled</action>
+			<action type="add" issue="014" dev="rombert">Add Monitor bug option</action>
 		</release>
 	</body>
 </document>
