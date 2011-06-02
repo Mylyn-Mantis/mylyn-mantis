@@ -79,7 +79,7 @@ public abstract class HtmlFormatter {
 	
 	public static String convertFromDisplayHtml(String input) {
 		
-		return input.replaceAll("<br/>", "\n");
+		return input.replaceAll("<br\\s?/>", "\n");
 	}
 
 	private static String nl2br(String input, boolean applyFinalBr) {

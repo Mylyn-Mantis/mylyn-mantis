@@ -24,7 +24,7 @@
 		<repository>
 			<id>mylyn</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/mylyn/archive/3.5.0/v20110316-0100/</url>
+			<url>http://download.eclipse.org/mylyn/snapshots/weekly</url>
 		</repository>
 	</repositories>
 

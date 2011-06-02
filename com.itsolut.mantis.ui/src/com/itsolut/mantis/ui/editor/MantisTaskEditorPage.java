@@ -4,12 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.eclipse.mylyn.tasks.ui.editors.*;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
+import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
+import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
+import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
-import com.itsolut.mantis.ui.MantisUIPlugin;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
@@ -63,10 +66,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		}.setPath(PATH_COMMENTS),
 			ID_MANTIS_PART_STEPSTOREPRODUCE);
 		
-		logDescriptors(descriptors);
-		
 		return descriptors;
-		
 	}
 	
 
@@ -144,26 +144,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		return newDescriptors;
 	}
 
-    private void logDescriptors(Set<TaskEditorPartDescriptor> descriptors) {
-        
-        StringBuilder output = new StringBuilder();
-        
-        for ( TaskEditorPartDescriptor descriptor : descriptors )
-            output.append(descriptor.getId()).append(" - ").append(descriptor.getPath()).append('\n');
-        
-        output.deleteCharAt(output.length() - 1);
-        
-        MantisCorePlugin.debug("Generated descriptor list : " + output, null);
-        
-    }
-
     @Override
     public void appendTextToNewComment(String text) {
-    
+
         final boolean useRichTextEditor = MantisRepositoryConfiguration.isUseRichTextEditor(getModel().getTaskRepository());
         
         if ( !useRichTextEditor ) {
-            
             super.appendTextToNewComment(text);
             return;
         }
@@ -172,7 +158,10 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
         if ( ! ( newCommentPart instanceof HtmlTextTaskEditorPart ))
             return;
         
+        if ( text == null )
+            text = "";
+        
         HtmlTextTaskEditorPart editorPart = (HtmlTextTaskEditorPart) newCommentPart;
-        editorPart.appendRawText("<p>" + text + "</p>");
+        editorPart.appendRawText(text.replace("\n", "") + "<br />");
     }
 }

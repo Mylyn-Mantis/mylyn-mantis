@@ -14,16 +14,19 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.mylyn.htmltext.HtmlComposer;
 import org.eclipse.mylyn.htmltext.commands.GetHtmlCommand;
 import org.eclipse.mylyn.htmltext.commands.SetHtmlCommand;
+import org.eclipse.mylyn.htmltext.configuration.Configuration;
+import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration;
+import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration.EnterMode;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,8 +36,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
 
-import com.itsolut.mantis.core.MantisAttributeMapper;
-import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.BoldAction;
 import com.itsolut.mantis.ui.editor.actions.BulletlistAction;
@@ -83,8 +84,11 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
                 ToolBarManager manager = new ToolBarManager(menu);
                 CoolItem item = new CoolItem(coolbar, SWT.NONE);
                 item.setControl(menu);
+                
+                Configuration configuration = new Configuration();
+                configuration.addConfigurationNode(new EnterModeConfiguration(EnterMode.BR));
 
-                composer = new HtmlComposer(parent, SWT.None);
+                composer = new HtmlComposer(parent, SWT.None, configuration);
 
                 manager.add(new BoldAction(composer));
                 manager.add(new ItalicAction(composer));
@@ -109,14 +113,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
 
                         getAttributeMapper().setValue(getTaskAttribute(), newValue);
 
-                        boolean attributeChanged = !newValue.equals(oldValue);
-
-                        MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue, attributeChanged }), new RuntimeException());
-
-                        // HtmlText 0.7.0 does not properly fire change events
-                        // 340938: Spurious change events fired by the HtmlComposer
-                        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
-                        if (attributeChanged)
+                        if ( !newValue.equals(oldValue) )
                             attributeChanged();
                     }
                 });
@@ -125,6 +122,15 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             }
             
             setControl(control);
+        }
+        
+        @Override
+        protected void decorateIncoming(Color color) {
+        
+            if ( composer != null )
+                composer.setBackground(color);
+            else
+                super.decorateIncoming(color);
         }
         
         public void appendRawText(String rawText) {
