@@ -63,9 +63,22 @@ public class HtmlFormatterTest {
 
 		assertThat(HtmlFormatter.convertFromDisplayHtml(OUTPUT_PRE), is(INPUT_PRE));
 	}
+	
 	@Test
 	public void linesWithBrBeforeAndAfterPreAreConvertedToNewlines() {
 
 		assertThat(HtmlFormatter.convertFromDisplayHtml(OUTPUT_MIXED_SPACES), is(INPUT_MIXED));
+	}
+	
+	@Test
+	public void emptyTextIsConvertedToEmptyHtml() {
+		
+		assertThat(HtmlFormatter.convertToDisplayHtml(""), is(""));
+	}
+	
+	@Test
+	public void emptyHtmlIsConvertedToEmptyText() {
+		
+		assertThat(HtmlFormatter.convertFromDisplayHtml(""), is(""));
 	}
 }
