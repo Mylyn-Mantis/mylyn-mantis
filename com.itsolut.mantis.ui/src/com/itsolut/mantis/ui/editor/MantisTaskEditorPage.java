@@ -176,6 +176,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
             return;
         
         HtmlTextTaskEditorPart editorPart = (HtmlTextTaskEditorPart) newCommentPart;
-        editorPart.appendRawText("<p>" + text + "</p>");
+        editorPart.appendRawText(text + "<br />");
     }
 }
