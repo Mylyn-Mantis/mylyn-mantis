@@ -22,7 +22,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
@@ -37,7 +36,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
 
-import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.BoldAction;
 import com.itsolut.mantis.ui.editor.actions.BulletlistAction;
@@ -115,14 +113,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
 
                         getAttributeMapper().setValue(getTaskAttribute(), newValue);
 
-                        boolean attributeChanged = !newValue.equals(oldValue);
-
-                        MantisCorePlugin.debug(NLS.bind("Attribute {0} changed from {1} to {2}. Change detected : {3}.", new Object[] { getTaskAttribute().getId(), oldValue, newValue, attributeChanged }), new RuntimeException());
-
-                        // HtmlText 0.7.0 does not properly fire change events
-                        // 340938: Spurious change events fired by the HtmlComposer
-                        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=340938
-                        if (attributeChanged)
+                        if ( !newValue.equals(oldValue) )
                             attributeChanged();
                     }
                 });
