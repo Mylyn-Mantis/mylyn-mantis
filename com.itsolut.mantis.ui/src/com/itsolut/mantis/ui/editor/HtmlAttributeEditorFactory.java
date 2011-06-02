@@ -27,6 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -130,6 +131,15 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             }
             
             setControl(control);
+        }
+        
+        @Override
+        protected void decorateIncoming(Color color) {
+        
+            if ( composer != null )
+                composer.setBackground(color);
+            else
+                super.decorateIncoming(color);
         }
         
         public void appendRawText(String rawText) {
