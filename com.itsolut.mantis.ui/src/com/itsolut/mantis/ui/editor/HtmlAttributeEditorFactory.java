@@ -14,6 +14,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.mylyn.htmltext.HtmlComposer;
 import org.eclipse.mylyn.htmltext.commands.GetHtmlCommand;
 import org.eclipse.mylyn.htmltext.commands.SetHtmlCommand;
+import org.eclipse.mylyn.htmltext.configuration.Configuration;
+import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration;
+import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration.EnterMode;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
@@ -33,7 +36,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
 
-import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.BoldAction;
@@ -83,8 +85,11 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
                 ToolBarManager manager = new ToolBarManager(menu);
                 CoolItem item = new CoolItem(coolbar, SWT.NONE);
                 item.setControl(menu);
+                
+                Configuration configuration = new Configuration();
+                configuration.addConfigurationNode(new EnterModeConfiguration(EnterMode.BR));
 
-                composer = new HtmlComposer(parent, SWT.None);
+                composer = new HtmlComposer(parent, SWT.None, configuration);
 
                 manager.add(new BoldAction(composer));
                 manager.add(new ItalicAction(composer));
