@@ -11,8 +11,6 @@ package com.itsolut.mantis.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.itsolut.mantis.core.MantisCorePlugin;
-
 /**
  * @author Robert Munteanu
  */
