@@ -141,7 +141,15 @@ public abstract class HtmlFormatter {
             String closeTag = "</" + tag.toString() + ">";
             
             start = input.indexOf(openTag, offset);
-            end = input.indexOf(closeTag, offset) + closeTag.length() + 1;
+            int tagEnd = input.indexOf(closeTag, offset) + closeTag.length() + 1;
+            int allLength = input.length();
+            if ( tagEnd < allLength ) {
+                char nextChar = input.charAt(tagEnd - 1);
+                if ( nextChar == '\n')
+                    tagEnd++;
+            }
+            
+            end = tagEnd;
         }
 
         public static TagRange find(String input, int start ) {

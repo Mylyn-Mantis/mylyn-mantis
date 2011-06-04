@@ -37,6 +37,9 @@ public class HtmlFormatterTest {
 	private static final String INPUT_UL_AND_PRE = "<pre>formatted\n</pre>third\n<ol>\n<li>First thing</li><li>Second thing</li></ol>";
 	
 	private static final String OUTPUT_UL_AND_PRE = "<pre>formatted\n</pre>third<br/><ol>\n<li>First thing</li><li>Second thing</li></ol>";
+	
+	private static final String INPUT_UL_WITH_NEWLINE = "<ul>\n<li>First thing</li><li>Second thing</li></ul>\nstuff";
+	private static final String OUTPUT_UL_WITH_NEWLINE = "<ul>\n<li>First thing</li><li>Second thing</li></ul>\nstuff";
 
 	@Test
 	public void linesHaveBrAppended() {
@@ -96,5 +99,11 @@ public class HtmlFormatterTest {
 	public void inputWithMultipleTagsPreservesFormatting() {
 		
 		assertThat(HtmlFormatter.convertToDisplayHtml(INPUT_UL_AND_PRE), is(OUTPUT_UL_AND_PRE));
+	}
+	
+	@Test
+	public void newlineAfterBlockTagIsNotConverted() {
+		
+		assertThat(HtmlFormatter.convertToDisplayHtml(INPUT_UL_WITH_NEWLINE), is(OUTPUT_UL_WITH_NEWLINE));
 	}
 }
