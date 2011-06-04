@@ -34,6 +34,10 @@ public class HtmlFormatterTest {
 	
 	private static final String OUTPUT_MIXED_SPACES = "first<br/>second<br/><pre>pre\nformatted</pre>third<br />fourth";
 
+	private static final String INPUT_UL_AND_PRE = "<pre>formatted\n</pre>third\n<ol>\n<li>First thing</li><li>Second thing</li></ol>";
+	
+	private static final String OUTPUT_UL_AND_PRE = "<pre>formatted\n</pre>third<br/><ol>\n<li>First thing</li><li>Second thing</li></ol>";
+
 	@Test
 	public void linesHaveBrAppended() {
 
@@ -86,5 +90,11 @@ public class HtmlFormatterTest {
 	public void brWithNewLineIsConvertedToPlainNewline() {
 		
 		assertThat(HtmlFormatter.convertFromDisplayHtml("<br/>\n"), is("\n"));
+	}
+	
+	@Test
+	public void inputWithMultipleTagsPreservesFormatting() {
+		
+		assertThat(HtmlFormatter.convertToDisplayHtml(INPUT_UL_AND_PRE), is(OUTPUT_UL_AND_PRE));
 	}
 }
