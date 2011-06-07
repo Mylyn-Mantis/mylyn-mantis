@@ -18,6 +18,19 @@ import java.util.TreeSet;
  */
 public abstract class HtmlFormatter {
 
+    private static final String HTML_PRE ="" +
+    "<html>" +
+    "  <head><style type='text/css'>" +
+    "    body { margin: 0; padding: 0 } " +
+    "  </style></head>" +
+    "  <body>" +
+    "";
+
+    private static final String HTML_POST = "" +
+    "  </body>" +
+    "</html>";
+
+    
 	/**
 	 * This function mimics the behaviour of MantisBT's <tt>string_nl2br</tt>
 	 * method
@@ -107,6 +120,17 @@ public abstract class HtmlFormatter {
 		return output.toString();
 	}
 
+    /**
+     * Wraps the specified <tt>value</tt> in a complete HTML declaration, ensuring that is optimised for display
+     * 
+     * @param htmlSnippet the value to wrap
+     * @return the wrapped value
+     */
+    public static String wrapForBrowserDisplay(String htmlSnippet) {
+
+        return HTML_PRE + htmlSnippet + HTML_POST;
+    }
+	
 	private HtmlFormatter() {
 
 	}

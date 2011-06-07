@@ -65,12 +65,12 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             
             Control control;
             String value = HtmlFormatter.convertToDisplayHtml(getTaskAttribute().getValue());
-
+            
             if (isReadOnly()) {
                 
                 Browser browser = new Browser(parent, SWT.None);
                 GridDataFactory.fillDefaults().applyTo(browser);
-                browser.setText(value);
+                browser.setText(HtmlFormatter.wrapForBrowserDisplay(value));
                 
                 control = browser;
 
@@ -123,7 +123,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             
             setControl(control);
         }
-        
+
         @Override
         protected void decorateIncoming(Color color) {
         
