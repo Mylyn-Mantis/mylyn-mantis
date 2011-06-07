@@ -17,6 +17,7 @@ import org.eclipse.mylyn.htmltext.commands.SetHtmlCommand;
 import org.eclipse.mylyn.htmltext.configuration.Configuration;
 import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration;
 import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration.EnterMode;
+import org.eclipse.mylyn.internal.provisional.commons.ui.CommonThemes;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
@@ -27,14 +28,18 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
+import org.eclipse.ui.themes.IThemeManager;
 
 import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.BoldAction;
@@ -51,7 +56,6 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
     
     public static final class HtmlAttributeEditor extends AbstractAttributeEditor {
         
-
         private HtmlComposer composer;
 
         public HtmlAttributeEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
@@ -68,9 +72,20 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
             
             if (isReadOnly()) {
                 
+                IThemeManager themeManager = PlatformUI.getWorkbench().getThemeManager();
+                Font font = themeManager.getCurrentTheme().getFontRegistry().get(CommonThemes.FONT_EDITOR_COMMENT);
+
+                // FIXME : how to take into account multiple fonts data items?
+                FontData fontData = font.getFontData()[0];
+
+                int fontSizePt = fontData.getHeight();
+                String fontFamily = fontData.getName(); // we benefit from the fact that we are using the same font repository
+                boolean isBold = ( fontData.getStyle() & SWT.BOLD  ) == SWT.BOLD;
+                boolean isItalic = ( fontData.getStyle() & SWT.ITALIC  ) == SWT.ITALIC;
+                
                 Browser browser = new Browser(parent, SWT.None);
                 GridDataFactory.fillDefaults().applyTo(browser);
-                browser.setText(HtmlFormatter.wrapForBrowserDisplay(value));
+                browser.setText(HtmlFormatter.wrapForBrowserDisplay(value, fontFamily, fontSizePt, isBold, isItalic));
                 
                 control = browser;
 

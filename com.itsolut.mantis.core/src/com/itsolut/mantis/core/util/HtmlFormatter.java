@@ -21,7 +21,13 @@ public abstract class HtmlFormatter {
     private static final String HTML_PRE ="" +
     "<html>" +
     "  <head><style type='text/css'>" +
-    "    body { margin: 0; padding: 0 } " +
+    "    body { " +
+    "       margin: 0; padding: 0;" +
+    "       font-size:   %spt;" +
+    "       font-family: %s;" +
+    "       font-weight: %s;" +
+    "       font-style:  %s;"+
+    "    } " +
     "  </style></head>" +
     "  <body>" +
     "";
@@ -124,11 +130,18 @@ public abstract class HtmlFormatter {
      * Wraps the specified <tt>value</tt> in a complete HTML declaration, ensuring that is optimised for display
      * 
      * @param htmlSnippet the value to wrap
+     * @param fontFamily the font-family of the font
+     * @param fontSizePt the size of the font in points
+     * @param isBold true if the text should be bold 
+     * @param isItalic true if the text should be italic
      * @return the wrapped value
      */
-    public static String wrapForBrowserDisplay(String htmlSnippet) {
+    public static String wrapForBrowserDisplay(String htmlSnippet, String fontFamily, int fontSizePt, boolean isBold, boolean isItalic) {
+        
+        String boldStyle = isBold ? "bold" : "normal";
+        String italicStyle = isItalic ? "italic" : "normal";
 
-        return HTML_PRE + htmlSnippet + HTML_POST;
+        return String.format(HTML_PRE, fontSizePt, fontFamily, boldStyle, italicStyle) + htmlSnippet + HTML_POST;
     }
 	
 	private HtmlFormatter() {
