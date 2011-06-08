@@ -13,6 +13,7 @@ import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
+import com.itsolut.mantis.core.util.HtmlFormatter;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
@@ -162,6 +163,6 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
             text = "";
         
         HtmlTextTaskEditorPart editorPart = (HtmlTextTaskEditorPart) newCommentPart;
-        editorPart.appendRawText(text.replace("\n", "") + "<br />");
+        editorPart.appendRawText(HtmlFormatter.convertToDisplayHtml(text));
     }
 }
