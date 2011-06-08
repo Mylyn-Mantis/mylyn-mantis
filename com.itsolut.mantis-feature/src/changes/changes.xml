@@ -9,6 +9,7 @@
 			<action type="add" issue="014" dev="rombert">Add Monitor bug option</action>
 			<action type="add" issue="202" dev="rombert">Improve rendering of comments in HTML format</action>
 			<action type="add" issue="205" dev="rombert">Consider stripping newline from ol, ul tags</action>
+			<action type="add" issue="203" dev="rombert">Appending text to new comment generates an extra newline</action>
 		</release>
 	</body>
 </document>
