@@ -73,7 +73,6 @@ public class HtmlTextTaskEditorPart extends AbstractTaskEditorPart {
         style = style | ExpandableComposite.EXPANDED;
     }
 
-
     public void appendRawText(String toAppend) {
 
         attributeEditor.appendRawText(toAppend);
