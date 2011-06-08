@@ -38,9 +38,12 @@ public class HtmlFormatterTest {
 	
 	private static final String OUTPUT_UL_AND_PRE = "<pre>formatted\n</pre>third<br/><ol>\n<li>First thing</li><li>Second thing</li></ol>";
 	
-	private static final String INPUT_UL_WITH_NEWLINE = "<ul>\n<li>First thing</li><li>Second thing</li></ul>\nstuff";
-	private static final String OUTPUT_UL_WITH_NEWLINE = "<ul>\n<li>First thing</li><li>Second thing</li></ul>\nstuff";
+	private static final String INPUT_UL_WITH_NEWLINE = "<ul><li>First thing</li><li>Second thing</li></ul>\nstuff";
+	private static final String OUTPUT_UL_WITH_NEWLINE = "<ul><li>First thing</li><li>Second thing</li></ul>\nstuff";
 
+	private static final String INPUT_OL_WITH_NEWLINE_WITHIN = "<ol>\n<li>Something</li>\n</ol>"; 
+	private static final String OUTPUT_OL_WITH_NEWLINE_WITHIN = "<ol><li>Something</li></ol>"; 
+	
 	@Test
 	public void linesHaveBrAppended() {
 
@@ -105,5 +108,11 @@ public class HtmlFormatterTest {
 	public void newlineAfterBlockTagIsNotConverted() {
 		
 		assertThat(HtmlFormatter.convertToDisplayHtml(INPUT_UL_WITH_NEWLINE), is(OUTPUT_UL_WITH_NEWLINE));
+	}
+	
+	@Test
+	public void newLinesInListTagsAreStripped() {
+		
+		assertThat(HtmlFormatter.convertFromDisplayHtml(INPUT_OL_WITH_NEWLINE_WITHIN), is(OUTPUT_OL_WITH_NEWLINE_WITHIN));
 	}
 }

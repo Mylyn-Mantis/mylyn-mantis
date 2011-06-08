@@ -51,50 +51,14 @@ public abstract class HtmlFormatter {
 	 */
 	public static String convertToDisplayHtml(String input) {
 
-		List<Range> ranges = new ArrayList<Range>();
-		
-		int pos = 0;
-		while ( pos < input.length() ) {
-		    
-		    TagRange range = TagRange.find(input, pos);
-		
-			int startIndex = range != null ? range.getStart() : -1;
-			int endIndex = range != null ? range.getEnd() : -1;
-			boolean outsideTag = false;
-			
-			// the found tag range is after the current start
-			// this denotes a text gap
-			if ( startIndex > pos ) {
-			    endIndex = startIndex + 1;
-			    startIndex = pos;
-			    outsideTag = true;
-			}
-			
-			if ( pos == 0 && startIndex > 0 ) { // tag exists, but is not the first
-
-				ranges.add(new Range(pos, startIndex - 1, true));
-			} else if ( pos == 0 && startIndex == -1 ) { // first iteration, tag does not exist at all
-				
-				ranges.add(new Range(pos, input.length(), true));
-				break;
-			} else if ( startIndex == -1 || endIndex == -1) { // last iteration, tag is no longer found
-				
-				ranges.add(new Range(pos, input.length(), true));
-				break;
-			} 
-			
-			// tag found
-			ranges.add(new Range(startIndex, endIndex - 1, outsideTag));
-			
-			pos = endIndex -1;
-		}
+		List<Range> ranges = parseIntoRanges(input);
 
 		StringBuilder output = new StringBuilder(input.length());
 		
 		for ( Range range : ranges ) {
 			
 			String rangeString = input.substring(range.from, range.to);
-			if ( range.applyNl2Br ) {
+			if ( range.rangeKind == RangeKind.TEXT ) {
 
 				boolean applyFinalBr = range.to != input.length();
 
@@ -106,10 +70,73 @@ public abstract class HtmlFormatter {
 		
 		return output.toString();
 	}
+
+    private static List<Range> parseIntoRanges(String input) {
+
+        List<Range> ranges = new ArrayList<Range>();
+		
+		int pos = 0;
+		while ( pos < input.length() ) {
+		    
+		    TagRange range = TagRange.find(input, pos);
+		
+			int startIndex = range != null ? range.getStart() : -1;
+			int endIndex = range != null ? range.getEnd() : -1;
+			RangeKind rangeKind;
+			if ( range == null )
+			    rangeKind = RangeKind.TEXT;
+			else if ( range.getTag() == Tag.pre )
+			    rangeKind = RangeKind.TAG_PRESERVE_NL;
+			else 
+			    rangeKind = RangeKind.TAG_CLEAN_NL;
+			
+			// the found tag range is after the current start
+			// this denotes a text gap
+			if ( startIndex > pos ) {
+			    endIndex = startIndex + 1;
+			    startIndex = pos;
+			    rangeKind = RangeKind.TEXT;
+			}
+			
+			if ( pos == 0 && startIndex > 0 ) { // tag exists, but is not the first
+
+				ranges.add(new Range(pos, startIndex - 1, rangeKind));
+			} else if ( pos == 0 && startIndex == -1 ) { // first iteration, tag does not exist at all
+				
+				ranges.add(new Range(pos, input.length(), RangeKind.TEXT));
+				break;
+			} else if ( startIndex == -1 || endIndex == -1) { // last iteration, tag is no longer found
+				
+				ranges.add(new Range(pos, input.length(), RangeKind.TEXT));
+				break;
+			} 
+			
+			// tag found
+			ranges.add(new Range(startIndex, endIndex - 1, rangeKind));
+			
+			pos = endIndex -1;
+		}
+        return ranges;
+    }
 	
 	public static String convertFromDisplayHtml(String input) {
 		
-		return input.replaceAll("<br\\s?/>\\n?", "\n");
+        List<Range> ranges = parseIntoRanges(input);
+
+        StringBuilder output = new StringBuilder(input.length());
+
+        for (Range range : ranges) {
+
+            String rangeString = input.substring(range.from, range.to);
+            if (range.rangeKind == RangeKind.TEXT)
+                output.append(rangeString.replaceAll("<br\\s?/>\\n?", "\n"));
+            else if ( range.rangeKind == RangeKind.TAG_CLEAN_NL )
+                output.append(rangeString.replaceAll("\n", ""));
+            else
+                output.append(rangeString);
+        }
+
+        return output.toString();
 	}
 
 	private static String nl2br(String input, boolean applyFinalBr) {
@@ -148,17 +175,22 @@ public abstract class HtmlFormatter {
 
 	}
 	
+	private enum RangeKind {
+	    
+	    TAG_PRESERVE_NL, TAG_CLEAN_NL, TEXT,
+	}
+	
 	private static class Range {
 		
 		public int from;
 		public int to;
-		public boolean applyNl2Br;
+		public RangeKind rangeKind;
 		
-		public Range(int from, int to, boolean applyNl2Br) {
+		public Range(int from, int to, RangeKind rangeKind) {
 			
 			this.from = from;
 			this.to = to;
-			this.applyNl2Br = applyNl2Br;
+            this.rangeKind = rangeKind;
 		}
 		
 	}
@@ -171,6 +203,7 @@ public abstract class HtmlFormatter {
 	    
 	    private final int start;
         private final int end;
+        private final Tag tag;
 	    
 	    public TagRange(String input, Tag tag, int offset) {
 
@@ -187,6 +220,7 @@ public abstract class HtmlFormatter {
             }
             
             end = tagEnd;
+            this.tag = tag;
         }
 
         public static TagRange find(String input, int start ) {
@@ -214,6 +248,11 @@ public abstract class HtmlFormatter {
         public int getEnd() {
 
             return end;
+        }
+        
+        public Tag getTag() {
+
+            return tag;
         }
         
         public boolean exists() {
