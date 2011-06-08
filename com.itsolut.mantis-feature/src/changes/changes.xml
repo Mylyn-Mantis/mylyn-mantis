@@ -7,6 +7,8 @@
 			<action type="add" issue="198" dev="rombert">Enable HTML editing for the new comment part as well</action>
 			<action type="add" issue="199" dev="rombert">Display comments as HTML if html editor is enabled</action>
 			<action type="add" issue="014" dev="rombert">Add Monitor bug option</action>
+			<action type="add" issue="202" dev="rombert">Improve rendering of comments in HTML format</action>
+			<action type="add" issue="205" dev="rombert">Consider stripping newline from ol, ul tags</action>
 		</release>
 	</body>
 </document>
