@@ -41,6 +41,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
 import org.eclipse.ui.themes.IThemeManager;
 
+import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
 import com.itsolut.mantis.ui.editor.actions.BoldAction;
 import com.itsolut.mantis.ui.editor.actions.BulletlistAction;
@@ -154,7 +155,10 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
                 return;
             
             String value = (String) composer.executeWithReturn(new GetHtmlCommand());
-            String newValue = value + rawText;
+            String baseValue = HtmlFormatter.convertFromDisplayHtml(value).trim();
+            
+            String newValue = baseValue + rawText;
+
             SetHtmlCommand command = new SetHtmlCommand();
             command.setHtml(newValue);
             composer.execute(command);
