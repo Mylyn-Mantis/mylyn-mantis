@@ -69,8 +69,6 @@ public class MantisCache {
 
     static final String BUILT_IN_PROJECT_TASKS_FILTER_FORMAT = "[Built-in] Latest %s tasks";
 
-    private static final String SUBPROJECT_SEPARATOR = " » ";
-
     private static final String RESOLVED_STATUS_THRESHOLD = "bug_resolved_status_threshold";
 
     private static final String REPORTER_THRESHOLD = "report_bug_threshold";
@@ -521,26 +519,24 @@ public class MantisCache {
 
         cacheData.projects.clear();
 
-        for (ProjectData pd : projectData) {
-            cacheData.projects.add(new MantisProject(pd.getName(), pd.getName(), pd.getId().intValue()));
+        for (ProjectData project : projectData) {
+            cacheData.projects.add(new MantisProject(project.getName(),project.getId().intValue()));
 
-            addSubProjectsIfApplicable(pd, pd.getName());
+            addSubProjectsIfApplicable(project);
         }
 
     }
 
-    private void addSubProjectsIfApplicable(ProjectData pd, String accumulatedName) {
+    private void addSubProjectsIfApplicable(ProjectData pd) {
 
         if (pd.getSubprojects() == null || pd.getSubprojects().length == 0)
             return;
 
         for (ProjectData subProject : pd.getSubprojects()) {
 
-            String projectName = accumulatedName + SUBPROJECT_SEPARATOR + subProject.getName();
+            cacheData.projects.add(new MantisProject(subProject.getName(), subProject.getId().intValue(), pd.getId().intValue()));
 
-            cacheData.projects.add(new MantisProject(subProject.getName(), projectName, subProject.getId().intValue()));
-
-            addSubProjectsIfApplicable(subProject, projectName);
+            addSubProjectsIfApplicable(subProject);
         }
 
     }
@@ -560,7 +556,7 @@ public class MantisCache {
 
     private MantisProjectFilter addDefaultFilters(int projectId) throws MantisException {
 
-        String projectDisplayName = getProjectById(projectId).getDisplayName();
+        String projectDisplayName = getProjectById(projectId).getName();
         String filterDisplayName = String.format(BUILT_IN_PROJECT_TASKS_FILTER_FORMAT, projectDisplayName);
 
         return new MantisProjectFilter(filterDisplayName, BUILT_IN_PROJECT_TASKS_FILTER_ID);

@@ -16,18 +16,22 @@ package com.itsolut.mantis.core.model;
 public class MantisProject extends MantisTicketAttribute {
 
     private static final long serialVersionUID = -7316456033389981356L;
-    private String displayName;
+    private Integer parentProjectId;
 
-    public MantisProject(String name, String displayName, int value) {
+    public MantisProject(String name, int value) {
 
         super(name, value);
-
-        this.displayName = displayName;
     }
 
-    public String getDisplayName() {
+    public MantisProject(String name, int value, Integer parentProjectId) {
 
-        return displayName;
+        this(name, value);
+        
+        this.parentProjectId = parentProjectId;
     }
+    
+    public Integer getParentProjectId() {
 
+        return parentProjectId;
+    }
 }
