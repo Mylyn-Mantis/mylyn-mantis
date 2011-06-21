@@ -19,19 +19,27 @@ class MantisProjectITreeContentProvider implements ITreeContentProvider {
 
     public Object[] getChildren(Object parentElement) {
 
-        if (parentElement instanceof MantisProject[]) {
-            return (MantisProject[]) parentElement;
-        }
+        if (parentElement instanceof MantisProject[])
+            return topLevelOnly((MantisProject[]) parentElement);
 
         if (parentElement instanceof MantisProject) {
-
             Integer parentProjectId = ((MantisProject) parentElement).getValue();
-
             List<MantisProject> childProjects = getChildProjects(parentProjectId);
             return childProjects.toArray(new MantisProject[childProjects.size()]);
         }
 
         return null;
+    }
+
+    private MantisProject[] topLevelOnly(MantisProject[] parentElement) {
+        
+        List<MantisProject> topLevel = new ArrayList<MantisProject>();
+        
+        for ( MantisProject project : parentElement )
+            if ( project.getParentProjectId() == null )
+                topLevel.add(project);
+
+        return topLevel.toArray(new MantisProject[topLevel.size()]);
     }
 
     private List<MantisProject> getChildProjects(Integer parentProjectId) {
