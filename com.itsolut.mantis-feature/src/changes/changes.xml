@@ -2,7 +2,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.5.0" date="2011-06-05">
+		<release version="3.5.0" date="2011-06-22">
 			<action type="add" issue="201" dev="rombert">Normalise newlines between MantisBT and text editor</action>
 			<action type="add" issue="198" dev="rombert">Enable HTML editing for the new comment part as well</action>
 			<action type="add" issue="199" dev="rombert">Display comments as HTML if html editor is enabled</action>
@@ -10,6 +10,8 @@
 			<action type="add" issue="202" dev="rombert">Improve rendering of comments in HTML format</action>
 			<action type="add" issue="205" dev="rombert">Consider stripping newline from ol, ul tags</action>
 			<action type="add" issue="203" dev="rombert">Appending text to new comment generates an extra newline</action>
+			<action type="add" issue="208" dev="rombert">Incorrect layout of sub-projects in query page on Mac OS X</action>
+			<action type="add" issue="214" dev="rombert">Mylyn 3.6 - Priority no longer mapped for partial tasks</action>
 		</release>
 	</body>
 </document>
