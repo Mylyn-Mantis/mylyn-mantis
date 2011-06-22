@@ -243,11 +243,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         copyValuesFromTicket(data, ticket);
         
-        // copy priority id
-        TaskAttribute priorityAttribute = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PRIORITY.getKey());
-        String priority = ticket.getValue(Key.PRIORITY);
-        int priorityId = client.getCache(monitor).getPriorityAsObjectRef(priority).getId().intValue();
-        priorityAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID, String.valueOf(priorityId));
+        createPriorityMetaValue(data, client, ticket, monitor);
 
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);
@@ -265,7 +261,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     .setValue(MantisUtils.toMantisTime(lastChanged) + "");
 
     }
-
+    
     private void copyValuesFromTicket(TaskData data, MantisTicket ticket) {
 
 		boolean warningLogged = false;
@@ -287,6 +283,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             }
         }
 	}
+    
+    private void createPriorityMetaValue(TaskData data, IMantisClient client, MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
+
+        // copy priority id
+        TaskAttribute priorityAttribute = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PRIORITY.getKey());
+        String priority = ticket.getValue(Key.PRIORITY);
+        int priorityId = client.getCache(monitor).getPriorityAsObjectRef(priority).getId().intValue();
+        priorityAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID, String.valueOf(priorityId));
+    }    
 
     private void addOperation(TaskData data, MantisTicket ticket, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
 
@@ -687,6 +692,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
         if ( ticket.getValue(Key.COMPLETION_DATE) != null )
         	createAttribute(taskData, MantisAttributeMapper.Attribute.COMPLETION_DATE).setValue(ticket.getValue(Key.COMPLETION_DATE));
+        
+        createPriorityMetaValue(taskData, client, ticket, monitor);
         
         return taskData;
     }
