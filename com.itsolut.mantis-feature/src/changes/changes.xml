@@ -3,7 +3,8 @@
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
 		<release version="3.6.0" date="2011-09-22">
-			<action type="add" issue="218" dev="rombert">[chrome] Html contents is encoded </action>
+			<action type="add" issue="218" dev="rombert">[chrome] Html contents is encoded</action>
+			<action type="add" issue="215" dev="rombert">Parsing the task url should take hashes into account</action>
 		</release>
 	</body>
 </document>

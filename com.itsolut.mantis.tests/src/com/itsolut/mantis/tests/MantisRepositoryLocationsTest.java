@@ -86,4 +86,11 @@ public class MantisRepositoryLocationsTest {
 		
 		assertEquals(MantisRepositoryLocations.extractTaskId("http://mylyn-mantis.sourceforge.net/Mantis/view.php?id=1"), Integer.valueOf(1));
 	}
+
+	@Test
+	public void getTaskIdFromUrlWithHash() {
+
+		assertEquals(MantisRepositoryLocations.extractTaskId("http://mylyn-mantis.sourceforge.net/Mantis/view.php?id=56#comments"), Integer.valueOf(56));
+	}
+
 }

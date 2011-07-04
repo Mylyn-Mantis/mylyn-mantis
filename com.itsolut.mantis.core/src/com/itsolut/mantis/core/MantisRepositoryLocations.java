@@ -28,9 +28,21 @@ public class MantisRepositoryLocations {
 
         Assert.isNotNull(rawUrl);
 
-        int index = rawUrl.lastIndexOf(URL_SHOW_BUG);
+        int start = rawUrl.lastIndexOf(URL_SHOW_BUG);
+        if ( start == - 1)
+            return null;
 
-        return index == -1 ? null : Integer.parseInt(rawUrl.substring(index + URL_SHOW_BUG.length()));
+        start = start + URL_SHOW_BUG.length();
+        int end = rawUrl.indexOf('#');
+        
+        String urlString;
+        
+        if ( end == - 1)
+            urlString = rawUrl.substring(start);
+        else
+            urlString = rawUrl.substring(start, end);
+        
+        return Integer.parseInt(urlString); 
     }
 
     public static MantisRepositoryLocations create(String rawUrl) {
