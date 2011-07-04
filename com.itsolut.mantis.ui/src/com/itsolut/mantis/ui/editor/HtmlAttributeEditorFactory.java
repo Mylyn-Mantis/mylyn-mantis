@@ -17,6 +17,7 @@ import org.eclipse.mylyn.htmltext.commands.SetHtmlCommand;
 import org.eclipse.mylyn.htmltext.configuration.Configuration;
 import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration;
 import org.eclipse.mylyn.htmltext.configuration.EnterModeConfiguration.EnterMode;
+import org.eclipse.mylyn.htmltext.configuration.UseEntitiesConfiguration;
 import org.eclipse.mylyn.internal.provisional.commons.ui.CommonThemes;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -31,24 +32,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.CoolBar;
-import org.eclipse.swt.widgets.CoolItem;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IServiceLocator;
 import org.eclipse.ui.themes.IThemeManager;
 
-import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.util.HtmlFormatter;
-import com.itsolut.mantis.ui.editor.actions.BoldAction;
-import com.itsolut.mantis.ui.editor.actions.BulletlistAction;
-import com.itsolut.mantis.ui.editor.actions.ItalicAction;
-import com.itsolut.mantis.ui.editor.actions.NumlistAction;
-import com.itsolut.mantis.ui.editor.actions.PreformatAction;
-import com.itsolut.mantis.ui.editor.actions.UnderlineAction;
+import com.itsolut.mantis.ui.editor.actions.*;
 
 /**
  * @author Robert Munteanu
@@ -103,6 +94,7 @@ public class HtmlAttributeEditorFactory extends AttributeEditorFactory {
                 
                 Configuration configuration = new Configuration();
                 configuration.addConfigurationNode(new EnterModeConfiguration(EnterMode.BR));
+                configuration.addConfigurationNode(new UseEntitiesConfiguration(false));
 
                 composer = new HtmlComposer(parent, SWT.None, configuration);
 
