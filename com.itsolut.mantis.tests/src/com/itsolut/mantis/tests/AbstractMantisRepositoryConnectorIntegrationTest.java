@@ -59,7 +59,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.SUMMARY), "First task");
 		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.DESCRIPTION), "Description");
-		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.STATUS), "new");
+		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.STATUS), String.valueOf(10)); // new
 
 	}
 
