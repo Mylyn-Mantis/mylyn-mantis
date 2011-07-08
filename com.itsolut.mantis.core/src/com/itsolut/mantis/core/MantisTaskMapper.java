@@ -11,7 +11,6 @@
 package com.itsolut.mantis.core;
 
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 
@@ -35,17 +34,12 @@ final class MantisTaskMapper extends TaskMapper {
     public PriorityLevel getPriorityLevel() {
         
         try {
+            String priority = getTaskData().getRoot().getAttribute(Attribute.PRIORITY.getKey()).getValue();
             
-            TaskAttribute priorityAttribute = getTaskData().getRoot().getAttribute(Attribute.PRIORITY.getKey());
-            
-            String value = priorityAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID);
-            
-            if ( value == null ) // task was not refreshed since we introduced the new meta attribute
+            if ( priority == null ) // task was not refreshed since we the priority mapping in MantisAttributeMapper
                 return null;
             
-            int priorityLevel = Integer.parseInt(value);
-            
-            return MantisPriorityLevel.fromPriorityId(priorityLevel);
+            return MantisPriorityLevel.fromPriorityId(Integer.parseInt(priority));
             
         } catch (NumberFormatException e) {
             

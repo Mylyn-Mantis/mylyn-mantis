@@ -91,13 +91,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             ITaskMapping initializationData, IProgressMonitor monitor)
     throws CoreException {
         try {
-            IMantisClient client = connector.getClientManager().getRepository(
-                    repository);
+            IMantisClient client = connector.getClientManager().getRepository(repository);
+            
+            // project name
             TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
-            String projectName = initializationData.getProduct();
-			projectAttribute.setValue(projectName);
-			
-			createDefaultAttributes(data, client, projectName, monitor, false);
+            projectAttribute.setValue(initializationData.getProduct());
+            
+			createDefaultAttributes(data, client, initializationData.getProduct(), monitor, false);
             createProjectSpecificAttributes(data, client, monitor);
             createCustomFieldAttributes(data, client, new DefaultCustomFieldValueSource(), monitor);
             return true;
@@ -111,8 +111,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskData taskData, Set<TaskAttribute> oldAttributes,
             IProgressMonitor monitor) throws CoreException {
         try {
-            IMantisClient client = connector.getClientManager().getRepository(
-                    repository);
+            IMantisClient client = connector.getClientManager().getRepository( repository);
 
             processOperation(taskData, client, monitor);
 
@@ -127,8 +126,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             
             if (taskData.isNew()) {
                 int id = client.createTicket(ticket, monitor, changes);
-                return new RepositoryResponse(ResponseKind.TASK_UPDATED, id
-                        + "");
+                return new RepositoryResponse(ResponseKind.TASK_UPDATED, id + "");
             } else {
                 
                 String newComment = "";
@@ -142,7 +140,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
                     timeTrackingAttribute.clearValues();
                 }
-                
                 
                 client.updateTicket(ticket, newComment, timeTracking, changes, monitor);
                 
@@ -242,8 +239,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Date lastChanged = ticket.getLastChanged();
 
         copyValuesFromTicket(data, ticket);
-        
-        createPriorityMetaValue(data, client, ticket, monitor);
 
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket);
@@ -274,24 +269,30 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				value = "";
 			
             TaskAttribute attribute = getAttribute(data, key);
-
-            attribute.setValue(value);
             
-            if ( !attribute.getOptions().isEmpty() && !attribute.getOptions().containsKey(value) && !warningLogged ) {
-            	MantisCorePlugin.warn(NLS.bind("Task {0} : Unable to find match for {1} value {2} in repository-supplied options {3}. Further similar warnings will be suppressed for this task, but errors may occur when submitting.", new Object[] { ticket.getId(),  key, value, attribute.getOptions() } ));
-				warningLogged = true;
+            // no options, just copy the value
+            if ( attribute.getOptions().isEmpty() ) {
+                attribute.setValue(value);
+            } else {
+
+                // map string to ids
+                String keyFromOption = null;
+                
+                for ( Map.Entry<String, String> optionEntry : attribute.getOptions().entrySet() ) {
+                    if ( optionEntry.getValue().equals(value) ) {
+                        keyFromOption = optionEntry.getKey();
+                        attribute.setValue(keyFromOption);
+                        break;
+                    }
+                }
+                
+                if ( keyFromOption == null && !warningLogged ) {
+                    MantisCorePlugin.warn(NLS.bind("Task {0} : Unable to find match for {1} value {2} in repository-supplied options {3}. Further similar warnings will be suppressed for this task, but errors may occur when submitting.", new Object[] { ticket.getId(),  key, value, attribute.getOptions() } ));
+                    warningLogged = true;
+                }
             }
         }
 	}
-    
-    private void createPriorityMetaValue(TaskData data, IMantisClient client, MantisTicket ticket, IProgressMonitor monitor) throws MantisException {
-
-        // copy priority id
-        TaskAttribute priorityAttribute = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.PRIORITY.getKey());
-        String priority = ticket.getValue(Key.PRIORITY);
-        int priorityId = client.getCache(monitor).getPriorityAsObjectRef(priority).getId().intValue();
-        priorityAttribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_PRIORITY_ID, String.valueOf(priorityId));
-    }    
 
     private void addOperation(TaskData data, MantisTicket ticket, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
 
@@ -384,7 +385,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
         attribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS, MantisUtils.toCsvString(originalValues));
     }
-
     
     private void addAttachments(TaskRepository repository,
             TaskData data, MantisTicket ticket) {
@@ -503,7 +503,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, cache.getDevelopersByProjectName(projectName, monitor), true);
             if (existingTask)
-				createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, cache.getUsersByProjectName(projectName, monitor));
+				createAttribute(data, MantisAttributeMapper.Attribute.REPORTER, cache.getUsersByProjectName(projectName, monitor), false);
             
             createAttribute(data, MantisAttributeMapper.Attribute.SUMMARY);
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
@@ -592,7 +592,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     private TaskAttribute createAttribute(TaskData data,
-            MantisAttributeMapper.Attribute attribute, Object[] values,
+            MantisAttributeMapper.Attribute attribute, MantisTicketAttribute[] values,
             boolean allowEmtpy) {
 
         boolean readOnly = data.isNew() ? attribute.isReadOnlyForNewTask() : attribute.isReadOnlyForExistingTask();
@@ -605,8 +605,28 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         if (values != null && values.length > 0) {
             if (allowEmtpy)
                 attr.putOption("", "");
-            for (Object value : values)
-                attr.putOption(String.valueOf(value), String.valueOf(value));
+            for (MantisTicketAttribute value : values)
+                attr.putOption(String.valueOf(value.getValue()), value.getName());
+        }
+        return attr;
+    }
+
+    private TaskAttribute createAttribute(TaskData data,
+            MantisAttributeMapper.Attribute attribute, String[] values,
+            boolean allowEmtpy) {
+        
+        boolean readOnly = data.isNew() ? attribute.isReadOnlyForNewTask() : attribute.isReadOnlyForExistingTask();
+        
+        TaskAttribute attr = data.getRoot().createAttribute(attribute.getKey());
+        
+        attr.getMetaData().setReadOnly(readOnly).setLabel(
+                attribute.toString()).setKind(attribute.getKind()).setType(
+                        attribute.getType());
+        if (values != null && values.length > 0) {
+            if (allowEmtpy)
+                attr.putOption("", "");
+            for (String value : values)
+                attr.putOption(value, value);
         }
         return attr;
     }
@@ -624,7 +644,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     private TaskAttribute createAttribute(TaskData data,
-            MantisAttributeMapper.Attribute attribute, Object[] values,
+            MantisAttributeMapper.Attribute attribute, MantisTicketAttribute[] values,
             String defaultValue) {
         TaskAttribute rta = createAttribute(data, attribute, values, false);
         rta.setValue(defaultValue);
@@ -639,7 +659,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     private TaskAttribute createAttribute(TaskData data,
-            MantisAttributeMapper.Attribute attribute, Object[] values) {
+            MantisAttributeMapper.Attribute attribute, MantisTicketAttribute[] values) {
         return createAttribute(data, attribute, values, false);
     }
 
@@ -693,8 +713,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         if ( ticket.getValue(Key.COMPLETION_DATE) != null )
         	createAttribute(taskData, MantisAttributeMapper.Attribute.COMPLETION_DATE).setValue(ticket.getValue(Key.COMPLETION_DATE));
         
-        createPriorityMetaValue(taskData, client, ticket, monitor);
-        
         return taskData;
     }
 
@@ -746,12 +764,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     	validateSupportsSubtasks(repository, parentTaskData);
     	
         try {
+            IMantisClient client = connector.getClientManager().getRepository( repository);
 			createAttributesForTaskData(repository, taskData, parentTaskData, monitor);
 			copyAttributesFromParent(taskData, parentTaskData); 
 			clearTaskRelations(taskData);
 			setChildAttribute(taskData, parentTaskData);
-			createCustomFieldAttributes(taskData, connector.getClientManager().getRepository(
-	                repository), new TaskDataCustomFieldValueSource(parentTaskData), monitor);
+			createCustomFieldAttributes(taskData, client, new TaskDataCustomFieldValueSource(parentTaskData), monitor);
 
 			return true;
 		} catch (MantisException e) {
@@ -769,8 +787,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,
             IProgressMonitor monitor) throws MantisException, CoreException {
 
-        IMantisClient client = connector.getClientManager().getRepository(
-                repository);
+        IMantisClient client = connector.getClientManager().getRepository( repository);
         TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
         createDefaultAttributes(taskData, client, projectAttribute.getValue(), monitor, false);
         getAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());

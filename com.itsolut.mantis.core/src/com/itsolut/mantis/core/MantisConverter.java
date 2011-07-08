@@ -218,15 +218,15 @@ public class MantisConverter {
         IssueData issue = new IssueData();
         issue.setSummary(ticket.getValue(Key.SUMMARY));
         issue.setDescription(ticket.getValue(Key.DESCRIPTION));
-        issue.setSeverity(cache.getSeverityAsObjectRef(ticket.getValue(Key.SEVERITY)));
-        issue.setResolution(cache.getResolutionAsObjectRef(ticket.getValue(Key.RESOLUTION)));
-        issue.setPriority(cache.getPriorityAsObjectRef(ticket.getValue(Key.PRIORITY)));
-        issue.setReproducibility(cache.getReproducibilityAsObjectRef(ticket.getValue(Key.REPRODUCIBILITY)));
+        issue.setSeverity(getValueAsObjectRef(ticket, Key.SEVERITY));
+        issue.setResolution(getValueAsObjectRef(ticket, Key.RESOLUTION));
+        issue.setPriority(getValueAsObjectRef(ticket, Key.PRIORITY));
+        issue.setReproducibility(getValueAsObjectRef(ticket, Key.REPRODUCIBILITY));
         if ( cache.isProjectionEnabled() )
-        	issue.setProjection(cache.getProjectionAsObjectRef(ticket.getValue(Key.PROJECTION)));
+        	issue.setProjection(getValueAsObjectRef(ticket, Key.PROJECTION));
         if ( cache.isEtaEnabled() )
-        	issue.setEta(cache.getEtaAsObjectRef(ticket.getValue(Key.ETA)));
-        issue.setView_state(cache.getViewStateAsObjectRef(ticket.getValue(Key.VIEW_STATE)));
+        	issue.setEta(getValueAsObjectRef(ticket, Key.ETA));
+        issue.setView_state(getValueAsObjectRef(ticket, Key.VIEW_STATE));
 
         issue.setProject(project);
         issue.setCategory(ticket.getValue(Key.CATEOGRY));
@@ -251,7 +251,7 @@ public class MantisConverter {
         issue.setSteps_to_reproduce(ticket.getValue(Key.STEPS_TO_REPRODUCE));
         issue.setAdditional_information(ticket.getValue(Key.ADDITIONAL_INFO));
 
-        issue.setStatus(cache.getStatusAsObjectRef(ticket.getValue(Key.STATUS)));
+        issue.setStatus(getValueAsObjectRef(ticket, Key.STATUS));
 
         if (MantisUtils.isEmpty(ticket.getValue(Key.REPORTER))) {
             issue.setReporter(convert(username, cache));
@@ -266,6 +266,11 @@ public class MantisConverter {
         setCustomFields(ticket, project, issue, cache);
 
         return issue;
+    }
+
+    private static ObjectRef getValueAsObjectRef(MantisTicket ticket, Key key) {
+
+        return new ObjectRef(new BigInteger(ticket.getValue(key)), "");
     }
 
     public static AccountData convert(String username, MantisCache cache) {

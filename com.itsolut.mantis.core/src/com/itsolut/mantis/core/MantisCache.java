@@ -648,48 +648,11 @@ public class MantisCache {
     public ObjectRef getProjectAsObjectRef(String projectName) throws MantisException {
 
         return toObjectRef(getProjectByName(projectName));
-
     }
 
     private ObjectRef toObjectRef(MantisTicketAttribute attribute) {
 
         return new ObjectRef(BigInteger.valueOf(attribute.getValue()), attribute.getName());
-    }
-
-    public ObjectRef getSeverityAsObjectRef(String severityName) throws MantisException {
-
-        for (MantisSeverity severity : cacheData.severities)
-            if (severity.getName().equals(severityName))
-                return toObjectRef(severity);
-
-        throw new MantisException("No severity with name " + severityName + " .");
-    }
-
-    public ObjectRef getResolutionAsObjectRef(String resolutionName) throws MantisException {
-
-        for (MantisResolution reslution : cacheData.resolutions)
-            if (reslution.getName().equals(resolutionName))
-                return toObjectRef(reslution);
-
-        throw new MantisException("No resolution with name " + resolutionName + " .");
-    }
-
-    public ObjectRef getPriorityAsObjectRef(String priorityName) throws MantisException {
-
-        for (MantisPriority priority : cacheData.priorities)
-            if (priority.getName().equals(priorityName))
-                return toObjectRef(priority);
-
-        throw new MantisException("No priority with name " + priorityName + " .");
-    }
-
-    public ObjectRef getReproducibilityAsObjectRef(String reproducibilityName) throws MantisException {
-
-        for (MantisReproducibility reproducibility : cacheData.reproducibilities)
-            if (reproducibility.getName().equals(reproducibilityName))
-                return toObjectRef(reproducibility);
-
-        throw new MantisException("No reproducibility with name " + reproducibilityName + " .");
     }
 
     public MantisReproducibility getReproducibility(int reproducibilityId) throws MantisException {
@@ -701,15 +664,6 @@ public class MantisCache {
         throw new MantisException("No reproducibility with id " + reproducibilityId + " .");
     }
 
-    public ObjectRef getProjectionAsObjectRef(String projectionName) throws MantisException {
-
-        for (MantisProjection projection : cacheData.projections)
-            if (projection.getName().equals(projectionName))
-                return toObjectRef(projection);
-
-        throw new MantisException("No projection with name " + projectionName + " .");
-    }
-
     public MantisProjection getProjection(int projectionId) throws MantisException {
         
         for (MantisProjection projection : cacheData.projections)
@@ -717,15 +671,6 @@ public class MantisCache {
                 return projection;
         
         throw new MantisException("No projection with id " + projectionId + " .");
-    }
-
-    public ObjectRef getEtaAsObjectRef(String etaName) throws MantisException {
-
-        for (MantisETA eta : cacheData.etas)
-            if (eta.getName().equals(etaName))
-                return toObjectRef(eta);
-
-        throw new MantisException("No eta with name " + etaName + " .");
     }
 
     public MantisETA getETA(int etaId) throws MantisException {
@@ -737,15 +682,6 @@ public class MantisCache {
         throw new MantisException("No eta with id " + etaId + " .");
     }
 
-    public ObjectRef getViewStateAsObjectRef(String viewStateName) throws MantisException {
-
-        for (MantisViewState viewState : cacheData.viewStates)
-            if (viewState.getName().equals(viewStateName))
-                return toObjectRef(viewState);
-
-        throw new MantisException("No viewState with name " + viewStateName + " .");
-    }
-
     public MantisViewState getViewState(int viewStateId) throws MantisException {
         
         for (MantisViewState viewState : cacheData.viewStates)
@@ -753,11 +689,6 @@ public class MantisCache {
                 return viewState;
         
         throw new MantisException("No viewState with name " + viewStateId + " .");
-    }
-
-    public ObjectRef getStatusAsObjectRef(String statusName) throws MantisException {
-
-        return toObjectRef(getStatusByName(statusName));
     }
 
     public MantisCustomField getCustomFieldByProjectIdAndFieldName(int projectId, String customFieldName)
