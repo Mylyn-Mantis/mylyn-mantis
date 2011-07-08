@@ -25,6 +25,13 @@
 			<id>mylyn</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/mylyn/drops/3.6.0/v20110608-1400/</url>
+	</repository>
+		<repository>
+			<id>sonatype-shadow</id>
+			<url>http://grid.sonatype.org:9000/nexus/content/repositories/central/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 	</repositories>
 
@@ -51,6 +58,7 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
 				</configuration>
 			</plugin>
 		</plugins>
