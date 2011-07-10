@@ -298,7 +298,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
 
-        String label = operation != MantisOperation.LEAVE ? operation.getLabel() : operation.getLabel() + " " + data.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey()).getValue();
+        String label;
+        if ( operation == MantisOperation.LEAVE) {
+            TaskAttribute statusAttribute = data.getRoot().getAttribute(MantisAttributeMapper.Attribute.STATUS.getKey());
+            label = operation.getLabel() + " " + statusAttribute.getOption(statusAttribute.getValue());
+        } else {
+            label = operation.getLabel();
+        }
 
         TaskOperation.applyTo(operationAttribute, operation.toString(), label);
 
