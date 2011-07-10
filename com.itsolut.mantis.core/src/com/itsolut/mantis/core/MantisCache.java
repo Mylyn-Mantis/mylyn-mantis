@@ -25,28 +25,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.osgi.util.NLS;
 
-import com.itsolut.mantis.binding.AccountData;
-import com.itsolut.mantis.binding.CustomFieldDefinitionData;
-import com.itsolut.mantis.binding.FilterData;
-import com.itsolut.mantis.binding.ObjectRef;
-import com.itsolut.mantis.binding.ProjectData;
-import com.itsolut.mantis.binding.ProjectVersionData;
+import com.itsolut.mantis.binding.*;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
-import com.itsolut.mantis.core.model.MantisSeverity;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisTicketAttribute;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisViewState;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -210,7 +192,7 @@ public class MantisCache {
                                 cacheData.reporterThreshold, monitor));
                     } catch (MantisException e) {
                         if (!cacheData.reportersByProjectId.containsKey(project.getValue())) {
-                            cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<String>(
+                            cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<User>(
                                     cacheData.developersByProjectId.get(project.getValue())));
                             MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
                         } else {
@@ -372,28 +354,30 @@ public class MantisCache {
 
     private void cacheProjectReporters(int projectId, AccountData[] projectUsers) {
 
-        List<String> reporters = new ArrayList<String>();
-
-        for (AccountData accountData : projectUsers) {
-            String username = accountData.getName();
-            reporters.add(username);
-            User user = new User(accountData.getId().intValue(), username, accountData.getReal_name(), accountData.getEmail());
-            cacheData.allUsers.put(username, user);
-        }
+        List<User> reporters = cacheUsers0(projectUsers);
 
         cacheData.reportersByProjectId.put(projectId, reporters);
     }
 
+    private List<User> cacheUsers0(AccountData[] projectUsers) {
+
+        List<User> reporters = new ArrayList<User>();
+
+        for (AccountData accountData : projectUsers) {
+            
+            String username = accountData.getName();
+            User user = new User(accountData.getId().intValue(), username, accountData.getReal_name(), accountData.getEmail());
+        
+            cacheData.allUsers.put(username, user);
+            reporters.add(user);
+        }
+        
+        return reporters;
+    }
+
     private void cacheProjectDevelopers(int projectId, AccountData[] projectDevelopers) {
 
-        List<String> developers = new ArrayList<String>();
-
-        for (AccountData accountData : projectDevelopers) {
-            String username = accountData.getName();
-            developers.add(username);
-            User user = new User(accountData.getId().intValue(), username, accountData.getReal_name(), accountData.getEmail());
-            cacheData.allUsers.put(username, user);
-        }
+        List<User> developers = cacheUsers0(projectDevelopers);
 
         cacheData.developersByProjectId.put(projectId, developers);
     }
@@ -808,29 +792,29 @@ public class MantisCache {
         return categories;
     }
 
-    public String[] getDevelopersByProjectName(String projectName, IProgressMonitor monitor) throws MantisException {
+    public User[] getDevelopersByProjectName(String projectName, IProgressMonitor monitor) throws MantisException {
 
         int projectId = getProjectId(projectName);
 
-        List<String> developers = cacheData.developersByProjectId.get(projectId);
+        List<User> developers = cacheData.developersByProjectId.get(projectId);
 
         if (developers == null)
             throw new MantisException("No developers for project with id " + projectId + " ");
 
-        return developers.toArray(new String[developers.size()]);
+        return developers.toArray(new User[developers.size()]);
 
     }
 
-    public String[] getUsersByProjectName(String projectName, IProgressMonitor monitor) throws MantisException {
+    public User[] getUsersByProjectName(String projectName, IProgressMonitor monitor) throws MantisException {
 
         int projectId = getProjectId(projectName);
 
-        List<String> reporters = cacheData.reportersByProjectId.get(projectId);
+        List<User> reporters = cacheData.reportersByProjectId.get(projectId);
 
         if (reporters == null)
             throw new MantisException("No reporters for project with id " + projectId + " ");
 
-        return reporters.toArray(new String[reporters.size()]);
+        return reporters.toArray(new User[reporters.size()]);
     }
 
     /**
@@ -961,34 +945,37 @@ public class MantisCache {
      *            the name of the reporter
      */
     void registerAdditionalReporter(int projectId, AccountData accountData) {
+        
+        // empty account
+        if ( accountData.getId().equals(BigInteger.ZERO) )
+            return;
 
     	// debug for issue #119
     	if ( cacheData.reportersByProjectId == null) {
     		MantisCorePlugin.warn("cacheData.reportersByProjectId is null.", new RuntimeException());
-    		cacheData.reportersByProjectId = new HashMap<Integer, List<String>>();
+    		cacheData.reportersByProjectId = new HashMap<Integer, List<User>>();
     	}
     	
-        List<String> reporters = cacheData.reportersByProjectId.get(projectId);
+        List<User> reporters = cacheData.reportersByProjectId.get(projectId);
         if (reporters == null) {
-            reporters = new ArrayList<String>();
+            reporters = new ArrayList<User>();
             MantisCorePlugin.warn("cacheData.reportersByProjectId is null for projectId " + projectId + " .",
                     new RuntimeException());
             cacheData.reportersByProjectId.put(projectId, reporters);
         }
         
-        cacheData.allUsers.put(accountData.getName(), new User(accountData.getId().intValue(), accountData.getName(), accountData.getReal_name(), accountData.getEmail()));
+        User user = new User(accountData.getId().intValue(), accountData.getName(), accountData.getReal_name(), accountData.getEmail());
         
-		if (reporters.contains(accountData.getName()))
+        cacheData.allUsers.put(accountData.getName(), user);
+        
+		if (reporters.contains(user))
             return;
 
-        reporters.add(accountData.getName());
+        reporters.add(user);
     }
 
     boolean dueDateIsEnabled() {
         
         return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
     }
-
-
-    
 }

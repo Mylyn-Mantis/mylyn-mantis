@@ -269,7 +269,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 				value = "";
 			
             TaskAttribute attribute = getAttribute(data, key);
-            
+       
             // no options, just copy the value
             if ( attribute.getOptions().isEmpty() ) {
                 attribute.setValue(value);
@@ -453,8 +453,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void createDefaultAttributes(TaskData data,
             IMantisClient client, String projectName, IProgressMonitor monitor, boolean existingTask) throws CoreException {
 
-        // The order here is important as it controls how it appears in the
-        // Editor.
+        // The order here is important as it controls how it appears in the Editor
 
         try {
             MantisCache cache = client.getCache(monitor);
@@ -607,26 +606,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 attr.putOption("", "");
             for (MantisTicketAttribute value : values)
                 attr.putOption(String.valueOf(value.getValue()), value.getName());
-        }
-        return attr;
-    }
-
-    private TaskAttribute createAttribute(TaskData data,
-            MantisAttributeMapper.Attribute attribute, String[] values,
-            boolean allowEmtpy) {
-        
-        boolean readOnly = data.isNew() ? attribute.isReadOnlyForNewTask() : attribute.isReadOnlyForExistingTask();
-        
-        TaskAttribute attr = data.getRoot().createAttribute(attribute.getKey());
-        
-        attr.getMetaData().setReadOnly(readOnly).setLabel(
-                attribute.toString()).setKind(attribute.getKind()).setType(
-                        attribute.getType());
-        if (values != null && values.length > 0) {
-            if (allowEmtpy)
-                attr.putOption("", "");
-            for (String value : values)
-                attr.putOption(value, value);
         }
         return attr;
     }
@@ -802,7 +781,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         mapper.setDescription("");
         mapper.setSummary("");
     }
-    
 
     private void clearTaskRelations(TaskData taskData) {
 

@@ -254,13 +254,15 @@ public class MantisConverter {
         return new ObjectRef(new BigInteger(ticket.getValue(key)), "");
     }
 
-    public static AccountData convert(String username, MantisCache cache) {
+    public static AccountData convert(String userId, MantisCache cache) {
         
         AccountData accountData = new AccountData();
-        accountData.setName(username);
-        User user = cache.getUserByUsername(username);
+        if ( userId.length() == 0 )
+            return accountData;
+        accountData.setId(new BigInteger(userId));
+        User user = cache.getUserByUsername(userId);
         if ( user != null ) {
-            accountData.setId(BigInteger.valueOf(user.getValue()));
+            accountData.setName(user.getName());
             accountData.setEmail(user.getEmail());
             accountData.setReal_name(user.getRealName());
         }
