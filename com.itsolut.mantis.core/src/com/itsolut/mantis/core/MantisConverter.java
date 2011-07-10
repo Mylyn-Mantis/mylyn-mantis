@@ -12,35 +12,16 @@
 package com.itsolut.mantis.core;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import com.itsolut.mantis.binding.AccountData;
-import com.itsolut.mantis.binding.AttachmentData;
-import com.itsolut.mantis.binding.CustomFieldDefinitionData;
-import com.itsolut.mantis.binding.CustomFieldValueForIssueData;
-import com.itsolut.mantis.binding.IssueData;
-import com.itsolut.mantis.binding.IssueHeaderData;
-import com.itsolut.mantis.binding.IssueNoteData;
-import com.itsolut.mantis.binding.ObjectRef;
-import com.itsolut.mantis.binding.ProjectVersionData;
-import com.itsolut.mantis.binding.RelationshipData;
+import com.itsolut.mantis.binding.*;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisAttachment;
-import com.itsolut.mantis.core.model.MantisComment;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
-import com.itsolut.mantis.core.model.MantisRelationship;
-import com.itsolut.mantis.core.model.MantisTicket;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -279,7 +260,7 @@ public class MantisConverter {
         accountData.setName(username);
         User user = cache.getUserByUsername(username);
         if ( user != null ) {
-            accountData.setId(BigInteger.valueOf(user.getId()));
+            accountData.setId(BigInteger.valueOf(user.getValue()));
             accountData.setEmail(user.getEmail());
             accountData.setReal_name(user.getRealName());
         }

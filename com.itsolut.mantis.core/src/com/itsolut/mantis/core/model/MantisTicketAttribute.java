@@ -22,6 +22,10 @@ public class MantisTicketAttribute implements Comparable<MantisTicketAttribute>,
 	private int value;
 
 	public MantisTicketAttribute(String name, int value) {
+	    
+	    if ( name == null )
+	        throw new IllegalArgumentException("Null name for " + getClass().getSimpleName() + " with id " + value);
+	    
 		this.name = name;
 		this.value = value;
 	}

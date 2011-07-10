@@ -8,31 +8,23 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-import java.io.Serializable;
+import com.itsolut.mantis.core.model.MantisTicketAttribute;
 
 /**
  * @author Robert Munteanu
  */
-public class User implements Serializable {
+public class User extends MantisTicketAttribute {
 
     private static final long serialVersionUID = 1L;
     
-    private int id;
-    private String username;
     private String realName;
     private String email;
 
     public User(int id, String username, String realName, String email) {
 
-        this.id = id;
-        this.username = username;
+        super(username, id);
         this.realName = realName;
         this.email = email;
-    }
-
-    public String getUsername() {
-
-        return username;
     }
 
     public String getEmail() {
@@ -43,10 +35,5 @@ public class User implements Serializable {
     public String getRealName() {
 
         return realName;
-    }
-    
-    public int getId() {
-
-        return id;
     }
 }
