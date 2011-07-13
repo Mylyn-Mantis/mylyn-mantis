@@ -52,7 +52,37 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
+					<target>
+						<artifact>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>com.itsolut.mantis.parent</artifactId> <!-- XXX resolves as com.itsolut.mantis.core -->
+							<version>${project.version}</version>
+							<classifier>mantis</classifier>
+						</artifact>
+					</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>mantis.target</file>
+									<type>target</type>
+									<classifier>mantis</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
