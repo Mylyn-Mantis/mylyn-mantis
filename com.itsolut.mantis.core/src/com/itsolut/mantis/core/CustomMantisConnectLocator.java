@@ -13,7 +13,7 @@ import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.WebUtil;
 import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
 
-import com.itsolut.mantis.binding.MantisConnectLocator;
+import biz.futureware.mantis.rpc.soap.client.MantisConnectLocator;
 
 /**
  * 

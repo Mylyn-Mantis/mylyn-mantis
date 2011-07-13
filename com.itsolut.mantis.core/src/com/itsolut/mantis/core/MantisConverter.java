@@ -18,7 +18,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import com.itsolut.mantis.binding.*;
+import biz.futureware.mantis.rpc.soap.client.AccountData;
+import biz.futureware.mantis.rpc.soap.client.AttachmentData;
+import biz.futureware.mantis.rpc.soap.client.CustomFieldDefinitionData;
+import biz.futureware.mantis.rpc.soap.client.CustomFieldValueForIssueData;
+import biz.futureware.mantis.rpc.soap.client.IssueData;
+import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
+import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
+import biz.futureware.mantis.rpc.soap.client.ObjectRef;
+import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
+import biz.futureware.mantis.rpc.soap.client.RelationshipData;
+
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;

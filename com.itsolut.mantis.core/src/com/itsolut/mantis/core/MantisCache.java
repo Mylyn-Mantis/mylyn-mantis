@@ -25,7 +25,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.osgi.util.NLS;
 
-import com.itsolut.mantis.binding.*;
+import biz.futureware.mantis.rpc.soap.client.AccountData;
+import biz.futureware.mantis.rpc.soap.client.CustomFieldDefinitionData;
+import biz.futureware.mantis.rpc.soap.client.FilterData;
+import biz.futureware.mantis.rpc.soap.client.ObjectRef;
+import biz.futureware.mantis.rpc.soap.client.ProjectData;
+import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
+
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;

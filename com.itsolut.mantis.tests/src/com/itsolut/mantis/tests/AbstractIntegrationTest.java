@@ -19,8 +19,9 @@ import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.junit.After;
 import org.junit.Before;
 
-import com.itsolut.mantis.binding.IssueData;
-import com.itsolut.mantis.binding.ObjectRef;
+import biz.futureware.mantis.rpc.soap.client.IssueData;
+import biz.futureware.mantis.rpc.soap.client.ObjectRef;
+
 import com.itsolut.mantis.core.MantisClientFactory;
 
 /**

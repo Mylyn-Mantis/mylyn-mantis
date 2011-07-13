@@ -13,51 +13,49 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<artifactId>com.itsolut.mantis.core</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Mylyn Mantis Connector core plugin</name>
-	
+
 	<profiles>
 		<profile>
-			<id>wsdl2java</id>
+			<id>refresh-soap-stubs</id>
 			<build>
 				<plugins>
 					<plugin>
-				        <groupId>org.codehaus.mojo</groupId>
-				        <artifactId>axistools-maven-plugin</artifactId>
-				        <version>1.4</version>
-				        <configuration>
-				          <inputFiles>
-				          	<inputFile>mantisconnect.wsdl</inputFile>
-				          </inputFiles>
-				          <sourceDirectory>wsdl</sourceDirectory>
-				          <packageSpace>com.itsolut.mantis.binding</packageSpace>
-				          <testCases>false</testCases>
-				          <serverSide>false</serverSide>
-				          <outputDirectory>${project.basedir}/src</outputDirectory>
-				          <typeMappingVersion>1.2</typeMappingVersion> <!-- corresponds to what the ant build was generating -->
-				        </configuration>
-				        <executions>
-				          <execution>
-				            <goals>
-				              <goal>wsdl2java</goal>
-				            </goals>
-				          </execution>
-				        </executions>
-				        <dependencies>
-				        	<dependency>
-				        		<groupId>javax.mail</groupId>
-				        		<artifactId>mail</artifactId>
-				        		<version>1.4</version>
-				        	</dependency>
-				        	<dependency>
-				        		<groupId>javax.activation</groupId>
-				        		<artifactId>activation</artifactId>
-				        		<version>1.1</version>
-				        	</dependency>
-				        </dependencies>
-				      </plugin>		
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.3</version>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>biz.futureware.mantis</groupId>
+									<artifactId>mantis-axis-soap-client</artifactId>
+									<version>${mantisbt.soap.version}</version>
+									<destFileName>mantis-axis-soap-client.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>biz.futureware.mantis</groupId>
+									<artifactId>mantis-axis-soap-client</artifactId>
+									<version>${mantisbt.soap.version}</version>
+									<classifier>sources</classifier>
+									<destFileName>mantis-axis-soap-client-sources.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>lib/</outputDirectory>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
-			</profile>
+		</profile>
 	</profiles>
 	
+	<properties>
+		<mantisbt.soap.version>1.2.6</mantisbt.soap.version>
+	</properties>
 </project>
 

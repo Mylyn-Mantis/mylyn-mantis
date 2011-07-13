@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.itsolut.mantis.binding.AccountData;
+import biz.futureware.mantis.rpc.soap.client.AccountData;
+
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**

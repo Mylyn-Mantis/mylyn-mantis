@@ -34,9 +34,10 @@ import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.junit.Test;
 
-import com.itsolut.mantis.binding.IssueData;
-import com.itsolut.mantis.binding.ObjectRef;
-import com.itsolut.mantis.binding.RelationshipData;
+import biz.futureware.mantis.rpc.soap.client.IssueData;
+import biz.futureware.mantis.rpc.soap.client.ObjectRef;
+import biz.futureware.mantis.rpc.soap.client.RelationshipData;
+
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.MantisRepositoryConnector;

@@ -23,10 +23,11 @@ import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
 
-import com.itsolut.mantis.binding.AccountData;
-import com.itsolut.mantis.binding.IssueData;
-import com.itsolut.mantis.binding.IssueHeaderData;
-import com.itsolut.mantis.binding.IssueNoteData;
+import biz.futureware.mantis.rpc.soap.client.AccountData;
+import biz.futureware.mantis.rpc.soap.client.IssueData;
+import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
+import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
+
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
