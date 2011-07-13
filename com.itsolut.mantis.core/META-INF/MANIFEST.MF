@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-RegisterBuddy: org.apache.axis
 Bundle-ActivationPolicy: lazy
 Export-Package: 
- biz.futureware.mantis.rpc.soap.client;version="1.2.6",
  com.itsolut.mantis.core,
  com.itsolut.mantis.core.exception,
  com.itsolut.mantis.core.model,
