@@ -20,22 +20,14 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Locale;
 
-import org.apache.axis.AxisFault;
 import org.eclipse.core.runtime.*;
-import org.eclipse.mylyn.internal.provisional.commons.soap.AxisHttpFault;
-import org.eclipse.mylyn.tasks.core.RepositoryStatus;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 
-import com.itsolut.mantis.core.exception.MantisLocalException;
-import com.itsolut.mantis.core.exception.MantisLoginException;
-import com.itsolut.mantis.core.exception.MantisRemoteException;
-import com.itsolut.mantis.core.exception.TicketNotFoundException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 
 /**
  * The headless Trac plug-in class.
@@ -45,7 +37,7 @@ import com.itsolut.mantis.core.exception.TicketNotFoundException;
  */
 public class MantisCorePlugin extends Plugin {
 
-    private static final String PLUGIN_ID = "com.itsolut.mantis.core";
+    static final String PLUGIN_ID = "com.itsolut.mantis.core";
 
     public static final String ENCODING_UTF_8 = "UTF-8";
 
@@ -58,6 +50,8 @@ public class MantisCorePlugin extends Plugin {
     private MantisRepositoryConnector connector;
     
     private StatusFactory statusFactory;
+
+    private Injector injector;
 
     public static MantisCorePlugin getDefault() {
 
@@ -76,7 +70,7 @@ public class MantisCorePlugin extends Plugin {
 
         super.start(context);
         plugin = this;
-        statusFactory = new StatusFactory();
+        statusFactory = Guice.createInjector(new MantisPluginModule()).getInstance(StatusFactory.class);
     }
 
     @Override
@@ -153,61 +147,5 @@ public class MantisCorePlugin extends Plugin {
     public static void warn(String message, Throwable e) {
         
         log(new Status(Status.WARNING, MantisCorePlugin.PLUGIN_ID, message, e));
-    }
-    
-    public static class StatusFactory {
-
-        public Status toStatus( String message, Throwable t, TaskRepository repository) {
-            
-            String actualMessage = message == null ? t.getMessage() : message;
-            
-            if ( t instanceof TicketNotFoundException )
-                return new Status(IStatus.WARNING, PLUGIN_ID, actualMessage, t);
-            
-            if ( repository == null)
-                return new Status(IStatus.ERROR, PLUGIN_ID, actualMessage, t);
-            
-            if ( t instanceof MantisLoginException || ( actualMessage != null && actualMessage.toLowerCase(Locale.ENGLISH).contains("access denied")) )
-                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, actualMessage);
-            if ( t instanceof MantisRemoteException) {
-                if ( t.getCause() instanceof AxisHttpFault )  {
-                	
-                	AxisHttpFault httpFault = (AxisHttpFault) t.getCause();
-                	
-                	switch ( httpFault.getReturnCode() ) {
-                	
-                		case 404:
-                			return RepositoryStatus.createNotFoundError(repository.getUrl(), PLUGIN_ID);
-                		case 403:
-                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Access denied by server configuration. Please contact your server administrator.");
-                		case 401:
-                			return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "Server requested authentication, but none was given. Please provide HTTP credentials.");
-                		case 302:
-                		case 301:
-                			return RepositoryStatus.createStatus(repository, IStatus.WARNING, PLUGIN_ID, "Repository moved to " + MantisRepositoryLocations.create(httpFault.getLocation()).getBaseRepositoryLocation() + ", please update the server location.");
-                	}
-                }
-                if ( t.getCause() instanceof AxisFault ) {
-                    AxisFault fault = (AxisFault) t.getCause();
-                    if ( fault.detail instanceof IOException )
-                        return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_PERMISSION_DENIED, "IO Error : " + fault.detail.getMessage() + " .");
-                }
-                
-                if ( ((MantisRemoteException) t).isUnexpected() )
-                    return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
-                
-                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_REPOSITORY, actualMessage);
-                
-            }
-            if ( t instanceof MalformedURLException || t.getCause() instanceof MalformedURLException )
-                return RepositoryStatus.createStatus(repository, RepositoryStatus.ERROR_REPOSITORY_NOT_FOUND, PLUGIN_ID, t.getMessage());
-            if ( t instanceof MantisLocalException)
-                return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
-            if ( t instanceof IOException || t.getCause() instanceof IOException )
-                return new RepositoryStatus(IStatus.ERROR, PLUGIN_ID, RepositoryStatus.ERROR_IO, actualMessage);
-            
-            return RepositoryStatus.createInternalError(PLUGIN_ID, actualMessage, t);
-            
-        }
     }
 }

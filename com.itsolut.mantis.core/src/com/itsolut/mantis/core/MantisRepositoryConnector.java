@@ -38,6 +38,8 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.osgi.util.NLS;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -53,12 +55,16 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private MantisClientManager clientManager;
 
-    private final MantisTaskDataHandler offlineTaskHandler = new MantisTaskDataHandler(this);
+    private final MantisTaskDataHandler offlineTaskHandler;
 
-    private final MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(this);
+    private final MantisAttachmentHandler attachmentHandler;
 
     public MantisRepositoryConnector() {
 
+        Injector injector = Guice.createInjector(new MantisConnectorModule(this));
+        offlineTaskHandler = injector.getInstance(MantisTaskDataHandler.class);
+        attachmentHandler = injector.getInstance(MantisAttachmentHandler.class);
+        
         MantisCorePlugin.getDefault().setConnector(this);
     }
 

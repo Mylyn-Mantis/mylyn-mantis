@@ -41,6 +41,7 @@ import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.AccountData;
 
+import com.google.inject.Inject;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
@@ -62,7 +63,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
-    private final MantisRepositoryConnector connector;
+    private final MantisClientManager clientManager;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -104,8 +105,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         customFieldTypeToTaskType.put(MantisCustomFieldType.STRING, TaskAttribute.TYPE_SHORT_TEXT);
     }
     
-    public MantisTaskDataHandler(MantisRepositoryConnector connector) {
-        this.connector = connector;
+    @Inject
+    public MantisTaskDataHandler(MantisClientManager clientManager) {
+        this.clientManager = clientManager;
     }
 
     @Override
@@ -118,7 +120,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             ITaskMapping initializationData, IProgressMonitor monitor)
     throws CoreException {
         try {
-            IMantisClient client = connector.getClientManager().getRepository(repository);
+            IMantisClient client = clientManager.getRepository(repository);
             
             // project name
             TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
@@ -138,7 +140,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskData taskData, Set<TaskAttribute> oldAttributes,
             IProgressMonitor monitor) throws CoreException {
         try {
-            IMantisClient client = connector.getClientManager().getRepository( repository);
+            IMantisClient client = clientManager.getRepository( repository);
 
             processOperation(taskData, client, monitor);
 
@@ -242,7 +244,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         int id = MantisRepositoryConnector.getTicketId(taskId);
         try {
-            IMantisClient client = connector.getClientManager().getRepository(repository);
+            IMantisClient client = clientManager.getRepository(repository);
             MantisTicket ticket = client.getTicket(id, monitor);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
         } catch ( TicketNotFoundException e) {
@@ -776,7 +778,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     	validateSupportsSubtasks(repository, parentTaskData);
     	
         try {
-            IMantisClient client = connector.getClientManager().getRepository( repository);
+            IMantisClient client = clientManager.getRepository( repository);
 			createAttributesForTaskData(repository, taskData, parentTaskData, monitor);
 			copyAttributesFromParent(taskData, parentTaskData); 
 			clearTaskRelations(taskData);
@@ -799,7 +801,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,
             IProgressMonitor monitor) throws MantisException, CoreException {
 
-        IMantisClient client = connector.getClientManager().getRepository( repository);
+        IMantisClient client = clientManager.getRepository( repository);
         TaskAttribute projectAttribute = parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PROJECT.getKey());
         createDefaultAttributes(taskData, client, projectAttribute.getValue(), monitor, false);
         getAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT.getKey()).setValue(projectAttribute.getValue());

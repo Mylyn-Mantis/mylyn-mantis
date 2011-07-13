@@ -29,6 +29,7 @@ import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentSource;
 import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
+import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.util.MantisUtils;
 
@@ -49,23 +50,27 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
 
-    private final MantisRepositoryConnector connector;
+    private final MantisClientManager clientManager;
 
-    public MantisAttachmentHandler(MantisRepositoryConnector connector) {
-        this.connector = connector;
+    private final StatusFactory statusFactory;
+
+    @Inject
+    public MantisAttachmentHandler(MantisClientManager clientManager, StatusFactory statusFactory) {
+        this.clientManager = clientManager;
+        this.statusFactory = statusFactory;
     }
 
     private byte[] getAttachmentData(TaskRepository repository, TaskAttachmentMapper attachment, IProgressMonitor monitor) throws CoreException {
         String id = attachment.getAttachmentId();
         if (id == null || id.length() == 0) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null, repository));
+            throw new CoreException(statusFactory.toStatus("Attachment download from " + repository.getRepositoryUrl() + " failed, missing attachment filename.", null, repository));
         }
 
         try {
-            IMantisClient client = connector.getClientManager().getRepository(repository);
+            IMantisClient client = clientManager.getRepository(repository);
             return client.getAttachmentData(Integer.parseInt(id), monitor);
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment download from " +repository.getRepositoryUrl() + " failed : " + e.getMessage(), e , repository));
+            throw new CoreException(statusFactory.toStatus("Attachment download from " +repository.getRepositoryUrl() + " failed : " + e.getMessage(), e , repository));
         }
     }
 
@@ -109,7 +114,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
         monitor.beginTask("Uploading attachment", 2);        
 
         try {
-            IMantisClient client = connector.getClientManager().getRepository(repository);
+            IMantisClient client = clientManager.getRepository(repository);
             int id = MantisRepositoryConnector.getTicketId(task.getTaskId());
             byte[] data = readData(source, monitor);
 
@@ -132,9 +137,9 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             Policy.advance(monitor, 1);
             
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
+            throw new CoreException(statusFactory.toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
         } catch (IOException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
+            throw new CoreException(statusFactory.toStatus("Attachment upload to " + task.getRepositoryUrl() + " failed, please see details.", e , repository));
         } finally {
             monitor.done();
         }

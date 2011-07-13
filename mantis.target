@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target name="mantis" sequenceNumber="2">
+<target name="mantis" sequenceNumber="4">
 <locations>
 <location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.platform.ide" version="3.5.2.M20100211-1343"/>
@@ -14,7 +14,10 @@
 <repository location="http://download.eclipse.org/mylyn/drops/3.6.0/v20110608-1400/"/>
 </location>
 <location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="com.google.inject" version="2.0.0.v201105231817"/>
+<unit id="com.google.inject.source" version="2.0.0.v201105231817"/>
 <unit id="org.junit" version="4.8.2.v4_8_2_v20110321-1705"/>
+<unit id="org.junit.source" version="4.8.2.v4_8_2_v20110321-1705"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/"/>
 </location>
 </locations>
