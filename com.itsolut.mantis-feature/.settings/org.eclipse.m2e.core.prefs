@@ -1,4 +1,5 @@
 #Wed Jul 13 14:29:52 EEST 2011
+activeProfiles=
 eclipse.preferences.version=1
-project.repository.kind=local
-project.repository.url=local
+resolveWorkspaceProjects=true
+version=1
