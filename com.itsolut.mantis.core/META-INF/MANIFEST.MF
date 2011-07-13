@@ -10,11 +10,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.commons.net;bundle-version="[3.5.0,4.0.0)",
  org.eclipse.mylyn.commons.soap;bundle-version="[3.5.0,4.0.0)",
  org.apache.axis;bundle-version="[1.4.0,2.0.0)",
- javax.xml.rpc
+ javax.xml.rpc,
+ biz.futureware.mantis.axis-soap-client;bundle-version="1.2.5"
 Eclipse-RegisterBuddy: org.apache.axis
 Bundle-ActivationPolicy: lazy
 Export-Package: 
- com.itsolut.mantis.binding,
  com.itsolut.mantis.core,
  com.itsolut.mantis.core.exception,
  com.itsolut.mantis.core.model,
