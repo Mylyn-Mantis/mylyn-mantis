@@ -39,7 +39,6 @@ import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -58,8 +57,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
@@ -107,20 +105,23 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private final Map<FilterKey, String> filterKeyToUrl = new HashMap<FilterKey, String>();
 
-    public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query) {
+    private final MantisClientManager clientManager;
+
+    public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query, MantisClientManager clientManager) {
 
         super(TITLE, repository, query);
 
         this.repository = repository;
         this.query = query;
+        this.clientManager = clientManager;
 
         setTitle(TITLE);
         setDescription(DESCRIPTION);
     }
+    
+    public MantisCustomQueryPage(TaskRepository repository, MantisClientManager clientManager) {
 
-    public MantisCustomQueryPage(TaskRepository repository) {
-
-        this(repository, null);
+        this(repository, null, clientManager);
     }
 
     public void createControl(Composite parent) {
@@ -239,10 +240,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private IMantisClient getMantisClient() throws MantisException {
 
-        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-        final IMantisClient client = connector.getClientManager().getRepository(repository);
-        return client;
+        return clientManager.getRepository(repository);
     }
 
     private void createProjectTree(Composite control) {
@@ -313,16 +311,13 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         final List<MantisProject> projects = new ArrayList<MantisProject>();
 
         try {
-            MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                    .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-            final IMantisClient client = connector.getClientManager().getRepository(repository);
-
+            
             CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
 
                 public void run(IProgressMonitor monitor) throws CoreException {
 
                     try {
-                        projects.addAll(client.getCache(monitor).getProjects());
+                        projects.addAll(getMantisClient().getCache(monitor).getProjects());
                     } catch (MantisException e) {
                         throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID,
                                 "Failed getting projects : " + e.getMessage(), e));
@@ -330,8 +325,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
                 }
             });
         } catch (CoreException e) {
-            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
-        } catch (MantisException e) {
             setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
         }
 

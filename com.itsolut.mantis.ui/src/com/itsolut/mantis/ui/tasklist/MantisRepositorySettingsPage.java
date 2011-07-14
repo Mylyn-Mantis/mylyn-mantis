@@ -47,9 +47,16 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private Button useRichTextEditor;
 
-    public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository) {
+    private final StatusFactory statusFactory;
+
+    private final MantisClientFactory clientFactory;
+
+    public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository, StatusFactory statusFactory, MantisClientFactory clientFactory) {
 
         super(TITLE, DESCRIPTION, taskRepository);
+        this.statusFactory = statusFactory;
+        this.clientFactory = clientFactory;
+        
         setNeedsAnonymousLogin(true);
         setNeedsEncoding(false);
         setNeedsTimeZone(false);
@@ -159,9 +166,9 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
             try {
                 validate(monitor);
             } catch (MantisException e) {
-                throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, taskRepository));
+                throw new CoreException(statusFactory.toStatus(null, e, taskRepository));
             } catch (MalformedURLException e) {
-                throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, taskRepository));
+                throw new CoreException(statusFactory.toStatus(null, e, taskRepository));
             }
         }
 
@@ -169,7 +176,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
             AbstractWebLocation location = new TaskRepositoryLocationFactory().createWebLocation(taskRepository);
 
-            IMantisClient client = MantisClientFactory.getDefault().createClient(location);
+            IMantisClient client = clientFactory.createClient(location);
             RepositoryValidationResult validate = client.validate(monitor);
             if ( !validate.getVersion().getMissingCapabilities().isEmpty() ) {
             	setStatusFromMissingCapabilities(validate);

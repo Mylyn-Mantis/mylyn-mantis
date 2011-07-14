@@ -21,12 +21,13 @@
 package com.itsolut.mantis.core;
 
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 
 
 /**
@@ -46,12 +47,10 @@ public class MantisCorePlugin extends Plugin {
     public final static String REPOSITORY_KIND = "mantis";
 
     public static final boolean DEBUG = Boolean.getBoolean(MantisCorePlugin.class.getName().toLowerCase() + ".debug");
-
-    private MantisRepositoryConnector connector;
     
     private StatusFactory statusFactory;
 
-    private Injector injector;
+    private MantisRepositoryConnector connector;
 
     public static MantisCorePlugin getDefault() {
 
@@ -69,45 +68,38 @@ public class MantisCorePlugin extends Plugin {
     public void start(BundleContext context) throws Exception {
 
         super.start(context);
+        
         plugin = this;
-        statusFactory = Guice.createInjector(new MantisPluginModule()).getInstance(StatusFactory.class);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
 
-        if (connector != null) {
+        if ( connector != null )
             connector.stop();
-            connector = null;
-        }
-
+        
         plugin = null;
         super.stop(context);
     }
-
-    public StatusFactory getStatusFactory() {
-
-        return statusFactory;
-    }
     
-    public MantisRepositoryConnector getConnector() {
-
-        return connector;
-    }
-
-    void setConnector(MantisRepositoryConnector connector) {
-
+    @Inject
+    public void setMantisRepositoryConnector(MantisRepositoryConnector connector) {
+        
         this.connector = connector;
     }
 
-    /**
-     * Returns the path to the file caching repository attributes.
-     */
-    protected IPath getRepositoryAttributeCachePath() {
+    @Inject
+    public void setStatusFactory(StatusFactory statusFactory) {
 
-        IPath stateLocation = Platform.getStateLocation(MantisCorePlugin.getDefault().getBundle());
-        IPath cacheFile = stateLocation.append("repositoryConfigurations");
-        return cacheFile;
+        this.statusFactory = statusFactory;
+    }
+
+    private StatusFactory getStatusFactory() {
+        
+        if ( statusFactory == null )
+            throw new IllegalStateException();
+
+        return statusFactory;
     }
 
     private static void log(IStatus status) {

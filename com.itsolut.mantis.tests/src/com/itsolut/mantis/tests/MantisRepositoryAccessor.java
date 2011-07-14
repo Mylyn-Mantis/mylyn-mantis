@@ -84,7 +84,7 @@ public class MantisRepositoryAccessor {
 				password), false);
 		location = new TaskRepositoryLocationFactory().createWebLocation(repository);
 
-		client = MantisClientFactory.getDefault().createClient(location);
+		client = new MantisClientFactory(new TaskRepositoryLocationFactory()).createClient(location);
 
 		FileProvider provider = new FileProvider(this.getClass().getClassLoader().getResourceAsStream(
 				"test-client-config.wsdd"));

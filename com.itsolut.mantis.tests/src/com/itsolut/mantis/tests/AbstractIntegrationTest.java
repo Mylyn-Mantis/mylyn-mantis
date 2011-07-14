@@ -15,14 +15,11 @@ import java.rmi.RemoteException;
 
 import javax.xml.rpc.ServiceException;
 
-import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.junit.After;
 import org.junit.Before;
 
 import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.ObjectRef;
-
-import com.itsolut.mantis.core.MantisClientFactory;
 
 /**
  * @author Robert Munteanu
@@ -57,8 +54,6 @@ public abstract class AbstractIntegrationTest  {
 
 	@Before
 	public final void setUp() throws Exception {
-
-		MantisClientFactory.getDefault().setTaskRepositoryLocationFactory(new TaskRepositoryLocationFactory());
 
 		repositoryAccessor = new MantisRepositoryAccessor(getUsername(), getPassword(), getRepositoryUrlWithOverride());
 		repositoryAccessor.init();

@@ -115,7 +115,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
         try {
             IMantisClient client = clientManager.getRepository(repository);
-            int id = MantisRepositoryConnector.getTicketId(task.getTaskId());
+            int id = Integer.parseInt(task.getTaskId());
             byte[] data = readData(source, monitor);
 
             //hack since context methods are final in superclasses & Mantis does not have a description column

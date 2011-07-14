@@ -32,7 +32,11 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.mylyn.tasks.core.*;
+import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.ITaskComment;
+import org.eclipse.mylyn.tasks.core.ITaskMapping;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttachmentModel;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.LegendElement;
@@ -41,9 +45,14 @@ import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
 import org.eclipse.mylyn.tasks.ui.wizards.TaskAttachmentPage;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.itsolut.mantis.core.MantisClientFactory;
+import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryLocations;
 import com.itsolut.mantis.core.SourceForgeConstants;
+import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
@@ -59,6 +68,21 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 
     private static final Pattern HYPERLINK_PATTERN = Pattern.compile("(bug|issue|task) #?(\\d+)",
             Pattern.CASE_INSENSITIVE);
+    
+    private final StatusFactory statusFactory;
+
+    private final MantisClientManager clientManager;
+
+    private final MantisClientFactory clientFactory;
+    
+    public MantisRepositoryUi() {
+        
+        Injector injector = Guice.createInjector(new MantisUiPluginModule());
+        
+        statusFactory = injector.getInstance(StatusFactory.class);
+        clientManager = injector.getInstance(MantisClientManager.class);
+        clientFactory = injector.getInstance(MantisClientFactory.class);
+    }
 
     @Override
     public String getConnectorKind() {
@@ -76,16 +100,16 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     public IWizard getQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit) {
 
         if (queryToEdit != null) {
-            return new NewMantisQueryWizard(repository, queryToEdit);
+            return new NewMantisQueryWizard(repository, queryToEdit, clientManager);
         }
 
-        return new NewMantisQueryWizard(repository);
+        return new NewMantisQueryWizard(repository, clientManager);
     }
 
     @Override
     public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
 
-        return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository);
+        return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository, statusFactory, clientFactory);
     }
     
     @Override
@@ -105,7 +129,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     @Override
     public ITaskSearchPage getSearchPage(TaskRepository repository, IStructuredSelection selection) {
 
-        return new MantisCustomQueryPage(repository);
+        return new MantisCustomQueryPage(repository, clientManager);
     }
 
     @Override

@@ -13,7 +13,6 @@ package com.itsolut.mantis.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.FormColors;
@@ -21,8 +20,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 
-import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryConnector;
 
 /**
  * @author Mik Kersten
@@ -44,16 +43,20 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
+	    
 		super.start(context);
 		
-		MantisClientFactory.getDefault().setTaskRepositoryLocationFactory(new TaskRepositoryLocationUiFactory());
-		TasksUi.getRepositoryManager().addListener(MantisCorePlugin.getDefault().getConnector().getClientManager());
+		MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
 		
+		TasksUi.getRepositoryManager().addListener(connector.getClientManager());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-	    TasksUi.getRepositoryManager().removeListener(MantisCorePlugin.getDefault().getConnector().getClientManager());
+	    
+	    MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+	    
+	    TasksUi.getRepositoryManager().removeListener(connector.getClientManager());
 		
 		plugin = null;
 		

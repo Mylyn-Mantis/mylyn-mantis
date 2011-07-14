@@ -22,17 +22,29 @@
 
 package com.itsolut.mantis.core;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.mylyn.commons.net.AbstractWebLocation;
-import org.eclipse.mylyn.internal.tasks.core.*;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.osgi.util.NLS;
 
+import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
@@ -43,12 +55,14 @@ import com.itsolut.mantis.core.exception.MantisException;
 public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
 
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
-    private PersistedState state;
+    private final PersistedState state;
+    private final MantisClientFactory clientFactory;
 
-    public MantisClientManager(File cacheFile) {
+    @Inject
+    public MantisClientManager(@RepositoryPersistencePath IPath repositoryPersistencePath, MantisClientFactory clientFactory) {
 
-        state = new PersistedState(cacheFile);
-        state.read();
+        this.clientFactory = clientFactory;
+        state = new PersistedState(repositoryPersistencePath.toFile());
     }
 
     public synchronized void persistCache() {
@@ -74,16 +88,14 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
     private IMantisClient newMantisClient(TaskRepository taskRepository) throws MantisException {
 
-        AbstractWebLocation location = MantisClientFactory.getDefault().getTaskRepositoryLocationFactory()
-                .createWebLocation(taskRepository);
+        IMantisClient repository = clientFactory.createClient(taskRepository);
 
-        IMantisClient repository = MantisClientFactory.getDefault().createClient(location);
-
-        MantisCacheData cacheData = state.get(location.getUrl());
+        String repositoryUrl = taskRepository.getUrl();
+        MantisCacheData cacheData = state.get(repositoryUrl);
         if (cacheData != null) {
             repository.setCacheData(cacheData);
         } else {
-            state.add(location.getUrl(), repository.getCacheData());
+            state.add(repositoryUrl, repository.getCacheData());
         }
 
         clientByUrl.put(taskRepository.getRepositoryUrl(), repository);
@@ -151,6 +163,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         private Map<String, MantisCacheData> _cacheDataByUrl = new HashMap<String, MantisCacheData>();
 
         private File cacheFile;
+        private boolean read;
 
         public PersistedState(File cacheFile) {
 
@@ -158,21 +171,33 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         }
 
         public void add(String url, MantisCacheData data) {
+            
+            ensureRead();
 
             _cacheDataByUrl.put(url, data);
         }
 
+        private void ensureRead() {
+
+            if ( !read )
+                read();
+        }
+
         public void remove(String url) {
 
+            ensureRead();
+            
             _cacheDataByUrl.remove(url);
         }
 
         public MantisCacheData get(String url) {
 
+            ensureRead();
+            
             return _cacheDataByUrl.get(url);
         }
 
-        public void read() {
+        private void read() {
 
             ObjectInputStream in = null;
             try {
@@ -188,6 +213,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
             } catch (Throwable e) {
                 cleanCache(e);
             } finally {
+                read = true;
                 closeSilently(in);
             }
 
@@ -200,6 +226,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         }
 
         public void write() {
+            
+            ensureRead();
 
             ObjectOutputStream out = null;
             try {

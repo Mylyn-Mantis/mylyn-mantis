@@ -64,6 +64,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private final MantisClientManager clientManager;
+    private final StatusFactory statusFactory;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -91,7 +92,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     
     private final static Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
-    
     {
         customFieldTypeToTaskType.put(MantisCustomFieldType.CHECKBOX, TaskAttribute.TYPE_BOOLEAN);
         customFieldTypeToTaskType.put(MantisCustomFieldType.DATE, TaskAttribute.TYPE_DATE);
@@ -106,8 +106,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
     
     @Inject
-    public MantisTaskDataHandler(MantisClientManager clientManager) {
+    public MantisTaskDataHandler(MantisClientManager clientManager, StatusFactory statusFactory) {
         this.clientManager = clientManager;
+        this.statusFactory = statusFactory;
     }
 
     @Override
@@ -131,7 +132,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createCustomFieldAttributes(data, client, new DefaultCustomFieldValueSource(), monitor);
             return true;
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
+            throw new CoreException(statusFactory.toStatus(null, e, repository));
         }
     }
 
@@ -175,9 +176,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
         } catch ( NumberFormatException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid time tracking value, must be an integer.", new MantisException(e), repository));
+            throw new CoreException(statusFactory.toStatus("Invalid time tracking value, must be an integer.", new MantisException(e), repository));
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
+            throw new CoreException(statusFactory.toStatus(null, e, repository));
         }
     }
 
@@ -242,15 +243,15 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     public TaskData getTaskData(TaskRepository repository, String taskId,
             IProgressMonitor monitor) throws CoreException {
 
-        int id = MantisRepositoryConnector.getTicketId(taskId);
+        int id = Integer.parseInt(taskId);
         try {
             IMantisClient client = clientManager.getRepository(repository);
             MantisTicket ticket = client.getTicket(id, monitor);
             return createTaskDataFromTicket(client, repository, ticket, monitor);
         } catch ( TicketNotFoundException e) {
-        	throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(e.getMessage(), e, repository));
+        	throw new CoreException(statusFactory.toStatus(e.getMessage(), e, repository));
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Ticket download from "
+            throw new CoreException(statusFactory.toStatus("Ticket download from "
                     + repository.getRepositoryUrl() + " for task " + id + " failed : " + e.getMessage() + " .", e, repository));
         }
     }
@@ -548,7 +549,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
                 .setType(TaskAttribute.TYPE_OPERATION);
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, null));
+            throw new CoreException(statusFactory.toStatus(null, e, null));
         }
 
     }
@@ -705,7 +706,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
             return taskData;
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository));
+            throw new CoreException(statusFactory.toStatus(null, e, repository));
         }
     }
     
@@ -787,7 +788,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
 			return true;
 		} catch (MantisException e) {
-			throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed updating attributes.", e, repository));
+			throw new CoreException(statusFactory.toStatus("Failed updating attributes.", e, repository));
 
 		}
     }
@@ -795,7 +796,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void validateSupportsSubtasks(TaskRepository repository, TaskData parentTaskData) throws CoreException {
 
         if ( parentTaskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.PARENT_OF.getKey()) == null)
-			throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("The repository does not support subtasks.", null, repository));
+			throw new CoreException(statusFactory.toStatus("The repository does not support subtasks.", null, repository));
     }
     
     private void createAttributesForTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData,

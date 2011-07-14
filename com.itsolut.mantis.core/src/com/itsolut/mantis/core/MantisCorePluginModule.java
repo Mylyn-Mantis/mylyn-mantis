@@ -1,0 +1,40 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Robert Munteanu <robert.munteanu@gmail.com>
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+package com.itsolut.mantis.core;
+
+import org.eclipse.core.runtime.IPath;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
+
+/**
+ * @author Robert Munteanu
+ *
+ */
+class MantisCorePluginModule extends AbstractModule {
+    
+    private final MantisRepositoryConnector mantisRepositoryConnector;
+
+    public MantisCorePluginModule(MantisRepositoryConnector mantisRepositoryConnector) {
+        
+        this.mantisRepositoryConnector = mantisRepositoryConnector;
+    }
+
+    @Override
+    protected void configure() {
+        
+        bind(StatusFactory.class).in(Singleton.class);
+        bind(MantisAttachmentHandler.class).in(Singleton.class);
+        bind(MantisTaskDataHandler.class).in(Singleton.class);
+        bind(MantisClientManager.class).in(Singleton.class);
+        bind(IPath.class).annotatedWith(RepositoryPersistencePath.class).toProvider(RepositoryPersistencePathProvider.class);
+        bind(MantisRepositoryConnector.class).toInstance(mantisRepositoryConnector);
+    }
+
+}

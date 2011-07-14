@@ -23,6 +23,7 @@ import org.junit.Test;
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.core.TaskRelationshipChange;
 import com.itsolut.mantis.core.TaskRelationshipChangeFinder;
 import com.itsolut.mantis.core.model.MantisRelationship;
@@ -50,7 +51,7 @@ public class TaskRelationshipChangeFinderTest {
 	
 	private TaskRelationshipChangeFinder newChangeFinder() {
 		
-		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null));
+		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null, new StatusFactory()));
 	}
 
 	private TaskData newExistingTaskData() {

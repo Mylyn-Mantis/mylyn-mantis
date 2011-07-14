@@ -23,23 +23,35 @@
 
 package com.itsolut.mantis.core;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
-import org.eclipse.mylyn.tasks.core.*;
-import org.eclipse.mylyn.tasks.core.data.*;
+import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
+import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.ITaskMapping;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
+import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
+import org.eclipse.mylyn.tasks.core.data.TaskMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -53,19 +65,23 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
 
-    private MantisClientManager clientManager;
+    private Provider<MantisClientManager> clientManager;
 
     private final MantisTaskDataHandler offlineTaskHandler;
 
     private final MantisAttachmentHandler attachmentHandler;
 
+    private final StatusFactory statusFactory;
+
     public MantisRepositoryConnector() {
 
-        Injector injector = Guice.createInjector(new MantisConnectorModule(this));
+        Injector injector = Guice.createInjector(new MantisCorePluginModule(this));
         offlineTaskHandler = injector.getInstance(MantisTaskDataHandler.class);
         attachmentHandler = injector.getInstance(MantisAttachmentHandler.class);
+        statusFactory = injector.getInstance(StatusFactory.class);
+        clientManager = injector.getProvider(MantisClientManager.class);
         
-        MantisCorePlugin.getDefault().setConnector(this);
+        injector.injectMembers(MantisCorePlugin.getDefault());
     }
 
     @Override
@@ -163,7 +179,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 }
 
             } catch (MantisException e) {
-                return MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, repository);
+                return statusFactory.toStatus(null, e, repository);
             } catch (CoreException e) {
                 return e.getStatus();
             }
@@ -172,39 +188,22 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         } finally {
             monitor.done();
         }
-
-       
-
     }
 
-    public synchronized MantisClientManager getClientManager() {
+    public MantisClientManager getClientManager() {
 
-        File cacheFile = MantisCorePlugin.getDefault().getRepositoryAttributeCachePath().toFile();
-        if (clientManager == null)
-            clientManager = new MantisClientManager(cacheFile);
-        return clientManager;
+        return clientManager.get();
     }
 
     public void stop() {
 
-        if (clientManager != null)
-            clientManager.persistCache();
-
+        clientManager.get().persistCache();
     }
 
     @Override
     public String getTaskIdPrefix() {
 
         return "#";
-    }
-
-    public static int getTicketId(String taskId) throws CoreException {
-
-        try {
-            return Integer.parseInt(taskId);
-        } catch (NumberFormatException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Invalid ticket id: " + taskId + ".", e, null));
-        }
     }
 
     // For the repositories, perform the queries to get the latest information
@@ -243,7 +242,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 if (ticket.getLastChanged() != null && ticket.getLastChanged().compareTo(since) > 0)
                     changedTickets.add(Integer.valueOf(ticket.getId()));
         } catch (MantisException e) {
-           throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Failed getting changed tasks.", e, repository));
+           throw new CoreException(statusFactory.toStatus("Failed getting changed tasks.", e, repository));
         }
         
         MantisCorePlugin.debug(NLS.bind("Found {0} changed tickets.", changedTickets.size()), null);
@@ -259,7 +258,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             client.updateAttributes(monitor);
             MantisRepositoryConfiguration.setSupportsSubTasks(repository, client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations());
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, repository));
+            throw new CoreException(statusFactory.toStatus("Could not update attributes", e, repository));
         }
 
     }
@@ -270,7 +269,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         try {
             getClientManager().getRepository(taskRepository).updateAttributesForTask(monitor, Integer.valueOf(task.getTaskId()));
         } catch (MantisException e) {
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus("Could not update attributes", e, taskRepository));
+            throw new CoreException(statusFactory.toStatus("Could not update attributes", e, taskRepository));
         }
     }
 
@@ -313,11 +312,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         scheme.applyTo(task);
 
         task.setCompletionDate(scheme.getCompletionDate());
-
-        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-                .getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-
-        task.setUrl(connector.getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
+        task.setUrl(getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {
@@ -373,7 +368,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
             for (Integer taskId : getChangedTasksByQuery(query, repository, since, monitor)) {
                 for (ITask task : event.getTasks()) {
-                    if (getTicketId(task.getTaskId()) == taskId.intValue()) {
+                    if (Integer.parseInt(task.getTaskId()) == taskId.intValue()) {
                         event.setNeedsPerformQueries(true);
                         event.markStale(task);
                         
@@ -423,7 +418,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             }
         } catch (RuntimeException e) {
             event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(new Date()) + "");
-            throw new CoreException(MantisCorePlugin.getDefault().getStatusFactory().toStatus(null, e, event.getTaskRepository()));
+            throw new CoreException(statusFactory.toStatus(null, e, event.getTaskRepository()));
         } finally {
             monitor.done();
         }

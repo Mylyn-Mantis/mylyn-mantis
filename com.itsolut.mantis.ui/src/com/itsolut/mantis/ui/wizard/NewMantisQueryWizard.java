@@ -27,41 +27,39 @@ import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
+import com.itsolut.mantis.core.MantisClientManager;
+
 /**
  * @author Steffen Pingel
  * @author David Carver
  */
 public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
-	private static final String TITLE = "New Mantis Query";
-
 	private final TaskRepository repository;
-	private IRepositoryQuery query;
+	private final IRepositoryQuery query;
+    private final MantisClientManager clientManager;
 
 	
-	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit) {
+	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit, MantisClientManager clientManager) {
 		super(repository);
 		this.repository = repository;
 		this.query = queryToEdit;
-		setWindowTitle("Edit Mantis Query");
+        this.clientManager = clientManager;
+        
+		setWindowTitle(query == null ? "Create Mantis Query" : "Edit Mantis Query");
 		setNeedsProgressMonitor(true);
 		setDefaultPageImageDescriptor(TasksUiImages.BANNER_REPOSITORY);
 		
 	}
 
-	public NewMantisQueryWizard(TaskRepository repository) {
-		super(repository);
-		this.repository = repository;
-
-		setNeedsProgressMonitor(true);
-		setWindowTitle(TITLE);
-		setDefaultPageImageDescriptor(TasksUiImages.BANNER_REPOSITORY);
+	public NewMantisQueryWizard(TaskRepository repository, MantisClientManager clientManager) {
+	    this(repository, null, clientManager);
 	}
 
 	@Override
 	public void addPages() {
 	    
-	    AbstractRepositoryQueryPage queryPage = query != null ? new MantisCustomQueryPage(repository, query) : new MantisCustomQueryPage(repository); 
+	    AbstractRepositoryQueryPage queryPage = query != null ? new MantisCustomQueryPage(repository, query, clientManager) : new MantisCustomQueryPage(repository, clientManager); 
 	    
 		queryPage.setWizard(this);
 		addPage(queryPage);

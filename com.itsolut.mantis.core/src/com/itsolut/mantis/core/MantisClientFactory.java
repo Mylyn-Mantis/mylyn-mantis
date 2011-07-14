@@ -21,10 +21,11 @@
 
 package com.itsolut.mantis.core;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
+import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
@@ -33,31 +34,21 @@ import com.itsolut.mantis.core.exception.MantisException;
  */
 public class MantisClientFactory {
 
-    private static MantisClientFactory DEFAULT = new MantisClientFactory();
+    private final TaskRepositoryLocationFactory taskRepositoryLocationFactory;
 
-    private TaskRepositoryLocationFactory taskRepositoryLocationFactory;
-
-    public void setTaskRepositoryLocationFactory(TaskRepositoryLocationFactory taskRepositoryLocationFactory) {
-
+    @Inject
+    public MantisClientFactory(TaskRepositoryLocationFactory taskRepositoryLocationFactory) {
+        
         this.taskRepositoryLocationFactory = taskRepositoryLocationFactory;
-
-    }
-
-    public TaskRepositoryLocationFactory getTaskRepositoryLocationFactory() {
-
-        Assert.isNotNull(taskRepositoryLocationFactory);
-
-        return taskRepositoryLocationFactory;
-    }
-
-    public static MantisClientFactory getDefault() {
-
-        return DEFAULT;
     }
 
     public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
         return new MantisClient(webLocation);
-
+    }
+    
+    public IMantisClient createClient(TaskRepository taskRepository) throws MantisException {
+        
+        return createClient(taskRepositoryLocationFactory.createWebLocation(taskRepository));
     }
 }
