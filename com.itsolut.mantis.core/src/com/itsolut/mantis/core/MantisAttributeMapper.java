@@ -44,8 +44,6 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     
     private final static Set<Key> _taskRelationKeys = EnumSet.of(Key.PARENT_OF, Key.CHILD_OF, Key.RELATED_TO, Key.HAS_DUPLICATE, Key.DUPLICATE_OF);
 
-    private static final long serialVersionUID = 5333211422546115138L;
-    
     /**
      * @return an unmodifiable set containing all the {@link Key keys} which are related to task relations.
      */
