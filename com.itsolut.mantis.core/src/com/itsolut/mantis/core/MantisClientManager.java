@@ -22,23 +22,12 @@
 
 package com.itsolut.mantis.core;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
-import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
+import org.eclipse.mylyn.internal.tasks.core.*;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -166,13 +155,18 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
             
             ensureRead();
 
-            _cacheDataByUrl.put(url, data);
+            add0(url, data);
         }
-
+        
         private void ensureRead() {
 
             if ( !read )
                 read();
+        }
+        
+        private void add0(String url, MantisCacheData data) {
+
+            _cacheDataByUrl.put(url, data);
         }
 
         public void remove(String url) {
@@ -198,7 +192,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
                 for (int i = 0; i < size; i++) {
                     String url = (String) in.readObject();
                     MantisCacheData data = (MantisCacheData) in.readObject();
-                    add(url, data);
+                    add0(url, data);
                 }
             } catch ( FileNotFoundException cacheDoesNotExist) {
                 // possible, deal with it
