@@ -167,7 +167,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 
                 int timeTracking = 0;
                 if( timeTrackingAttribute  != null && timeTrackingAttribute.getValue() != null && timeTrackingAttribute.getValue().length() != 0 ) {
-                    timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
+                    try {
+                        timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
+                    } catch ( NumberFormatException e) {
+                        throw new CoreException(statusFactory.toStatus("Invalid time tracking value " + timeTrackingAttribute.getValue() + " must be an integer.", new MantisException(e), repository));
+                    }
                     timeTrackingAttribute.clearValues();
                 }
                 
@@ -175,8 +179,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 
                 return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
             }
-        } catch ( NumberFormatException e) {
-            throw new CoreException(statusFactory.toStatus("Invalid time tracking value, must be an integer.", new MantisException(e), repository));
         } catch (MantisException e) {
             throw new CoreException(statusFactory.toStatus(null, e, repository));
         }
