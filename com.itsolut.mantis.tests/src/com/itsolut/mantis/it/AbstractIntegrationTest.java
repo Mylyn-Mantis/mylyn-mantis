@@ -28,7 +28,7 @@ import biz.futureware.mantis.rpc.soap.client.ObjectRef;
 /**
  * @author Robert Munteanu
  */
-abstract class AbstractIntegrationTest  {
+public abstract class AbstractIntegrationTest  {
 
 	protected static final BigInteger DEFAULT_PROJECT_ID = BigInteger.ONE;
 	protected static final String DEFAULT_CATEGORY_NAME = "General";
