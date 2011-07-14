@@ -7,9 +7,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package com.itsolut.mantis.tests;
+package com.itsolut.mantis.it;
 
 import static com.itsolut.mantis.tests.RepositoryConfiguration.MANTIS_11_BASIC;
+
+import com.itsolut.mantis.tests.RepositoryConfiguration;
 
 public class Mantis11AttachmentHandlerTestDisabled extends AbstractMantisAttachmentHandlerIntegrationTest {
 

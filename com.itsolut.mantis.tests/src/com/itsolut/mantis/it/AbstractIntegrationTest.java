@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package com.itsolut.mantis.tests;
+package com.itsolut.mantis.it;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -18,13 +18,17 @@ import javax.xml.rpc.ServiceException;
 import org.junit.After;
 import org.junit.Before;
 
+import com.itsolut.mantis.tests.MantisRepositoryAccessor;
+import com.itsolut.mantis.tests.MylynObjectsFactory;
+import com.itsolut.mantis.tests.RepositoryConfiguration;
+
 import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.ObjectRef;
 
 /**
  * @author Robert Munteanu
  */
-public abstract class AbstractIntegrationTest  {
+abstract class AbstractIntegrationTest  {
 
 	protected static final BigInteger DEFAULT_PROJECT_ID = BigInteger.ONE;
 	protected static final String DEFAULT_CATEGORY_NAME = "General";

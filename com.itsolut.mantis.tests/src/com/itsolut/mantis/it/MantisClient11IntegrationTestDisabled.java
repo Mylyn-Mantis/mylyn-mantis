@@ -7,16 +7,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package com.itsolut.mantis.tests;
 
-import static com.itsolut.mantis.tests.RepositoryConfiguration.MANTIS_12_BASIC;
+package com.itsolut.mantis.it;
 
-public class MantisRepositoryConnector12IntegrationTest extends AbstractMantisRepositoryConnectorIntegrationTest {
+import static com.itsolut.mantis.tests.RepositoryConfiguration.MANTIS_11_BASIC;
+
+import com.itsolut.mantis.tests.RepositoryConfiguration;
+
+public class MantisClient11IntegrationTestDisabled extends AbstractMantisClientIntegrationTest {
 
 	@Override
 	protected RepositoryConfiguration getRepositoryConfiguration() {
 
-		return MANTIS_12_BASIC;
+		return MANTIS_11_BASIC;
 	}
 
 }
