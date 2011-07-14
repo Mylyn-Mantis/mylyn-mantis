@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import biz.futureware.mantis.rpc.soap.client.AccountData;
-
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**
@@ -125,7 +123,7 @@ public class MantisTicket {
 
     private List<MantisRelationship> relationships;
     
-    private List<AccountData> monitors;
+    private List<User> monitors;
     
     private Map<String, String> customFieldValues = new HashMap<String, String>(); 
 
@@ -283,7 +281,7 @@ public class MantisTicket {
         return (attachments != null) ? attachments.toArray(new MantisAttachment[0]) : null;
     }
 
-    public void setMonitors(List<AccountData> monitors) {
+    public void setMonitors(List<User> monitors) {
 
         this.monitors = monitors;
     }
@@ -297,9 +295,9 @@ public class MantisTicket {
      * 
      * @return the list of monitors, possibly <code>null</code>
      */
-    public AccountData[] getMonitors() {
+    public User[] getMonitors() {
         
-        return monitors != null ? monitors.toArray(new AccountData[monitors.size()]) : null; 
+        return monitors != null ? monitors.toArray(new User[monitors.size()]) : null; 
     }
     
     @Override
@@ -321,8 +319,4 @@ public class MantisTicket {
         
         return toString.toString();
     }
-
-    /**
-     * @param monitors2
-     */
 }

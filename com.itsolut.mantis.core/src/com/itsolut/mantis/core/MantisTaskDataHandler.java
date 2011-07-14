@@ -39,8 +39,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 import org.eclipse.osgi.util.NLS;
 
-import biz.futureware.mantis.rpc.soap.client.AccountData;
-
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -51,12 +49,12 @@ import com.itsolut.mantis.core.model.MantisCustomField;
 import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisProjectCategory;
 import com.itsolut.mantis.core.model.MantisRelationship;
-import com.itsolut.mantis.core.model.User;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.model.MantisTicketAttribute;
 import com.itsolut.mantis.core.model.MantisVersion;
+import com.itsolut.mantis.core.model.User;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -414,7 +412,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
         List<String> originalValues = new ArrayList<String>();
         
-        for ( AccountData issueMonitor: ticket.getMonitors() ) {
+        for ( User issueMonitor: ticket.getMonitors() ) {
             IRepositoryPerson person = newPerson(repository, issueMonitor.getName() , client, monitor);
             attribute.putOption(person.getPersonId(), person.toString());
             originalValues.add(person.getPersonId());
