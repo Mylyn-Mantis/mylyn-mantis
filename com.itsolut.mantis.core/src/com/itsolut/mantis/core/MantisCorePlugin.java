@@ -75,8 +75,10 @@ public class MantisCorePlugin extends Plugin {
     @Override
     public void stop(BundleContext context) throws Exception {
 
-        if ( connector != null )
+        if ( connector != null ) {
             connector.stop();
+            connector = null;
+        }
         
         plugin = null;
         super.stop(context);
