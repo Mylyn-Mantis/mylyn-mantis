@@ -54,7 +54,7 @@ import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 import com.itsolut.mantis.core.model.MantisTicketAttribute;
 import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.User;
+import com.itsolut.mantis.core.model.MantisUser;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -412,7 +412,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         TaskAttribute attribute = createAttribute(data, Attribute.MONITORS);
         List<String> originalValues = new ArrayList<String>();
         
-        for ( User issueMonitor: ticket.getMonitors() ) {
+        for ( MantisUser issueMonitor: ticket.getMonitors() ) {
             IRepositoryPerson person = newPerson(repository, issueMonitor.getName() , client, monitor);
             attribute.putOption(person.getPersonId(), person.toString());
             originalValues.add(person.getPersonId());
@@ -479,7 +479,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             return repository.createPerson("unknown");
         
         IRepositoryPerson person = repository.createPerson(personId);
-        User user = client.getCache(monitor).getUserByUsername(personId);
+        MantisUser user = client.getCache(monitor).getUserByUsername(personId);
         if ( user != null )
             person.setName(user.getRealName());
         return person;

@@ -12,14 +12,14 @@ package com.itsolut.mantis.core.model;
 /**
  * @author Robert Munteanu
  */
-public class User extends MantisTicketAttribute {
+public class MantisUser extends MantisTicketAttribute {
 
     private static final long serialVersionUID = 1L;
     
     private String realName;
     private String email;
 
-    public User(int id, String username, String realName, String email) {
+    public MantisUser(int id, String username, String realName, String email) {
 
         super(username, id);
         this.realName = realName;

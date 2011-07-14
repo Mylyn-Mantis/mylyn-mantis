@@ -57,9 +57,9 @@ public class MantisCacheData implements Serializable {
 
     Map<Integer, List<MantisVersion>> versionsByProjectId = new HashMap<Integer, List<MantisVersion>>();
 
-    Map<Integer, List<User>> reportersByProjectId = new HashMap<Integer, List<User>>();
+    Map<Integer, List<MantisUser>> reportersByProjectId = new HashMap<Integer, List<MantisUser>>();
     
-    Map<Integer, List<User>> developersByProjectId = new HashMap<Integer, List<User>>();
+    Map<Integer, List<MantisUser>> developersByProjectId = new HashMap<Integer, List<MantisUser>>();
 
     int reporterThreshold;
 
@@ -85,5 +85,5 @@ public class MantisCacheData implements Serializable {
 	
 	boolean projectionEnabled;
 	
-	Map<String, User> allUsers = new HashMap<String, User>();
+	Map<String, MantisUser> allUsers = new HashMap<String, MantisUser>();
 }

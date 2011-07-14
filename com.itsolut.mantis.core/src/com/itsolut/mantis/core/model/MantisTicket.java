@@ -123,7 +123,7 @@ public class MantisTicket {
 
     private List<MantisRelationship> relationships;
     
-    private List<User> monitors;
+    private List<MantisUser> monitors;
     
     private Map<String, String> customFieldValues = new HashMap<String, String>(); 
 
@@ -281,7 +281,7 @@ public class MantisTicket {
         return (attachments != null) ? attachments.toArray(new MantisAttachment[0]) : null;
     }
 
-    public void setMonitors(List<User> monitors) {
+    public void setMonitors(List<MantisUser> monitors) {
 
         this.monitors = monitors;
     }
@@ -295,9 +295,9 @@ public class MantisTicket {
      * 
      * @return the list of monitors, possibly <code>null</code>
      */
-    public User[] getMonitors() {
+    public MantisUser[] getMonitors() {
         
-        return monitors != null ? monitors.toArray(new User[monitors.size()]) : null; 
+        return monitors != null ? monitors.toArray(new MantisUser[monitors.size()]) : null; 
     }
     
     @Override

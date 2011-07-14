@@ -122,7 +122,7 @@ public class MantisConverter {
                 ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
         
         if ( issue.getMonitors() != null ) {
-            List<User> monitors = new ArrayList<User>();
+            List<MantisUser> monitors = new ArrayList<MantisUser>();
             for ( AccountData issueMonitor : issue.getMonitors() )
                 monitors.add(convert(issueMonitor));
             
@@ -139,9 +139,9 @@ public class MantisConverter {
      * @param issueMonitor
      * @return
      */
-    private static User convert(AccountData issueMonitor) {
+    private static MantisUser convert(AccountData issueMonitor) {
 
-        return new User(issueMonitor.getId().intValue(), issueMonitor.getName(), issueMonitor.getReal_name(), issueMonitor.getEmail());
+        return new MantisUser(issueMonitor.getId().intValue(), issueMonitor.getName(), issueMonitor.getReal_name(), issueMonitor.getEmail());
     }
 
     private static MantisAttachment convert(AttachmentData ad) {
@@ -283,7 +283,7 @@ public class MantisConverter {
         if ( userId.length() == 0 )
             return accountData;
         accountData.setId(new BigInteger(userId));
-        User user = cache.getUserByUsername(userId);
+        MantisUser user = cache.getUserByUsername(userId);
         if ( user != null ) {
             accountData.setName(user.getName());
             accountData.setEmail(user.getEmail());
