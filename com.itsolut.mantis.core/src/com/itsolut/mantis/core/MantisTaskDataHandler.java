@@ -225,8 +225,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 
                 originalMonitors.removeAll(monitorsToRemove);
                 
-                System.out.println("Final value of monitors is " + originalMonitors);
-                
                 ticket.putValue(attribute.getId(), MantisUtils.toCsvString(originalMonitors));
                 continue;
             }
