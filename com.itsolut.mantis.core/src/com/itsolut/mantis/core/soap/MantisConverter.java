@@ -18,16 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import biz.futureware.mantis.rpc.soap.client.AccountData;
-import biz.futureware.mantis.rpc.soap.client.AttachmentData;
-import biz.futureware.mantis.rpc.soap.client.CustomFieldDefinitionData;
-import biz.futureware.mantis.rpc.soap.client.CustomFieldValueForIssueData;
-import biz.futureware.mantis.rpc.soap.client.IssueData;
-import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
-import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
-import biz.futureware.mantis.rpc.soap.client.ObjectRef;
-import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
-import biz.futureware.mantis.rpc.soap.client.RelationshipData;
+import biz.futureware.mantis.rpc.soap.client.*;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
@@ -277,14 +268,16 @@ public class MantisConverter {
         return new ObjectRef(new BigInteger(ticket.getValue(key)), "");
     }
 
-    public static AccountData convert(String userId, MantisCache cache) {
+    public static AccountData convert(String userName, MantisCache cache) {
         
         AccountData accountData = new AccountData();
-        if ( userId.length() == 0 )
+        if ( userName.length() == 0 )
             return accountData;
-        accountData.setId(new BigInteger(userId));
-        MantisUser user = cache.getUserByUsername(userId);
+        
+        MantisUser user = cache.getUserByUsername(userName);
+        
         if ( user != null ) {
+            accountData.setId(BigInteger.valueOf(user.getValue()));
             accountData.setName(user.getName());
             accountData.setEmail(user.getEmail());
             accountData.setReal_name(user.getRealName());
