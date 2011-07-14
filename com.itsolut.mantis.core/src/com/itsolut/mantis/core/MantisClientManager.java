@@ -77,14 +77,6 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
             client = newMantisClient(taskRepository);
         return client;
     }
-    
-    public synchronized IMantisClient getRepository(String url) throws MantisException {
-        
-        IMantisClient client = clientByUrl.get(url);
-        if (client == null)
-            throw new MantisException("No client with url " + url + " .");
-        return client;
-    }
 
     private IMantisClient newMantisClient(TaskRepository taskRepository) throws MantisException {
 
