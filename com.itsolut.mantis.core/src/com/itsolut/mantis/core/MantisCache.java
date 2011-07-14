@@ -35,6 +35,8 @@ import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
+import com.itsolut.mantis.core.soap.MantisAxis1SOAPClient;
+import com.itsolut.mantis.core.soap.MantisConverter;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -53,7 +55,7 @@ import com.itsolut.mantis.core.model.MantisTicket.Key;
  */
 public class MantisCache {
 
-    static final int BUILT_IN_PROJECT_TASKS_FILTER_ID = -1;
+    public static final int BUILT_IN_PROJECT_TASKS_FILTER_ID = -1;
 
     static final String BUILT_IN_PROJECT_TASKS_FILTER_FORMAT = "[Built-in] Latest %s tasks";
 
@@ -104,7 +106,7 @@ public class MantisCache {
         return cacheData.projects;
     }
 
-    void refreshIfNeeded(IProgressMonitor progressMonitor, String repositoryUrl) throws MantisException {
+    public void refreshIfNeeded(IProgressMonitor progressMonitor, String repositoryUrl) throws MantisException {
 
         synchronized (sync) {
             if (cacheData.lastUpdate == 0)
@@ -113,7 +115,7 @@ public class MantisCache {
 
     }
 
-    void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
+    public void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
 
     	refresh0(monitor, repositoryUrl, ALL_PROJECTS);
     }
@@ -305,7 +307,7 @@ public class MantisCache {
 	    }
 	}
 
-    void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
+    public void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
     	
     	refresh0(monitor, url, projectId);
 	}
@@ -925,7 +927,7 @@ public class MantisCache {
     	return cacheData.projectionEnabled;
     }
     
-    MantisCacheData getCacheData() {
+    public MantisCacheData getCacheData() {
 
         synchronized (sync) {
             return cacheData;
@@ -933,7 +935,7 @@ public class MantisCache {
 
     }
 
-    void setCacheData(MantisCacheData cacheData) {
+    public void setCacheData(MantisCacheData cacheData) {
 
         synchronized (sync) {
             this.cacheData = cacheData;
@@ -950,7 +952,7 @@ public class MantisCache {
      * @param accountData
      *            the name of the reporter
      */
-    void registerAdditionalReporter(int projectId, AccountData accountData) {
+    public void registerAdditionalReporter(int projectId, AccountData accountData) {
         
         // empty account
         if ( accountData.getId().equals(BigInteger.ZERO) )
@@ -980,7 +982,7 @@ public class MantisCache {
         reporters.add(user);
     }
 
-    boolean dueDateIsEnabled() {
+    public boolean dueDateIsEnabled() {
         
         return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
     }

@@ -10,7 +10,7 @@
  *******************************************************************************/
 
 
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.core.soap;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -28,6 +28,12 @@ import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
 import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
 
+import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.MantisCache;
+import com.itsolut.mantis.core.MantisCacheData;
+import com.itsolut.mantis.core.RepositoryValidationResult;
+import com.itsolut.mantis.core.RepositoryVersion;
+import com.itsolut.mantis.core.TaskRelationshipChange;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;

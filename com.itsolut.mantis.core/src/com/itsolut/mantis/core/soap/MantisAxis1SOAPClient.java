@@ -8,7 +8,7 @@
  * Contributors:
  *     Chris Hane - Initial implementation for Mantis
  *******************************************************************************/
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.core.soap;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -42,6 +42,7 @@ import biz.futureware.mantis.rpc.soap.client.ProjectData;
 import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
 import biz.futureware.mantis.rpc.soap.client.RelationshipData;
 
+import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
@@ -58,7 +59,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
     /**
      * The default location of the SOAP API entry point, as of Mantis 1.1
      */
-    static final String SOAP_API_LOCATION = "/api/soap/mantisconnect.php";
+    public static final String SOAP_API_LOCATION = "/api/soap/mantisconnect.php";
 
 	private transient MantisConnectPortType soap;
 

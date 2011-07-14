@@ -27,6 +27,7 @@ import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.soap.MantisClient;
 
 /**
  * @author Steffen Pingel

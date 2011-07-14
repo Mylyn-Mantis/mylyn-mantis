@@ -1,4 +1,4 @@
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.core.soap;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -12,6 +12,8 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.WebUtil;
 import org.eclipse.mylyn.internal.provisional.commons.soap.SoapHttpSender;
+
+import com.itsolut.mantis.core.MantisCorePlugin;
 
 import biz.futureware.mantis.rpc.soap.client.MantisConnectLocator;
 

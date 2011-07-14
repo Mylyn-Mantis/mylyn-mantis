@@ -9,7 +9,7 @@
  *     Robert Munteanu
  *******************************************************************************/
 
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.core.soap;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -29,6 +29,10 @@ import biz.futureware.mantis.rpc.soap.client.ObjectRef;
 import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
 import biz.futureware.mantis.rpc.soap.client.RelationshipData;
 
+import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.MantisCache;
+import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.RepositoryVersion;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;

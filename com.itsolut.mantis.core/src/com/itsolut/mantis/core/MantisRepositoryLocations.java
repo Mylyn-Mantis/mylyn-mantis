@@ -12,6 +12,8 @@ package com.itsolut.mantis.core;
 
 import org.eclipse.core.runtime.Assert;
 
+import com.itsolut.mantis.core.soap.MantisAxis1SOAPClient;
+
 /**
  * @author Robert Munteanu
  * 
