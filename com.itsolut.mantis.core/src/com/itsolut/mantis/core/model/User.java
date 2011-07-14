@@ -6,9 +6,8 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.itsolut.mantis.core;
+package com.itsolut.mantis.core.model;
 
-import com.itsolut.mantis.core.model.MantisTicketAttribute;
 
 /**
  * @author Robert Munteanu
