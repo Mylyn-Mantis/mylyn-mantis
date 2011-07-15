@@ -169,7 +169,11 @@ public class MantisSoapClient implements IMantisClient {
     private void registerAdditionalReporters(IssueData issueData) {
 
         int projectId = issueData.getProject().getId().intValue();
+        
         cache.registerAdditionalReporter(projectId, MantisConverter.convert(issueData.getReporter()));
+        
+        if ( issueData.getHandler() != null )
+            cache.registerAdditionalReporter(projectId, MantisConverter.convert(issueData.getHandler()));
         
         if (issueData.getNotes() != null)
             for (IssueNoteData note : issueData.getNotes())
