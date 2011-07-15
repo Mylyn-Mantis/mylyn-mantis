@@ -65,7 +65,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
 
-    private Provider<MantisClientManager> clientManager;
+    private MantisClientManager clientManager;
 
     private final MantisTaskDataHandler offlineTaskHandler;
 
@@ -79,7 +79,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         offlineTaskHandler = injector.getInstance(MantisTaskDataHandler.class);
         attachmentHandler = injector.getInstance(MantisAttachmentHandler.class);
         statusFactory = injector.getInstance(StatusFactory.class);
-        clientManager = injector.getProvider(MantisClientManager.class);
+        clientManager = injector.getInstance(MantisClientManager.class);
         
         injector.injectMembers(MantisCorePlugin.getDefault());
     }
@@ -192,12 +192,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     public MantisClientManager getClientManager() {
 
-        return clientManager.get();
+        return clientManager;
     }
 
     public void stop() {
 
-        clientManager.get().persistCache();
+        clientManager.persistCache();
     }
 
     @Override
