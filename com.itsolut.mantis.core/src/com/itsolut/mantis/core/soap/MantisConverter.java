@@ -251,10 +251,11 @@ public class MantisConverter {
         if (MantisUtils.isEmpty(ticket.getValue(Key.REPORTER))) {
             issue.setReporter(convert(username, cache));
         } else {
-            issue.setReporter(convert(ticket.getValue(Key.REPORTER), cache));
+            issue.setReporter(convertToAccountData(Integer.valueOf(ticket.getValue(Key.REPORTER))));
         }
 
-        issue.setHandler(convert(ticket.getValue(Key.ASSIGNED_TO), cache));
+        if ( !MantisUtils.isEmpty(ticket.getValue(Key.ASSIGNED_TO)) )
+            issue.setHandler(convertToAccountData(Integer.valueOf(ticket.getValue(Key.ASSIGNED_TO))));
         issue.setLast_updated(MantisUtils.transform(new Date()));
 
         setIssueMonitors(ticket, project, issue, cache, username);
@@ -268,7 +269,16 @@ public class MantisConverter {
         return new ObjectRef(new BigInteger(ticket.getValue(key)), "");
     }
 
-    public static AccountData convert(String userName, MantisCache cache) {
+    public static AccountData convertToAccountData(Integer userId) {
+        
+        AccountData accountData = new AccountData();
+        if ( userId == null  )
+            return accountData;
+        
+        return new AccountData(BigInteger.valueOf(userId.intValue()), null, null, null);
+    }
+    
+    public static AccountData convert(String userName, MantisCache cache) throws MantisException {
         
         AccountData accountData = new AccountData();
         if ( userName.length() == 0 )
@@ -276,17 +286,18 @@ public class MantisConverter {
         
         MantisUser user = cache.getUserByUsername(userName);
         
-        if ( user != null ) {
-            accountData.setId(BigInteger.valueOf(user.getValue()));
-            accountData.setName(user.getName());
-            accountData.setEmail(user.getEmail());
-            accountData.setReal_name(user.getRealName());
-        }
+        if ( user == null )
+            throw new MantisException("Could not find user for username " + userName);
+        
+        accountData.setId(BigInteger.valueOf(user.getValue()));
+        accountData.setName(user.getName());
+        accountData.setEmail(user.getEmail());
+        accountData.setReal_name(user.getRealName());
         
         return accountData;
     }
 
-    private static void setIssueMonitors(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache, String username) {
+    private static void setIssueMonitors(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache, String username) throws MantisException {
 
         boolean addSelf = Boolean.valueOf(ticket.getValue(Key.ADD_SELF_TO_MONITORS));
         List<String> monitorList = MantisUtils.fromCsvString(ticket.getValue(Key.MONITORS));
