@@ -56,8 +56,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisCache;
-import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
@@ -105,9 +105,9 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private final Map<FilterKey, String> filterKeyToUrl = new HashMap<FilterKey, String>();
 
-    private final MantisClientManager clientManager;
+    private final IMantisClientManager clientManager;
 
-    public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query, MantisClientManager clientManager) {
+    public MantisCustomQueryPage(TaskRepository repository, IRepositoryQuery query, IMantisClientManager clientManager) {
 
         super(TITLE, repository, query);
 
@@ -119,7 +119,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         setDescription(DESCRIPTION);
     }
     
-    public MantisCustomQueryPage(TaskRepository repository, MantisClientManager clientManager) {
+    public MantisCustomQueryPage(TaskRepository repository, IMantisClientManager clientManager) {
 
         this(repository, null, clientManager);
     }

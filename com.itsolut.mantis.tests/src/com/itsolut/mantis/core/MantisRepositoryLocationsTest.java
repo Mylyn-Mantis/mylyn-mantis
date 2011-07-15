@@ -9,7 +9,7 @@
  *     Robert Munteanu - initial API and implementation
  *******************************************************************************/
 
-package com.itsolut.mantis.tests;
+package com.itsolut.mantis.core;
 
 import static org.junit.Assert.assertEquals;
 

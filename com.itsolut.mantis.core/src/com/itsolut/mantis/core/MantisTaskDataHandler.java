@@ -62,7 +62,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
  */
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
-    private final MantisClientManager clientManager;
+    private final IMantisClientManager clientManager;
     private final StatusFactory statusFactory;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
@@ -105,7 +105,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
     
     @Inject
-    public MantisTaskDataHandler(MantisClientManager clientManager, StatusFactory statusFactory) {
+    public MantisTaskDataHandler(IMantisClientManager clientManager, StatusFactory statusFactory) {
         this.clientManager = clientManager;
         this.statusFactory = statusFactory;
     }

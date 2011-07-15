@@ -36,6 +36,8 @@ import com.itsolut.mantis.core.MantisCorePlugin;
  */
 public class MantisRepositoryAccessor {
 	
+	private static final MantisClientFactory clientFactory = new MantisClientFactory(new TaskRepositoryLocationFactory());
+	
 	private final String username;
 	private final String password;
 	private final String repositoryUrl;

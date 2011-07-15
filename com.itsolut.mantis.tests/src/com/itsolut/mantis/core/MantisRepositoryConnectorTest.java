@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package com.itsolut.mantis.tests;
+package com.itsolut.mantis.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

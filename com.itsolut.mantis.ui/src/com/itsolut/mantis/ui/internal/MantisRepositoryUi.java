@@ -47,6 +47,7 @@ import org.eclipse.mylyn.tasks.ui.wizards.TaskAttachmentPage;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -71,7 +72,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     
     private final StatusFactory statusFactory;
 
-    private final MantisClientManager clientManager;
+    private final IMantisClientManager clientManager;
 
     private final MantisClientFactory clientFactory;
     
@@ -80,7 +81,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
         Injector injector = Guice.createInjector(new MantisUiPluginModule());
         
         statusFactory = injector.getInstance(StatusFactory.class);
-        clientManager = injector.getInstance(MantisClientManager.class);
+        clientManager = injector.getInstance(IMantisClientManager.class);
         clientFactory = injector.getInstance(MantisClientFactory.class);
     }
 

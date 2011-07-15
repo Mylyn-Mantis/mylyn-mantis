@@ -50,12 +50,12 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
 
-    private final MantisClientManager clientManager;
+    private final IMantisClientManager clientManager;
 
     private final StatusFactory statusFactory;
 
     @Inject
-    public MantisAttachmentHandler(MantisClientManager clientManager, StatusFactory statusFactory) {
+    public MantisAttachmentHandler(IMantisClientManager clientManager, StatusFactory statusFactory) {
         this.clientManager = clientManager;
         this.statusFactory = statusFactory;
     }

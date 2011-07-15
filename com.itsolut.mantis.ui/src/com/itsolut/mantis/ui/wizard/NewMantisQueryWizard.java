@@ -27,7 +27,7 @@ import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
-import com.itsolut.mantis.core.MantisClientManager;
+import com.itsolut.mantis.core.IMantisClientManager;
 
 /**
  * @author Steffen Pingel
@@ -37,10 +37,10 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
 	private final TaskRepository repository;
 	private final IRepositoryQuery query;
-    private final MantisClientManager clientManager;
+    private final IMantisClientManager clientManager;
 
 	
-	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit, MantisClientManager clientManager) {
+	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit, IMantisClientManager clientManager) {
 		super(repository);
 		this.repository = repository;
 		this.query = queryToEdit;
@@ -52,7 +52,7 @@ public class NewMantisQueryWizard extends RepositoryQueryWizard {
 		
 	}
 
-	public NewMantisQueryWizard(TaskRepository repository, MantisClientManager clientManager) {
+	public NewMantisQueryWizard(TaskRepository repository, IMantisClientManager clientManager) {
 	    this(repository, null, clientManager);
 	}
 

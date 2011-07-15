@@ -41,7 +41,7 @@ import com.itsolut.mantis.core.exception.MantisException;
  * 
  * @author Robert Mutneanu
  */
-public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener {
+public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener, IMantisClientManager {
 
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private final PersistedState state;
