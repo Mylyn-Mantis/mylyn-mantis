@@ -202,7 +202,7 @@ public class MantisConverter {
 
         MantisCache cache = client.getCache(monitor);
 
-        ObjectRef project = getValueAsObjectRef(ticket, Key.PROJECT);
+        ObjectRef project = new ObjectRef(BigInteger.valueOf(cache.getProjectByName(ticket.getValue(Key.PROJECT)).getValue()), ticket.getValue(Key.PROJECT));
 
         IssueData issue = new IssueData();
 
