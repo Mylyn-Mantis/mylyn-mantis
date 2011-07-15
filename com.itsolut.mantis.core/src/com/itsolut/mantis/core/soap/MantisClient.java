@@ -70,7 +70,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        IssueData issueData = MantisConverter.convert(ticket, this, getUserName());
+        IssueData issueData = MantisConverter.convert(ticket, this, getUserName(), monitor);
 
         int issueId = soapClient.addIssue(issueData, monitor);
 
@@ -205,7 +205,7 @@ public class MantisClient implements IMantisClient {
 
         cache.refreshIfNeeded(monitor, location.getUrl());
 
-        IssueData issue = MantisConverter.convert(ticket, this, getUserName());
+        IssueData issue = MantisConverter.convert(ticket, this, getUserName(), monitor);
         issue.setId(BigInteger.valueOf(ticket.getId()));
 
         // add comment first because when updating the issue to resolved

@@ -15,7 +15,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.*;
@@ -204,9 +203,9 @@ public class MantisConverter {
             return ticket;
     }
     
-    public static IssueData convert(MantisTicket ticket, IMantisClient client, String username) throws MantisException {
+    public static IssueData convert(MantisTicket ticket, IMantisClient client, String username, IProgressMonitor monitor) throws MantisException {
 
-        MantisCache cache = client.getCache(new NullProgressMonitor());
+        MantisCache cache = client.getCache(monitor);
         
         ObjectRef project = cache.getProjectAsObjectRef(ticket.getValue(Key.PROJECT));
 
@@ -231,7 +230,7 @@ public class MantisConverter {
         if (cache.getRepositoryVersion().isHasTargetVersionSupport())
             issue.setTarget_version(ticket.getValueAndFilterNone(Key.TARGET_VERSION));
 
-        if (client.isDueDateEnabled(new NullProgressMonitor())) {
+        if (client.isDueDateEnabled(monitor)) {
             String dueDate = ticket.getValue(Key.DUE_DATE);
             if (dueDate == null || dueDate.length() == 0) {
                 issue.setDue_date(null);
