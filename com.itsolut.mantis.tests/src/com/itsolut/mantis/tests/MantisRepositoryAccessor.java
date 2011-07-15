@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.axis.configuration.FileProvider;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -24,9 +25,12 @@ import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import biz.futureware.mantis.rpc.soap.client.MantisConnectLocator;
 import biz.futureware.mantis.rpc.soap.client.MantisConnectPortType;
 
+import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * The <tt>MantisRepositoryAccessor</tt> provides test-specific methods for easy
@@ -36,7 +40,23 @@ import com.itsolut.mantis.core.MantisCorePlugin;
  */
 public class MantisRepositoryAccessor {
 	
-	private static final MantisClientFactory clientFactory = new MantisClientFactory(new TaskRepositoryLocationFactory());
+	private static final class InMemoryMantisClientManager implements IMantisClientManager {
+
+		private final Map<String, IMantisClient> urlToClient = Maps.newHashMap();
+
+		public synchronized IMantisClient getRepository(TaskRepository taskRepository) throws MantisException {
+			
+			IMantisClient client = urlToClient.get(taskRepository.getUrl());
+			if ( client == null ) {
+				client = new MantisClientFactory(new TaskRepositoryLocationFactory()).createClient(taskRepository);
+				urlToClient.put(taskRepository.getUrl(), client);
+			}
+
+			return client;
+		}
+	}
+
+	private static final IMantisClientManager clientManager = new InMemoryMantisClientManager();
 	
 	private final String username;
 	private final String password;
@@ -86,7 +106,7 @@ public class MantisRepositoryAccessor {
 				password), false);
 		location = new TaskRepositoryLocationFactory().createWebLocation(repository);
 
-		client = new MantisClientFactory(new TaskRepositoryLocationFactory()).createClient(location);
+		client = clientManager.getRepository(repository);
 
 		FileProvider provider = new FileProvider(this.getClass().getClassLoader().getResourceAsStream(
 				"test-client-config.wsdd"));
