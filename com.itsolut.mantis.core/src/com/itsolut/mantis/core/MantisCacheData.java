@@ -31,9 +31,9 @@ public class MantisCacheData implements Serializable {
 
     private List<MantisProject> projects = new ArrayList<MantisProject>();
 
-    Map<Integer, List<MantisProjectFilter>> projectFiltersById = new HashMap<Integer, List<MantisProjectFilter>>();
+    private ListMultimap<Integer, MantisProjectFilter> projectFiltersById = ArrayListMultimap.create();
 
-    Map<Integer, List<MantisCustomField>> customFieldsByProjectId = new HashMap<Integer, List<MantisCustomField>>();
+    private ListMultimap<Integer,MantisCustomField> customFieldsByProjectId = ArrayListMultimap.create();
 
     RepositoryVersion repositoryVersion;
 
@@ -57,7 +57,7 @@ public class MantisCacheData implements Serializable {
 
     Map<Integer, List<MantisProjectCategory>> categoriesByProjectId = new HashMap<Integer, List<MantisProjectCategory>>();
 
-    Map<Integer, List<MantisVersion>> versionsByProjectId = new HashMap<Integer, List<MantisVersion>>();
+    private ListMultimap<Integer, MantisVersion> versionsByProjectId = ArrayListMultimap.create();
 
     private ListMultimap<Integer, MantisUser> reportersByProjectId = ArrayListMultimap.create();
     
@@ -200,5 +200,27 @@ public class MantisCacheData implements Serializable {
     public void setProjectionEnabled(boolean projectionEnabled) {
 
         this.projectionEnabled = projectionEnabled;
+    }
+
+    public ListMultimap<Integer, MantisVersion> getVersionsByProjectId() {
+
+        return versionsByProjectId;
+    }
+
+    public void setVersionsByProjectId(ListMultimap<Integer, MantisVersion> versionsByProjectId) {
+
+        this.versionsByProjectId = versionsByProjectId;
+    }
+    
+    
+    public ListMultimap<Integer, MantisProjectFilter> getProjectFiltersById() {
+
+        return projectFiltersById;
+    }
+    
+    
+    public ListMultimap<Integer, MantisCustomField> getCustomFieldsByProjectId() {
+
+        return customFieldsByProjectId;
     }
 }

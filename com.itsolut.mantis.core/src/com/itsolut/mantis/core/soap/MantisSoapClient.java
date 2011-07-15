@@ -45,10 +45,18 @@ import com.itsolut.mantis.core.RepositoryValidationResult;
 import com.itsolut.mantis.core.RepositoryVersion;
 import com.itsolut.mantis.core.TaskRelationshipChange;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisETA;
+import com.itsolut.mantis.core.model.MantisPriority;
 import com.itsolut.mantis.core.model.MantisProject;
+import com.itsolut.mantis.core.model.MantisProjection;
+import com.itsolut.mantis.core.model.MantisReproducibility;
+import com.itsolut.mantis.core.model.MantisResolution;
 import com.itsolut.mantis.core.model.MantisSearch;
+import com.itsolut.mantis.core.model.MantisSeverity;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
+import com.itsolut.mantis.core.model.MantisTicketStatus;
+import com.itsolut.mantis.core.model.MantisViewState;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -161,15 +169,15 @@ public class MantisSoapClient implements IMantisClient {
     private void registerAdditionalReporters(IssueData issueData) {
 
         int projectId = issueData.getProject().getId().intValue();
-        cache.registerAdditionalReporter(projectId, issueData.getReporter());
+        cache.registerAdditionalReporter(projectId, MantisConverter.convert(issueData.getReporter()));
         
         if (issueData.getNotes() != null)
             for (IssueNoteData note : issueData.getNotes())
-                cache.registerAdditionalReporter(projectId, note.getReporter());
+                cache.registerAdditionalReporter(projectId, MantisConverter.convert(note.getReporter()));
         
         if ( issueData.getMonitors() != null )
             for ( AccountData issueMonitor : issueData.getMonitors() )
-                cache.registerAdditionalReporter(projectId, issueMonitor);
+                cache.registerAdditionalReporter(projectId, MantisConverter.convert(issueMonitor));
 
     }
 
@@ -328,7 +336,8 @@ public class MantisSoapClient implements IMantisClient {
             SubMonitor subMonitor = SubMonitor.convert(monitor);
 
             try {
-                cache.cacheProjects(soapClient.getProjectData(monitor));
+                // TODO: recursive
+                cache.cacheProjects(MantisConverter.convert(soapClient.getProjectData(monitor)));
 
                 int projectsToRefresh =  projectId == ALL_PROJECTS ? cache.getCacheData().getProjects().size()  : 1 ;
                 
@@ -379,24 +388,24 @@ public class MantisSoapClient implements IMantisClient {
                     if ( projectId != ALL_PROJECTS && projectId != project.getValue() )
                         continue;
                     
-                    cache.cacheFilters(project.getValue(), soapClient.getProjectFilters(project.getValue(), monitor));
+                    cache.cacheFilters(project.getValue(), MantisConverter.convert(soapClient.getProjectFilters(project.getValue(), monitor)));
                     Policy.advance(subMonitor, 1);
 
-                    cache.cacheProjectCustomFields(project.getValue(), soapClient.getProjectCustomFields(project.getValue(),
-                            monitor));
+                    cache.cacheProjectCustomFields(project.getValue(), MantisConverter.convert(soapClient.getProjectCustomFields(project.getValue(),
+                            monitor)));
                     Policy.advance(subMonitor, 1);
 
                     cache.cacheProjectCategories(project.getValue(), soapClient.getProjectCategories(project.getValue(),
                             monitor));
                     Policy.advance(subMonitor, 1);
 
-                    cache.cacheProjectDevelopers(project.getValue(), soapClient.getProjectUsers(project.getValue(),
-                            cache.getCacheData().getDeveloperThreshold(), monitor));
+                    cache.cacheProjectDevelopers(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
+                            cache.getCacheData().getDeveloperThreshold(), monitor)));
                     Policy.advance(subMonitor, 1);
 
                     try {
-                        cache.cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
-                                cache.getCacheData().getReporterThreshold(), monitor));
+                        cache.cacheProjectReporters(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
+                                cache.getCacheData().getReporterThreshold(), monitor)));
                     } catch (MantisException e) {
                         if ( cache.getCacheData().getReportersByProjectId().containsKey(project.getValue()) ) {
                             MantisCorePlugin.warn("Failed retrieving reporter information, using previously loaded values.", e);
@@ -407,7 +416,7 @@ public class MantisSoapClient implements IMantisClient {
                     }
                     Policy.advance(subMonitor, 1);
 
-                    cache.cacheProjectVersions(project.getValue(), soapClient.getProjectVersions(project.getValue(), monitor));
+                    cache.cacheProjectVersions(project.getValue(), MantisConverter.convert(soapClient.getProjectVersions(project.getValue(), monitor)));
                     Policy.advance(subMonitor, 1);
                 }
 
@@ -417,28 +426,28 @@ public class MantisSoapClient implements IMantisClient {
                 cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
                 Policy.advance(subMonitor, 1);
                 
-                cache.cachePriorities(soapClient.getPriorities(monitor));
+                cache.cachePriorities(MantisConverter.convert( soapClient.getPriorities(monitor), MantisPriority.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheStatuses(soapClient.getStatuses(monitor));
+                cache.cacheStatuses(MantisConverter.convert(soapClient.getStatuses(monitor), MantisTicketStatus.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheSeverities(soapClient.getSeverities(monitor));
+                cache.cacheSeverities(MantisConverter.convert(soapClient.getSeverities(monitor), MantisSeverity.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheResolutions(soapClient.getResolutions(monitor));
+                cache.cacheResolutions(MantisConverter.convert(soapClient.getResolutions(monitor), MantisResolution.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheReproducibilites(soapClient.getReproducibilities(monitor));
+                cache.cacheReproducibilites(MantisConverter.convert(soapClient.getReproducibilities(monitor), MantisReproducibility.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheProjections(soapClient.getProjections(monitor));
+                cache.cacheProjections(MantisConverter.convert(soapClient.getProjections(monitor), MantisProjection.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheEtas(soapClient.getEtas(monitor));
+                cache.cacheEtas(MantisConverter.convert(soapClient.getEtas(monitor), MantisETA.class));
                 Policy.advance(subMonitor, 1);
 
-                cache.cacheViewStates(soapClient.getViewStates(monitor));
+                cache.cacheViewStates(MantisConverter.convert(soapClient.getViewStates(monitor), MantisViewState.class));
                 Policy.advance(subMonitor, 1);
                 
                 cache.cacheDefaultAttributeValue(Key.SEVERITY, safeGetThreshold(monitor, "default_bug_severity", DefaultConstantValues.Attribute.BUG_SEVERITY));

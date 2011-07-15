@@ -1,16 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2009 IT Solutions, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2007 - 2009 IT Solutions, Inc. All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  * 
- * Contributors:
- *     Robert Munteanu
+ * Contributors: Robert Munteanu
  *******************************************************************************/
 
 package com.itsolut.mantis.core.soap;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -19,6 +18,7 @@ import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.*;
 
+import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -82,9 +82,9 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
         if (mantisClient.isDueDateEnabled(monitor) && issue.getDue_date() != null)
             ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
-        
-        if ( issue.getStatus().getId().intValue() >= mantisClient.getCache(monitor).getResolvedStatus() )
-        	ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(issue.getLast_updated().getTimeInMillis()));
+
+        if (issue.getStatus().getId().intValue() >= mantisClient.getCache(monitor).getResolvedStatus())
+            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(issue.getLast_updated().getTimeInMillis()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
@@ -92,7 +92,7 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.REPORTER, issue.getReporter().getName());
         if (issue.getHandler() != null)
             ticket.putBuiltinValue(Key.ASSIGNED_TO, issue.getHandler().getName());
-        
+
         boolean supportsTimeTracking = mantisClient.isTimeTrackingEnabled(monitor);
 
         if (issue.getNotes() != null)
@@ -110,28 +110,24 @@ public class MantisConverter {
         if (issue.getCustom_fields() != null)
             for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
                 ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
-        
-        if ( issue.getMonitors() != null ) {
+
+        if (issue.getMonitors() != null) {
             List<MantisUser> monitors = new ArrayList<MantisUser>();
-            for ( AccountData issueMonitor : issue.getMonitors() )
+            for (AccountData issueMonitor : issue.getMonitors())
                 monitors.add(convert(issueMonitor));
-            
+
             ticket.setMonitors(monitors);
         }
-        
-        MantisCorePlugin.debug(NLS.bind("Converted IssueData to {0}." , ticket), null);
+
+        MantisCorePlugin.debug(NLS.bind("Converted IssueData to {0}.", ticket), null);
 
         return ticket;
 
     }
 
-    /**
-     * @param issueMonitor
-     * @return
-     */
-    private static MantisUser convert(AccountData issueMonitor) {
+    public static MantisUser convert(AccountData accountData) {
 
-        return new MantisUser(issueMonitor.getId().intValue(), issueMonitor.getName(), issueMonitor.getReal_name(), issueMonitor.getEmail());
+        return new MantisUser(accountData.getId().intValue(), accountData.getName(), accountData.getReal_name(), accountData.getEmail());
     }
 
     private static MantisAttachment convert(AttachmentData ad) {
@@ -156,7 +152,7 @@ public class MantisConverter {
         comment.setText(ind.getText());
         comment.setDateSubmitted(MantisUtils.transform(ind.getDate_submitted()));
         comment.setLastModified(MantisUtils.transform(ind.getLast_modified()));
-        if ( supportsTimeTracking)
+        if (supportsTimeTracking)
             comment.setTimeTracking(ind.getTime_tracking().intValue());
 
         return comment;
@@ -178,48 +174,48 @@ public class MantisConverter {
 
     public static MantisTicket convert(IssueHeaderData ihd, MantisCache cache, String projectName) throws MantisException {
 
-            MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
-            
-            ticket.putBuiltinValue(Key.PROJECT, projectName);
-            ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
-            ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
+        MantisTicket ticket = new MantisTicket(ihd.getId().intValue());
 
-            ticket.putBuiltinValue(Key.RESOLUTION, cache.getResolution(ihd.getResolution().intValue()).getName());
-            ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
-            ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
-            ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
-            
-            if ( ihd.getStatus().intValue() >= cache.getResolvedStatus() )
-            	ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(ihd.getLast_updated().getTimeInMillis()));
-            
+        ticket.putBuiltinValue(Key.PROJECT, projectName);
+        ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
+        ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
 
-            // DC: Added so that it isn't necessary to retrieve all tasks one at time
-            // to see if they have changed since the last synchronization.
-            // This cuts down on the number of soap requests that need to be made to the server.
-            ticket.setLastChanged(ihd.getLast_updated().getTime());
-            
-            MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}." , ticket), new RuntimeException());
-            
-            return ticket;
+        ticket.putBuiltinValue(Key.RESOLUTION, cache.getResolution(ihd.getResolution().intValue()).getName());
+        ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
+        ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
+        ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
+
+        if (ihd.getStatus().intValue() >= cache.getResolvedStatus())
+            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(ihd.getLast_updated().getTimeInMillis()));
+
+        // DC: Added so that it isn't necessary to retrieve all tasks one at time
+        // to see if they have changed since the last synchronization.
+        // This cuts down on the number of soap requests that need to be made to the server.
+        ticket.setLastChanged(ihd.getLast_updated().getTime());
+
+        MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}.", ticket), new RuntimeException());
+
+        return ticket;
     }
-    
+
     public static IssueData convert(MantisTicket ticket, IMantisClient client, String username, IProgressMonitor monitor) throws MantisException {
 
         MantisCache cache = client.getCache(monitor);
-        
-        ObjectRef project = cache.getProjectAsObjectRef(ticket.getValue(Key.PROJECT));
+
+        ObjectRef project = getValueAsObjectRef(ticket, Key.PROJECT);
 
         IssueData issue = new IssueData();
+
         issue.setSummary(ticket.getValue(Key.SUMMARY));
         issue.setDescription(ticket.getValue(Key.DESCRIPTION));
         issue.setSeverity(getValueAsObjectRef(ticket, Key.SEVERITY));
         issue.setResolution(getValueAsObjectRef(ticket, Key.RESOLUTION));
         issue.setPriority(getValueAsObjectRef(ticket, Key.PRIORITY));
         issue.setReproducibility(getValueAsObjectRef(ticket, Key.REPRODUCIBILITY));
-        if ( cache.isProjectionEnabled() )
-        	issue.setProjection(getValueAsObjectRef(ticket, Key.PROJECTION));
-        if ( cache.isEtaEnabled() )
-        	issue.setEta(getValueAsObjectRef(ticket, Key.ETA));
+        if (cache.isProjectionEnabled())
+            issue.setProjection(getValueAsObjectRef(ticket, Key.PROJECTION));
+        if (cache.isEtaEnabled())
+            issue.setEta(getValueAsObjectRef(ticket, Key.ETA));
         issue.setView_state(getValueAsObjectRef(ticket, Key.VIEW_STATE));
 
         issue.setProject(project);
@@ -253,7 +249,7 @@ public class MantisConverter {
             issue.setReporter(convertToAccountData(Integer.valueOf(ticket.getValue(Key.REPORTER))));
         }
 
-        if ( !MantisUtils.isEmpty(ticket.getValue(Key.ASSIGNED_TO)) )
+        if (!MantisUtils.isEmpty(ticket.getValue(Key.ASSIGNED_TO)))
             issue.setHandler(convertToAccountData(Integer.valueOf(ticket.getValue(Key.ASSIGNED_TO))));
         issue.setLast_updated(MantisUtils.transform(new Date()));
 
@@ -269,30 +265,30 @@ public class MantisConverter {
     }
 
     public static AccountData convertToAccountData(Integer userId) {
-        
+
         AccountData accountData = new AccountData();
-        if ( userId == null  )
+        if (userId == null)
             return accountData;
-        
+
         return new AccountData(BigInteger.valueOf(userId.intValue()), null, null, null);
     }
-    
+
     public static AccountData convert(String userName, MantisCache cache) throws MantisException {
-        
+
         AccountData accountData = new AccountData();
-        if ( userName.length() == 0 )
+        if (userName.length() == 0)
             return accountData;
-        
+
         MantisUser user = cache.getUserByUsername(userName);
-        
-        if ( user == null )
+
+        if (user == null)
             throw new MantisException("Could not find user for username " + userName);
-        
+
         accountData.setId(BigInteger.valueOf(user.getValue()));
         accountData.setName(user.getName());
         accountData.setEmail(user.getEmail());
         accountData.setReal_name(user.getRealName());
-        
+
         return accountData;
     }
 
@@ -300,15 +296,15 @@ public class MantisConverter {
 
         boolean addSelf = Boolean.valueOf(ticket.getValue(Key.ADD_SELF_TO_MONITORS));
         List<String> monitorList = MantisUtils.fromCsvString(ticket.getValue(Key.MONITORS));
-        if ( addSelf && !monitorList.contains(username) )
+        if (addSelf && !monitorList.contains(username))
             monitorList.add(username);
 
         List<AccountData> monitors = new ArrayList<AccountData>();
-        for ( String monitorUsername : monitorList )
+        for (String monitorUsername : monitorList)
             monitors.add(convert(monitorUsername, cache));
         issue.setMonitors(monitors.toArray(new AccountData[monitors.size()]));
     }
-    
+
     private static void setCustomFields(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache) throws MantisException {
 
         if (ticket.getCustomFieldValues().isEmpty())
@@ -333,7 +329,7 @@ public class MantisConverter {
                 entry.getValue());
         return customFieldValueForIssueData;
     }
-    
+
     public static RelationshipData convert(MantisRelationship relationship) {
 
         ObjectRef relationType = new ObjectRef(BigInteger.valueOf(relationship.getType().getMantisConstant()), "");
@@ -342,6 +338,109 @@ public class MantisConverter {
         relationshipData.setType(relationType);
         relationshipData.setTarget_id(BigInteger.valueOf(relationship.getTargetId()));
         return relationshipData;
+    }
+
+    public static <T extends MantisTicketAttribute> List<T> convert(ObjectRef[] objectRef, Class<T> attributeType) throws MantisException {
+
+        if (objectRef == null || objectRef.length == 0)
+            return Collections.emptyList();
+
+        try {
+            List<T> attributes = Lists.newArrayListWithExpectedSize(objectRef.length);
+
+            Constructor<T> contructor = attributeType.getConstructor(String.class, int.class);
+
+            for (ObjectRef ref : objectRef) {
+
+                attributes.add(contructor.newInstance(ref.getName(), ref.getId().intValue()));
+            }
+
+            return attributes;
+        } catch (SecurityException e) {
+            throw new MantisException("Unable to convert ObjectRef to attribute of type " + attributeType.getName(), e);
+        } catch (NoSuchMethodException e) {
+            throw new MantisException("Unable to convert ObjectRef to attribute of type " + attributeType.getName(), e);
+        } catch (InstantiationException e) {
+            throw new MantisException("Unable to convert ObjectRef to attribute of type " + attributeType.getName(), e);
+        } catch (IllegalAccessException e) {
+            throw new MantisException("Unable to convert ObjectRef to attribute of type " + attributeType.getName(), e);
+        } catch (InvocationTargetException e) {
+            throw new MantisException("Unable to convert ObjectRef to attribute of type " + attributeType.getName(), e);
+        }
+    }
+
+    public static List<MantisProject> convert(ProjectData[] projectData) {
+        
+        if ( projectData == null )
+            return Collections.emptyList();
+
+        List<MantisProject> projects = Lists.newArrayList();
+
+        addSubProjects(projects, projectData, null);
+
+        return projects;
+    }
+
+    private static void addSubProjects(List<MantisProject> projects, ProjectData[] projectData, Integer parentProjectId) {
+
+        for (ProjectData projectDataItem : projectData) {
+
+            MantisProject project = new MantisProject(projectDataItem.getName(), projectDataItem.getId().intValue(), parentProjectId);
+
+            projects.add(project);
+
+            if (projectDataItem.getSubprojects() != null)
+                addSubProjects(projects, projectDataItem.getSubprojects(), projectDataItem.getId().intValue());
+        }
+    }
+
+    public static List<MantisProjectFilter> convert(FilterData[] projectFilters) {
+
+        if (projectFilters == null)
+            return Collections.emptyList();
+
+        List<MantisProjectFilter> filters = Lists.newArrayListWithCapacity(projectFilters.length);
+
+        for (FilterData filterData : projectFilters)
+            filters.add(new MantisProjectFilter(filterData.getName(), filterData.getId().intValue(), filterData.getUrl()));
+
+        return filters;
+    }
+
+    public static List<MantisCustomField> convert(CustomFieldDefinitionData[] projectCustomFields) {
+
+        if (projectCustomFields == null)
+            return Collections.emptyList();
+
+        List<MantisCustomField> customFields = Lists.newArrayListWithCapacity(projectCustomFields.length);
+        for (CustomFieldDefinitionData projectCustomField : projectCustomFields)
+            customFields.add(convert(projectCustomField));
+
+        return customFields;
+    }
+
+    public static List<MantisVersion> convert(ProjectVersionData[] projectVersions) {
+
+        if (projectVersions == null)
+            return Collections.emptyList();
+
+        List<MantisVersion> versions = Lists.newArrayListWithCapacity(projectVersions.length);
+        for (ProjectVersionData projectVersion : projectVersions)
+            versions.add(convert(projectVersion));
+
+        return versions;
+    }
+
+    public static List<MantisUser> convert(AccountData[] projectUsers) {
+
+        if (projectUsers == null)
+            return Collections.emptyList();
+
+        List<MantisUser> users = Lists.newArrayListWithCapacity(projectUsers.length);
+        for (AccountData projectCustomField : projectUsers)
+            users.add(convert(projectCustomField));
+
+        return users;
     }
 
 }
