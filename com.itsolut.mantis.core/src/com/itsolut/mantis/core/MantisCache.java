@@ -45,15 +45,6 @@ import com.itsolut.mantis.core.soap.MantisConverter;
 /**
  * Holds the cached information for a complete Mantis installations.
  * 
- * <p>
- * All access calls should be guarded by a call to {@link #refreshIfNeeded(IProgressMonitor)}, since
- * this insures that
- * <ol>
- * <li>The cache is populated</li>
- * <li>Multi-threaded access is properly synchronised</li>
- * </ol>
- * </p>
- * 
  * @author Robert Munteanu
  * 
  */
