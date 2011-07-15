@@ -13,7 +13,7 @@ import com.itsolut.mantis.core.model.MantisProject;
  * @author Robert Munteanu
  * 
  */
-class MantisProjectITreeContentProvider implements ITreeContentProvider {
+public class MantisProjectITreeContentProvider implements ITreeContentProvider {
 
     private MantisProject[] projects;
 
@@ -89,6 +89,11 @@ class MantisProjectITreeContentProvider implements ITreeContentProvider {
     }
 
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+        setInput(newInput);
+    }
+
+    public void setInput(Object newInput) {
 
         if (newInput instanceof MantisProject[])
             projects = (MantisProject[]) newInput;
