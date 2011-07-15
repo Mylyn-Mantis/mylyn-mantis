@@ -14,6 +14,8 @@ package com.itsolut.mantis.core;
 import java.io.Serializable;
 import java.util.*;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.itsolut.mantis.core.model.*;
 
 /**
@@ -25,9 +27,9 @@ public class MantisCacheData implements Serializable {
     // increment when structure changes
     private static final long serialVersionUID = 8L;
     
-    long lastUpdate = 0;
+    private long lastUpdate = 0;
 
-    List<MantisProject> projects = new ArrayList<MantisProject>();
+    private List<MantisProject> projects = new ArrayList<MantisProject>();
 
     Map<Integer, List<MantisProjectFilter>> projectFiltersById = new HashMap<Integer, List<MantisProjectFilter>>();
 
@@ -57,13 +59,13 @@ public class MantisCacheData implements Serializable {
 
     Map<Integer, List<MantisVersion>> versionsByProjectId = new HashMap<Integer, List<MantisVersion>>();
 
-    Map<Integer, List<MantisUser>> reportersByProjectId = new HashMap<Integer, List<MantisUser>>();
+    private ListMultimap<Integer, MantisUser> reportersByProjectId = ArrayListMultimap.create();
     
-    Map<Integer, List<MantisUser>> developersByProjectId = new HashMap<Integer, List<MantisUser>>();
+    private ListMultimap<Integer, MantisUser> developersByProjectId = ArrayListMultimap.create();
 
-    int reporterThreshold;
+    private int reporterThreshold;
 
-    int developerThreshold;
+    private int developerThreshold;
     
     int dueDateUpdateThreshold;
 
@@ -75,15 +77,128 @@ public class MantisCacheData implements Serializable {
     
     int bugAssignedStatus;
     
-    Map<MantisTicket.Key, Integer> defaultValuesForAttributes = new EnumMap<MantisTicket.Key, Integer>(MantisTicket.Key.class);
+    private Map<MantisTicket.Key, Integer> defaultValuesForAttributes = new EnumMap<MantisTicket.Key, Integer>(MantisTicket.Key.class);
 
-    Map<MantisTicket.Key, String> defaultStringValuesForAttributes = new EnumMap<MantisTicket.Key, String>(MantisTicket.Key.class);
+    private Map<MantisTicket.Key, String> defaultStringValuesForAttributes = new EnumMap<MantisTicket.Key, String>(MantisTicket.Key.class);
 
-	int bugResolutionFixedThreshold;
+	private int bugResolutionFixedThreshold;
 	
-	boolean etaEnabled;
+	private boolean etaEnabled;
 	
-	boolean projectionEnabled;
+	private boolean projectionEnabled;
 	
 	Map<String, MantisUser> allUsers = new HashMap<String, MantisUser>();
+	
+	public boolean hasBeenRefreshed() {
+	    
+	    return lastUpdate != 0;
+	}
+    
+    public void setLastUpdate(long lastUpdate) {
+
+        this.lastUpdate = lastUpdate;
+    }
+    
+    
+    public List<MantisProject> getProjects() {
+
+        return projects;
+    }
+    
+    public void setProjects(List<MantisProject> projects) {
+
+        this.projects = projects;
+    }
+
+    public int getDeveloperThreshold() {
+
+        return developerThreshold;
+    }
+
+    public void setDeveloperThreshold(int developerThreshold) {
+
+        this.developerThreshold = developerThreshold;
+    }
+
+    public int getReporterThreshold() {
+
+        return reporterThreshold;
+    }
+
+    public void setReporterThreshold(int reporterThreshold) {
+
+        this.reporterThreshold = reporterThreshold;
+    }
+
+    public ListMultimap<Integer, MantisUser> getReportersByProjectId() {
+
+        return reportersByProjectId;
+    }
+
+    public void setReportersByProjectId(ListMultimap<Integer, MantisUser> reportersByProjectId) {
+
+        this.reportersByProjectId = reportersByProjectId;
+    }
+    
+    
+    public ListMultimap<Integer, MantisUser> getDevelopersByProjectId() {
+
+        return developersByProjectId;
+    }
+    
+    
+    public void setDevelopersByProjectId(ListMultimap<Integer, MantisUser> developersByProjectId) {
+
+        this.developersByProjectId = developersByProjectId;
+    }
+    
+    public void putDefaultValueForAttribute(MantisTicket.Key key, Integer value) {
+        
+        defaultValuesForAttributes.put(key, value);
+    }
+    
+    public Integer getDefaultValueForAttribute(MantisTicket.Key key ) {
+        
+        return defaultValuesForAttributes.get(key);
+    }
+
+    public void putDefaultValueForStringAttribute(MantisTicket.Key key, String value) {
+        
+        defaultStringValuesForAttributes.put(key, value);
+    }
+
+    public String getDefaultValueForStringAttribute(MantisTicket.Key key ) {
+        
+        return defaultStringValuesForAttributes.get(key);
+    }
+
+    public int getBugResolutionFixedThreshold() {
+
+        return bugResolutionFixedThreshold;
+    }
+
+    public void setBugResolutionFixedThreshold(int bugResolutionFixedThreshold) {
+
+        this.bugResolutionFixedThreshold = bugResolutionFixedThreshold;
+    }
+
+    public boolean isEtaEnabled() {
+
+        return etaEnabled;
+    }
+
+    public void setEtaEnabled(boolean etaEnabled) {
+
+        this.etaEnabled = etaEnabled;
+    }
+
+    public boolean isProjectionEnabled() {
+
+        return projectionEnabled;
+    }
+
+    public void setProjectionEnabled(boolean projectionEnabled) {
+
+        this.projectionEnabled = projectionEnabled;
+    }
 }

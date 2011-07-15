@@ -12,7 +12,7 @@ package com.itsolut.mantis.core;
 
 import org.eclipse.core.runtime.Assert;
 
-import com.itsolut.mantis.core.soap.MantisAxis1SOAPClient;
+import com.itsolut.mantis.core.soap.MantisAxis1SoapClient;
 
 /**
  * @author Robert Munteanu
@@ -53,8 +53,8 @@ public class MantisRepositoryLocations {
 
         String repositoryUrl;
 
-        if (rawUrl.endsWith(MantisAxis1SOAPClient.SOAP_API_LOCATION))
-            repositoryUrl = rawUrl.substring(0, rawUrl.length() - MantisAxis1SOAPClient.SOAP_API_LOCATION.length() + 1);
+        if (rawUrl.endsWith(MantisAxis1SoapClient.SOAP_API_LOCATION))
+            repositoryUrl = rawUrl.substring(0, rawUrl.length() - MantisAxis1SoapClient.SOAP_API_LOCATION.length() + 1);
         else if (rawUrl.indexOf(URL_SHOW_BUG) != -1)
             repositoryUrl = rawUrl.substring(0, rawUrl.indexOf(URL_SHOW_BUG) + 1);
         else
@@ -76,7 +76,7 @@ public class MantisRepositoryLocations {
 
     public String getSoapApiLocation() {
 
-        return join(baseRepositoryUrl, MantisAxis1SOAPClient.SOAP_API_LOCATION);
+        return join(baseRepositoryUrl, MantisAxis1SoapClient.SOAP_API_LOCATION);
     }
 
     private String join(String first, String second) {

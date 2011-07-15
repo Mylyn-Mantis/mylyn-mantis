@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.commons.soap;bundle-version="[3.5.0,4.0.0)",
  org.apache.axis;bundle-version="[1.4.0,2.0.0)",
  javax.xml.rpc,
- com.google.inject;bundle-version="[2.0.0,3.0.0)"
+ com.google.inject;bundle-version="[2.0.0,3.0.0)",
+ com.google.collect;bundle-version="[1.0.0,2.0.0)"
 Eclipse-RegisterBuddy: org.apache.axis
 Bundle-ActivationPolicy: lazy
 Export-Package: 

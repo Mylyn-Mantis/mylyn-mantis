@@ -10,11 +10,11 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-interface DefaultConstantValues {
+public interface DefaultConstantValues {
 
     public enum Role {
 
-        REPORTER(25), DEVELOPER(55);
+        REPORTER(25), DEVELOPER(55), NOBODY(100);
 
         private final int value;
 
@@ -64,7 +64,6 @@ interface DefaultConstantValues {
         }
 
     }
-
     
     /**
      * Contains default values for bug, bug note and bug operations attributes.
@@ -89,5 +88,22 @@ interface DefaultConstantValues {
         }
 
 
+    }
+
+    public enum Status {
+        
+        NEW(10), ASSIGNED(50);
+        
+        private final int value;
+
+        private Status(int value) {
+
+            this.value = value;
+        }
+
+        public int getValue() {
+
+            return value;
+        }
     }
 }

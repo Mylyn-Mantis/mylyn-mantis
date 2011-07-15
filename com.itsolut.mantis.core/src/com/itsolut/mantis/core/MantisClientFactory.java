@@ -27,7 +27,7 @@ import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.soap.MantisClient;
+import com.itsolut.mantis.core.soap.MantisSoapClient;
 
 /**
  * @author Steffen Pingel
@@ -45,7 +45,7 @@ public class MantisClientFactory {
 
     public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
-        return new MantisClient(webLocation);
+        return new MantisSoapClient(webLocation);
     }
     
     public IMantisClient createClient(TaskRepository taskRepository) throws MantisException {

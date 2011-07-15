@@ -54,7 +54,7 @@ import com.itsolut.mantis.core.exception.TicketNotFoundException;
  * @author Chris Hane
  */
 @SuppressWarnings("restriction")
-public class MantisAxis1SOAPClient extends AbstractSoapClient {
+public class MantisAxis1SoapClient extends AbstractSoapClient {
 
     /**
      * The default location of the SOAP API entry point, as of Mantis 1.1
@@ -65,7 +65,7 @@ public class MantisAxis1SOAPClient extends AbstractSoapClient {
 
     private AbstractWebLocation location;
 
-    public MantisAxis1SOAPClient(AbstractWebLocation webLocation) throws MantisException {
+    public MantisAxis1SoapClient(AbstractWebLocation webLocation) throws MantisException {
 
         this.location = webLocation;
 

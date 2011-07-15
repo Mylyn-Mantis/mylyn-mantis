@@ -57,7 +57,7 @@ public class MantisConverter {
         return version;
     }
 
-    public static MantisTicket convert(IssueData issue, MantisClient mantisClient, IProgressMonitor monitor) throws MantisException {
+    public static MantisTicket convert(IssueData issue, MantisSoapClient mantisClient, IProgressMonitor monitor) throws MantisException {
 
         MantisTicket ticket = new MantisTicket(issue.getId().intValue());
         ticket.setCreated(issue.getDate_submitted().getTime());

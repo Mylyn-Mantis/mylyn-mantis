@@ -10,20 +10,11 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
-import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.ETA_ENABLED;
-import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.PROJECTION_ENABLED;
-
 import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.mylyn.commons.net.Policy;
-import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.AccountData;
 import biz.futureware.mantis.rpc.soap.client.CustomFieldDefinitionData;
@@ -33,9 +24,22 @@ import biz.futureware.mantis.rpc.soap.client.ProjectData;
 import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
 
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.*;
+import com.itsolut.mantis.core.model.MantisCustomField;
+import com.itsolut.mantis.core.model.MantisETA;
+import com.itsolut.mantis.core.model.MantisPriority;
+import com.itsolut.mantis.core.model.MantisProject;
+import com.itsolut.mantis.core.model.MantisProjectCategory;
+import com.itsolut.mantis.core.model.MantisProjectFilter;
+import com.itsolut.mantis.core.model.MantisProjection;
+import com.itsolut.mantis.core.model.MantisReproducibility;
+import com.itsolut.mantis.core.model.MantisResolution;
+import com.itsolut.mantis.core.model.MantisSeverity;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.soap.MantisAxis1SOAPClient;
+import com.itsolut.mantis.core.model.MantisTicketAttribute;
+import com.itsolut.mantis.core.model.MantisTicketStatus;
+import com.itsolut.mantis.core.model.MantisUser;
+import com.itsolut.mantis.core.model.MantisVersion;
+import com.itsolut.mantis.core.model.MantisViewState;
 import com.itsolut.mantis.core.soap.MantisConverter;
 
 /**
@@ -59,260 +63,19 @@ public class MantisCache {
 
     static final String BUILT_IN_PROJECT_TASKS_FILTER_FORMAT = "[Built-in] Latest %s tasks";
 
-    private static final String RESOLVED_STATUS_THRESHOLD = "bug_resolved_status_threshold";
-
-    private static final String REPORTER_THRESHOLD = "report_bug_threshold";
-
-    private static final String DEVELOPER_THRESHOLD = "update_bug_assign_threshold";
-
-    private static final String DUE_DATE_VIEW_THRESOLD = "due_date_view_threshold";
-
-    private static final String DUE_DATE_UPDATE_THRESOLD = "due_date_update_threshold";
-    
-    private static final String TIME_TRACKING_ENABLED = "time_tracking_enabled";
-
-    private static final String BUG_SUBMIT_STATUS = "bug_submit_status";
-    
-    private static final String BUG_ASSIGNED_STATUS = "bug_assigned_status";
-    
-    static final int STATUS_NEW = 10;
-
-    static final int STATUS_ASSIGNED = 50;
-    
-    static final int ACCESS_LEVEL_NOBODY = 100;
-
-	private static final int ALL_PROJECTS = 0;
-
-    private final Object sync = new Object();
-
-    private MantisAxis1SOAPClient soapClient;
-
     private MantisCacheData cacheData = new MantisCacheData();
-
-    private final NumberFormat formatter = new DecimalFormat("#.#");
-
-    public MantisCache(MantisAxis1SOAPClient soapClient) {
-
-        this.soapClient = soapClient;
-    }
 
     public void setProjects(List<MantisProject> projects) {
 
-        this.cacheData.projects = projects;
+        this.cacheData.setProjects( projects );
     }
 
     public List<MantisProject> getProjects() {
 
-        return cacheData.projects;
+        return cacheData.getProjects();
     }
 
-    public void refreshIfNeeded(IProgressMonitor progressMonitor, String repositoryUrl) throws MantisException {
-
-        synchronized (sync) {
-            if (cacheData.lastUpdate == 0)
-                refresh(progressMonitor, repositoryUrl);
-        }
-
-    }
-
-    public void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
-
-    	refresh0(monitor, repositoryUrl, ALL_PROJECTS);
-    }
-
-	private void refresh0(IProgressMonitor monitor, String repositoryUrl, int projectId) throws MantisException {
-		
-		synchronized (sync) {
-
-            long start = System.currentTimeMillis();
-
-            SubMonitor subMonitor = SubMonitor.convert(monitor);
-
-            try {
-                cacheProjects(soapClient.getProjectData(monitor));
-
-                int projectsToRefresh =  projectId == ALL_PROJECTS ? cacheData.projects.size()  : 1 ;
-                
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 29);
-
-                cacheReporterThreshold(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD));
-                Policy.advance(subMonitor, 1);
-
-                cacheDeveloperThreshold(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD));
-                Policy.advance(subMonitor, 1);
-                
-                cacheAssignedStatus(soapClient.getStringConfiguration(monitor, BUG_ASSIGNED_STATUS));
-                Policy.advance(subMonitor, 1);
-
-                cacheSubmitStatus(soapClient.getStringConfiguration(monitor, BUG_SUBMIT_STATUS));
-                Policy.advance(subMonitor, 1);
-                
-                try {
-                    cacheDueDateViewThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cacheDueDateViewThreshold(String.valueOf(ACCESS_LEVEL_NOBODY));
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
-
-                try {
-                    cacheDueDateUpdateThreshold(soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cacheDueDateUpdateThreshold(ACCESS_LEVEL_NOBODY + "");
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
-
-
-                try {
-                    cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cacheTimeTrackingEnabled(Boolean.FALSE.toString());
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
-                
-                for (MantisProject project : cacheData.projects) {
-                	
-                	if ( projectId != ALL_PROJECTS && projectId != project.getValue() )
-                		continue;
-                	
-                    cacheFilters(project.getValue(), soapClient.getProjectFilters(project.getValue(), monitor));
-                    Policy.advance(subMonitor, 1);
-
-                    cacheProjectCustomFields(project.getValue(), soapClient.getProjectCustomFields(project.getValue(),
-                            monitor));
-                    Policy.advance(subMonitor, 1);
-
-                    cacheProjectCategories(project.getValue(), soapClient.getProjectCategories(project.getValue(),
-                            monitor));
-                    Policy.advance(subMonitor, 1);
-
-                    cacheProjectDevelopers(project.getValue(), soapClient.getProjectUsers(project.getValue(),
-                            cacheData.developerThreshold, monitor));
-                    Policy.advance(subMonitor, 1);
-
-                    try {
-                        cacheProjectReporters(project.getValue(), soapClient.getProjectUsers(project.getValue(),
-                                cacheData.reporterThreshold, monitor));
-                    } catch (MantisException e) {
-                        if (!cacheData.reportersByProjectId.containsKey(project.getValue())) {
-                            cacheData.reportersByProjectId.put(project.getValue(), new ArrayList<MantisUser>(
-                                    cacheData.developersByProjectId.get(project.getValue())));
-                            MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
-                        } else {
-                            MantisCorePlugin.warn("Failed retrieving reporter information, using previously loaded values.", e);
-                        }
-                    }
-                    Policy.advance(subMonitor, 1);
-
-                    cacheProjectVersions(project.getValue(), soapClient.getProjectVersions(project.getValue(), monitor));
-                    Policy.advance(subMonitor, 1);
-                }
-
-                cacheResolvedStatus(soapClient.getStringConfiguration(monitor, RESOLVED_STATUS_THRESHOLD));
-                Policy.advance(subMonitor, 1);
-                
-                cacheRepositoryVersion(soapClient.getVersion(monitor));
-                Policy.advance(subMonitor, 1);
-                
-                cachePriorities(soapClient.getPriorities(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheStatuses(soapClient.getStatuses(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheSeverities(soapClient.getSeverities(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheResolutions(soapClient.getResolutions(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheReproducibilites(soapClient.getReproducibilities(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheProjections(soapClient.getProjections(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheEtas(soapClient.getEtas(monitor));
-                Policy.advance(subMonitor, 1);
-
-                cacheViewStates(soapClient.getViewStates(monitor));
-                Policy.advance(subMonitor, 1);
-                
-                cacheDefaultAttributeValue(Key.SEVERITY, safeGetThreshold(monitor, "default_bug_severity", DefaultConstantValues.Attribute.BUG_SEVERITY));
-                Policy.advance(subMonitor, 1);
-
-                cacheDefaultAttributeValue(Key.PRIORITY, safeGetThreshold(monitor, "default_bug_priority", DefaultConstantValues.Attribute.BUG_PRIORITY));
-                Policy.advance(subMonitor, 1);
-
-                cacheDefaultAttributeValue(Key.ETA, safeGetThreshold(monitor, "default_bug_eta", DefaultConstantValues.Attribute.BUG_ETA));
-                Policy.advance(subMonitor, 1);
-
-                cacheDefaultAttributeValue(Key.REPRODUCIBILITY, safeGetThreshold(monitor, "default_bug_reproducibility", DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY));
-                Policy.advance(subMonitor, 1);
-
-                cacheDefaultAttributeValue(Key.RESOLUTION, safeGetThreshold(monitor, "default_bug_resolution", DefaultConstantValues.Attribute.BUG_RESOLUTION));
-                Policy.advance(subMonitor, 1);
-
-                cacheDefaultAttributeValue(Key.PROJECTION, safeGetThreshold(monitor, "default_bug_projection", DefaultConstantValues.Attribute.BUG_PROJECTION));
-                Policy.advance(subMonitor, 1);
-                
-                cacheDefaultAttributeValue(Key.VIEW_STATE, safeGetThreshold(monitor, "default_bug_view_status", DefaultConstantValues.Attribute.BUG_VIEW_STATUS));
-                Policy.advance(subMonitor, 1);
-                
-                cacheData.defaultStringValuesForAttributes.put(Key.STEPS_TO_REPRODUCE, soapClient.getStringConfiguration(monitor, "default_bug_steps_to_reproduce"));
-                Policy.advance(subMonitor, 1);
-                
-                cacheData.defaultStringValuesForAttributes.put(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
-                Policy.advance(subMonitor, 1);
-                
-                cacheData.bugResolutionFixedThreshold = safeGetThreshold(monitor, "bug_resolution_fixed_threshold", DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD);
-                
-                cacheData.etaEnabled = safeGetBoolean(subMonitor, "enable_eta", ETA_ENABLED );
-                
-                cacheData.projectionEnabled = safeGetBoolean(subMonitor, "enable_projection", PROJECTION_ENABLED );
-                
-                cacheData.lastUpdate = System.currentTimeMillis();
-            } finally {
-                subMonitor.done();
-                MantisCorePlugin.debug(NLS.bind("Repository sync for {0} complete in {1} seconds.", repositoryUrl,
-                        format(start)), null);
-            }
-        }
-	}
-	
-	private int safeGetThreshold(IProgressMonitor monitor, String configName, DefaultConstantValues.Attribute attribute) {
-	    
-	    try {
-	        return safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
-	    } catch ( MantisException e ) {
-	        MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");
-	        return attribute.getValue();
-	    }
-	}
-
-	
-	private boolean safeGetBoolean(IProgressMonitor monitor, String configName, DefaultConstantValues.Attribute attribute) {
-	    
-	    try {
-	        int intValue = safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
-	        return intValue == 1;
-	    } catch ( MantisException e ) {
-	        MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");
-	        return attribute.getValue() == 1;
-	    }
-	}
-
-    public void refreshForProject(IProgressMonitor monitor, String url, int projectId) throws MantisException {
-    	
-    	refresh0(monitor, url, projectId);
-	}
-
-    private void cacheTimeTrackingEnabled(String stringValue) {
+    public void cacheTimeTrackingEnabled(String stringValue) {
         
         cacheData.timeTrackingEnabled = parseMantisBoolean(stringValue);
     }
@@ -322,34 +85,27 @@ public class MantisCache {
         return "1".equals(stringValue);
     }
 
-    private void cacheDueDateUpdateThreshold(String stringValue) {
+    public void cacheDueDateUpdateThreshold(int threshold) {
 
-        cacheData.dueDateUpdateThreshold = safeGetInt(stringValue, ACCESS_LEVEL_NOBODY);
+        cacheData.dueDateUpdateThreshold = threshold;
     }
 
-    private void cacheDueDateViewThreshold(String stringValue) {
+    public void cacheDueDateViewThreshold(int threshold) {
 
-        cacheData.dueDateViewThreshold = safeGetInt(stringValue, ACCESS_LEVEL_NOBODY);
+        cacheData.dueDateViewThreshold = threshold;
     }
     
-    private void cacheAssignedStatus(String stringValue) {
+    public void cacheAssignedStatus(int status) {
 
-        cacheData.bugAssignedStatus = safeGetInt(stringValue, STATUS_ASSIGNED);
+        cacheData.bugAssignedStatus = status;
     }
 
-    private void cacheSubmitStatus(String stringValue) {
+    public void cacheSubmitStatus(int status) {
         
-        cacheData.bugSubmitStatus = safeGetInt(stringValue, STATUS_NEW);
+        cacheData.bugSubmitStatus = status;
     }
 
-    private String format(long start) {
-
-        double millis = (System.currentTimeMillis() - start) / (double) 1000;
-        return formatter.format(millis);
-
-    }
-
-    private void cacheProjectVersions(int value, ProjectVersionData[] projectVerions) {
+    public void cacheProjectVersions(int value, ProjectVersionData[] projectVerions) {
 
         List<MantisVersion> projectVersions = new ArrayList<MantisVersion>();
 
@@ -360,11 +116,11 @@ public class MantisCache {
 
     }
 
-    private void cacheProjectReporters(int projectId, AccountData[] projectUsers) {
+    public void cacheProjectReporters(int projectId, AccountData[] projectUsers) {
 
         List<MantisUser> reporters = cacheUsers0(projectUsers);
 
-        cacheData.reportersByProjectId.put(projectId, reporters);
+        cacheData.getReportersByProjectId().putAll(projectId, reporters);
     }
 
     private List<MantisUser> cacheUsers0(AccountData[] projectUsers) {
@@ -383,39 +139,24 @@ public class MantisCache {
         return reporters;
     }
 
-    private void cacheProjectDevelopers(int projectId, AccountData[] projectDevelopers) {
+    public void cacheProjectDevelopers(int projectId, AccountData[] projectDevelopers) {
 
         List<MantisUser> developers = cacheUsers0(projectDevelopers);
 
-        cacheData.developersByProjectId.put(projectId, developers);
+        cacheData.getDevelopersByProjectId().putAll(projectId, developers);
     }
 
-    private void cacheReporterThreshold(String stringConfiguration) {
+    public void cacheReporterThreshold(int threshold) {
 
-        cacheData.reporterThreshold = safeGetInt(stringConfiguration,
-                DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue());
-
+        cacheData.setReporterThreshold(threshold);
     }
 
-    private int safeGetInt(String stringConfiguration, int defaultValue) {
+    public void cacheDeveloperThreshold(int threshold) {
 
-        try {
-            return Integer.parseInt(stringConfiguration);
-        } catch (NumberFormatException e) {
-            MantisCorePlugin.warn("Failed parsing config option value " + stringConfiguration
-                    + ". Using default value.", e);
-            return defaultValue;
-        }
+        cacheData.setDeveloperThreshold(threshold);
     }
 
-    private void cacheDeveloperThreshold(String stringConfiguration) {
-
-        cacheData.developerThreshold = safeGetInt(stringConfiguration,
-                DefaultConstantValues.Threshold.UPDATE_BUG_ASSIGN_THRESHOLD.getValue());
-
-    }
-
-    private void cacheProjectCategories(int projectId, String[] projectCategories) {
+    public void cacheProjectCategories(int projectId, String[] projectCategories) {
 
         List<MantisProjectCategory> categories = new ArrayList<MantisProjectCategory>();
 
@@ -429,7 +170,7 @@ public class MantisCache {
 
     }
 
-    private void cacheViewStates(ObjectRef[] viewStates) {
+    public void cacheViewStates(ObjectRef[] viewStates) {
 
         this.cacheData.viewStates = new ArrayList<MantisViewState>();
 
@@ -438,7 +179,7 @@ public class MantisCache {
 
     }
 
-    private void cacheEtas(ObjectRef[] etas) {
+    public void cacheEtas(ObjectRef[] etas) {
 
         this.cacheData.etas = new ArrayList<MantisETA>();
 
@@ -447,7 +188,7 @@ public class MantisCache {
 
     }
 
-    private void cacheProjections(ObjectRef[] projections) {
+    public void cacheProjections(ObjectRef[] projections) {
 
         this.cacheData.projections = new ArrayList<MantisProjection>();
 
@@ -456,7 +197,7 @@ public class MantisCache {
 
     }
 
-    private void cacheReproducibilites(ObjectRef[] reproducibilities) {
+    public void cacheReproducibilites(ObjectRef[] reproducibilities) {
 
         this.cacheData.reproducibilities = new ArrayList<MantisReproducibility>();
 
@@ -466,7 +207,7 @@ public class MantisCache {
 
     }
 
-    private void cacheResolutions(ObjectRef[] resolutions) {
+    public void cacheResolutions(ObjectRef[] resolutions) {
 
         this.cacheData.resolutions = new ArrayList<MantisResolution>();
 
@@ -475,7 +216,7 @@ public class MantisCache {
 
     }
 
-    private void cacheSeverities(ObjectRef[] severities) {
+    public void cacheSeverities(ObjectRef[] severities) {
 
         this.cacheData.severities = new ArrayList<MantisSeverity>();
 
@@ -484,7 +225,7 @@ public class MantisCache {
 
     }
 
-    private void cacheStatuses(ObjectRef[] statuses) {
+    public void cacheStatuses(ObjectRef[] statuses) {
 
         this.cacheData.statuses = new ArrayList<MantisTicketStatus>();
 
@@ -493,7 +234,7 @@ public class MantisCache {
 
     }
 
-    private void cachePriorities(ObjectRef[] prios) {
+    public void cachePriorities(ObjectRef[] prios) {
 
         cacheData.priorities = new ArrayList<MantisPriority>();
         for (ObjectRef prio : prios)
@@ -501,18 +242,18 @@ public class MantisCache {
 
     }
 
-    private void cacheResolvedStatus(String resolvedStatus) {
+    public void cacheResolvedStatus(String resolvedStatus) {
 
         this.cacheData.resolvedStatus = Integer.parseInt(resolvedStatus);
 
     }
 
-    private void cacheProjects(ProjectData[] projectData) {
+    public void cacheProjects(ProjectData[] projectData) {
 
-        cacheData.projects.clear();
+        cacheData.getProjects().clear();
 
         for (ProjectData project : projectData) {
-            cacheData.projects.add(new MantisProject(project.getName(),project.getId().intValue()));
+            cacheData.getProjects().add(new MantisProject(project.getName(),project.getId().intValue()));
 
             addSubProjectsIfApplicable(project);
         }
@@ -526,14 +267,14 @@ public class MantisCache {
 
         for (ProjectData subProject : pd.getSubprojects()) {
 
-            cacheData.projects.add(new MantisProject(subProject.getName(), subProject.getId().intValue(), pd.getId().intValue()));
+            cacheData.getProjects().add(new MantisProject(subProject.getName(), subProject.getId().intValue(), pd.getId().intValue()));
 
             addSubProjectsIfApplicable(subProject);
         }
 
     }
 
-    private void cacheFilters(int projectId, FilterData[] projectFilters) throws MantisException {
+    public void cacheFilters(int projectId, FilterData[] projectFilters) throws MantisException {
 
         List<MantisProjectFilter> filters = new ArrayList<MantisProjectFilter>();
 
@@ -554,7 +295,7 @@ public class MantisCache {
         return new MantisProjectFilter(filterDisplayName, BUILT_IN_PROJECT_TASKS_FILTER_ID);
     }
 
-    private void cacheProjectCustomFields(int projectId, CustomFieldDefinitionData[] customFieldData) {
+    public void cacheProjectCustomFields(int projectId, CustomFieldDefinitionData[] customFieldData) {
 
         List<MantisCustomField> customFields = new ArrayList<MantisCustomField>();
 
@@ -565,14 +306,14 @@ public class MantisCache {
 
     }
 
-    private void cacheRepositoryVersion(String version) throws MantisException {
+    public void cacheRepositoryVersion(String version) throws MantisException {
 
         this.cacheData.repositoryVersion = RepositoryVersion.fromVersionString(version);
     }
 
-    private void cacheDefaultAttributeValue(Key attribute, int readValue) {
+    public void cacheDefaultAttributeValue(Key attribute, int readValue) {
 
-        cacheData.defaultValuesForAttributes.put(attribute, readValue);
+        cacheData.putDefaultValueForAttribute(attribute, readValue);
     }
     
     public RepositoryVersion getRepositoryVersion() {
@@ -582,7 +323,7 @@ public class MantisCache {
 
     public int getProjectId(String projectName) throws MantisException {
 
-        for (MantisProject mantisProject : cacheData.projects)
+        for (MantisProject mantisProject : cacheData.getProjects())
             if (mantisProject.getName().equals(projectName))
                 return mantisProject.getValue();
 
@@ -763,7 +504,7 @@ public class MantisCache {
 
     public MantisProject getProjectByName(String projectName) throws MantisException {
 
-        for (MantisProject project : cacheData.projects)
+        for (MantisProject project : cacheData.getProjects())
             if (project.getName().equals(projectName))
                 return project;
 
@@ -772,7 +513,7 @@ public class MantisCache {
 
     public MantisProject getProjectById(int projectId) throws MantisException {
 
-        for (MantisProject project : cacheData.projects)
+        for (MantisProject project : cacheData.getProjects())
             if (project.getValue() == projectId)
                 return project;
 
@@ -804,10 +545,7 @@ public class MantisCache {
 
         int projectId = getProjectId(projectName);
 
-        List<MantisUser> developers = cacheData.developersByProjectId.get(projectId);
-
-        if (developers == null)
-            throw new MantisException("No developers for project with id " + projectId + " ");
+        List<MantisUser> developers = cacheData.getDevelopersByProjectId().get(projectId);
 
         return developers.toArray(new MantisUser[developers.size()]);
 
@@ -817,7 +555,7 @@ public class MantisCache {
 
         int projectId = getProjectId(projectName);
 
-        List<MantisUser> reporters = cacheData.reportersByProjectId.get(projectId);
+        List<MantisUser> reporters = cacheData.getReportersByProjectId().get(projectId);
 
         if (reporters == null)
             throw new MantisException("No reporters for project with id " + projectId + " ");
@@ -869,78 +607,72 @@ public class MantisCache {
 
     public String getDefaultSeverityName() throws MantisException {
         
-        return getSeverity(cacheData.defaultValuesForAttributes.get(Key.SEVERITY)).getName();
+        return getSeverity(cacheData.getDefaultValueForAttribute(Key.SEVERITY)).getName();
     }
     
     public String getDefaultPriorityName() throws MantisException {
         
-        return getPriority(cacheData.defaultValuesForAttributes.get(Key.PRIORITY)).getName();
+        return getPriority(cacheData.getDefaultValueForAttribute(Key.PRIORITY)).getName();
     }
     
     public String getDefaultEtaName() throws MantisException {
         
-        return getETA(cacheData.defaultValuesForAttributes.get(Key.ETA)).getName();
+        return getETA(cacheData.getDefaultValueForAttribute(Key.ETA)).getName();
     }
 
     public String getDefaultProjectionName() throws MantisException {
 
-        return getProjection(cacheData.defaultValuesForAttributes.get(Key.PROJECTION)).getName();
+        return getProjection(cacheData.getDefaultValueForAttribute(Key.PROJECTION)).getName();
     }
     
     public String getDefaultResolutionName() throws MantisException {
         
-        return getResolution(cacheData.defaultValuesForAttributes.get(Key.RESOLUTION)).getName();
+        return getResolution(cacheData.getDefaultValueForAttribute(Key.RESOLUTION)).getName();
     }
     
     public String getDefaultReproducibilityName() throws MantisException {
         
-        return getReproducibility(cacheData.defaultValuesForAttributes.get(Key.REPRODUCIBILITY)).getName();
+        return getReproducibility(cacheData.getDefaultValueForAttribute(Key.REPRODUCIBILITY)).getName();
     }
     
     public String getDefaultViewStateName() throws MantisException {
         
-        return getViewState(cacheData.defaultValuesForAttributes.get(Key.VIEW_STATE)).getName();
+        return getViewState(cacheData.getDefaultValueForAttribute(Key.VIEW_STATE)).getName();
     }
     
     public String getDefaultStepsToReproduce() {
     	
-    	return cacheData.defaultStringValuesForAttributes.get(Key.STEPS_TO_REPRODUCE);
+    	return cacheData.getDefaultValueForStringAttribute(Key.STEPS_TO_REPRODUCE);
     }
     
     public String getDefaultAdditionalInfo() {
     	
-    	return cacheData.defaultStringValuesForAttributes.get(Key.ADDITIONAL_INFO);
+    	return cacheData.getDefaultValueForStringAttribute(Key.ADDITIONAL_INFO);
     }
     
     public MantisResolution getBugResolutionFixedThreshold() throws MantisException {
     	
-    	return getResolution(cacheData.bugResolutionFixedThreshold);
+    	return getResolution(cacheData.getBugResolutionFixedThreshold());
     }
     
     public boolean isEtaEnabled() {
     	
-    	return cacheData.etaEnabled;
+    	return cacheData.isEtaEnabled();
     }
     
     public boolean isProjectionEnabled() {
     	
-    	return cacheData.projectionEnabled;
+    	return cacheData.isProjectionEnabled();
     }
     
     public MantisCacheData getCacheData() {
 
-        synchronized (sync) {
-            return cacheData;
-        }
-
+        return cacheData;
     }
 
     public void setCacheData(MantisCacheData cacheData) {
 
-        synchronized (sync) {
-            this.cacheData = cacheData;
-        }
-
+        this.cacheData = cacheData;
     }
 
     /**
@@ -958,32 +690,23 @@ public class MantisCache {
         if ( accountData.getId().equals(BigInteger.ZERO) )
             return;
 
-    	// debug for issue #119
-    	if ( cacheData.reportersByProjectId == null) {
-    		MantisCorePlugin.warn("cacheData.reportersByProjectId is null.", new RuntimeException());
-    		cacheData.reportersByProjectId = new HashMap<Integer, List<MantisUser>>();
-    	}
-    	
-        List<MantisUser> reporters = cacheData.reportersByProjectId.get(projectId);
-        if (reporters == null) {
-            reporters = new ArrayList<MantisUser>();
-            MantisCorePlugin.warn("cacheData.reportersByProjectId is null for projectId " + projectId + " .",
-                    new RuntimeException());
-            cacheData.reportersByProjectId.put(projectId, reporters);
-        }
-        
         MantisUser user = new MantisUser(accountData.getId().intValue(), accountData.getName(), accountData.getReal_name(), accountData.getEmail());
         
         cacheData.allUsers.put(accountData.getName(), user);
         
-		if (reporters.contains(user))
+        if ( cacheData.getReportersByProjectId().containsEntry(projectId, user) )
             return;
-
-        reporters.add(user);
+        
+        cacheData.getReportersByProjectId().put(projectId, user);
     }
 
     public boolean dueDateIsEnabled() {
         
-        return cacheData.dueDateViewThreshold < ACCESS_LEVEL_NOBODY && cacheData.dueDateUpdateThreshold < ACCESS_LEVEL_NOBODY;
+        return cacheData.dueDateViewThreshold < DefaultConstantValues.Role.NOBODY.getValue() && cacheData.dueDateUpdateThreshold < DefaultConstantValues.Role.NOBODY.getValue();
+    }
+
+    public void copyReportersFromDevelopers(int projectId) {
+
+        cacheData.getReportersByProjectId().replaceValues(projectId, cacheData.getDevelopersByProjectId().get(projectId));
     }
 }
