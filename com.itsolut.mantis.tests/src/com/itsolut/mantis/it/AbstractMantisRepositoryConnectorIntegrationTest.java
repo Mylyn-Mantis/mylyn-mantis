@@ -19,6 +19,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
@@ -38,6 +39,8 @@ import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.ObjectRef;
 import biz.futureware.mantis.rpc.soap.client.RelationshipData;
 
+import com.google.common.collect.Maps;
+import com.itsolut.mantis.core.DefaultConstantValues;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
@@ -57,11 +60,18 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		TaskData taskData = connector.getTaskData(repositoryAccessor.getRepository(), String.valueOf(firstTaskId),
 				new NullProgressMonitor());
-
-		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.SUMMARY), "First task");
-		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.DESCRIPTION), "Description");
-		assertAttributeEquals(taskData.getRoot().getMappedAttribute(TaskAttribute.STATUS), String.valueOf(10)); // new
-
+		
+		Map<String, String> expectedValues = Maps.newHashMap();
+		expectedValues.put(TaskAttribute.PRODUCT, "Test project");
+		expectedValues.put(TaskAttribute.SUMMARY, "First task");
+		expectedValues.put(TaskAttribute.DESCRIPTION, "Description");
+		expectedValues.put(TaskAttribute.STATUS, String.valueOf(DefaultConstantValues.Status.NEW.getValue()));
+		expectedValues.put(TaskAttribute.RESOLUTION, String.valueOf(DefaultConstantValues.Resolution.OPEN.getValue()));
+		expectedValues.put(TaskAttribute.PRIORITY, String.valueOf(DefaultConstantValues.Priority.NORMAL.getValue()));
+		expectedValues.put(TaskAttribute.SEVERITY, String.valueOf(DefaultConstantValues.Severity.MINOR.getValue()));
+		
+		for ( Map.Entry<String, String> expectedValueEntry : expectedValues.entrySet() )
+			assertAttributeEquals(taskData.getRoot().getMappedAttribute(expectedValueEntry.getKey()), expectedValueEntry.getValue());
 	}
 
 	@Test

@@ -106,4 +106,38 @@ public interface DefaultConstantValues {
             return value;
         }
     }
+    
+    public enum Resolution {
+        
+        OPEN(10);
+        
+        private final int value;
+
+        private Resolution(int value) {
+
+            this.value = value;
+        }
+
+        public int getValue() {
+
+            return value;
+        }
+    }
+
+    public enum Severity {
+        
+        MINOR(50);
+        
+        private final int value;
+
+        private Severity(int value) {
+
+            this.value = value;
+        }
+
+        public int getValue() {
+
+            return value;
+        }
+    }
 }
