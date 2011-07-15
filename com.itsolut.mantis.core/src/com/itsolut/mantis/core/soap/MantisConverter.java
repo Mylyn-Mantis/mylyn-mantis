@@ -350,10 +350,8 @@ public class MantisConverter {
 
             Constructor<T> contructor = attributeType.getConstructor(String.class, int.class);
 
-            for (ObjectRef ref : objectRef) {
-
+            for (ObjectRef ref : objectRef)
                 attributes.add(contructor.newInstance(ref.getName(), ref.getId().intValue()));
-            }
 
             return attributes;
         } catch (SecurityException e) {
