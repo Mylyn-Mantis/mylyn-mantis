@@ -485,9 +485,9 @@ public class MantisCache {
         return getStatus(cacheData.bugSubmitStatus).getName();
     }
     
-    public String getAssignedStatus() throws MantisException {
+    public MantisTicketStatus getAssignedStatus() throws MantisException {
 
-        return getStatus(cacheData.bugAssignedStatus).getName();
+        return getStatus(cacheData.bugAssignedStatus);
     }        
 
     public String getResolvedStatusName() throws MantisException {

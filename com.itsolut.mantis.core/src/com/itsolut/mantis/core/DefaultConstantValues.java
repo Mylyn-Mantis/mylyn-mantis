@@ -92,7 +92,7 @@ public interface DefaultConstantValues {
 
     public enum Status {
         
-        NEW(10), ASSIGNED(50);
+        NEW(10), ASSIGNED(50), RESOLVED(80);
         
         private final int value;
 

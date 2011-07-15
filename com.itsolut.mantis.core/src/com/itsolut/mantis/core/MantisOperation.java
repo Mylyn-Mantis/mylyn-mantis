@@ -56,16 +56,15 @@ enum MantisOperation {
         @Override
         public void performPostOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
        
-            String resolvedStatus;
+            int resolvedStatus = DefaultConstantValues.Status.RESOLVED.getValue();
             try {
-                resolvedStatus = client.getCache(monitor).getResolvedStatusName();
+                resolvedStatus = client.getCache(monitor).getResolvedStatus();
             } catch (MantisException e) {
-                resolvedStatus = "resolved";
                 MantisCorePlugin.warn("Failed retrieving customised resolved bug status. Using default.", e);
             }
             
             taskData.getRoot().getAttribute(Attribute.RESOLUTION.getKey()).setValue(taskData.getRoot().getAttribute(getAttributeId(this)).getValue());
-            taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(resolvedStatus);
+            taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(String.valueOf(resolvedStatus));
        }
     },
     
@@ -76,15 +75,14 @@ enum MantisOperation {
         @Override
         public void performPostOperation(TaskData taskData, TaskAttribute attribute, IMantisClient client, IProgressMonitor monitor) {
 
-            String assignedStatus;
+            int assignedStatus = DefaultConstantValues.Status.ASSIGNED.getValue();
             try {
-                assignedStatus = client.getCache(monitor).getAssignedStatus();
+                assignedStatus = client.getCache(monitor).getAssignedStatus().getValue();
             } catch (MantisException e) {
-                assignedStatus = "assigned";
                 MantisCorePlugin.warn("Failed retrieving customised assigned bug status. Using default.", e);
             }
             
-            taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(assignedStatus);
+            taskData.getRoot().getAttribute(Attribute.STATUS.getKey()).setValue(String.valueOf(assignedStatus));
         }
     };
     
