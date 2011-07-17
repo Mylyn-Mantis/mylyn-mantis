@@ -47,7 +47,7 @@ enum MantisOperation {
 				for ( Map.Entry<String, String> option : resolution.getOptions().entrySet() )
 					resolveAs.putOption(option.getKey(), option.getValue());
 				
-				resolveAs.setValue(client.getCache(monitor).getBugResolutionFixedThreshold().getName());
+				resolveAs.setValue(String.valueOf(client.getCache(monitor).getBugResolutionFixedThreshold().getValue()));
 			} catch (MantisException e) {
 				MantisCorePlugin.warn("Unable to preselect bug fixed threshold.", e);
 			}
