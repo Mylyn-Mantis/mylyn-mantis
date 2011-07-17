@@ -11,50 +11,23 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.RepositoryResponse;
+import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
-import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
-import org.eclipse.mylyn.tasks.core.data.TaskMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskOperation;
+import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
-import com.itsolut.mantis.core.model.MantisAttachment;
-import com.itsolut.mantis.core.model.MantisComment;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisRelationship;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
-import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisTicketAttribute;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisUser;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -497,24 +470,26 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.CATEGORY, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.RESOLUTION,
-                    cache.getTicketResolutions(), cache.getDefaultResolutionName());
+                    cache.getTicketResolutions(), String.valueOf(cache.getDefaultResolution().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.STATUS, cache
-                    .getTicketStatus(), cache.getSubmitStatus());
+                    .getTicketStatus(), String.valueOf(cache.getSubmitStatus().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.PRIORITY, cache
-                    .getPriorities(), cache.getDefaultPriorityName());
+                    .getPriorities(), String.valueOf(cache.getDefaultPriority().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.SEVERITY, cache
-                    .getSeverities(), cache.getDefaultSeverityName());
+                    .getSeverities(), String.valueOf(cache.getDefaultSeverity().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.REPRODUCIBILITY,
-                    cache.getReproducibility(), cache.getDefaultReproducibilityName());
+                    cache.getReproducibility(), String.valueOf(cache.getDefaultReproducibility().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
             createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             
             if ( cache.isProjectionEnabled())
-            	createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION, cache.getProjection(), cache.getDefaultProjectionName());
+            	createAttribute(data, MantisAttributeMapper.Attribute.PROJECTION, cache.getProjection(), 
+            	        String.valueOf(cache.getDefaultProjection().getValue()));
             if ( cache.isEtaEnabled() )
-            	createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache.getETA(), cache.getDefaultEtaName());
+            	createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache.getETA(), 
+            	        String.valueOf(cache.getDefaultEta().getValue()));
             
             if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
@@ -533,7 +508,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.NEW_COMMENT, null);
 
             createAttribute(data, MantisAttributeMapper.Attribute.VIEW_STATE,
-                    cache.getViewState(), cache.getDefaultViewStateName());
+                    cache.getViewState(), String.valueOf(cache.getDefaultViewState().getValue()));
 
             createAttribute(data, MantisAttributeMapper.Attribute.ASSIGNED_TO, cache.getDevelopersByProjectName(projectName, monitor), true);
             if (existingTask)
@@ -545,8 +520,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.COMPLETION_DATE);
 
             // operations
-            data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData()
-                .setType(TaskAttribute.TYPE_OPERATION);
+            data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData() .setType(TaskAttribute.TYPE_OPERATION);
         } catch (MantisException e) {
             throw new CoreException(statusFactory.toStatus(null, e, null));
         }

@@ -17,21 +17,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisProjectFilter;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
-import com.itsolut.mantis.core.model.MantisSeverity;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisUser;
-import com.itsolut.mantis.core.model.MantisVersion;
-import com.itsolut.mantis.core.model.MantisViewState;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -480,9 +467,9 @@ public class MantisCache {
         return versions.toArray(new MantisVersion[versions.size()]);
     }
     
-    public String getSubmitStatus() throws MantisException {
+    public MantisTicketStatus getSubmitStatus() throws MantisException {
 
-        return getStatus(cacheData.bugSubmitStatus).getName();
+        return getStatus(cacheData.bugSubmitStatus);
     }
     
     public MantisTicketStatus getAssignedStatus() throws MantisException {
@@ -499,39 +486,39 @@ public class MantisCache {
         throw new MantisException("No status with id " + cacheData.resolvedStatus + " .");
     }
 
-    public String getDefaultSeverityName() throws MantisException {
+    public MantisSeverity getDefaultSeverity() throws MantisException {
         
-        return getSeverity(cacheData.getDefaultValueForAttribute(Key.SEVERITY)).getName();
+        return getSeverity(cacheData.getDefaultValueForAttribute(Key.SEVERITY));
     }
     
-    public String getDefaultPriorityName() throws MantisException {
+    public MantisPriority getDefaultPriority() throws MantisException {
         
-        return getPriority(cacheData.getDefaultValueForAttribute(Key.PRIORITY)).getName();
+        return getPriority(cacheData.getDefaultValueForAttribute(Key.PRIORITY));
     }
     
-    public String getDefaultEtaName() throws MantisException {
+    public MantisETA getDefaultEta() throws MantisException {
         
-        return getETA(cacheData.getDefaultValueForAttribute(Key.ETA)).getName();
+        return getETA(cacheData.getDefaultValueForAttribute(Key.ETA));
     }
 
-    public String getDefaultProjectionName() throws MantisException {
+    public MantisProjection getDefaultProjection() throws MantisException {
 
-        return getProjection(cacheData.getDefaultValueForAttribute(Key.PROJECTION)).getName();
+        return getProjection(cacheData.getDefaultValueForAttribute(Key.PROJECTION));
     }
     
-    public String getDefaultResolutionName() throws MantisException {
+    public MantisResolution getDefaultResolution() throws MantisException {
         
-        return getResolution(cacheData.getDefaultValueForAttribute(Key.RESOLUTION)).getName();
+        return getResolution(cacheData.getDefaultValueForAttribute(Key.RESOLUTION));
     }
     
-    public String getDefaultReproducibilityName() throws MantisException {
+    public MantisReproducibility getDefaultReproducibility() throws MantisException {
         
-        return getReproducibility(cacheData.getDefaultValueForAttribute(Key.REPRODUCIBILITY)).getName();
+        return getReproducibility(cacheData.getDefaultValueForAttribute(Key.REPRODUCIBILITY));
     }
     
-    public String getDefaultViewStateName() throws MantisException {
+    public MantisViewState getDefaultViewState() throws MantisException {
         
-        return getViewState(cacheData.getDefaultValueForAttribute(Key.VIEW_STATE)).getName();
+        return getViewState(cacheData.getDefaultValueForAttribute(Key.VIEW_STATE));
     }
     
     public String getDefaultStepsToReproduce() {
