@@ -52,7 +52,6 @@ import org.eclipse.osgi.util.NLS;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -67,7 +66,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
 
     @Inject
-    private MantisClientManager clientManager;
+    private IMantisClientManager clientManager;
 
     @Inject
     private MantisTaskDataHandler offlineTaskHandler;
@@ -171,7 +170,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
             IMantisClient client;
             try {
-                client = getClientManager().getRepository(repository);
+                client = clientManager.getRepository(repository);
                 client.search(MantisUtils.getMantisSearch(query), tickets, monitor);
                 for (MantisTicket ticket : tickets) {
                     ticket.setLastChanged(null); // XXX Remove once we have a fix for
@@ -192,7 +191,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
     }
 
-    public MantisClientManager getClientManager() {
+    public IMantisClientManager getClientManager() {
 
         return clientManager;
     }
@@ -232,7 +231,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         IMantisClient client;
         try {
-            client = getClientManager().getRepository(repository);
+            client = clientManager.getRepository(repository);
             client.search(MantisUtils.getMantisSearch(query), tickets, Policy.subMonitorFor(monitor, 1));
 
             for (MantisTicket ticket : tickets)
@@ -251,7 +250,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public void updateRepositoryConfiguration(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
 
         try {
-            IMantisClient client = getClientManager().getRepository(repository);
+            IMantisClient client = clientManager.getRepository(repository);
             client.updateAttributes(monitor);
             MantisRepositoryConfiguration.setSupportsSubTasks(repository, client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations());
         } catch (MantisException e) {
@@ -264,7 +263,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public void updateRepositoryConfiguration(TaskRepository taskRepository, ITask task, IProgressMonitor monitor) throws CoreException {
 
         try {
-            getClientManager().getRepository(taskRepository).updateAttributesForTask(monitor, Integer.valueOf(task.getTaskId()));
+            clientManager.getRepository(taskRepository).updateAttributesForTask(monitor, Integer.valueOf(task.getTaskId()));
         } catch (MantisException e) {
             throw new CoreException(statusFactory.toStatus("Could not update attributes", e, taskRepository));
         }

@@ -39,7 +39,7 @@ class MantisUiPluginModule extends AbstractModule {
         bind(StatusFactory.class);
         bind(IMantisClientManager.class).toInstance(connector.getClientManager());
         bind(TaskRepositoryLocationFactory.class).to(TaskRepositoryLocationUiFactory.class);
-        bind(IRepositoryListener.class).toInstance(connector.getClientManager());
+        bind(IRepositoryListener.class).toInstance((IRepositoryListener) connector.getClientManager());
     }
 
 }
