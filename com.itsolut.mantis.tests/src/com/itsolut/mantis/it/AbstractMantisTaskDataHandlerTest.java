@@ -33,7 +33,6 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.DefaultConstantValues;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.tests.MantisRepositoryAccessor;
