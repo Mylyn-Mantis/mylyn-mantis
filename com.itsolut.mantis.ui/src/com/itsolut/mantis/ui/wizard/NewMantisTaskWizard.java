@@ -20,6 +20,8 @@ import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.model.MantisProject;
 
 /**
@@ -29,11 +31,18 @@ import com.itsolut.mantis.core.model.MantisProject;
  */
 public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 
-	public NewMantisTaskWizard(TaskRepository taskRepository,
-			ITaskMapping taskSelection) {
+    private final TaskRepository taskRepository;
+
+    private MantisProjectPage newTaskPage;
+
+    private IMantisClientManager clientManager;
+
+    public NewMantisTaskWizard(TaskRepository taskRepository,
+			ITaskMapping taskSelection, IMantisClientManager clientManager) {
 		super(taskRepository, taskSelection);
 		
 		this.taskRepository = taskRepository;
+        this.clientManager = clientManager;
 
 		
 		setWindowTitle("New Repository Task");
@@ -42,17 +51,12 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 
-	private TaskRepository taskRepository;
-
-	private MantisProjectPage newTaskPage;
-
-
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}
 
 	@Override
 	public void addPages() {
-		newTaskPage = new MantisProjectPage(this.taskRepository);
+		newTaskPage = new MantisProjectPage(taskRepository, clientManager);
 		addPage(newTaskPage);
 	}
 	

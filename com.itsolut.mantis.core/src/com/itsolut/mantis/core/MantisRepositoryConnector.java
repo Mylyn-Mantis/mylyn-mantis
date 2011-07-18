@@ -33,8 +33,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
+import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
@@ -73,7 +75,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     @Inject
     private MantisAttachmentHandler attachmentHandler;
-
+    
     @Inject
     private StatusFactory statusFactory;
 
@@ -189,11 +191,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         } finally {
             monitor.done();
         }
-    }
-
-    public IMantisClientManager getClientManager() {
-
-        return clientManager;
     }
 
     @Override
@@ -314,6 +311,31 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     public TaskMapper getTaskMapper(final TaskData taskData) {
 
         return new MantisTaskMapper(taskData);
+    }
+    
+    
+    /**
+     * Returns the client manager, for internal use in the UI module only.
+     * 
+     * <p><b>For internal use only</b></p>
+     * 
+     * @return the client manager instance
+     */
+    public IMantisClientManager getClientManager() {
+
+        return clientManager;
+    }
+    
+    /**
+     * Returns the repository change listener, for internal use in the UI module only.
+     * 
+     * <p><b>For internal use only</b></p>
+     * 
+     * @return the client manager instance
+     */
+    public IRepositoryListener getRepositoryListener() {
+
+        return (IRepositoryListener) clientManager;
     }
 
     @Override

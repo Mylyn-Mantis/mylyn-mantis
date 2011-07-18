@@ -54,6 +54,7 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryLocations;
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.StatusFactory;
+import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
@@ -97,7 +98,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     @Override
     public IWizard getNewTaskWizard(TaskRepository repository, ITaskMapping selection) {
 
-       return new NewMantisTaskWizard(repository, selection);
+        return new NewMantisTaskWizard(repository, selection, clientManager);
     }
 
     @Override

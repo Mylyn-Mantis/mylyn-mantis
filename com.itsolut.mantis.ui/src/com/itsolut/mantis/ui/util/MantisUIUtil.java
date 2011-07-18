@@ -9,15 +9,13 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PatternFilter;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 
@@ -28,13 +26,11 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
 @SuppressWarnings("restriction")
 public class MantisUIUtil {
 
-    public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository) {
+    public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository, IMantisClientManager clientManager) {
 
-        MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(
-                MantisCorePlugin.REPOSITORY_KIND);
         final IMantisClient client;
         try {
-            client = connector.getClientManager().getRepository(repository);
+            client = clientManager.getRepository(repository);
         } catch (MantisException e) {
             MantisUIPlugin.handleError(e, "Failed getting the repository.", true);
             return;

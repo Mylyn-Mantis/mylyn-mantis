@@ -211,7 +211,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
                 public void widgetSelected(SelectionEvent arg0) {
 
-                    MantisUIUtil.updateRepositoryConfiguration(getRunnableContext(), getRepository());
+                    MantisUIUtil.updateRepositoryConfiguration(getRunnableContext(), getRepository(), clientManager);
                     refreshFilterCombo();
 
                 }

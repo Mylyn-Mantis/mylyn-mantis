@@ -39,7 +39,6 @@ import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,8 +48,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.ui.MantisUIPlugin;
@@ -69,15 +67,18 @@ public class MantisProjectPage extends WizardPage {
 
     private TaskRepository taskRepository;
 	private EnhancedFilteredTree tree;
+    private IMantisClientManager clientManager;
 
-    public MantisProjectPage(TaskRepository taskRepository) {
+    public MantisProjectPage(TaskRepository taskRepository, IMantisClientManager clientManager) {
         super("New Task");
         setTitle("Mantis - Select project");
         setDescription("Select the tickets project.");
         setImageDescriptor(MantisImages.WIZARD);
 
         this.taskRepository = taskRepository;
+        this.clientManager = clientManager;
     }
+    
     public void createControl(Composite parent) {
 
         Composite control = new Composite(parent, SWT.NULL);
@@ -112,7 +113,7 @@ public class MantisProjectPage extends WizardPage {
 		updateButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-			    MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository);
+			    MantisUIUtil.updateRepositoryConfiguration(getContainer(), taskRepository, clientManager);
 				projectTreeViewer.setInput(getProjects());
 			}
 		});
@@ -126,25 +127,19 @@ public class MantisProjectPage extends WizardPage {
         final List<MantisProject> projects = new ArrayList<MantisProject>();
         
         try {
-			MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager()
-			.getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-			final IMantisClient client = connector.getClientManager().getRepository(taskRepository);
-			
 			
 			CommonUiUtil.run(getContainer(), new ICoreRunnable() {
                 
                 public void run(IProgressMonitor monitor) throws CoreException {
             
                     try {
-                        projects.addAll(client.getCache(monitor).getProjects());
+                        projects.addAll(clientManager.getRepository(taskRepository).getCache(monitor).getProjects());
                     } catch (MantisException e) {
                         throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID, "Failed getting projects : " + e.getMessage(), e));
                     }
                     
                 }
             });
-		} catch (MantisException e) {
-			setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
 		} catch (CoreException e) {
             setMessage("Unable to load projects : " + e.getMessage()+ " .", DialogPage.ERROR);
         }
