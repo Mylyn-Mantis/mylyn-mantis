@@ -28,8 +28,12 @@ import biz.futureware.mantis.rpc.soap.client.MantisConnectPortType;
 import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.IMantisClientManager;
+import com.itsolut.mantis.core.MantisAttachmentHandler;
 import com.itsolut.mantis.core.MantisClientFactory;
 import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
@@ -60,7 +64,19 @@ public class MantisRepositoryAccessor {
 		}
 	}
 
-	private static final IMantisClientManager clientManager = new InMemoryMantisClientManager();
+	public static final IMantisClientManager clientManager = new InMemoryMantisClientManager();
+	
+	public static final MantisRepositoryConnector connector;
+	
+	static {
+		
+		StatusFactory statusFactory = new StatusFactory();
+		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory);
+		MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(clientManager, statusFactory);
+
+		connector = new MantisRepositoryConnector(clientManager, dataHandler, attachmentHandler, statusFactory);
+		
+	}
 	
 	private final String username;
 	private final String password;

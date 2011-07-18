@@ -19,7 +19,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
@@ -39,8 +38,6 @@ import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.ObjectRef;
 import biz.futureware.mantis.rpc.soap.client.RelationshipData;
 
-import com.google.common.collect.Maps;
-import com.itsolut.mantis.core.DefaultConstantValues;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
@@ -48,31 +45,10 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisRelationship;
+import com.itsolut.mantis.tests.MantisRepositoryAccessor;
 
 public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends AbstractIntegrationTest {
 
-	@Test
-	public void testGetTaskData() throws MalformedURLException, RemoteException, ServiceException, CoreException {
-
-		int firstTaskId = createTask("First task", "Description");
-
-		MantisRepositoryConnector connector = new MantisRepositoryConnector();
-
-		TaskData taskData = connector.getTaskData(repositoryAccessor.getRepository(), String.valueOf(firstTaskId),
-				new NullProgressMonitor());
-		
-		Map<String, String> expectedValues = Maps.newHashMap();
-		expectedValues.put(TaskAttribute.PRODUCT, "Test project");
-		expectedValues.put(TaskAttribute.SUMMARY, "First task");
-		expectedValues.put(TaskAttribute.DESCRIPTION, "Description");
-		expectedValues.put(TaskAttribute.STATUS, String.valueOf(DefaultConstantValues.Status.NEW.getValue()));
-		expectedValues.put(TaskAttribute.RESOLUTION, String.valueOf(DefaultConstantValues.Resolution.OPEN.getValue()));
-		expectedValues.put(TaskAttribute.PRIORITY, String.valueOf(DefaultConstantValues.Priority.NORMAL.getValue()));
-		expectedValues.put(TaskAttribute.SEVERITY, String.valueOf(DefaultConstantValues.Severity.MINOR.getValue()));
-		
-		for ( Map.Entry<String, String> expectedValueEntry : expectedValues.entrySet() )
-			assertAttributeEquals(taskData.getRoot().getMappedAttribute(expectedValueEntry.getKey()), expectedValueEntry.getValue());
-	}
 
 	@Test
 	public void testPerformQuery() throws MantisException, MalformedURLException, RemoteException, ServiceException {
@@ -91,7 +67,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		final List<TaskData> hits = new ArrayList<TaskData>();
 
-		MantisRepositoryConnector connector = new MantisRepositoryConnector();
+		MantisRepositoryConnector connector = MantisRepositoryAccessor.connector;
 
 		IRepositoryQuery query = getObjectsFactory().newQuery();
 		query.setAttribute(IMantisClient.PROJECT_NAME, project.getName());
@@ -134,7 +110,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 
 		final List<TaskData> hits = new ArrayList<TaskData>();
 
-		MantisRepositoryConnector connector = new MantisRepositoryConnector();
+		MantisRepositoryConnector connector = MantisRepositoryAccessor.connector;
 
 		IRepositoryQuery query = getObjectsFactory().newQuery();
 		query.setAttribute(IMantisClient.PROJECT_NAME, project.getName());
@@ -189,7 +165,7 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		repositoryAccessor.getMantisConnectPort().mc_issue_relationship_add(getUsername(), getPassword(),
 				BigInteger.valueOf(taskId), relation);
 
-		MantisRepositoryConnector connector = new MantisRepositoryConnector();
+		MantisRepositoryConnector connector = MantisRepositoryAccessor.connector;
 
 		TaskData taskData = connector.getTaskData(repositoryAccessor.getRepository(), String.valueOf(taskId),
 				new NullProgressMonitor());
@@ -213,12 +189,6 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		assertEquals("kind", expected.getKind(), actual.getKind());
 		assertEquals("taskId", expected.getTaskId(), actual.getTaskId());
 		assertEquals("direction", expected.getDirection(), actual.getDirection());
-	}
-
-	private void assertAttributeEquals(TaskAttribute mappedAttribute, String expectedValue) {
-
-		assertNotNull("mappedAttribute is null", mappedAttribute);
-		assertEquals(expectedValue, mappedAttribute.getValue());
 	}
 
 }

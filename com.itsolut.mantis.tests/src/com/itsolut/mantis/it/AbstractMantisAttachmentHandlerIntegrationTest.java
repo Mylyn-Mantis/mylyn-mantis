@@ -25,7 +25,9 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisAttachmentHandler;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.StatusFactory;
+import com.itsolut.mantis.tests.MantisRepositoryAccessor;
 
 /**
  * @author Robert Munteanu
@@ -37,15 +39,16 @@ public abstract class AbstractMantisAttachmentHandlerIntegrationTest extends Abs
 
 		int taskId = createTask("Upload task", "Description");
 
-		MantisRepositoryConnector connector = new MantisRepositoryConnector();
-		MantisAttachmentHandler attachmentHandler = (MantisAttachmentHandler) connector.getTaskAttachmentHandler();
+		MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(MantisRepositoryAccessor.clientManager, new StatusFactory());
 
 		ITask task = getObjectsFactory().newTask(repositoryAccessor.getLocation().getUrl(), String.valueOf(taskId));
 
 		attachmentHandler.postContent(repositoryAccessor.getRepository(), task,
 				getObjectsFactory().newTaskAttachmentSource("Attachment contents"), "", null, new NullProgressMonitor());
 
-		TaskData taskData = connector.getTaskData(repositoryAccessor.getRepository(), String.valueOf(taskId),
+		MantisTaskDataHandler taskDataHandler = new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory());
+		
+		TaskData taskData = taskDataHandler.getTaskData(repositoryAccessor.getRepository(), String.valueOf(taskId),
 				new NullProgressMonitor());
 
 		TaskAttribute attachmentAttribute = taskData.getRoot().getAttribute(TaskAttribute.PREFIX_ATTACHMENT + 1);

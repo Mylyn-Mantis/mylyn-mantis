@@ -12,27 +12,19 @@ package com.itsolut.mantis.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.tests.MantisRepositoryAccessor;
 
 public class MantisRepositoryConnectorTest  {
 
 	private static final String REPOSITORY_ROOT = "http://mylyn-mantis.sourceforge.net/MantisTest/";
 
-	private MantisRepositoryConnector connector;
+	private MantisRepositoryConnector connector = MantisRepositoryAccessor.connector;
 
 	private final String taskId = "12";
 
 	private final String expectedUrl = REPOSITORY_ROOT + "view.php?id=" + taskId;
-
-	@Before
-	public void setUp() throws Exception {
-
-		connector = new MantisRepositoryConnector();
-
-	}
 
 	@Test
 	public void testGetUrl11x() {

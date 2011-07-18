@@ -23,6 +23,7 @@
 
 package com.itsolut.mantis.core;
 
+import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -85,6 +86,19 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         
         injector.injectMembers(this);
         injector.injectMembers(MantisCorePlugin.getDefault());
+    }
+    
+    /**
+     * <b>Visible for testing only</b>
+     */
+    public MantisRepositoryConnector(IMantisClientManager clientManager, MantisTaskDataHandler taskDataHandler,
+            MantisAttachmentHandler attachmentHandler, StatusFactory statusFactory) {
+        
+        this.clientManager = clientManager;
+        offlineTaskHandler = taskDataHandler;
+        this.attachmentHandler = attachmentHandler;
+        this.statusFactory = statusFactory;
+        
     }
 
     @Override
