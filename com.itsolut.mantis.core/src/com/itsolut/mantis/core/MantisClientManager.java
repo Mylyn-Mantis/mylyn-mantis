@@ -41,7 +41,7 @@ import com.itsolut.mantis.core.exception.MantisException;
  * 
  * @author Robert Mutneanu
  */
-public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener, IMantisClientManager {
+public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener, IMantisClientManager, IShutdown {
 
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private final PersistedState state;
@@ -54,7 +54,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         state = new PersistedState(repositoryPersistencePath.toFile());
     }
 
-    public synchronized void persistCache() {
+    public synchronized void onShutdown() {
 
         state.write();
     }

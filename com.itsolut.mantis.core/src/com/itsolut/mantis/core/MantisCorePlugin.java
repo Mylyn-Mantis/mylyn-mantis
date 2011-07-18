@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 
 
 /**
- * The headless Trac plug-in class.
+ * The headless Mantis plug-in class.
  * 
  * @author Steffen Pingel
  * @author Chris Hane
@@ -50,7 +50,7 @@ public class MantisCorePlugin extends Plugin {
     
     private StatusFactory statusFactory;
 
-    private MantisRepositoryConnector connector;
+    private IShutdown shutdown;
 
     public static MantisCorePlugin getDefault() {
 
@@ -74,26 +74,26 @@ public class MantisCorePlugin extends Plugin {
 
     @Override
     public void stop(BundleContext context) throws Exception {
-
-        if ( connector != null ) {
-            connector.stop();
-            connector = null;
-        }
         
+        if ( shutdown != null ) {
+            shutdown.onShutdown();
+            shutdown = null;
+        }
+
         plugin = null;
         super.stop(context);
     }
     
     @Inject
-    public void setMantisRepositoryConnector(MantisRepositoryConnector connector) {
-        
-        this.connector = connector;
-    }
-
-    @Inject
     public void setStatusFactory(StatusFactory statusFactory) {
 
         this.statusFactory = statusFactory;
+    }
+    
+    @Inject
+    public void setShutdown(IMantisClientManager shutdown) {
+
+        this.shutdown = shutdown;
     }
 
     private StatusFactory getStatusFactory() {

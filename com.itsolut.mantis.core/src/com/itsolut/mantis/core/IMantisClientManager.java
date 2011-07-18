@@ -18,7 +18,7 @@ import com.itsolut.mantis.core.exception.MantisException;
  * @author Robert Munteanu
  *
  */
-public interface IMantisClientManager {
+public interface IMantisClientManager extends IShutdown {
 
     /**
      * Returns a client for the specified taskRepository
@@ -30,5 +30,4 @@ public interface IMantisClientManager {
      * @throws MantisException an error creating the repository
      */
     IMantisClient getRepository(TaskRepository taskRepository) throws MantisException;
-
 }

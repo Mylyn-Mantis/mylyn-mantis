@@ -15,7 +15,6 @@ import org.eclipse.mylyn.tasks.ui.TasksUi;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.itsolut.mantis.core.IMantisClientManager;
-import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.StatusFactory;

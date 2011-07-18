@@ -195,11 +195,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         return clientManager;
     }
 
-    public void stop() {
-
-        clientManager.persistCache();
-    }
-
     @Override
     public String getTaskIdPrefix() {
 

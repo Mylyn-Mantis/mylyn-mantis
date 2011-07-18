@@ -54,6 +54,10 @@ public class MantisRepositoryAccessor {
 
 			return client;
 		}
+		
+		public void onShutdown() {
+			// ignore
+		}
 	}
 
 	private static final IMantisClientManager clientManager = new InMemoryMantisClientManager();
