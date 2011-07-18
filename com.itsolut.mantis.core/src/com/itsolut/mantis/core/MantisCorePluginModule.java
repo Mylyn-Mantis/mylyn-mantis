@@ -11,7 +11,6 @@ package com.itsolut.mantis.core;
 import org.eclipse.core.runtime.IPath;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 
 /**
  * @author Robert Munteanu
@@ -29,10 +28,10 @@ class MantisCorePluginModule extends AbstractModule {
     @Override
     protected void configure() {
         
-        bind(StatusFactory.class).in(Singleton.class);
-        bind(MantisAttachmentHandler.class).in(Singleton.class);
-        bind(MantisTaskDataHandler.class).in(Singleton.class);
-        bind(IMantisClientManager.class).to(MantisClientManager.class).in(Singleton.class);
+        bind(StatusFactory.class);
+        bind(MantisAttachmentHandler.class);
+        bind(MantisTaskDataHandler.class);
+        bind(IMantisClientManager.class).to(MantisClientManager.class);
         bind(IPath.class).annotatedWith(RepositoryPersistencePath.class).toProvider(RepositoryPersistencePathProvider.class);
         bind(MantisRepositoryConnector.class).toInstance(mantisRepositoryConnector);
     }

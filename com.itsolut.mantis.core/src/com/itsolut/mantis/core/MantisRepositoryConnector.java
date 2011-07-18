@@ -50,6 +50,7 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -65,22 +66,23 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
 
+    @Inject
     private MantisClientManager clientManager;
 
-    private final MantisTaskDataHandler offlineTaskHandler;
+    @Inject
+    private MantisTaskDataHandler offlineTaskHandler;
 
-    private final MantisAttachmentHandler attachmentHandler;
+    @Inject
+    private MantisAttachmentHandler attachmentHandler;
 
-    private final StatusFactory statusFactory;
+    @Inject
+    private StatusFactory statusFactory;
 
     public MantisRepositoryConnector() {
 
         Injector injector = Guice.createInjector(new MantisCorePluginModule(this));
-        offlineTaskHandler = injector.getInstance(MantisTaskDataHandler.class);
-        attachmentHandler = injector.getInstance(MantisAttachmentHandler.class);
-        statusFactory = injector.getInstance(StatusFactory.class);
-        clientManager = injector.getInstance(MantisClientManager.class);
         
+        injector.injectMembers(this);
         injector.injectMembers(MantisCorePlugin.getDefault());
     }
 

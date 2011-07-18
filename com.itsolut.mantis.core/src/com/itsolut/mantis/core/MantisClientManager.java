@@ -34,13 +34,15 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.itsolut.mantis.core.exception.MantisException;
 
 /**
  * Caches {@link IMantisClient} objects.
  * 
- * @author Robert Mutneanu
+ * @author Robert Munteanu
  */
+@Singleton
 public class MantisClientManager implements IRepositoryListener, IRepositoryChangeListener, IMantisClientManager, IShutdown {
 
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();

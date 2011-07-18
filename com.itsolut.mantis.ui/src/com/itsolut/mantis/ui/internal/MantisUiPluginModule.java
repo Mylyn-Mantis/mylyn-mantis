@@ -8,13 +8,12 @@
  *******************************************************************************/
 package com.itsolut.mantis.ui.internal;
 
-import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
+import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
@@ -37,10 +36,10 @@ class MantisUiPluginModule extends AbstractModule {
         // we need to retrieve the single instance from the Core module
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
         
-        bind(StatusFactory.class).in(Singleton.class);
+        bind(StatusFactory.class);
         bind(IMantisClientManager.class).toInstance(connector.getClientManager());
-        bind(TaskRepositoryLocationFactory.class).to(TaskRepositoryLocationUiFactory.class).in(Singleton.class);
-        bind(IRepositoryChangeListener.class).toInstance(connector.getClientManager());
+        bind(TaskRepositoryLocationFactory.class).to(TaskRepositoryLocationUiFactory.class);
+        bind(IRepositoryListener.class).toInstance(connector.getClientManager());
     }
 
 }

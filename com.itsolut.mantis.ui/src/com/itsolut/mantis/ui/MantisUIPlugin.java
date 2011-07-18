@@ -74,7 +74,7 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 
         this.repositoryListener = repositoryListener;
         
-        TasksUi.getRepositoryManager().addListener(repositoryListener);
+        TasksUi.getRepositoryManager().addListener(this.repositoryListener);
     }
 	
     public static void handleError(Throwable throwable, String message, boolean show) {

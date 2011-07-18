@@ -46,14 +46,15 @@ import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
 import org.eclipse.mylyn.tasks.ui.wizards.TaskAttachmentPage;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisClientFactory;
-import com.itsolut.mantis.core.MantisClientManager;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryLocations;
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.StatusFactory;
+import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
 import com.itsolut.mantis.ui.wizard.NewMantisQueryWizard;
@@ -70,19 +71,21 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     private static final Pattern HYPERLINK_PATTERN = Pattern.compile("(bug|issue|task) #?(\\d+)",
             Pattern.CASE_INSENSITIVE);
     
-    private final StatusFactory statusFactory;
+    @Inject
+    private StatusFactory statusFactory;
 
-    private final IMantisClientManager clientManager;
+    @Inject
+    private IMantisClientManager clientManager;
 
-    private final MantisClientFactory clientFactory;
+    @Inject
+    private MantisClientFactory clientFactory;
     
     public MantisRepositoryUi() {
         
         Injector injector = Guice.createInjector(new MantisUiPluginModule());
         
-        statusFactory = injector.getInstance(StatusFactory.class);
-        clientManager = injector.getInstance(IMantisClientManager.class);
-        clientFactory = injector.getInstance(MantisClientFactory.class);
+        injector.injectMembers(MantisUIPlugin.getDefault());
+        injector.injectMembers(this);
     }
 
     @Override
