@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.itsolut.mantis.ui.internal;
 
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -39,6 +40,7 @@ class MantisUiPluginModule extends AbstractModule {
         bind(StatusFactory.class).in(Singleton.class);
         bind(IMantisClientManager.class).toInstance(connector.getClientManager());
         bind(TaskRepositoryLocationFactory.class).to(TaskRepositoryLocationUiFactory.class).in(Singleton.class);
+        bind(IRepositoryChangeListener.class).toInstance(connector.getClientManager());
     }
 
 }

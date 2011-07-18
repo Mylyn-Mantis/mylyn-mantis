@@ -13,6 +13,7 @@ package com.itsolut.mantis.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.FormColors;
@@ -20,8 +21,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.google.inject.Inject;
 
 /**
  * @author Mik Kersten
@@ -36,6 +36,8 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	private static MantisUIPlugin plugin;
 
     private FormColors formColors;
+    
+    private IRepositoryListener repositoryListener;
 
 	public MantisUIPlugin() {
 		plugin = this;
@@ -45,18 +47,12 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 	    
 		super.start(context);
-		
-		MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-		
-		TasksUi.getRepositoryManager().addListener(connector.getClientManager());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 	    
-	    MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
-	    
-	    TasksUi.getRepositoryManager().removeListener(connector.getClientManager());
+	    TasksUi.getRepositoryManager().removeListener(repositoryListener);
 		
 		plugin = null;
 		
@@ -69,8 +65,17 @@ public class MantisUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static MantisUIPlugin getDefault() {
-		return plugin;
+		
+	    return plugin;
 	}
+	
+	@Inject
+    public void setRepositoryListener(IRepositoryListener repositoryListener) {
+
+        this.repositoryListener = repositoryListener;
+        
+        TasksUi.getRepositoryManager().addListener(repositoryListener);
+    }
 	
     public static void handleError(Throwable throwable, String message, boolean show) {
 
