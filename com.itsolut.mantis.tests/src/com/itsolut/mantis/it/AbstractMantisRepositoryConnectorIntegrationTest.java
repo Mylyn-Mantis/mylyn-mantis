@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
@@ -48,7 +49,6 @@ import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.tests.MantisRepositoryAccessor;
 
 public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends AbstractIntegrationTest {
-
 
 	@Test
 	public void testPerformQuery() throws MantisException, MalformedURLException, RemoteException, ServiceException {
@@ -191,4 +191,20 @@ public abstract class AbstractMantisRepositoryConnectorIntegrationTest extends A
 		assertEquals("direction", expected.getDirection(), actual.getDirection());
 	}
 
+	@Test
+	public void deleteTask() throws MalformedURLException, RemoteException, ServiceException, CoreException {
+
+		int taskId = createTask("First task", "Description");
+		
+		ITask matchingTask = getObjectsFactory().newTask(repositoryAccessor.getRepository().getRepositoryUrl(), String.valueOf(taskId));
+	
+		MantisRepositoryAccessor.connector.deleteTask(repositoryAccessor.getRepository(),  matchingTask, new NullProgressMonitor());
+		repositoryAccessor.unregisterIssueToDelete(taskId);
+		
+		try {
+			MantisRepositoryAccessor.connector.getTaskData(repositoryAccessor.getRepository(), matchingTask.getTaskId(), new NullProgressMonitor());
+		} catch (CoreException e) {
+			// not found
+		}
+	}
 }

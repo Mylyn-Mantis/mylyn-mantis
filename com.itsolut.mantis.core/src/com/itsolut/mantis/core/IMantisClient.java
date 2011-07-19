@@ -133,5 +133,9 @@ public interface IMantisClient {
     
     boolean isDueDateEnabled(IProgressMonitor monitor) throws MantisException;
 
-    
+    /**
+     * @param ticketId
+     * @param monitor
+     */
+    void deleteTicket(int ticketId, IProgressMonitor monitor) throws MantisException;
 }

@@ -390,6 +390,20 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
         });
 
     }
+    
+    public void deleteIssue(final int issueId, IProgressMonitor monitor) throws MantisException {
+
+        call(monitor, new Callable<Void>() {
+
+            public Void call() throws Exception {
+
+                getSOAP().mc_issue_delete(getUsername(), getPassword(), BigInteger.valueOf(issueId));
+                
+                return null;
+            }
+        });
+    }
+
 
     public ProjectData[] getProjectData(IProgressMonitor monitor) throws MantisException {
 
@@ -594,5 +608,6 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
             }
         });
     }
+
 
 }

@@ -140,6 +140,11 @@ public class MantisRepositoryAccessor {
 		
 		tasksToDelete.add(issueId);
 	}
+	
+	public void unregisterIssueToDelete(int issueId ) {
+		
+		tasksToDelete.remove(Integer.valueOf(issueId));
+	}
 
 	public void deleteIssues() throws Exception {
 

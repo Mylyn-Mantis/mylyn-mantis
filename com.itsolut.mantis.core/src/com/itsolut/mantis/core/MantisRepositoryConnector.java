@@ -504,4 +504,27 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         
     	return taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.DUE_DATE.getKey()) != null;
     }
+    
+    @Override
+    public boolean canDeleteTask(TaskRepository repository, ITask task) {
+    
+        return true;
+    }
+    
+    @Override
+    public IStatus deleteTask(TaskRepository repository, ITask task, IProgressMonitor monitor) throws CoreException {
+
+        monitor = Policy.subMonitorFor(monitor, 1);
+        monitor.beginTask("Deleting task with id " + task.getTaskId(), 1);
+        
+        try {
+            clientManager.getRepository(repository).deleteTicket(Integer.parseInt(task.getTaskId()), monitor);
+            return Status.OK_STATUS;
+        } catch (MantisException e) {
+            return statusFactory.toStatus("Failed deleting task with id " + task.getTaskId() + " : " + e.getMessage(), e, repository);
+        } finally {
+            monitor.done();
+        }
+        
+    }
 }

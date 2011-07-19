@@ -539,4 +539,9 @@ public class MantisSoapClient implements IMantisClient {
         
         refresh0(monitor, url, projectId);
     }
+    
+    public void deleteTicket(int ticketId, IProgressMonitor monitor) throws MantisException {
+        
+        soapClient.deleteIssue(ticketId, monitor);
+    };
 }
