@@ -73,17 +73,7 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 
     private Set<TaskEditorPartDescriptor> replaceDescriptionPart(Set<TaskEditorPartDescriptor> descriptors) {
 	    
-	    String toInsertAfter = null;
-        
-	    for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
-            TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
-            if (taskEditorPartDescriptor.getId().equals(ID_PART_DESCRIPTION)) {
-                it.remove();
-                break;
-            } else {
-                toInsertAfter = taskEditorPartDescriptor.getId();
-            }
-        }
+	    String toInsertAfter = removePartDescriptor(descriptors, ID_PART_DESCRIPTION);
         
         return insertPart(descriptors, new TaskEditorPartDescriptor(ID_PART_DESCRIPTION) {
             @Override
@@ -95,18 +85,12 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
     }
     
     private Set<TaskEditorPartDescriptor> replaceNewCommentPart(Set<TaskEditorPartDescriptor> descriptors) {
+
+        String toInsertAfter = removePartDescriptor(descriptors, ID_PART_NEW_COMMENT);
         
-        String toInsertAfter = null;
-        
-        for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
-            TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
-            if (taskEditorPartDescriptor.getId().equals(ID_PART_NEW_COMMENT)) {
-                it.remove();
-                break;
-            } else {
-                toInsertAfter = taskEditorPartDescriptor.getId();
-            }
-        }
+        // do not add a part if none matching by id was found
+        if ( toInsertAfter == null )
+            return descriptors;
         
         return insertPart(descriptors, new TaskEditorPartDescriptor(ID_PART_NEW_COMMENT) {
             @Override
@@ -115,6 +99,30 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
                 return new HtmlTextTaskEditorPart(MantisAttributeMapper.Attribute.NEW_COMMENT.toString(), MantisAttributeMapper.Attribute.NEW_COMMENT.getKey(), true);
             }
         }.setPath(PATH_COMMENTS), toInsertAfter);
+    }
+
+    /**
+     * Removes a part descriptor by id
+     * 
+     * @param descriptors the descriptors to operate on
+     * @param descriptorId the id of the descriptor to remove
+     * @return the part descriptor id before the removed id, or null if the id was not found 
+     */
+    private String removePartDescriptor(Set<TaskEditorPartDescriptor> descriptors, String descriptorId) {
+
+        String toInsertAfter = null;
+        
+        for (Iterator<TaskEditorPartDescriptor> it = descriptors.iterator(); it.hasNext();) {
+            TaskEditorPartDescriptor taskEditorPartDescriptor = it.next();
+            if (taskEditorPartDescriptor.getId().equals(descriptorId)) {
+                it.remove();
+                return toInsertAfter;
+            } else {
+                toInsertAfter = taskEditorPartDescriptor.getId();
+            }
+        }
+        
+        return null;
     }
 
     @Override
