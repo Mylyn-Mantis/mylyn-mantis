@@ -29,6 +29,8 @@ public class MantisComment {
 
     private int timeTracking;
 
+    private boolean isPrivate;
+
     public MantisComment() {
 
     }
@@ -94,6 +96,16 @@ public class MantisComment {
         return timeTracking;
     }
 
+    public void setIsPrivate(boolean isPrivate) {
+
+        this.isPrivate = isPrivate;
+    }
+    
+    public boolean getIsPrivate() {
+
+        return isPrivate;
+    }
+    
     @Override
     public String toString() {
 

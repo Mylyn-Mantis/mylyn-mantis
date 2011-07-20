@@ -140,4 +140,20 @@ public interface DefaultConstantValues {
             return value;
         }
     }
+
+    public enum ViewState {
+        PUBLIC(10), PRIVATE(50);
+        
+        private final int value;
+        
+        private ViewState(int value) {
+            
+            this.value = value;
+        }
+        
+        public int getValue() {
+
+            return value;
+        }
+    }
 }

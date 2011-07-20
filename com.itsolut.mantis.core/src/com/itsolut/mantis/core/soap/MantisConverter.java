@@ -19,6 +19,7 @@ import org.eclipse.osgi.util.NLS;
 import biz.futureware.mantis.rpc.soap.client.*;
 
 import com.google.common.collect.Lists;
+import com.itsolut.mantis.core.DefaultConstantValues;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCache;
 import com.itsolut.mantis.core.MantisCorePlugin;
@@ -154,6 +155,8 @@ public class MantisConverter {
         comment.setLastModified(MantisUtils.transform(ind.getLast_modified()));
         if (supportsTimeTracking)
             comment.setTimeTracking(ind.getTime_tracking().intValue());
+        boolean isPrivate = ind.getView_state().getId().intValue() == DefaultConstantValues.ViewState.PRIVATE.getValue();
+        comment.setIsPrivate(isPrivate);
 
         return comment;
 

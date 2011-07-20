@@ -437,9 +437,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskCommentMapper taskComment = TaskCommentMapper .createFrom(attribute);
             taskComment.setAuthor(newPerson(data.getAttributeMapper().getTaskRepository(), comment.getReporter(), client, monitor));
             taskComment.setNumber(i);
-            
-            String commentText = comment.getText();
-            taskComment.setText(commentText);
+            taskComment.setIsPrivate(comment.getIsPrivate());
+            taskComment.setText(comment.getText());
             taskComment.setCreationDate(comment.getDateSubmitted());
             taskComment.applyTo(attribute);
             i++;
