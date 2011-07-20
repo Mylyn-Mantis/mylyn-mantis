@@ -139,7 +139,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         // handled in repositoryChanged
     }
 
-    private static class PersistedState implements Serializable {
+    static class PersistedState implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
@@ -209,7 +209,8 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
 
         public void cleanCache(Throwable reason) {
 
-            MantisCorePlugin.warn("Removing invalid cache file", reason);
+            if ( MantisCorePlugin.getDefault() != null )
+                MantisCorePlugin.warn("Removing invalid cache file", reason);
             cacheFile.delete();
         }
 
