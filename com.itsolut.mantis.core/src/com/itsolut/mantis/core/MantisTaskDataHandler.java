@@ -12,6 +12,8 @@
 package com.itsolut.mantis.core;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -22,6 +24,7 @@ import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
@@ -33,10 +36,12 @@ import com.itsolut.mantis.core.util.MantisUtils;
 /**
  * @author Dave Carver
  */
+@Singleton
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private final IMantisClientManager clientManager;
     private final StatusFactory statusFactory;
+    private final ConcurrentMap<Integer, Integer> commentIdToCommentNumber = new ConcurrentHashMap<Integer, Integer>();
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -435,6 +440,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskAttribute attribute = data.getRoot().createAttribute(
                     TaskAttribute.PREFIX_COMMENT + i);
             TaskCommentMapper taskComment = TaskCommentMapper .createFrom(attribute);
+            taskComment.setCommentId(String.valueOf(comment.getId()));
             taskComment.setAuthor(newPerson(data.getAttributeMapper().getTaskRepository(), comment.getReporter(), client, monitor));
             taskComment.setNumber(i);
             taskComment.setIsPrivate(comment.getIsPrivate());
@@ -442,7 +448,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             taskComment.setCreationDate(comment.getDateSubmitted());
             taskComment.applyTo(attribute);
             i++;
+            
+            commentIdToCommentNumber.put(comment.getId(), i);
         }
+        
+        System.out.println(commentIdToCommentNumber);
     }
 
     private IRepositoryPerson newPerson(TaskRepository repository, String personId, IMantisClient client, IProgressMonitor monitor) throws MantisException {
@@ -861,5 +871,19 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             return customField.getDefaultValue();
         }
         
+    }
+
+
+    /**
+     * Returns the comment number for a specified comment id
+     * 
+     * <p>This method does not perform I/O.</p>
+     * 
+     * @param commentId the id of the comment
+     * @return the comment number or null if the number is unknown
+     */
+    public Integer getCachedCommentNumber(int commentId) {
+
+        return commentIdToCommentNumber.get(commentId);
     }
 }
