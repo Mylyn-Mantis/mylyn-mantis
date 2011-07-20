@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  javax.xml.rpc,
  org.junit;bundle-version="[4.3.0,5.0.0)",
  org.apache.commons.logging,
- org.apache.commons.discovery
+ org.apache.commons.discovery,
+ org.eclipse.jface.text;bundle-version="[3.5.0,4.0.0)"
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -15,8 +15,10 @@ import org.eclipse.mylyn.tasks.ui.TasksUi;
 
 import com.google.inject.AbstractModule;
 import com.itsolut.mantis.core.IMantisClientManager;
+import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
+import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.StatusFactory;
 
 
@@ -35,11 +37,15 @@ class MantisUiPluginModule extends AbstractModule {
 
         // we need to retrieve the single instance from the Core module
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
+        MantisTaskDataHandler taskDataHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
         
         bind(StatusFactory.class);
         bind(IMantisClientManager.class).toInstance(connector.getClientManager());
+        bind(MantisTaskDataHandler.class).toInstance(taskDataHandler);
         bind(TaskRepositoryLocationFactory.class).to(TaskRepositoryLocationUiFactory.class);
         bind(IRepositoryListener.class).toInstance(connector.getRepositoryListener());
+        bind(MantisHyperlinkFinder.class);
+        bind(MantisCommentMapper.class).toInstance(taskDataHandler.getCommentMapper());
     }
 
 }

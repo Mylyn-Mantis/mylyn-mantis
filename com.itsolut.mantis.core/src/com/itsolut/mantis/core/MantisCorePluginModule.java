@@ -32,6 +32,7 @@ class MantisCorePluginModule extends AbstractModule {
         bind(MantisAttachmentHandler.class);
         bind(MantisTaskDataHandler.class);
         bind(IMantisClientManager.class).to(MantisClientManager.class);
+        bind(MantisCommentMapper.class);
         bind(IPath.class).annotatedWith(RepositoryPersistencePath.class).toProvider(RepositoryPersistencePathProvider.class);
         bind(MantisRepositoryConnector.class).toInstance(mantisRepositoryConnector);
     }

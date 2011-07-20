@@ -19,15 +19,10 @@
 
 package com.itsolut.mantis.ui.internal;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
@@ -40,10 +35,10 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttachmentModel;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.LegendElement;
-import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskSearchPage;
 import org.eclipse.mylyn.tasks.ui.wizards.TaskAttachmentPage;
+import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -54,7 +49,6 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryLocations;
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.StatusFactory;
-import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.tasklist.MantisRepositorySettingsPage;
 import com.itsolut.mantis.ui.wizard.MantisCustomQueryPage;
@@ -68,9 +62,6 @@ import com.itsolut.mantis.ui.wizard.NewMantisTaskWizard;
  * @author dcarver
  */
 public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
-
-    private static final Pattern HYPERLINK_PATTERN = Pattern.compile("(bug|issue|task) #?(\\d+)",
-            Pattern.CASE_INSENSITIVE);
     
     @Inject
     private StatusFactory statusFactory;
@@ -80,6 +71,9 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
 
     @Inject
     private MantisClientFactory clientFactory;
+    
+    @Inject
+    private MantisHyperlinkFinder hyperlinkFinder;
     
     public MantisRepositoryUi() {
         
@@ -187,45 +181,18 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     @Override
     public IHyperlink[] findHyperlinks(TaskRepository repository, ITask task, String text, int lineOffset, int regionOffset) {
 
-        Matcher matcher = HYPERLINK_PATTERN.matcher(text);
-
-        List<IHyperlink> links = null;
-
-        while (matcher.find()) {
-            if (!isInRegion(lineOffset, matcher))
-                continue;
-
-            if (links == null)
-                links = new ArrayList<IHyperlink>();
-
-            String id = matcher.group(2);
-
-            links.add(new TaskHyperlink(determineRegion(regionOffset, matcher), repository, id));
-        }
-
-        return links == null ? null : links.toArray(new IHyperlink[links.size()]);
-
-    }
-
-    private boolean isInRegion(int lineOffset, Matcher m) {
-
-        return (lineOffset >= m.start() && lineOffset <= m.end());
-    }
-
-    private IRegion determineRegion(int regionOffset, Matcher m) {
-
-        return new Region(regionOffset + m.start(), m.end() - m.start());
+        return hyperlinkFinder.findHyperlinks(repository, task, text, lineOffset, regionOffset);
     }
 
     @Override
     public String getReplyText(TaskRepository taskRepository, ITask task, ITaskComment taskComment, boolean includeTask) {
 
-        if (taskComment == null) {
-            return "(In reply to comment #0)";
-        } else if (includeTask) {
-            return MessageFormat.format("(In reply to {0} comment #{1})", task.getTaskKey(), taskComment.getNumber());
-        } else {
-            return MessageFormat.format("(In reply to comment #{0})", taskComment.getNumber());
-        }
+        if (taskComment == null) 
+            return NLS.bind("(In reply to bug #{0})", task.getTaskId());
+        
+        if (includeTask)
+            return NLS.bind("(In reply to bug #{0} comment ~{1})", task.getTaskId(), taskComment.getTaskAttribute().getValue());
+
+        return NLS.bind("(In reply to comment ~{0})", taskComment.getTaskAttribute().getValue());
     }
 }

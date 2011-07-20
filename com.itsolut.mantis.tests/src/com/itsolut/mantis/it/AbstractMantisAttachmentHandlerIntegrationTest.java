@@ -25,6 +25,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisAttachmentHandler;
+import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.tests.MantisRepositoryAccessor;
@@ -46,7 +47,7 @@ public abstract class AbstractMantisAttachmentHandlerIntegrationTest extends Abs
 		attachmentHandler.postContent(repositoryAccessor.getRepository(), task,
 				getObjectsFactory().newTaskAttachmentSource("Attachment contents"), "", null, new NullProgressMonitor());
 
-		MantisTaskDataHandler taskDataHandler = new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory());
+		MantisTaskDataHandler taskDataHandler = new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory(), new MantisCommentMapper());
 		
 		TaskData taskData = taskDataHandler.getTaskData(repositoryAccessor.getRepository(), String.valueOf(taskId),
 				new NullProgressMonitor());

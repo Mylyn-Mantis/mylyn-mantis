@@ -51,7 +51,7 @@ public class TaskRelationshipChangeFinderTest {
 	
 	private TaskRelationshipChangeFinder newChangeFinder() {
 		
-		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null, new StatusFactory()));
+		return new TaskRelationshipChangeFinder(new MantisTaskDataHandler(null, new StatusFactory(), new MantisCommentMapper()));
 	}
 
 	private TaskData newExistingTaskData() {

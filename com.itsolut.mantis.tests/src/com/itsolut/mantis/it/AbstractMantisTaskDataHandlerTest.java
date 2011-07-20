@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.DefaultConstantValues;
+import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.StatusFactory;
@@ -48,7 +49,7 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 	}
 
 	private MantisTaskDataHandler newTaskDataHandler() {
-		return new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory());
+		return new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory(), new MantisCommentMapper());
 	}
 	
 	@Test
@@ -75,8 +76,7 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 
 		int firstTaskId = createTask("First task", "Description");
 
-		TaskData taskData = new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory())
-			.getTaskData(repositoryAccessor.getRepository(), String.valueOf(firstTaskId), new NullProgressMonitor());
+		TaskData taskData = newTaskDataHandler().getTaskData(repositoryAccessor.getRepository(), String.valueOf(firstTaskId), new NullProgressMonitor());
 		
 		Map<String, String> expectedValues = Maps.newHashMap();
 		expectedValues.put(TaskAttribute.PRODUCT, "Test project");

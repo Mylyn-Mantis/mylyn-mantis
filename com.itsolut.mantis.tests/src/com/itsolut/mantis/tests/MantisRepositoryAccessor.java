@@ -30,6 +30,7 @@ import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.MantisAttachmentHandler;
 import com.itsolut.mantis.core.MantisClientFactory;
+import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
@@ -71,7 +72,7 @@ public class MantisRepositoryAccessor {
 	static {
 		
 		StatusFactory statusFactory = new StatusFactory();
-		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory);
+		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory, new MantisCommentMapper());
 		MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(clientManager, statusFactory);
 
 		connector = new MantisRepositoryConnector(clientManager, dataHandler, attachmentHandler, statusFactory);

@@ -41,7 +41,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private final IMantisClientManager clientManager;
     private final StatusFactory statusFactory;
-    private final ConcurrentMap<Integer, Integer> commentIdToCommentNumber = new ConcurrentHashMap<Integer, Integer>();
+    private final MantisCommentMapper commentMapper;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -83,9 +83,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
     
     @Inject
-    public MantisTaskDataHandler(IMantisClientManager clientManager, StatusFactory statusFactory) {
+    public MantisTaskDataHandler(IMantisClientManager clientManager, StatusFactory statusFactory, MantisCommentMapper commentMapper) {
         this.clientManager = clientManager;
         this.statusFactory = statusFactory;
+        this.commentMapper = commentMapper;
     }
 
     @Override
@@ -449,10 +450,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             taskComment.applyTo(attribute);
             i++;
             
-            commentIdToCommentNumber.put(comment.getId(), i);
+            commentMapper.registerCommentNumber(comment.getId(), i);
         }
-        
-        System.out.println(commentIdToCommentNumber);
     }
 
     private IRepositoryPerson newPerson(TaskRepository repository, String personId, IMantisClient client, IProgressMonitor monitor) throws MantisException {
@@ -822,6 +821,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
         return relationType;
     }
+
+    public MantisCommentMapper getCommentMapper() {
+
+        return commentMapper;
+    }
     
     private static interface CustomFieldValueSource {
         
@@ -873,17 +877,4 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
     }
 
-
-    /**
-     * Returns the comment number for a specified comment id
-     * 
-     * <p>This method does not perform I/O.</p>
-     * 
-     * @param commentId the id of the comment
-     * @return the comment number or null if the number is unknown
-     */
-    public Integer getCachedCommentNumber(int commentId) {
-
-        return commentIdToCommentNumber.get(commentId);
-    }
 }
