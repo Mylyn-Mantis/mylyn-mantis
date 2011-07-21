@@ -76,15 +76,14 @@ public class MantisCache {
 
     public void cacheProjectVersions(int value, List<MantisVersion> projectVersions) {
 
-        cacheData.getVersionsByProjectId().putAll(value, projectVersions);
-
+        cacheData.getVersionsByProjectId().replaceValues(value, projectVersions);
     }
 
     public void cacheProjectReporters(int projectId, List<MantisUser> projectUsers) {
 
         cacheUsers0(projectUsers);
 
-        cacheData.getReportersByProjectId().putAll(projectId, projectUsers);
+        cacheData.getReportersByProjectId().replaceValues(projectId, projectUsers);
     }
 
     private void cacheUsers0(List<MantisUser> projectUsers) {
@@ -98,7 +97,7 @@ public class MantisCache {
 
         cacheUsers0(projectDevelopers);
 
-        cacheData.getDevelopersByProjectId().putAll(projectId, projectDevelopers);
+        cacheData.getDevelopersByProjectId().replaceValues(projectId, projectDevelopers);
     }
 
     public void cacheReporterThreshold(int threshold) {

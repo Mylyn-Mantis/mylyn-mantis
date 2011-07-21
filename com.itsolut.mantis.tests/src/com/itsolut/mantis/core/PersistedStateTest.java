@@ -17,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.itsolut.mantis.core.MantisClientManager.PersistedState;
 import com.itsolut.mantis.core.model.MantisUser;
 
@@ -48,9 +47,7 @@ public class PersistedStateTest {
 	private MantisCacheData createCacheData() {
 		
 		MantisCacheData cacheData = new MantisCacheData();
-		ArrayListMultimap<Integer, MantisUser> reporters = ArrayListMultimap.create();
-		reporters.put(Integer.valueOf(1), new MantisUser(5, "username", null, null));
-		cacheData.setReportersByProjectId(reporters);
+		cacheData.getReportersByProjectId().put(1, new MantisUser(5	, "username", null, null));
 		return cacheData;
 	}
 }

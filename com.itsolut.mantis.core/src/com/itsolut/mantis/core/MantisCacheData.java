@@ -11,12 +11,36 @@
 
 package com.itsolut.mantis.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.itsolut.mantis.core.model.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.itsolut.mantis.core.model.MantisCustomField;
+import com.itsolut.mantis.core.model.MantisETA;
+import com.itsolut.mantis.core.model.MantisPriority;
+import com.itsolut.mantis.core.model.MantisProject;
+import com.itsolut.mantis.core.model.MantisProjectCategory;
+import com.itsolut.mantis.core.model.MantisProjectFilter;
+import com.itsolut.mantis.core.model.MantisProjection;
+import com.itsolut.mantis.core.model.MantisReproducibility;
+import com.itsolut.mantis.core.model.MantisResolution;
+import com.itsolut.mantis.core.model.MantisSeverity;
+import com.itsolut.mantis.core.model.MantisTicket;
+import com.itsolut.mantis.core.model.MantisTicketStatus;
+import com.itsolut.mantis.core.model.MantisUser;
+import com.itsolut.mantis.core.model.MantisVersion;
+import com.itsolut.mantis.core.model.MantisViewState;
 
 /**
  * @author Robert Munteanu
@@ -31,9 +55,9 @@ public class MantisCacheData implements Serializable {
 
     private List<MantisProject> projects = new ArrayList<MantisProject>();
 
-    private ListMultimap<Integer, MantisProjectFilter> projectFiltersById = ArrayListMultimap.create();
+    private ArrayListMultimapHolder<Integer, MantisProjectFilter> projectFiltersById = ArrayListMultimapHolder.create();
 
-    private ListMultimap<Integer,MantisCustomField> customFieldsByProjectId = ArrayListMultimap.create();
+    private ArrayListMultimapHolder<Integer,MantisCustomField> customFieldsByProjectId = ArrayListMultimapHolder.create();
 
     RepositoryVersion repositoryVersion;
 
@@ -57,11 +81,11 @@ public class MantisCacheData implements Serializable {
 
     Map<Integer, List<MantisProjectCategory>> categoriesByProjectId = new HashMap<Integer, List<MantisProjectCategory>>();
 
-    private ListMultimap<Integer, MantisVersion> versionsByProjectId = ArrayListMultimap.create();
+    private ArrayListMultimapHolder<Integer, MantisVersion> versionsByProjectId = ArrayListMultimapHolder.create();
 
-    private ListMultimap<Integer, MantisUser> reportersByProjectId = ArrayListMultimap.create();
+    private ArrayListMultimapHolder<Integer, MantisUser> reportersByProjectId = ArrayListMultimapHolder.create();
     
-    private ListMultimap<Integer, MantisUser> developersByProjectId = ArrayListMultimap.create();
+    private ArrayListMultimapHolder<Integer, MantisUser> developersByProjectId = ArrayListMultimapHolder.create();
 
     private int reporterThreshold;
 
@@ -99,7 +123,6 @@ public class MantisCacheData implements Serializable {
         this.lastUpdate = lastUpdate;
     }
     
-    
     public List<MantisProject> getProjects() {
 
         return projects;
@@ -132,24 +155,18 @@ public class MantisCacheData implements Serializable {
 
     public ListMultimap<Integer, MantisUser> getReportersByProjectId() {
 
-        return reportersByProjectId;
+        if ( reportersByProjectId == null )
+            reportersByProjectId = ArrayListMultimapHolder.create();
+        
+        return reportersByProjectId.get();
     }
 
-    public void setReportersByProjectId(ListMultimap<Integer, MantisUser> reportersByProjectId) {
-
-        this.reportersByProjectId = reportersByProjectId;
-    }
-    
-    
     public ListMultimap<Integer, MantisUser> getDevelopersByProjectId() {
 
-        return developersByProjectId;
-    }
-    
-    
-    public void setDevelopersByProjectId(ListMultimap<Integer, MantisUser> developersByProjectId) {
-
-        this.developersByProjectId = developersByProjectId;
+        if ( developersByProjectId == null )
+            developersByProjectId = ArrayListMultimapHolder.create();
+        
+        return developersByProjectId.get();
     }
     
     public void putDefaultValueForAttribute(MantisTicket.Key key, Integer value) {
@@ -204,23 +221,84 @@ public class MantisCacheData implements Serializable {
 
     public ListMultimap<Integer, MantisVersion> getVersionsByProjectId() {
 
-        return versionsByProjectId;
+        if ( versionsByProjectId == null )
+            versionsByProjectId = ArrayListMultimapHolder.create();
+        
+        return versionsByProjectId.get();
     }
-
-    public void setVersionsByProjectId(ListMultimap<Integer, MantisVersion> versionsByProjectId) {
-
-        this.versionsByProjectId = versionsByProjectId;
-    }
-    
     
     public ListMultimap<Integer, MantisProjectFilter> getProjectFiltersById() {
 
-        return projectFiltersById;
+        if ( projectFiltersById == null )
+            projectFiltersById = ArrayListMultimapHolder.create();
+        
+        return projectFiltersById.get();
     }
-    
     
     public ListMultimap<Integer, MantisCustomField> getCustomFieldsByProjectId() {
 
-        return customFieldsByProjectId;
+        if ( customFieldsByProjectId == null )
+            customFieldsByProjectId = ArrayListMultimapHolder.create();
+        
+        return customFieldsByProjectId.get();
+    }
+
+    /**
+     * This class allows safe serialisation of a {@link ArrayListMultimap} in an OSGI environment
+     * 
+     * <p>When reading a serialized version of a multimap, the classloaded does not have access to
+     * the classes from the <tt>com.itsolut.mantis.core</tt> bundle, and it does not have have a
+     * <tt>Eclipse-BuddyPolicy:Registered</tt> header , which means we can not use
+     * <tt>RegisterBuddy</tt> to allow it to access our classes.</p>
+     * 
+     * <p>This class simply wraps a multimap instance and serializes it as a map of
+     * {@literal K -> Collection<V> }</p< 
+     *
+     */
+    private static class ArrayListMultimapHolder<K, V> implements Serializable {
+        
+        // copied from ArrayListMultimap.DEFAULT_VALUES_PER_KEY
+        private static final int DEFAULT_VALUES_PER_KEY = 10;
+
+        public static  <K,V> ArrayListMultimapHolder<K, V> create() {
+            
+            return new ArrayListMultimapHolder<K, V>();
+        }
+        
+        private ArrayListMultimap<K, V> wrapped = ArrayListMultimap.create();
+        
+        public ArrayListMultimapHolder() {
+
+        }
+        
+        public ArrayListMultimap<K, V> get() {
+            
+            return wrapped;
+        }
+        
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            
+            Map<K, Collection<V>> wrappedMap = wrapped.asMap();
+            
+            Map<K, Collection<V>> outMap = Maps.newHashMapWithExpectedSize(wrappedMap.size());
+            for ( Map.Entry<K, Collection<V>> entry : wrappedMap.entrySet() )
+                outMap.put(entry.getKey(), Lists.newArrayList(entry.getValue()));
+            
+            out.writeObject(outMap);
+        }
+        
+        private void readObject(ObjectInputStream in) throws IOException {
+            try {
+                @SuppressWarnings("unchecked")
+                Map<K, Collection<V>> map = (Map<K, Collection<V>>) in.readObject();
+                wrapped = ArrayListMultimap.create(map.size(), DEFAULT_VALUES_PER_KEY);
+                
+                for ( Map.Entry<K, Collection<V>> entry : map.entrySet() )
+                    wrapped.putAll(entry.getKey(), entry.getValue());
+                        
+            } catch (ClassNotFoundException e) {
+                throw new IOException(e);
+            }
+        }
     }
 }
