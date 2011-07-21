@@ -73,9 +73,6 @@ public abstract class AbstractCommandWrapper extends Action implements
 
 	public void propertyChange(PropertyChangeEvent evt) {
 	    
-       System.out.println("Property change " + evt);
-
-	    
 		if ("state".equals(evt.getPropertyName())) {
 			switch ((TriState) evt.getNewValue()) {
 			case OFF:
