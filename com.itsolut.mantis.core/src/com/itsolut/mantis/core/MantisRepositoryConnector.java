@@ -385,6 +385,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         // detect if any of the tasks have TaskData attributes in the old format 
         for ( ITask task : event.getTasks() ) {
             TaskData taskData = event.getTaskDataManager().getTaskData(task);
+            if ( taskData == null )
+                continue;
             
             // pick a random attribute which used to have keys == values
             TaskAttribute viewState = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.VIEW_STATE.getKey());
