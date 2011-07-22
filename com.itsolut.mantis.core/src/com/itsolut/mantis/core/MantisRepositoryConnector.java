@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,6 +49,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
+import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
@@ -378,6 +380,23 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 since = MantisUtils.parseDate(Long.valueOf(repository.getSynchronizationTimeStamp()));
         } catch (NumberFormatException e) {
              MantisCorePlugin.warn("Failed parsing repository synchronisationTimestamp " + repository.getSynchronizationTimeStamp() + " .", e);
+        }
+
+        // detect if any of the tasks have TaskData attributes in the old format 
+        for ( ITask task : event.getTasks() ) {
+            TaskData taskData = event.getTaskDataManager().getTaskData(task);
+            
+            // pick a random attribute which used to have keys == values
+            TaskAttribute viewState = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.VIEW_STATE.getKey());
+            if ( !viewState.getOptions().isEmpty() ) {
+                Entry<String, String> viewStateEntry = viewState.getOptions().entrySet().iterator().next();
+                
+                // if the key == the value, we need to refresh
+                if ( viewStateEntry.getKey().equals(viewStateEntry.getValue()) ) {
+                    MantisCorePlugin.debug("Detected old TaskData structure for task with id " + task.getTaskId() + " . Marking as stale", null);
+                    event.markStale(task);
+                }
+            }
         }
 
 
