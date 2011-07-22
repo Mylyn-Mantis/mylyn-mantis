@@ -183,10 +183,10 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.SUMMARY, ihd.getSummary());
         ticket.putBuiltinValue(Key.ID, ihd.getId().toString());
 
-        ticket.putBuiltinValue(Key.RESOLUTION, cache.getResolution(ihd.getResolution().intValue()).getName());
-        ticket.putBuiltinValue(Key.PRIORITY, cache.getPriority(ihd.getPriority().intValue()).getName());
-        ticket.putBuiltinValue(Key.SEVERITY, cache.getSeverity(ihd.getSeverity().intValue()).getName());
-        ticket.putBuiltinValue(Key.STATUS, cache.getStatus(ihd.getStatus().intValue()).getName());
+        ticket.putBuiltinValue(Key.RESOLUTION, String.valueOf(cache.getResolution(ihd.getResolution().intValue()).getValue()));
+        ticket.putBuiltinValue(Key.PRIORITY, String.valueOf(cache.getPriority(ihd.getPriority().intValue()).getValue()));
+        ticket.putBuiltinValue(Key.SEVERITY, String.valueOf(cache.getSeverity(ihd.getSeverity().intValue()).getValue()));
+        ticket.putBuiltinValue(Key.STATUS, String.valueOf(cache.getStatus(ihd.getStatus().intValue()).getValue()));
 
         if (ihd.getStatus().intValue() >= cache.getResolvedStatus())
             ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(ihd.getLast_updated().getTimeInMillis()));

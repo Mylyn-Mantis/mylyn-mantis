@@ -43,7 +43,7 @@ final class MantisTaskMapper extends TaskMapper {
             
         } catch (NumberFormatException e) {
             
-            MantisCorePlugin.warn("Failed getting the priority level", e);
+            MantisCorePlugin.warn("Failed getting the priority level for task with id " + getTaskData().getTaskId(), e);
             return null;
         }
     }
