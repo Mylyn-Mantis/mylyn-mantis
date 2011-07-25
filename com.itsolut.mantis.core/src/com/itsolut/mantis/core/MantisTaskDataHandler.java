@@ -696,15 +696,16 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskRepository repository, MantisTicket ticket,
             IProgressMonitor monitor) throws CoreException, MantisException {
      
+        MantisCache cache = client.getCache(monitor);
         TaskData taskData = newTaskData(repository, ticket);
         taskData.setPartial(true);
         
         createAttribute(taskData, MantisAttributeMapper.Attribute.PROJECT).setValue(ticket.getValue(Key.PROJECT));
         createAttribute(taskData, MantisAttributeMapper.Attribute.SUMMARY).setValue(ticket.getValue(Key.SUMMARY));
-        createAttribute(taskData, MantisAttributeMapper.Attribute.STATUS).setValue(ticket.getValue(Key.STATUS));
-        createAttribute(taskData, MantisAttributeMapper.Attribute.RESOLUTION).setValue(ticket.getValue(Key.RESOLUTION));
-        createAttribute(taskData, MantisAttributeMapper.Attribute.PRIORITY).setValue(ticket.getValue(Key.PRIORITY));
-        createAttribute(taskData, MantisAttributeMapper.Attribute.SEVERITY).setValue(ticket.getValue(Key.SEVERITY));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.STATUS, cache.getTicketStatus()).setValue(ticket.getValue(Key.STATUS));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.RESOLUTION, cache.getTicketResolutions()).setValue(ticket.getValue(Key.RESOLUTION));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.PRIORITY, cache.getPriorities()).setValue(ticket.getValue(Key.PRIORITY));
+        createAttribute(taskData, MantisAttributeMapper.Attribute.SEVERITY, cache.getSeverities()).setValue(ticket.getValue(Key.SEVERITY));
         if ( ticket.getLastChanged() != null ) // XXX Remove once we have a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=331733
             createAttribute(taskData, MantisAttributeMapper.Attribute.LAST_UPDATED).setValue(String.valueOf(MantisUtils.toMantisTime(ticket.getLastChanged())));
         if ( ticket.getValue(Key.COMPLETION_DATE) != null )
