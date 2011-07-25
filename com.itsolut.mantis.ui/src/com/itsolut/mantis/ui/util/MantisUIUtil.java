@@ -7,10 +7,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PatternFilter;
 
@@ -78,4 +82,23 @@ public class MantisUIUtil {
         return tree;
     }
 
+    /**
+     * @return the current selection, if any
+     */
+    public static IStructuredSelection getCurrentSelection() {
+
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        
+        if (workbench != null) {
+            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            if (window != null) {
+                ISelection sel = window.getSelectionService().getSelection();
+                if (sel instanceof IStructuredSelection) {
+                    return (IStructuredSelection) sel;
+                }
+            }
+        }
+
+        return null;
+    }
 }

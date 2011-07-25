@@ -23,10 +23,9 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import static com.itsolut.mantis.core.MantisAttributeMapper.Attribute.PROJECT;
+
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
@@ -35,21 +34,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
-import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
-import org.eclipse.mylyn.tasks.core.IRepositoryListener;
-import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
-import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
-import org.eclipse.mylyn.tasks.core.data.TaskMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskRelation;
+import org.eclipse.mylyn.tasks.core.*;
+import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
@@ -320,6 +307,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         task.setCompletionDate(scheme.getCompletionDate());
         task.setUrl(getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
+        task.setAttribute(PROJECT.getKey(), taskData.getRoot().getAttribute(PROJECT.getKey()).getValue());
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {

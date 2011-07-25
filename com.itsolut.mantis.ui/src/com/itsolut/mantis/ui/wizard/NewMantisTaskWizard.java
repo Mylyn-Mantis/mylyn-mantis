@@ -11,18 +11,19 @@
 
 package com.itsolut.mantis.ui.wizard;
 
+import static com.itsolut.mantis.core.MantisAttributeMapper.Attribute.PROJECT;
+
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.TaskMapping;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.IWorkbench;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.IMantisClientManager;
 import com.itsolut.mantis.core.model.MantisProject;
+import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
  * Wizard for creating new Mantis tickets through a rich editor..
@@ -36,6 +37,8 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
     private MantisProjectPage newTaskPage;
 
     private IMantisClientManager clientManager;
+
+    private ProductOnlyTaskMapping mapping;
 
     public NewMantisTaskWizard(TaskRepository taskRepository,
 			ITaskMapping taskSelection, IMantisClientManager clientManager) {
@@ -51,25 +54,72 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
-	}
-
 	@Override
 	public void addPages() {
+	    
+	    IStructuredSelection selection = MantisUIUtil.getCurrentSelection();
+         
+         if ( selection != null && ! selection.isEmpty() ) {
+             
+             Object selectedElement = selection.getFirstElement();
+             String projectName = null;
+             if ( selectedElement instanceof ITask ) {
+                ITask task = (ITask) selectedElement;
+                projectName = task.getAttribute(PROJECT.getKey());
+             } else if ( selectedElement instanceof IRepositoryQuery) {
+                 IRepositoryQuery query = (IRepositoryQuery) selectedElement;
+                 projectName = query.getAttribute(IMantisClient.PROJECT_NAME);
+             } else if (selectedElement instanceof IAdaptable) {
+                 IAdaptable adaptable = (IAdaptable) selectedElement;
+                 ITask task = (ITask) adaptable.getAdapter(ITask.class);
+                 if (task != null)
+                    projectName = task.getAttribute(PROJECT.getKey());
+             }
+             
+             if ( projectName != null ) {
+                 mapping = new ProductOnlyTaskMapping(projectName);
+                 return;
+             }
+         }
+         
 		newTaskPage = new MantisProjectPage(taskRepository, clientManager);
 		addPage(newTaskPage);
+	}
+	
+	@Override
+	public ITaskMapping getTaskSelection() {
+	
+	    ITaskMapping selection = super.getTaskSelection();
+	    if ( selection == null )
+	        selection = mapping;
+	    
+	    return mapping;
 	}
 	
 
 	@Override
 	protected ITaskMapping getInitializationData() {
+	    
+       if (getTaskSelection() != null)
+           return getTaskSelection();
+	    
 		final MantisProject project = newTaskPage.getSelectedProject();
-		return new TaskMapping() {
-			@Override
-			public String getProduct() {
-				return project.getName();
-			}
-		};
+		
+		return new ProductOnlyTaskMapping(project.getName());
 	}
+	
+	private static class ProductOnlyTaskMapping extends TaskMapping {
+	    
+	    private final String product;
 
+        public ProductOnlyTaskMapping(String product) {
+
+            this.product = product;
+        }
+        
+        public String getProduct() {
+
+            return product;
+        }
+	}
 }
