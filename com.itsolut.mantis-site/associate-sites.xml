@@ -1,4 +1,3 @@
 <associateSites> 
 	<associateSite label="Mylyn for Eclipse 3.5, 3.6 and 3.7" url="http://download.eclipse.org/mylyn/releases/latest"/> 
-	<associateSite label="Orbit repository" url="http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/"/> 
 </associateSites> 
