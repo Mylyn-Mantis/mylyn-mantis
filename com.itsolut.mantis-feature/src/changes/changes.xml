@@ -2,7 +2,15 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.6.0" date="2011-09-22">
+		<release version="3.6.0" date="2011-08-02">
+			<action type="add" issue="221" dev="rombert">Migrate TaskData to the new format</action>
+			<action type="add" issue="222" dev="rombert">Take the selection into account when creating new tasks</action>
+			<action type="add" issue="223" dev="rombert">Consider bundling artifacts from Orbit</action>
+			<action type="add" issue="136" dev="rombert">Improve comment link parsing</action>
+			<action type="add" issue="210" dev="rombert">Mark private comments accordingly</action>
+			<action type="add" issue="220" dev="rombert">Allow deletion of tasks</action>
+			<action type="add" issue="204" dev="rombert">Investigate using the OSGi-fyed MantisBT SOAP stubs</action>
+			<action type="add" issue="217" dev="rombert">Priority icon not displayed for unsubmitted tasks</action>
 			<action type="add" issue="218" dev="rombert">[chrome] Html contents is encoded</action>
 			<action type="add" issue="215" dev="rombert">Parsing the task url should take hashes into account</action>
 		</release>
