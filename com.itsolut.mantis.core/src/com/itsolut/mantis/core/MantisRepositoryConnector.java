@@ -25,7 +25,10 @@ package com.itsolut.mantis.core;
 
 import static com.itsolut.mantis.core.MantisAttributeMapper.Attribute.PROJECT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -371,12 +374,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             return;
         }
         
-        // if we get the chance to resync an old task before the user opens the editor
-        // there will be no lag and request to refresh
-        for (ITask task : event.getTasks())
-            if ( ! TASK_VALUE_MANTIS_VERSION_CURRENT.equals(task.getAttribute(TASK_ATTRIBUTE_MANTIS_VERSION)))
-                event.markStale(task);
-
         Date since = new Date(0);
         try {
             if (repository.getSynchronizationTimeStamp().length() > 0)
