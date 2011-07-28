@@ -26,7 +26,6 @@ package com.itsolut.mantis.core;
 import static com.itsolut.mantis.core.MantisAttributeMapper.Attribute.PROJECT;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,6 +53,10 @@ import com.itsolut.mantis.core.util.MantisUtils;
 public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
     private final static String CLIENT_LABEL = "MantisBT (supports 1.1 or later)";
+    
+    private static final String TASK_ATTRIBUTE_MANTIS_VERSION = "mantis.version";
+    // increment when the ITask structure changes in an incompatible way to force tasks to be refreshed
+    private static final String TASK_VALUE_MANTIS_VERSION_CURRENT = "1";
 
     @Inject
     private IMantisClientManager clientManager;
@@ -287,12 +290,17 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 
         if (!MantisUtils.hasValue(attrModification))
             return false;
+        
+        // detect if any of the tasks has and old version 
+        boolean taskVersionIsCurrent = TASK_VALUE_MANTIS_VERSION_CURRENT.equals(task.getAttribute(TASK_ATTRIBUTE_MANTIS_VERSION));
 
         Date lastKnownUpdated = task.getModificationDate();
         
         Date modified = taskData.getAttributeMapper().getDateValue(attrModification);
         
-        boolean hasChanged = !MantisUtils.equal(lastKnownUpdated, modified);
+        boolean lastChangeIsDifferent = !MantisUtils.equal(lastKnownUpdated, modified);
+        
+        boolean hasChanged = lastChangeIsDifferent || !taskVersionIsCurrent;
 
         MantisCorePlugin.debug(NLS.bind("Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged), new RuntimeException());
         
@@ -308,6 +316,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         task.setCompletionDate(scheme.getCompletionDate());
         task.setUrl(getTaskUrl(repository.getRepositoryUrl(), taskData.getTaskId()));
         task.setAttribute(PROJECT.getKey(), taskData.getRoot().getAttribute(PROJECT.getKey()).getValue());
+        task.setAttribute(TASK_ATTRIBUTE_MANTIS_VERSION, TASK_VALUE_MANTIS_VERSION_CURRENT);
     }
 
     public TaskMapper getTaskMapper(final TaskData taskData) {
@@ -361,6 +370,12 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                 event.markStale(task);
             return;
         }
+        
+        // if we get the chance to resync an old task before the user opens the editor
+        // there will be no lag and request to refresh
+        for (ITask task : event.getTasks())
+            if ( ! TASK_VALUE_MANTIS_VERSION_CURRENT.equals(task.getAttribute(TASK_ATTRIBUTE_MANTIS_VERSION)))
+                event.markStale(task);
 
         Date since = new Date(0);
         try {
@@ -369,26 +384,6 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         } catch (NumberFormatException e) {
              MantisCorePlugin.warn("Failed parsing repository synchronisationTimestamp " + repository.getSynchronizationTimeStamp() + " .", e);
         }
-
-        // detect if any of the tasks have TaskData attributes in the old format 
-        for ( ITask task : event.getTasks() ) {
-            TaskData taskData = event.getTaskDataManager().getTaskData(task);
-            if ( taskData == null )
-                continue;
-            
-            // pick a random attribute which used to have keys == values
-            TaskAttribute viewState = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.VIEW_STATE.getKey());
-            if ( !viewState.getOptions().isEmpty() ) {
-                Entry<String, String> viewStateEntry = viewState.getOptions().entrySet().iterator().next();
-                
-                // if the key == the value, we need to refresh
-                if ( viewStateEntry.getKey().equals(viewStateEntry.getValue()) ) {
-                    MantisCorePlugin.debug("Detected old TaskData structure for task with id " + task.getTaskId() + " . Marking as stale", null);
-                    event.markStale(task);
-                }
-            }
-        }
-
 
         // Run the queries to get the list of tasks currently meeting the query
         // criteria. The result returned are only the ids that have changed.
