@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.axis.encoding.Base64;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -36,27 +37,10 @@ import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
 import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
 
-import com.itsolut.mantis.core.DefaultConstantValues;
-import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisCache;
-import com.itsolut.mantis.core.MantisCacheData;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.RepositoryValidationResult;
-import com.itsolut.mantis.core.RepositoryVersion;
-import com.itsolut.mantis.core.TaskRelationshipChange;
+import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
-import com.itsolut.mantis.core.model.MantisETA;
-import com.itsolut.mantis.core.model.MantisPriority;
-import com.itsolut.mantis.core.model.MantisProject;
-import com.itsolut.mantis.core.model.MantisProjection;
-import com.itsolut.mantis.core.model.MantisReproducibility;
-import com.itsolut.mantis.core.model.MantisResolution;
-import com.itsolut.mantis.core.model.MantisSearch;
-import com.itsolut.mantis.core.model.MantisSeverity;
-import com.itsolut.mantis.core.model.MantisTicket;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisTicketStatus;
-import com.itsolut.mantis.core.model.MantisViewState;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -244,15 +228,19 @@ public class MantisSoapClient implements IMantisClient {
         IssueData issue = MantisConverter.convert(ticket, this, getUserName(), monitor);
         issue.setId(BigInteger.valueOf(ticket.getId()));
 
-        // add comment first because when updating the issue to resolved
-        // comments can't be added
-        addCommentIfApplicable(ticket.getId(), comment, timeTracking, monitor);
         updateRelationsIfApplicable(ticket, changes, monitor);
+        
+        addCommentIfApplicable(ticket.getId(), issue, comment, timeTracking, monitor);
 
         soapClient.updateIssue(issue, monitor);
     }
 
     public void addIssueComment(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+
+        soapClient.addNote(issueId, createIssue(comment, timeTracking), monitor);
+    }
+
+    private IssueNoteData createIssue(String comment, int timeTracking) throws MantisException {
 
         IssueNoteData ind = new IssueNoteData();
         
@@ -261,16 +249,17 @@ public class MantisSoapClient implements IMantisClient {
         ind.setReporter(MantisConverter.convert(getUserName(), cache));
         ind.setTime_tracking(BigInteger.valueOf(timeTracking));
         ind.setText(comment);
-
-        soapClient.addNote(issueId, ind, monitor);
+        return ind;
     }
     
-    private void addCommentIfApplicable(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(int issueId, IssueData issue, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
 
         if (MantisUtils.isEmpty(comment) && timeTracking == 0)
             return;
+        
+        Assert.isLegal(issue.getNotes() == null || issue.getNotes().length == 0, "Issue should not have had notes");
 
-        addIssueComment(issueId, comment, timeTracking, monitor);
+        issue.setNotes(new IssueNoteData[] { createIssue(comment, timeTracking) });
     }
 
     public RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException {
