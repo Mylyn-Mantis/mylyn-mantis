@@ -193,6 +193,11 @@ public class MantisSoapClient implements IMantisClient {
 
         soapClient.addIssueAttachment(id, name, encoded, monitor);
     }
+    
+    public void deleteAttachment(int attachmentId, IProgressMonitor progressMonitor) throws MantisException {
+        
+        soapClient.deleteIssueAttachment(attachmentId, progressMonitor);
+    }
 
     public void search(MantisSearch query, List<MantisTicket> result, IProgressMonitor monitor) throws MantisException {
 

@@ -99,6 +99,8 @@ public interface IMantisClient {
 
     void putAttachmentData(int id, String name, byte[] data, IProgressMonitor monitor) throws MantisException;
 
+    void deleteAttachment(int attachmentId, IProgressMonitor progressMonitor) throws MantisException;
+    
     /**
      * @param monitor
      * @param changes 

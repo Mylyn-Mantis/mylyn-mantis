@@ -288,6 +288,20 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
 
     }
 
+    public void deleteIssueAttachment(final int attachmentId, final IProgressMonitor monitor) throws MantisException {
+        
+        call(monitor, new Callable<Void>() {
+
+            public Void call() throws Exception {
+
+                getSOAP().mc_issue_attachment_delete(getUsername(), getPassword(), BigInteger.valueOf(attachmentId));
+                
+                return null;
+            }
+            
+        });
+    }
+
     public IssueHeaderData[] getIssueHeaders(final int projectId, final int filterId, final int limit,
             IProgressMonitor monitor) throws MantisException {
 
