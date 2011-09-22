@@ -43,4 +43,25 @@
             id="com.itsolut.mantis.ui.pageFactory">
       </pageFactory>            
    </extension>
+   
+   <extension point = "org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="com.itsolut.mantis.ui.contribution.attachment"
+            objectClass="org.eclipse.mylyn.tasks.core.ITaskAttachment">
+         <action
+               class="com.itsolut.mantis.ui.action.MantisDeleteAttachmentAction"
+               enablesFor="*"
+               id="com.itsolut.mantis.ui.contribution.attachment.delete"
+               label="Delete"
+               tooltip="Delete">
+            <enablement> 
+              <objectState name="connectorKind" value="mantis"/>
+            </enablement> 
+         </action>
+         <visibility>
+               <objectState name="connectorKind" value="mantis"></objectState>
+         </visibility>
+      </objectContribution>
+   </extension>   
 </plugin>
