@@ -67,11 +67,14 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
 
     public MantisAxis1SoapClient(AbstractWebLocation webLocation) throws MantisException {
 
-        this.location = webLocation;
-
-        soap = this.getSOAP();
-
-        configureHttpAuthentication();
+        synchronized ( this ) {
+        
+            this.location = webLocation;
+    
+            soap = this.getSOAP();
+    
+            configureHttpAuthentication();
+        }
 
     }
 
