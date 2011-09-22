@@ -93,7 +93,7 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 	    if ( selection == null )
 	        selection = mapping;
 	    
-	    return mapping;
+	    return selection;
 	}
 	
 
