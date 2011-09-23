@@ -352,13 +352,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         tree.getViewer().setSelection(new StructuredSelection(cache.getProjectByName(search.getProjectName())));
 
-        int selectedProjectId = getSelectedProject().getValue();
-
-        for (MantisProjectFilter pd : cache.getProjectFilters(selectedProjectId)) {
-            filterCombo.add(pd.getName());
-            filterKeyToUrl.put(new FilterKey(selectedProjectId, pd.getName()), pd.getUrl());
-        }
-
         filterCombo.setText(search.getFilterName());
         searchLimit.setText(String.valueOf(search.getLimit()));
 
