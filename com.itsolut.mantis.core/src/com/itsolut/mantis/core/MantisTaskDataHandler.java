@@ -67,6 +67,8 @@ import com.itsolut.mantis.core.util.MantisUtils;
 @Singleton
 public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
+    private static final String TASK_RELATIONS_MANTIS_ID = "Task Relations";
+    private static final String TASK_RELATIONS_TASKTOP_ID = "task_relations";
     private final IMantisClientManager clientManager;
     private final StatusFactory statusFactory;
     private final MantisCommentMapper commentMapper;
@@ -260,7 +262,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly() || MantisOperation.isOperationRelated(attribute))
                 continue;
 
-            ticket.putValue(attribute.getId(), attribute.getValue());
+            
+            
+            String key = attribute.getId().equals(TASK_RELATIONS_TASKTOP_ID) ? TASK_RELATIONS_MANTIS_ID : attribute.getId();
+            
+            ticket.putValue(key, attribute.getValue());
         }
 
         return ticket;
@@ -787,9 +793,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         TaskAttribute projectAttribute = taskData.getRoot().getAttribute( MantisAttributeMapper.Attribute.PROJECT.getKey());
 
         for ( MantisCustomField customField : client.getCache(monitor).getCustomFieldsByProjectName(projectAttribute.getValue()) ) {
-            TaskAttribute customAttribute = taskData.getRoot().createAttribute(customField.getName());
+            String fieldName = customField.getName();
+            String label = customField.getName();
+            if ( fieldName.equals(TASK_RELATIONS_MANTIS_ID) && customField.getType() == MantisCustomFieldType.TEXTAREA )
+                fieldName = TASK_RELATIONS_TASKTOP_ID;
+            TaskAttribute customAttribute = taskData.getRoot().createAttribute(fieldName);
             customAttribute.getMetaData().setReadOnly(false);
-            customAttribute.getMetaData().setLabel(customField.getName());
+            customAttribute.getMetaData().setLabel(label);
             customAttribute.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
             customAttribute.getMetaData().setType(customFieldTypeToTaskType.get(customField.getType()));
             
