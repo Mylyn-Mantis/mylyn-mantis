@@ -23,6 +23,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
@@ -50,6 +52,7 @@ import com.itsolut.mantis.core.model.MantisCustomField;
 import com.itsolut.mantis.core.model.MantisCustomFieldType;
 import com.itsolut.mantis.core.model.MantisProjectCategory;
 import com.itsolut.mantis.core.model.MantisRelationship;
+import com.itsolut.mantis.core.model.MantisTicketComment;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
@@ -160,32 +163,51 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             
             if (taskData.isNew()) {
                 int id = client.createTicket(ticket, monitor, changes);
-                return new RepositoryResponse(ResponseKind.TASK_UPDATED, id + "");
+                return new RepositoryResponse(ResponseKind.TASK_UPDATED, String.valueOf(id) );
             } else {
                 
-                String newComment = "";
-                TaskAttribute newCommentAttribute = taskData.getRoot().getMappedAttribute(TaskAttribute.COMMENT_NEW);
-                if (newCommentAttribute != null)
-                    newComment = newCommentAttribute.getValue();
-                TaskAttribute timeTrackingAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.TIME_SPENT_NEW.getKey());
+                MantisTicketComment note = extractTicketComment(repository, taskData);
                 
-                int timeTracking = 0;
-                if( timeTrackingAttribute  != null && timeTrackingAttribute.getValue() != null && timeTrackingAttribute.getValue().length() != 0 ) {
-                    try {
-                        timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
-                    } catch ( NumberFormatException e) {
-                        throw new CoreException(statusFactory.toStatus("Invalid time tracking value " + timeTrackingAttribute.getValue() + " must be an integer.", new MantisException(e), repository));
+                boolean submitTaskChanges = false;
+                for ( TaskAttribute attribute : oldAttributes ) {
+                    if ( !attribute.getId().equals(MantisAttributeMapper.Attribute.NEW_COMMENT.getKey()) ) {
+                        submitTaskChanges = true;
+                        break;
                     }
-                    timeTrackingAttribute.clearValues();
                 }
                 
-                client.updateTicket(ticket, newComment, timeTracking, changes, monitor);
+                if ( submitTaskChanges)
+                    client.updateTicket(ticket, note, changes, monitor);
+                else if ( note.hasContent() )
+                    client.addIssueComment(ticket.getId(), note, monitor);
+                else
+                    throw new CoreException(new Status(IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, "No changes were found. Please add a comment or change at least one of the fields."));
                 
-                return new RepositoryResponse(ResponseKind.TASK_UPDATED, ticket.getId()+ "");
+                return new RepositoryResponse(ResponseKind.TASK_UPDATED, String.valueOf(ticket.getId()) );
             }
         } catch (MantisException e) {
             throw new CoreException(statusFactory.toStatus(null, e, repository));
         }
+    }
+
+    private MantisTicketComment extractTicketComment(TaskRepository repository, TaskData taskData) throws CoreException {
+
+        String newComment = "";
+        TaskAttribute newCommentAttribute = taskData.getRoot().getMappedAttribute(TaskAttribute.COMMENT_NEW);
+        if (newCommentAttribute != null)
+            newComment = newCommentAttribute.getValue();
+        TaskAttribute timeTrackingAttribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.TIME_SPENT_NEW.getKey());
+        
+        int timeTracking = 0;
+        if( timeTrackingAttribute  != null && timeTrackingAttribute.getValue() != null && timeTrackingAttribute.getValue().length() != 0 ) {
+            try {
+                timeTracking = Integer.parseInt(timeTrackingAttribute.getValue());
+            } catch ( NumberFormatException e) {
+                throw new CoreException(statusFactory.toStatus("Invalid time tracking value " + timeTrackingAttribute.getValue() + " must be an integer.", new MantisException(e), repository));
+            }
+        }
+        
+        return new MantisTicketComment(newComment, timeTracking);
     }
 
     /**

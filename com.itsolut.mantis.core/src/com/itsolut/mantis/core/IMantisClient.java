@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
+import com.itsolut.mantis.core.model.MantisTicketComment;
 
 /**
  * Defines the requirements for classes that provide remote access to Mantis repositories.
@@ -108,9 +109,9 @@ public interface IMantisClient {
      */
     int createTicket(MantisTicket ticket, IProgressMonitor monitor, List<TaskRelationshipChange> changes) throws MantisException;
 
-    void updateTicket(MantisTicket ticket, String comment, int timeTracking, List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException;
+    void updateTicket(MantisTicket ticket, MantisTicketComment note, List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException;
 
-    void addIssueComment(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException;
+    void addIssueComment(int issueId, MantisTicketComment note, IProgressMonitor monitor) throws MantisException;
     
     MantisCache getCache(IProgressMonitor progressMonitor) throws MantisException;
 

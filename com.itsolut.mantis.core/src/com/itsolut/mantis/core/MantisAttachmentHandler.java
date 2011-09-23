@@ -31,6 +31,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisTicketComment;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -133,7 +134,7 @@ public class MantisAttachmentHandler extends AbstractTaskAttachmentHandler {
             Policy.advance(monitor, 1);
             
             if  ( !MantisUtils.isEmpty(comment) )
-                client.addIssueComment(id, comment, 0, monitor);
+                client.addIssueComment(id, new MantisTicketComment(comment, 0), monitor);
             Policy.advance(monitor, 1);
             
         } catch (MantisException e) {

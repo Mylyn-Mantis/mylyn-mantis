@@ -221,7 +221,7 @@ public class MantisSoapClient implements IMantisClient {
     	refreshForProject(monitor, location.getUrl(), issueData.getProject().getId().intValue());
     }
 
-    public void updateTicket(MantisTicket ticket, String comment, int timeTracking,  List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException {
+    public void updateTicket(MantisTicket ticket, MantisTicketComment note,  List<TaskRelationshipChange> changes, IProgressMonitor monitor) throws MantisException {
 
         refreshIfNeeded(monitor, location.getUrl());
 
@@ -230,36 +230,36 @@ public class MantisSoapClient implements IMantisClient {
 
         updateRelationsIfApplicable(ticket, changes, monitor);
         
-        addCommentIfApplicable(ticket.getId(), issue, comment, timeTracking, monitor);
+        addCommentIfApplicable(ticket.getId(), issue, note, monitor);
 
         soapClient.updateIssue(issue, monitor);
     }
 
-    public void addIssueComment(int issueId, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    public void addIssueComment(int issueId, MantisTicketComment note, IProgressMonitor monitor) throws MantisException {
 
-        soapClient.addNote(issueId, createIssue(comment, timeTracking), monitor);
+        soapClient.addNote(issueId, createIssue(note), monitor);
     }
 
-    private IssueNoteData createIssue(String comment, int timeTracking) throws MantisException {
+    private IssueNoteData createIssue(MantisTicketComment note) throws MantisException {
 
         IssueNoteData ind = new IssueNoteData();
         
         ind.setDate_submitted(MantisUtils.transform(new Date()));
         ind.setLast_modified(MantisUtils.transform(new Date()));
         ind.setReporter(MantisConverter.convert(getUserName(), cache));
-        ind.setTime_tracking(BigInteger.valueOf(timeTracking));
-        ind.setText(comment);
+        ind.setTime_tracking(BigInteger.valueOf(note.getTimeTracking()));
+        ind.setText(note.getComment());
         return ind;
     }
     
-    private void addCommentIfApplicable(int issueId, IssueData issue, String comment, int timeTracking, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(int issueId, IssueData issue, MantisTicketComment note, IProgressMonitor monitor) throws MantisException {
 
-        if (MantisUtils.isEmpty(comment) && timeTracking == 0)
+        if ( !note.hasContent() )
             return;
         
         Assert.isLegal(issue.getNotes() == null || issue.getNotes().length == 0, "Issue should not have had notes");
 
-        issue.setNotes(new IssueNoteData[] { createIssue(comment, timeTracking) });
+        issue.setNotes(new IssueNoteData[] { createIssue(note) });
     }
 
     public RepositoryValidationResult validate(IProgressMonitor monitor) throws MantisException {

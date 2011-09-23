@@ -142,14 +142,12 @@ public class MantisTicket {
         this.id = id;
     }
 
-
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
     }
-
 
     public Date getCreated() {
         return created;
@@ -235,7 +233,6 @@ public class MantisTicket {
 
         return customFieldValues.get(name);
     }
-    
 
     public void addComment(MantisComment comment) {
         if (comments == null) {
