@@ -21,7 +21,8 @@ public class MantisAttachment {
 	private String contentType;
 	private String downloadURL;
 	private String filename;
-	int size;
+	private int size;
+	private int userId;
 
 	public String getContentType() {
 		return contentType;
@@ -71,9 +72,16 @@ public class MantisAttachment {
 		this.size = size;
 	}
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+	
 	@Override
 	public String toString() {
 		return filename;
 	}
-
 }

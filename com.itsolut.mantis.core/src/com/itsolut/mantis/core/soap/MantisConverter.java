@@ -140,6 +140,7 @@ public class MantisConverter {
         ma.setFilename(ad.getFilename());
         ma.setSize(ad.getSize().intValue());
         ma.setId(ad.getId().intValue());
+        ma.setUserId(ad.getUser_id().intValue());
 
         return ma;
 

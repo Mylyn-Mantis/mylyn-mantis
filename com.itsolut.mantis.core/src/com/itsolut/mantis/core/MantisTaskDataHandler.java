@@ -11,16 +11,32 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.tasks.core.*;
+import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
+import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.ITaskMapping;
+import org.eclipse.mylyn.tasks.core.RepositoryResponse;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
-import org.eclipse.mylyn.tasks.core.data.*;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
+import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
+import org.eclipse.mylyn.tasks.core.data.TaskMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
@@ -28,9 +44,18 @@ import com.google.inject.Singleton;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
-import com.itsolut.mantis.core.model.*;
+import com.itsolut.mantis.core.model.MantisAttachment;
+import com.itsolut.mantis.core.model.MantisComment;
+import com.itsolut.mantis.core.model.MantisCustomField;
+import com.itsolut.mantis.core.model.MantisCustomFieldType;
+import com.itsolut.mantis.core.model.MantisProjectCategory;
+import com.itsolut.mantis.core.model.MantisRelationship;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
+import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
+import com.itsolut.mantis.core.model.MantisTicketAttribute;
+import com.itsolut.mantis.core.model.MantisUser;
+import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -249,7 +274,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         copyValuesFromTicket(data, ticket);
 
         addComments(data, ticket, client, monitor);
-        addAttachments(repository, data, ticket);
+        addAttachments(repository, data, ticket, client, monitor);
         addRelationships(data, ticket);
         addMonitors(data, ticket, client, repository, monitor);
         addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
@@ -400,8 +425,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         attribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS, MantisUtils.toCsvString(originalValues));
     }
     
-    private void addAttachments(TaskRepository repository,
-            TaskData data, MantisTicket ticket) {
+    private void addAttachments(TaskRepository repository, TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
 
         int i = 1;
         if (ticket.getAttachments() == null)
@@ -428,9 +452,17 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     .getRepositoryUrl()).getAttachmentDownloadLocation(attachment.getId()));
             taskAttachment
             .setAttachmentId(Integer.toString(attachment.getId()));
+            taskAttachment.setAuthor(newPerson(repository, attachment.getUserId(), client, monitor));
             taskAttachment.applyTo(attribute);
             i++;
         }
+    }
+
+    private IRepositoryPerson newPerson(TaskRepository repository, int userId, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+
+        String userName = client.getCache(monitor).getUserNameById(userId);
+        
+        return newPerson(repository, userName, client, monitor);
     }
 
     private void addComments(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {

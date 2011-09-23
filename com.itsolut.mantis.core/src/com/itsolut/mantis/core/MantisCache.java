@@ -587,4 +587,18 @@ public class MantisCache {
 
         cacheData.getReportersByProjectId().replaceValues(projectId, cacheData.getDevelopersByProjectId().get(projectId));
     }
+
+
+    /**
+     * @param userId
+     * @return the matching username, possibly <code>null</code>
+     */
+    public String getUserNameById(int userId) {
+
+        for ( MantisUser user : cacheData.allUsers.values() )
+            if ( user.getValue() == userId )
+                return user.getName();
+                
+        return null;
+    }
 }
