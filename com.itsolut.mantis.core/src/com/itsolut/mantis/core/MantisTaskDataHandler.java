@@ -105,6 +105,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         customFieldTypeToTaskType.put(MantisCustomFieldType.NUMERIC, TaskAttribute.TYPE_SHORT_TEXT);
         customFieldTypeToTaskType.put(MantisCustomFieldType.RADIO, TaskAttribute.TYPE_SINGLE_SELECT);
         customFieldTypeToTaskType.put(MantisCustomFieldType.STRING, TaskAttribute.TYPE_SHORT_TEXT);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.TEXTAREA, TaskAttribute.TYPE_LONG_TEXT);
     }
     
     @Inject

@@ -7,7 +7,7 @@ package com.itsolut.mantis.core.model;
 public enum MantisCustomFieldType {
 
 	STRING(0), NUMERIC(1), FLOAT(2), ENUM(3), EMAIL(4), CHECKBOX(5), LIST(6), MULTILIST(
-			7), DATE(8), RADIO(9);
+			7), DATE(8), RADIO(9), TEXTAREA(10);
 
 	public static MantisCustomFieldType fromMantisConstant(int mantisConstant) {
 
