@@ -58,8 +58,6 @@ public class MantisSoapClient implements IMantisClient {
 
     private AbstractWebLocation location;
     
-    private static final int ALL_PROJECTS = 0;
-    
     private final NumberFormat formatter = new DecimalFormat("#.#");
 
     public MantisSoapClient(AbstractWebLocation webLocation) throws MantisException {
@@ -322,7 +320,7 @@ public class MantisSoapClient implements IMantisClient {
 
     public void refresh(IProgressMonitor monitor, String repositoryUrl) throws MantisException {
 
-        refresh0(monitor, repositoryUrl, ALL_PROJECTS);
+        refresh0(monitor, repositoryUrl, MantisProject.ALL_PROJECTS.getValue());
     }
 
     private void refresh0(IProgressMonitor monitor, String repositoryUrl, int projectId) throws MantisException {
@@ -337,7 +335,7 @@ public class MantisSoapClient implements IMantisClient {
                 // TODO: recursive
                 cache.cacheProjects(MantisConverter.convert(soapClient.getProjectData(monitor)));
 
-                int projectsToRefresh =  projectId == ALL_PROJECTS ? cache.getCacheData().getProjects().size()  : 1 ;
+                int projectsToRefresh =  projectId == MantisProject.ALL_PROJECTS.getValue() ? cache.getCacheData().getProjects().size()  : 1 ;
                 
                 subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 29);
 
@@ -383,7 +381,7 @@ public class MantisSoapClient implements IMantisClient {
                 
                 for (MantisProject project : cache.getProjects()) {
                     
-                    if ( projectId != ALL_PROJECTS && projectId != project.getValue() )
+                    if ( projectId != MantisProject.ALL_PROJECTS.getValue() && projectId != project.getValue() )
                         continue;
                     
                     cache.cacheFilters(project.getValue(), MantisConverter.convert(soapClient.getProjectFilters(project.getValue(), monitor)));

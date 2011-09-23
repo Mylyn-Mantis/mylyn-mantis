@@ -309,6 +309,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
     private MantisProject[] getProjects() {
 
         final List<MantisProject> projects = new ArrayList<MantisProject>();
+        projects.add(MantisProject.ALL_PROJECTS);
 
         try {
             

@@ -76,7 +76,7 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
                     projectName = task.getAttribute(PROJECT.getKey());
              }
              
-             if ( projectName != null ) {
+             if ( projectName != null && ! MantisProject.ALL_PROJECTS.getName().equals(projectName) ) {
                  mapping = new ProductOnlyTaskMapping(projectName);
                  return;
              }

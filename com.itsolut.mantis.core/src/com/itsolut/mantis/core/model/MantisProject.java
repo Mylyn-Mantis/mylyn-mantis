@@ -14,6 +14,8 @@ package com.itsolut.mantis.core.model;
  * @author Chris Hane
  */
 public class MantisProject extends MantisTicketAttribute {
+    
+    public static final MantisProject ALL_PROJECTS = new MantisProject("All Projects", 0, null);
 
     private static final long serialVersionUID = -7316456033389981356L;
     private Integer parentProjectId;

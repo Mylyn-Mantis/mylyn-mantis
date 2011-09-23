@@ -11,7 +11,9 @@
 package com.itsolut.mantis.core;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -19,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
+import com.itsolut.mantis.core.soap.MantisSoapClient;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -220,6 +223,9 @@ public class MantisCache {
     }
 
     public int getProjectId(String projectName) throws MantisException {
+        
+        if ( MantisProject.ALL_PROJECTS.getName().equals(projectName) )
+            return MantisProject.ALL_PROJECTS.getValue();
 
         for (MantisProject mantisProject : cacheData.getProjects())
             if (mantisProject.getName().equals(projectName))
@@ -230,9 +236,7 @@ public class MantisCache {
 
     public int getProjectFilterId(int projectId, String filterName) throws MantisException {
 
-        List<MantisProjectFilter> filters = cacheData.getProjectFiltersById().get(projectId);
-
-        for (MantisProjectFilter filter : filters)
+        for (MantisProjectFilter filter : getProjectFilters(projectId))
             if (filter.getName().equals(filterName))
                 return filter.getValue();
 
@@ -388,6 +392,9 @@ public class MantisCache {
     }
 
     public MantisProject getProjectByName(String projectName) throws MantisException {
+        
+        if ( MantisProject.ALL_PROJECTS.getName().equals(projectName) )
+            return MantisProject.ALL_PROJECTS;
 
         for (MantisProject project : cacheData.getProjects())
             if (project.getName().equals(projectName))
@@ -405,9 +412,26 @@ public class MantisCache {
         throw new MantisException("No project with id " + projectId + " .");
     }
 
+    /**
+     * @param projectId the project id or {@link MantisSoapClient#ALL_PROJECTS}
+     */
     public List<MantisProjectFilter> getProjectFilters(int projectId) throws MantisException {
+        
+        if ( projectId == MantisProject.ALL_PROJECTS.getValue() )
+            return getProjectFiltersForAllProject();
 
         return cacheData.getProjectFiltersById().get(projectId);
+    }
+    
+    private List<MantisProjectFilter> getProjectFiltersForAllProject() {
+        
+        Map<Integer, MantisProjectFilter> filters = new LinkedHashMap<Integer, MantisProjectFilter>();
+        
+        for ( MantisProjectFilter filter : cacheData.getProjectFiltersById().values() )
+            if ( filter.getProjectId() == MantisProject.ALL_PROJECTS.getValue() && filter.getValue() != BUILT_IN_PROJECT_TASKS_FILTER_ID )
+                filters.put(filter.getValue(), filter);
+        
+        return Lists.newArrayList(filters.values());
     }
 
     public List<MantisProjectCategory> getProjectCategories(String projectName) throws MantisException {
