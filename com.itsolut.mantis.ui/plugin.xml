@@ -29,12 +29,17 @@
             repositoryKind="mantis"
             urlRepository="http://www.example.com/mantisbt/"/>
       <repository
+            addAutomatically="false"
+            anonymous="true"
+            label="MantisBT Bugs"
+            repositoryKind="mantis"
+            urlRepository="http://www.mantisbt.org/bugs/"/>
+      <repository
             addAutomatically="true"
             anonymous="true"
             label="Mylyn-Mantis Support"
             repositoryKind="mantis"
-            urlRepository="https://sourceforge.net/apps/mantisbt/mylyn-mantis/">
-      </repository>
+            urlRepository="https://sourceforge.net/apps/mantisbt/mylyn-mantis/"/>
    </extension> 
      <extension
          point="org.eclipse.mylyn.tasks.ui.editors">
