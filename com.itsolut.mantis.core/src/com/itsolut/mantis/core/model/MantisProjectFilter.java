@@ -18,17 +18,14 @@ public class MantisProjectFilter extends MantisTicketAttribute {
     private static final long serialVersionUID = 2392206019389785563L;
 
     private String url;
+    private int projectId;
 
-    public MantisProjectFilter(String name, int value) {
-
-        this(name, value, null);
-    }
-
-    public MantisProjectFilter(String name, int value, String url) {
+    public MantisProjectFilter(String name, int value, String url, int projectId) {
 
         super(name, value);
 
         this.url = url;
+        this.projectId = projectId;
     }
 
     public String getUrl() {
@@ -40,5 +37,9 @@ public class MantisProjectFilter extends MantisTicketAttribute {
 
         this.url = url;
     }
+    
+    public int getProjectId() {
 
+        return projectId;
+    }
 }

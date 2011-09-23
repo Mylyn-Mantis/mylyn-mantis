@@ -404,7 +404,7 @@ public class MantisConverter {
         List<MantisProjectFilter> filters = Lists.newArrayListWithCapacity(projectFilters.length);
 
         for (FilterData filterData : projectFilters)
-            filters.add(new MantisProjectFilter(filterData.getName(), filterData.getId().intValue(), filterData.getUrl()));
+            filters.add(new MantisProjectFilter(filterData.getName(), filterData.getId().intValue(), filterData.getUrl(), filterData.getProject_id().intValue()));
 
         return filters;
     }

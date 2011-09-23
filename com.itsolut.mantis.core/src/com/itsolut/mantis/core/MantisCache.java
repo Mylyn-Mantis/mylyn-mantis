@@ -195,7 +195,7 @@ public class MantisCache {
         String projectDisplayName = getProjectById(projectId).getName();
         String filterDisplayName = String.format(BUILT_IN_PROJECT_TASKS_FILTER_FORMAT, projectDisplayName);
 
-        return new MantisProjectFilter(filterDisplayName, BUILT_IN_PROJECT_TASKS_FILTER_ID);
+        return new MantisProjectFilter(filterDisplayName, BUILT_IN_PROJECT_TASKS_FILTER_ID, null, projectId);
     }
 
     public void cacheProjectCustomFields(int projectId, List<MantisCustomField> customFieldData) {
