@@ -63,27 +63,30 @@ public class MantisHyperlinkFinder {
             links.add(new TaskHyperlink(determineRegion(regionOffset, matcher), repository, id));
         }
         
-        matcher = COMMENT_PATTERN.matcher(text);
+        if ( task != null ) {
         
-        while ( matcher.find() ) {
-
-            if (!isInRegion(lineOffset, matcher))
-                continue;
-
-            if (links == null)
-                links = new ArrayList<IHyperlink>();
-
-            String commentId = matcher.group(1);
+            matcher = COMMENT_PATTERN.matcher(text);
             
-            Integer commentNumber = commentMapper.getCommentNumber(Integer.parseInt(commentId));
-            
-            if ( commentNumber == null )
-                continue;
-            
-            TaskHyperlink link = new TaskHyperlink(determineRegion(regionOffset, matcher), repository, task.getTaskId());
-            link.setSelection(TaskAttribute.PREFIX_COMMENT + commentNumber);
-            
-            links.add(link);
+            while ( matcher.find() ) {
+    
+                if (!isInRegion(lineOffset, matcher))
+                    continue;
+    
+                if (links == null)
+                    links = new ArrayList<IHyperlink>();
+    
+                String commentId = matcher.group(1);
+                
+                Integer commentNumber = commentMapper.getCommentNumber(Integer.parseInt(commentId));
+                
+                if ( commentNumber == null )
+                    continue;
+                
+                TaskHyperlink link = new TaskHyperlink(determineRegion(regionOffset, matcher), repository, task.getTaskId());
+                link.setSelection(TaskAttribute.PREFIX_COMMENT + commentNumber);
+                
+                links.add(link);
+            }
         }
 
         return links == null ? null : links.toArray(new IHyperlink[links.size()]);
