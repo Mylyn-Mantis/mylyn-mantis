@@ -458,23 +458,27 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     private void addComments(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
-        int i = 1;
+        
         if (ticket.getComments() == null)
             return;
+        
+        int commentNumber = 1;
+        
         for (MantisComment comment : ticket.getComments()) {
             TaskAttribute attribute = data.getRoot().createAttribute(
-                    TaskAttribute.PREFIX_COMMENT + i);
+                    TaskAttribute.PREFIX_COMMENT + commentNumber);
             TaskCommentMapper taskComment = TaskCommentMapper .createFrom(attribute);
             taskComment.setCommentId(String.valueOf(comment.getId()));
             taskComment.setAuthor(newPerson(data.getAttributeMapper().getTaskRepository(), comment.getReporter(), client, monitor));
-            taskComment.setNumber(i);
+            taskComment.setNumber(commentNumber);
             taskComment.setIsPrivate(comment.getIsPrivate());
             taskComment.setText(comment.getText());
             taskComment.setCreationDate(comment.getDateSubmitted());
             taskComment.applyTo(attribute);
-            i++;
             
-            commentMapper.registerCommentNumber(comment.getId(), new CommentMapping(ticket.getId(), i));
+            commentMapper.registerCommentNumber(comment.getId(), new CommentMapping(ticket.getId(), commentNumber));
+            
+            commentNumber++;
         }
     }
 
