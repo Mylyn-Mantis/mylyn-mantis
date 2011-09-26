@@ -23,9 +23,11 @@ import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 
 import com.google.inject.Inject;
 import com.itsolut.mantis.core.MantisCommentMapper;
-
+import com.itsolut.mantis.core.MantisCommentMapper.CommentMapping;
 
 /**
+ * The <tt>MantisHyperlinkFinder</tt> detects links to tasks and task comments in text
+ * 
  * @author Robert Munteanu
  *
  */
@@ -36,7 +38,6 @@ public class MantisHyperlinkFinder {
     private static final Pattern COMMENT_PATTERN = Pattern.compile("~(\\d+)", Pattern.CASE_INSENSITIVE);
 
     private MantisCommentMapper commentMapper;
-    
 
     @Inject
     public MantisHyperlinkFinder(MantisCommentMapper commentMapper) {
@@ -46,7 +47,6 @@ public class MantisHyperlinkFinder {
     
     public IHyperlink[] findHyperlinks(TaskRepository repository, ITask task, String text, int lineOffset, int regionOffset) {
 
-        
         Matcher matcher = HYPERLINK_PATTERN.matcher(text);
 
         List<IHyperlink> links = null;
@@ -56,37 +56,34 @@ public class MantisHyperlinkFinder {
                 continue;
 
             if (links == null)
-                links = new ArrayList<IHyperlink>();
+                links = new ArrayList<IHyperlink>(1);
 
             String id = matcher.group(2);
 
             links.add(new TaskHyperlink(determineRegion(regionOffset, matcher), repository, id));
         }
         
-        if ( task != null ) {
+        matcher = COMMENT_PATTERN.matcher(text);
         
-            matcher = COMMENT_PATTERN.matcher(text);
+        while ( matcher.find() ) {
+
+            if (!isInRegion(lineOffset, matcher))
+                continue;
+
+            String commentId = matcher.group(1);
             
-            while ( matcher.find() ) {
-    
-                if (!isInRegion(lineOffset, matcher))
-                    continue;
-    
-                if (links == null)
-                    links = new ArrayList<IHyperlink>();
-    
-                String commentId = matcher.group(1);
-                
-                Integer commentNumber = commentMapper.getCommentNumber(Integer.parseInt(commentId));
-                
-                if ( commentNumber == null )
-                    continue;
-                
-                TaskHyperlink link = new TaskHyperlink(determineRegion(regionOffset, matcher), repository, task.getTaskId());
-                link.setSelection(TaskAttribute.PREFIX_COMMENT + commentNumber);
-                
-                links.add(link);
-            }
+            CommentMapping commentMapping = commentMapper.getCommentMapping(Integer.parseInt(commentId));
+            
+            if ( commentMapping == null )
+                continue;
+
+            if (links == null)
+                links = new ArrayList<IHyperlink>(1);
+            
+            TaskHyperlink link = new TaskHyperlink(determineRegion(regionOffset, matcher), repository, String.valueOf(commentMapping.getTaskId()));
+            link.setSelection(TaskAttribute.PREFIX_COMMENT + commentMapping.getCommentNumber());
+            
+            links.add(link);
         }
 
         return links == null ? null : links.toArray(new IHyperlink[links.size()]);

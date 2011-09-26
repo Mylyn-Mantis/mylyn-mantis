@@ -11,54 +11,23 @@
 
 package com.itsolut.mantis.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.ITaskMapping;
-import org.eclipse.mylyn.tasks.core.RepositoryResponse;
+import org.eclipse.core.runtime.*;
+import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
-import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
-import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
-import org.eclipse.mylyn.tasks.core.data.TaskMapper;
-import org.eclipse.mylyn.tasks.core.data.TaskOperation;
+import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
+import com.itsolut.mantis.core.MantisCommentMapper.CommentMapping;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
-import com.itsolut.mantis.core.model.MantisAttachment;
-import com.itsolut.mantis.core.model.MantisComment;
-import com.itsolut.mantis.core.model.MantisCustomField;
-import com.itsolut.mantis.core.model.MantisCustomFieldType;
-import com.itsolut.mantis.core.model.MantisProjectCategory;
-import com.itsolut.mantis.core.model.MantisRelationship;
-import com.itsolut.mantis.core.model.MantisTicketComment;
+import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisRelationship.RelationType;
-import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.model.MantisTicketAttribute;
-import com.itsolut.mantis.core.model.MantisUser;
-import com.itsolut.mantis.core.model.MantisVersion;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -505,7 +474,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             taskComment.applyTo(attribute);
             i++;
             
-            commentMapper.registerCommentNumber(comment.getId(), i);
+            commentMapper.registerCommentNumber(comment.getId(), new CommentMapping(ticket.getId(), i));
         }
     }
 

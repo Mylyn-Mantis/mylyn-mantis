@@ -21,6 +21,7 @@ import org.eclipse.mylyn.tasks.ui.TaskHyperlink;
 import org.junit.Test;
 
 import com.itsolut.mantis.core.MantisCommentMapper;
+import com.itsolut.mantis.core.MantisCommentMapper.CommentMapping;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.tests.MantisTestConstants;
 import com.itsolut.mantis.tests.MylynObjectsFactory;
@@ -31,6 +32,7 @@ import com.itsolut.mantis.tests.MylynObjectsFactory;
 public class MantisHyperlinkFinderTest {
 	
 	private static final String TASK_ID = "12";
+	private static final int COMMENT_TASK_ID = 13;
 	private static final int COMMENT_ID = 25;
 	private static final int COMMENT_NUMBER = 1;
 
@@ -60,18 +62,17 @@ public class MantisHyperlinkFinderTest {
 		assertEquals(TASK_ID, ((TaskHyperlink) hyperlinks[0]).getTaskId());
 	}
 	
-	
 	@Test
 	public void commentHyperlinkFound() {
 	
 		MantisCommentMapper commentMapper = new MantisCommentMapper();
-		commentMapper.registerCommentNumber(COMMENT_ID, COMMENT_NUMBER);
+		commentMapper.registerCommentNumber(COMMENT_ID, new CommentMapping(COMMENT_TASK_ID, COMMENT_NUMBER));
 
 		IHyperlink[] hyperlinks = findHyperlinks("Some text which contains\reference to comment ~"+COMMENT_ID+".", commentMapper);
 		
 		assertNotNull(hyperlinks);
 		assertEquals(1, hyperlinks.length);
-		assertEquals(TASK_ID, ((TaskHyperlink) hyperlinks[0]).getTaskId());
+		assertEquals(String.valueOf(COMMENT_TASK_ID), ((TaskHyperlink) hyperlinks[0]).getTaskId());
 		assertEquals(TaskAttribute.PREFIX_COMMENT + COMMENT_NUMBER, ((TaskHyperlink) hyperlinks[0]).getSelection());
 	}
 }

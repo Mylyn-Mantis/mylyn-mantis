@@ -13,26 +13,48 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 
-
 /**
  * @author Robert Munteanu
  */
 @Singleton
 public class MantisCommentMapper {
 
-    private final Map<Integer, Integer> idToNumber = Maps.newHashMap();
+    private final Map<Integer, CommentMapping> idToNumber = Maps.newHashMap();
     
-    public void registerCommentNumber(int commentId, int commentNumber) {
+    public void registerCommentNumber(int commentId, CommentMapping commentMapping) {
         
         synchronized(this) {
-            idToNumber.put(commentId, commentNumber);
+            idToNumber.put(commentId, commentMapping);
         }
     }
     
-    public Integer getCommentNumber(int commentId) {
+    public CommentMapping getCommentMapping(int commentId) {
         
         synchronized (this) {
             return idToNumber.get(commentId);
         }
+    }
+    
+    public static class CommentMapping {
+        
+        private final int taskId;
+        private final int commentNumber;
+        
+        public CommentMapping(int taskid, int commentNumber) {
+
+            this.taskId = taskid;
+            this.commentNumber = commentNumber;
+        }
+        
+        public int getTaskId() {
+
+            return taskId;
+        }
+        
+        public int getCommentNumber() {
+
+            return commentNumber;
+        }
+        
     }
 }
