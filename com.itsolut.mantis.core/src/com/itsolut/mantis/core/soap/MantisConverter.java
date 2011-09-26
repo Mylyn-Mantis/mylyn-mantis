@@ -19,11 +19,7 @@ import org.eclipse.osgi.util.NLS;
 import biz.futureware.mantis.rpc.soap.client.*;
 
 import com.google.common.collect.Lists;
-import com.itsolut.mantis.core.DefaultConstantValues;
-import com.itsolut.mantis.core.IMantisClient;
-import com.itsolut.mantis.core.MantisCache;
-import com.itsolut.mantis.core.MantisCorePlugin;
-import com.itsolut.mantis.core.RepositoryVersion;
+import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
@@ -140,7 +136,8 @@ public class MantisConverter {
         ma.setFilename(ad.getFilename());
         ma.setSize(ad.getSize().intValue());
         ma.setId(ad.getId().intValue());
-        ma.setUserId(ad.getUser_id().intValue());
+        if ( ad.getUser_id() != null)
+            ma.setUserId(ad.getUser_id().intValue());
 
         return ma;
 
