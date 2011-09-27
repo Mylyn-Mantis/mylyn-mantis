@@ -68,5 +68,20 @@
                <objectState name="connectorKind" value="mantis"/>
          </visibility>
       </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.wikitext.core.markupLanguage">
+      <language
+            class="com.itsolut.mantis.ui.internal.wikitext.MantisHtmlMarkupLanguage"
+            name="Mantis HTML">
+      </language>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.tasks.ui.taskEditorExtensions">
+         <taskEditorExtension
+               class="com.itsolut.mantis.ui.internal.wikitext.MantisHtmlMarkupTaskEditorExtension"
+               id="com.itsolut.mantis.ui.wikitext.mantisHtmlTaskEditorExtension"
+               name="Mantis HTML"
+               />
    </extension>   
 </plugin>
