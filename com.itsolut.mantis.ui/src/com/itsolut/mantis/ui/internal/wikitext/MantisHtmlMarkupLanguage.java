@@ -18,9 +18,12 @@ import com.itsolut.mantis.ui.internal.wikitext.block.ParagraphBlock;
  */
 public class MantisHtmlMarkupLanguage extends AbstractMarkupLanguage {
 
+    // needs to be linked with /org.eclipse.mylyn.wikitext.ui.contentAssist/templates[markupLanguage]
+    private static final String NAME = "Mantis HTML";
+
     public MantisHtmlMarkupLanguage() {
         
-        setName("MantisBT HTML");
+        setName(NAME);
     }
 
     @Override
