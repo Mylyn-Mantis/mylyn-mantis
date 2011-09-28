@@ -25,11 +25,16 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.itsolut.mantis.core.*;
+import com.itsolut.mantis.core.IMantisClient;
+import com.itsolut.mantis.core.MantisClientFactory;
+import com.itsolut.mantis.core.MantisCorePlugin;
+import com.itsolut.mantis.core.MantisRepositoryConfiguration;
+import com.itsolut.mantis.core.RepositoryCapability;
+import com.itsolut.mantis.core.RepositoryValidationResult;
+import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.ui.MantisUIPlugin;
 import com.itsolut.mantis.ui.internal.WikiLinkedErrorDialog;
@@ -45,8 +50,6 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private static final String DESCRIPTION = "Enter the path to your repository, for example : http://www.example.com/mantis/\nPlease validate the settings to ensure they are correct.";
 
-    private Button useRichTextEditor;
-
     private final StatusFactory statusFactory;
 
     private final MantisClientFactory clientFactory;
@@ -57,12 +60,13 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         this.statusFactory = statusFactory;
         this.clientFactory = clientFactory;
         
-        setNeedsAnonymousLogin(true);
-        setNeedsEncoding(false);
-        setNeedsTimeZone(false);
+        setNeedsAnonymousLogin(true); 
         setNeedsValidation(true);
         setNeedsHttpAuth(true);
-        setNeedsAdvanced(true);
+        
+        setNeedsEncoding(false);
+        setNeedsTimeZone(false);
+        setNeedsAdvanced(false);
     }
     
     @Override
@@ -74,15 +78,6 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     @Override
     protected void createAdditionalControls(final Composite parent) {
-
-        Label downloadAttachmentsLabel = new Label(parent, SWT.NONE);
-        downloadAttachmentsLabel.setText("Use rich text editor (EXPERIMENTAL)");
-        useRichTextEditor = new Button(parent, SWT.CHECK | SWT.LEFT);
-        
-        if ( getRepository() != null )
-            useRichTextEditor.setSelection(MantisRepositoryConfiguration.isUseRichTextEditor(repository));
-        else
-            useRichTextEditor.setSelection(false);
     }
 
     @Override
@@ -120,7 +115,6 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
         super.applyTo(repository);
 
         MantisRepositoryConfiguration.setCategoryIfNotSet(repository);
-        MantisRepositoryConfiguration.setUseRichTextEditor(repository, useRichTextEditor.getSelection());
     }
 
     @Override
