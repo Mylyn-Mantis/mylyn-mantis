@@ -81,7 +81,10 @@
          <taskEditorExtension
                class="com.itsolut.mantis.ui.internal.wikitext.MantisHtmlMarkupTaskEditorExtension"
                id="com.itsolut.mantis.ui.wikitext.mantisHtmlTaskEditorExtension"
-               name="Mantis HTML"
-               />
+               name="Mantis HTML"/>
+         <repositoryAssociation
+               connectorKind="mantis"
+               taskEditorExtension="com.itsolut.mantis.ui.wikitext.mantisHtmlTaskEditorExtension">
+         </repositoryAssociation>
    </extension>   
 </plugin>
