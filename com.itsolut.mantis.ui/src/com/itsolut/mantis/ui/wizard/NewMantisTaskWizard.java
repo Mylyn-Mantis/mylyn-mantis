@@ -100,7 +100,7 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
 	@Override
 	protected ITaskMapping getInitializationData() {
 	    
-       if (getTaskSelection() != null)
+       if (getTaskSelection() != null && getTaskSelection().getProduct() != null)
            return getTaskSelection();
 	    
 		final MantisProject project = newTaskPage.getSelectedProject();
@@ -120,6 +120,12 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
         public String getProduct() {
 
             return product;
+        }
+        
+        @Override
+        public String toString() {
+        
+            return getClass().getSimpleName()+"{ product: " + product + "}";
         }
 	}
 }
