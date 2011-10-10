@@ -100,7 +100,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             IMantisClient client = clientManager.getRepository(repository);
             
             // project name
-            TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
+            TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey());
             projectAttribute.setValue(initializationData.getProduct());
             
 			createDefaultAttributes(data, client, initializationData.getProduct(), monitor, false);

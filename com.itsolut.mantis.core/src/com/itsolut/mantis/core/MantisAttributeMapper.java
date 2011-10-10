@@ -247,9 +247,9 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     	
     	Attribute mapped = taskAttributeToMantisAttributes.get(key);
     	if ( mapped != null)
-    		return mapped.getKey().toString();
+    		return mapped.getKey();
     	
-        return super.mapToRepositoryKey(parent, key).toString();
+        return super.mapToRepositoryKey(parent, key);
     }
 
     @Override
