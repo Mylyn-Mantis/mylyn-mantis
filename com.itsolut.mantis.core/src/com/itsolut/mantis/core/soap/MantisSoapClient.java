@@ -228,7 +228,7 @@ public class MantisSoapClient implements IMantisClient {
 
         updateRelationsIfApplicable(ticket, changes, monitor);
         
-        addCommentIfApplicable(ticket.getId(), issue, note, monitor);
+        addCommentIfApplicable(issue, note);
 
         soapClient.updateIssue(issue, monitor);
     }
@@ -250,7 +250,7 @@ public class MantisSoapClient implements IMantisClient {
         return ind;
     }
     
-    private void addCommentIfApplicable(int issueId, IssueData issue, MantisTicketComment note, IProgressMonitor monitor) throws MantisException {
+    private void addCommentIfApplicable(IssueData issue, MantisTicketComment note) throws MantisException {
 
         if ( !note.hasContent() )
             return;
