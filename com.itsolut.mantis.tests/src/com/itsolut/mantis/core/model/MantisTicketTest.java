@@ -12,8 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.core.model.MantisComment;
-import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
 
 public class MantisTicketTest {

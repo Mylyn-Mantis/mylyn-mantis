@@ -14,8 +14,6 @@ import java.net.MalformedURLException;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.ui.internal.MantisImages;
-
 /**
  * @author Robert Munteanu
  */

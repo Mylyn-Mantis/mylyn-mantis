@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.core.RepositoryVersion;
 import com.itsolut.mantis.core.exception.MantisException;
 
 public class RepositoryVersionTest {
