@@ -30,17 +30,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.internal.provisional.commons.soap.AbstractSoapClient;
 import org.xml.sax.SAXException;
 
-import biz.futureware.mantis.rpc.soap.client.AccountData;
-import biz.futureware.mantis.rpc.soap.client.CustomFieldDefinitionData;
-import biz.futureware.mantis.rpc.soap.client.FilterData;
-import biz.futureware.mantis.rpc.soap.client.IssueData;
-import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
-import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
-import biz.futureware.mantis.rpc.soap.client.MantisConnectPortType;
-import biz.futureware.mantis.rpc.soap.client.ObjectRef;
-import biz.futureware.mantis.rpc.soap.client.ProjectData;
-import biz.futureware.mantis.rpc.soap.client.ProjectVersionData;
-import biz.futureware.mantis.rpc.soap.client.RelationshipData;
+import biz.futureware.mantis.rpc.soap.client.*;
 
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -218,7 +208,7 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
 
             if (axisFault.getCause() instanceof SAXException)
                 message.append("The repository has returned an invalid XML response : "
-                        + String.valueOf(axisFault.getCause().getMessage()));
+                        + axisFault.getCause().getMessage());
             else if (e.getMessage() != null)
                 message.append(e.getMessage());
             

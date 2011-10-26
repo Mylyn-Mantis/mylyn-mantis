@@ -13,8 +13,6 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.core.util.HtmlFormatter;
-
 /**
  * @author Robert Munteanu
  */

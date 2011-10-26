@@ -12,8 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.core.MantisPriorityLevel;
-
 /**
  * @author David Carver
  * @author Robert Munteanu

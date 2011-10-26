@@ -20,12 +20,7 @@ package com.itsolut.mantis.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -137,7 +132,7 @@ public class MantisUtils {
 
             while (t.hasMoreTokens()) {
                 String token = t.nextToken();
-                int i = token.indexOf("=");
+                int i = token.indexOf('=');
                 if (i != -1)
                     try {
                         String key = URLDecoder.decode(token.substring(0, i), IMantisClient.CHARSET);

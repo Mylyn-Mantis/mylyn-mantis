@@ -100,7 +100,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             IMantisClient client = clientManager.getRepository(repository);
             
             // project name
-            TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey().toString());
+            TaskAttribute projectAttribute = getAttribute(data, MantisAttributeMapper.Attribute.PROJECT.getKey());
             projectAttribute.setValue(initializationData.getProduct());
             
 			createDefaultAttributes(data, client, initializationData.getProduct(), monitor, false);
@@ -128,7 +128,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             TaskRelationshipChangeFinder changeFinder = new TaskRelationshipChangeFinder(this);
             List<TaskRelationshipChange> changes = changeFinder.findChanges(taskData, oldAttributes);
             
-            MantisTicket ticket = getMantisTicket(repository, taskData);
+            MantisTicket ticket = getMantisTicket(taskData);
             
             if (taskData.isNew()) {
                 int id = client.createTicket(ticket, monitor, changes);
@@ -198,7 +198,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         type.performPostOperation(taskData, attributeOperation, client, monitor);
     }
 
-    private MantisTicket getMantisTicket(TaskRepository repository, TaskData data) throws MantisException {
+    private MantisTicket getMantisTicket(TaskData data) throws MantisException {
         MantisTicket ticket;
         if (data.getTaskId() == null || data.getTaskId().length() == 0)
             ticket = new MantisTicket();
@@ -252,8 +252,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
 
     private void updateTaskData(TaskRepository repository,
-            TaskAttributeMapper attributeMapper, TaskData data,
-            IMantisClient client, MantisTicket ticket, IProgressMonitor monitor) throws CoreException, MantisException {
+            TaskData data, IMantisClient client,
+            MantisTicket ticket, IProgressMonitor monitor) throws CoreException, MantisException {
 
         if (ticket.getCreated() != null)
             data.getRoot().getAttribute(
@@ -269,11 +269,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         addAttachments(repository, data, ticket, client, monitor);
         addRelationships(data, ticket);
         addMonitors(data, ticket, client, repository, monitor);
-        addOperation(data, ticket, MantisOperation.LEAVE, client, monitor);
+        addOperation(data, MantisOperation.LEAVE, client, monitor);
         if ( client.isTimeTrackingEnabled(monitor))
-            addOperation(data, ticket, MantisOperation.TRACK_TIME, client, monitor);
-        addOperation(data, ticket, MantisOperation.RESOLVE_AS, client, monitor);
-        addOperation(data, ticket, MantisOperation.ASSIGN_TO, client, monitor);
+            addOperation(data, MantisOperation.TRACK_TIME, client, monitor);
+        addOperation(data, MantisOperation.RESOLVE_AS, client, monitor);
+        addOperation(data, MantisOperation.ASSIGN_TO, client, monitor);
 
         if (lastChanged != null)
             data.getRoot().getAttribute(
@@ -319,7 +319,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
 	}
 
-    private void addOperation(TaskData data, MantisTicket ticket, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
+    private void addOperation(TaskData data, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
 
         TaskAttribute operationAttribute = data.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
 
@@ -535,7 +535,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             }
             
             if ( client.getCache(monitor).getRepositoryVersion().isHasProperTaskRelations())
-                createTaskRelations(data, client);
+                createTaskRelations(data);
 
             createAttribute(data, MantisAttributeMapper.Attribute.DESCRIPTION);
             createAttribute(data,
@@ -564,7 +564,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     }
 
-    private void createTaskRelations(TaskData data, IMantisClient client) {
+    private void createTaskRelations(TaskData data) {
 
         createAttribute(data, MantisAttributeMapper.Attribute.PARENT_OF, null);
         createAttribute(data, MantisAttributeMapper.Attribute.CHILD_OF, null);
@@ -709,8 +709,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         try {
         	String projectName = ticket.getValue(Key.PROJECT);
             createDefaultAttributes(taskData, client, projectName, monitor, true);
-            updateTaskData(repository, getAttributeMapper(repository),
-                    taskData, client, ticket, monitor);
+            updateTaskData(repository, taskData,
+                    client, ticket, monitor);
             createProjectSpecificAttributes(taskData, client, monitor);
             createCustomFieldAttributes(taskData, client, new MantisTicketCustomFieldValueSource(ticket), monitor);
 

@@ -52,7 +52,7 @@ public class MantisRepositorySettingsPage extends AbstractRepositorySettingsPage
 
     private final MantisClientFactory clientFactory;
 
-    public MantisRepositorySettingsPage(String title, String description, TaskRepository taskRepository, StatusFactory statusFactory, MantisClientFactory clientFactory) {
+    public MantisRepositorySettingsPage(TaskRepository taskRepository, StatusFactory statusFactory, MantisClientFactory clientFactory) {
 
         super(TITLE, DESCRIPTION, taskRepository);
         this.statusFactory = statusFactory;

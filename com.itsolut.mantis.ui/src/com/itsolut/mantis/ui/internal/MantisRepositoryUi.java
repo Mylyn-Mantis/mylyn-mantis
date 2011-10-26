@@ -108,7 +108,7 @@ public class MantisRepositoryUi extends AbstractRepositoryConnectorUi {
     @Override
     public ITaskRepositoryPage getSettingsPage(TaskRepository taskRepository) {
 
-        return new MantisRepositorySettingsPage("Mantis", "Mantis", taskRepository, statusFactory, clientFactory);
+        return new MantisRepositorySettingsPage(taskRepository, statusFactory, clientFactory);
     }
     
     @Override

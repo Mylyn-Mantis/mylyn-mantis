@@ -254,7 +254,7 @@ public class MantisConverter {
             issue.setHandler(convertToAccountData(Integer.valueOf(ticket.getValue(Key.ASSIGNED_TO))));
         issue.setLast_updated(MantisUtils.transform(new Date()));
 
-        setIssueMonitors(ticket, project, issue, cache, username);
+        setIssueMonitors(ticket, issue, cache, username);
         setCustomFields(ticket, project, issue, cache);
 
         return issue;
@@ -293,7 +293,7 @@ public class MantisConverter {
         return accountData;
     }
 
-    private static void setIssueMonitors(MantisTicket ticket, ObjectRef project, IssueData issue, MantisCache cache, String username) throws MantisException {
+    private static void setIssueMonitors(MantisTicket ticket, IssueData issue, MantisCache cache, String username) throws MantisException {
 
         boolean addSelf = Boolean.valueOf(ticket.getValue(Key.ADD_SELF_TO_MONITORS));
         List<String> monitorList = MantisUtils.fromCsvString(ticket.getValue(Key.MONITORS));

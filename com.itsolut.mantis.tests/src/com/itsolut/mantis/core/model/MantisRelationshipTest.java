@@ -15,8 +15,6 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import com.itsolut.mantis.core.model.MantisRelationship;
-
 public class MantisRelationshipTest {
 	
 	@Test

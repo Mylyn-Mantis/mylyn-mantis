@@ -39,14 +39,12 @@ public class MantisUIPlugin extends AbstractUIPlugin {
     
     private IRepositoryListener repositoryListener;
 
-	public MantisUIPlugin() {
-		plugin = this;
-	}
-
 	@Override
 	public void start(BundleContext context) throws Exception {
 	    
 		super.start(context);
+		
+		plugin = this;
 	}
 
 	@Override
