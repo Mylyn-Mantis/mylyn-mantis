@@ -30,7 +30,7 @@ import com.itsolut.mantis.core.util.MantisUtils;
  * 
  */
 public class MantisConverter {
-
+    
     public static MantisCustomField convert(CustomFieldDefinitionData customFieldData) {
 
         MantisCustomField customField = new MantisCustomField();
@@ -48,7 +48,7 @@ public class MantisConverter {
 
         MantisVersion version = new MantisVersion(versionData.getName());
         version.setDescription(versionData.getDescription());
-        version.setTime(versionData.getDate_order().getTime());
+        version.setTime(MantisUtils.transform(versionData.getDate_order()));
         version.setReleased(versionData.getReleased());
 
         return version;
@@ -58,7 +58,7 @@ public class MantisConverter {
 
         MantisTicket ticket = new MantisTicket(issue.getId().intValue());
         ticket.setCreated(issue.getDate_submitted().getTime());
-        ticket.setLastChanged(issue.getLast_updated().getTime());
+        ticket.setLastChanged(MantisUtils.transform(issue.getLast_updated()));
 
         ticket.putBuiltinValue(Key.PROJECT, issue.getProject().getName());
 
@@ -78,10 +78,10 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.FIXED_IN, issue.getFixed_in_version());
         ticket.putBuiltinValue(Key.TARGET_VERSION, issue.getTarget_version());
         if (mantisClient.isDueDateEnabled(monitor) && issue.getDue_date() != null)
-            ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(issue.getDue_date().getTimeInMillis()));
+            ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(MantisUtils.transform(issue.getDue_date()).getTime()));
 
         if (issue.getStatus().getId().intValue() >= mantisClient.getCache(monitor).getResolvedStatus())
-            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(issue.getLast_updated().getTimeInMillis()));
+            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(MantisUtils.transform(issue.getLast_updated())));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
@@ -187,12 +187,12 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.STATUS, String.valueOf(cache.getStatus(ihd.getStatus().intValue()).getValue()));
 
         if (ihd.getStatus().intValue() >= cache.getResolvedStatus())
-            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(ihd.getLast_updated().getTimeInMillis()));
+            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(MantisUtils.transform(ihd.getLast_updated()).getTime()));
 
         // DC: Added so that it isn't necessary to retrieve all tasks one at time
         // to see if they have changed since the last synchronization.
         // This cuts down on the number of soap requests that need to be made to the server.
-        ticket.setLastChanged(ihd.getLast_updated().getTime());
+        ticket.setLastChanged(MantisUtils.transform(ihd.getLast_updated()));
 
         MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}.", ticket), new RuntimeException());
 

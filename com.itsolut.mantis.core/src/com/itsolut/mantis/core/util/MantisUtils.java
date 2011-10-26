@@ -47,9 +47,24 @@ public class MantisUtils {
         return date.getTime();
     }
 
+    /**
+     * Transforms an <b>Axis-supplied</b> calendar into a data.
+     * 
+     * <p>Performs TimeZone conversion to take into account that Axis assumes all dates are in GMT.</p>
+     * 
+     * @param cal
+     * @return the date value
+     */
     public static Date transform(Calendar cal) {
-
-        return cal.getTime();
+        
+        Date time = cal.getTime();
+        
+        long offset = TimeZone.getDefault().getOffset(time.getTime());
+        
+        if ( offset == 0 )
+            return time;
+        
+        return new Date(time.getTime() - offset);
     }
 
     public static Calendar transform(Date date) {
@@ -58,7 +73,7 @@ public class MantisUtils {
         cal.setTime(date);
         return cal;
     }
-
+    
     public static boolean isEmpty(String value) {
 
         return (value == null || value.length() == 0);

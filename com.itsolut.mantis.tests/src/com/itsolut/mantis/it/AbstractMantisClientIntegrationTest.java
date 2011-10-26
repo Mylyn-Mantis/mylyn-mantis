@@ -16,7 +16,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.rpc.ServiceException;
 
@@ -54,12 +56,16 @@ public abstract class AbstractMantisClientIntegrationTest extends AbstractIntegr
 		String summary = "Summary";
 		String description = "Description";
 		
+		long localCreationTime = new Date().getTime();
 		int taskId = createTask(summary, description);
 
 		MantisTicket ticket = repositoryAccessor.getClient().getTicket(taskId, new NullProgressMonitor());
-
 		assertEquals(summary, ticket.getValue(Key.SUMMARY));
 		assertEquals(description, ticket.getValue(Key.DESCRIPTION));
+
+		// we should get back approximatively the same date as the one we created
+		// allow up to 5 minutes for network delays and - more importantly - clock differences
+		assertEquals(ticket.getCreated().getTime(), localCreationTime, TimeUnit.SECONDS.toMillis( 5 * 60));
 	}
 	
 	@Test(expected = TicketNotFoundException.class)
