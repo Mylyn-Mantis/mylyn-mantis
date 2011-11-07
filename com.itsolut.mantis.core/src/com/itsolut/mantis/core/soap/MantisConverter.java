@@ -81,7 +81,7 @@ public class MantisConverter {
             ticket.putBuiltinValue(Key.DUE_DATE, String.valueOf(MantisUtils.transform(issue.getDue_date()).getTime()));
 
         if (issue.getStatus().getId().intValue() >= mantisClient.getCache(monitor).getResolvedStatus())
-            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(MantisUtils.transform(issue.getLast_updated())));
+            ticket.putBuiltinValue(Key.COMPLETION_DATE, String.valueOf(MantisUtils.transform(issue.getLast_updated()).getTime()));
 
         ticket.putBuiltinValue(Key.ADDITIONAL_INFO, issue.getAdditional_information());
         ticket.putBuiltinValue(Key.STEPS_TO_REPRODUCE, issue.getSteps_to_reproduce());
