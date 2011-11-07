@@ -106,7 +106,7 @@ public class MantisConverter {
 
         if (issue.getCustom_fields() != null)
             for (CustomFieldValueForIssueData customFieldValue : issue.getCustom_fields())
-                ticket.putCustomFieldValue(customFieldValue.getField().getName(), customFieldValue.getValue());
+                putCustomFieldValue(ticket, customFieldValue, mantisClient.getCache(monitor).getCustomFieldByProjectIdAndFieldName(issue.getProject().getId().intValue(), customFieldValue.getField().getName()));
 
         if (issue.getMonitors() != null) {
             List<MantisUser> monitors = new ArrayList<MantisUser>();
@@ -120,6 +120,18 @@ public class MantisConverter {
 
         return ticket;
 
+    }
+
+    private static void putCustomFieldValue(MantisTicket ticket, CustomFieldValueForIssueData customFieldValue, MantisCustomField customField) {
+        
+        String value;
+        if ( customField.getType() == MantisCustomFieldType.DATE ) {
+            value = MantisUtils.convertFromCustomFieldDate(customFieldValue.getValue());
+        } else {
+            value = customFieldValue.getValue();
+        }
+        
+        ticket.putCustomFieldValue(customFieldValue.getField().getName(), value);
     }
 
     public static MantisUser convert(AccountData accountData) {
@@ -325,10 +337,13 @@ public class MantisConverter {
         String customFieldName = entry.getKey();
         MantisCustomField customField = cache.getCustomFieldByProjectIdAndFieldName(project.getId().intValue(),
                 customFieldName);
+        
         ObjectRef customFieldRef = new ObjectRef(BigInteger.valueOf(customField.getId()), customField.getName());
-        CustomFieldValueForIssueData customFieldValueForIssueData = new CustomFieldValueForIssueData(customFieldRef,
-                entry.getValue());
-        return customFieldValueForIssueData;
+        String value = entry.getValue();
+        if ( customField.getType() == MantisCustomFieldType.DATE ) 
+            value = MantisUtils.convertToCustomFieldDate(value);
+            
+        return new CustomFieldValueForIssueData(customFieldRef, value);
     }
 
     public static RelationshipData convert(MantisRelationship relationship) {

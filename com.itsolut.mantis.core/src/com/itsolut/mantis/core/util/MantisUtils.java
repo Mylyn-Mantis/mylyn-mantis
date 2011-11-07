@@ -74,6 +74,24 @@ public class MantisUtils {
         return cal;
     }
     
+    public static String convertFromCustomFieldDate(String customFieldValue) {
+        
+        if ( customFieldValue.length() == 0 )
+            return customFieldValue;
+        
+        return customFieldValue + "000";
+    }
+    
+    public static String convertToCustomFieldDate(String valueInMilliseconds) {
+        
+        if ( valueInMilliseconds.length() == 0 )
+            return valueInMilliseconds;
+        
+        long dateValue = Long.valueOf(valueInMilliseconds) / 1000;
+
+        return String.valueOf(dateValue);
+    }
+    
     public static boolean isEmpty(String value) {
 
         return (value == null || value.length() == 0);
