@@ -48,7 +48,7 @@ public class MantisUtils {
     }
 
     /**
-     * Transforms an <b>Axis-supplied</b> calendar into a data.
+     * Transforms an <b>Axis-supplied</b> calendar into a date.
      * 
      * <p>Performs TimeZone conversion to take into account that Axis assumes all dates are in GMT.</p>
      * 
