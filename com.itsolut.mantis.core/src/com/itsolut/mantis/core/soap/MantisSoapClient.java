@@ -19,7 +19,6 @@ import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.PROJECTION
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.axis.encoding.Base64;
@@ -41,7 +40,6 @@ import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
  * The {@link MantisSoapClient} is a SOAP-based implementation of the {@link IMantisClient}
@@ -242,8 +240,6 @@ public class MantisSoapClient implements IMantisClient {
 
         IssueNoteData ind = new IssueNoteData();
         
-        ind.setDate_submitted(MantisUtils.transform(new Date()));
-        ind.setLast_modified(MantisUtils.transform(new Date()));
         ind.setReporter(MantisConverter.convert(getUserName(), cache));
         ind.setTime_tracking(BigInteger.valueOf(note.getTimeTracking()));
         ind.setText(note.getComment());
