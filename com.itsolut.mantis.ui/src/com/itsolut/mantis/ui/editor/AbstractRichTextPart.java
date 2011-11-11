@@ -3,7 +3,9 @@ package com.itsolut.mantis.ui.editor;
 import org.eclipse.mylyn.internal.tasks.ui.editors.TaskEditorRichTextPart;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import com.itsolut.mantis.core.MantisAttributeMapper;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -40,6 +42,16 @@ public class AbstractRichTextPart extends TaskEditorRichTextPart {
         if ( MantisUtils.hasValue (attribute) )
             expand();
 
+    }
+    
+    @Override
+    public void createControl(Composite parent, FormToolkit toolkit) {
+    
+        super.createControl(parent, toolkit);
+        
+        getEditor().enableAutoTogglePreview();
+        if (!getTaskData().isNew())
+            getEditor().showPreview();
     }
 
     private void collapse() {
