@@ -18,6 +18,9 @@ import org.junit.Test;
  * @author Robert Munteanu
  */
 public class MantisUtilsTest {
+	
+	public static final long TEST_TIMESTAMP_MILLIS = 1320616800000l;
+	public static final long TEST_TIMESTAMP_SECONDS = TEST_TIMESTAMP_MILLIS / 1000l;
 
 	@Test
 	public void convertFromEmptyCustomFieldValue() {
@@ -28,7 +31,7 @@ public class MantisUtilsTest {
 	@Test
 	public void convertFromCustomFieldValue() {
 		
-		assertThat(MantisUtils.convertFromCustomFieldDate("1320616800"), is("1320616800000"));
+		assertThat(MantisUtils.convertFromCustomFieldDate(String.valueOf(TEST_TIMESTAMP_SECONDS)), is(String.valueOf(TEST_TIMESTAMP_MILLIS)));
 	}
 
 	@Test
@@ -40,6 +43,6 @@ public class MantisUtilsTest {
 	@Test
 	public void convertToCustomFieldValue() {
 		
-		assertThat(MantisUtils.convertToCustomFieldDate("1320616800000"), is("1320616800"));
+		assertThat(MantisUtils.convertToCustomFieldDate(String.valueOf(TEST_TIMESTAMP_MILLIS)), is(String.valueOf(TEST_TIMESTAMP_SECONDS)));
 	}
 }
