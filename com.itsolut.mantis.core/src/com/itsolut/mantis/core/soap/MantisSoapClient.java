@@ -29,7 +29,6 @@ import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
-import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.AccountData;
 import biz.futureware.mantis.rpc.soap.client.IssueData;
@@ -478,8 +477,8 @@ public class MantisSoapClient implements IMantisClient {
                 cache.getCacheData().setLastUpdate( System.currentTimeMillis() );
             } finally {
                 subMonitor.done();
-                MantisCorePlugin.debug(NLS.bind("Repository sync for {0} complete in {1} seconds.", repositoryUrl,
-                        format(start)), null);
+                MantisCorePlugin.getDefault().trace(TraceLocation.CONFIG, "Repository sync for {0} complete in {1} seconds.", repositoryUrl,
+                        format(start));
             }
         }
     }

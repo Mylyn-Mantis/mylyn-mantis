@@ -39,7 +39,6 @@ import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -228,7 +227,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since,
             IProgressMonitor monitor) throws CoreException {
 
-        MantisCorePlugin.debug(NLS.bind("Looking for tasks changed in query {0} since {1} .", query.getSummary(), since), null);
+        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Looking for tasks changed in query {0} since {1} .", query.getSummary(), since);
         
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
@@ -245,7 +244,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
            throw new CoreException(statusFactory.toStatus("Failed getting changed tasks.", e, repository));
         }
         
-        MantisCorePlugin.debug(NLS.bind("Found {0} changed tickets.", changedTickets.size()), null);
+        
+        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Found {0} changed tickets.", changedTickets.size());
         
         return changedTickets;
     }
@@ -304,8 +304,8 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         boolean lastChangeIsDifferent = !MantisUtils.equal(lastKnownUpdated, modified);
         
         boolean hasChanged = lastChangeIsDifferent || !taskVersionIsCurrent;
-
-        MantisCorePlugin.debug(NLS.bind("Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged), new RuntimeException());
+        
+        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged);
         
         return hasChanged;
     }
@@ -403,7 +403,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                         event.setNeedsPerformQueries(true);
                         event.markStale(task);
                         
-                        MantisCorePlugin.debug(NLS.bind("Marking task {0} as stale.", task), null);
+                        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Marking task {0} as stale.", task);
                     }
                 }
             }
@@ -439,7 +439,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             if (event.isFullSynchronization()) {
                 Date date = getSynchronizationTimestamp(event);
                 
-                MantisCorePlugin.debug(NLS.bind("Synchronisation timestamp from event for {0} is {1} .", event.getTaskRepository(), date), null);
+                MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Synchronisation timestamp from event for {0} is {1} .", event.getTaskRepository(), date);
                 
                 if (date != null) {
                     event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");

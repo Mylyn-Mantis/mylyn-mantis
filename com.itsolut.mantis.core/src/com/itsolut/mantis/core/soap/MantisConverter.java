@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osgi.util.NLS;
 
 import biz.futureware.mantis.rpc.soap.client.*;
 
@@ -116,7 +115,7 @@ public class MantisConverter {
             ticket.setMonitors(monitors);
         }
 
-        MantisCorePlugin.debug(NLS.bind("Converted IssueData to {0}.", ticket), null);
+        MantisCorePlugin.getDefault().trace(TraceLocation.CONVERTER, "Converted IssueData to {0}.", ticket);
 
         return ticket;
 
@@ -206,7 +205,7 @@ public class MantisConverter {
         // This cuts down on the number of soap requests that need to be made to the server.
         ticket.setLastChanged(MantisUtils.transform(ihd.getLast_updated()));
 
-        MantisCorePlugin.debug(NLS.bind("Converted IssueHeaderData to {0}.", ticket), new RuntimeException());
+        MantisCorePlugin.getDefault().trace(TraceLocation.CONVERTER, "Converted IssueHeaderData to {0}.", ticket);
 
         return ticket;
     }

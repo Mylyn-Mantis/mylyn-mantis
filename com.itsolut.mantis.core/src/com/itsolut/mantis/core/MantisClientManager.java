@@ -31,7 +31,6 @@ import org.eclipse.mylyn.internal.tasks.core.*;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.osgi.util.NLS;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -113,7 +112,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
         
-        MantisCorePlugin.debug(NLS.bind("repositoryChanged : {0} , {1} = {2} .",  new Object[] {repository.getUrl(), delta.getType(), delta.getKey()}), null);
+        MantisCorePlugin.getDefault().trace(TraceLocation.CLIENT_MANAGER, "repositoryChanged : {0} , {1} = {2} .",  repository.getUrl(), delta.getType(), delta.getKey());
 
         boolean credentialsChanged = delta.getType() == Type.CREDENTIALS;
         boolean urlChanged = delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_URL);
@@ -121,7 +120,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if ( !credentialsChanged && !urlChanged )
             return;
         
-        MantisCorePlugin.debug(NLS.bind("Clearing repository state; credentialsChanged: {0}, urlChanged: {1}", credentialsChanged, urlChanged), null);
+        MantisCorePlugin.getDefault().trace(TraceLocation.CLIENT_MANAGER, "Clearing repository state; credentialsChanged: {0}, urlChanged: {1}", credentialsChanged, urlChanged);;
         
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());

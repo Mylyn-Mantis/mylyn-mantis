@@ -1,0 +1,5 @@
+com.itsolut.mantis.core/debug=false
+com.itsolut.mantis.core/debug/clientmanager=false
+com.itsolut.mantis.core/debug/config=false
+com.itsolut.mantis.core/debug/converter=false
+com.itsolut.mantis.core/debug/sync=false
