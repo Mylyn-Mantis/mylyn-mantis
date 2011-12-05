@@ -17,7 +17,10 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import biz.futureware.mantis.rpc.soap.client.TagData;
+
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
@@ -624,5 +627,19 @@ public class MantisCache {
                 return user.getName();
                 
         return null;
+    }
+    
+    public void cacheTags(List<MantisTag> tags) {
+        
+        Map<Integer, MantisTag> tagsById = Maps.newHashMapWithExpectedSize(tags.size());
+        for ( MantisTag tag : tags )
+            tagsById.put(tag.getValue(), tag);
+        
+        cacheData.setTagsById(tagsById);
+    }
+    
+    public List<MantisTag> getTags() {
+        
+        return Lists.newArrayList(cacheData.getTagsById().values());
     }
 }

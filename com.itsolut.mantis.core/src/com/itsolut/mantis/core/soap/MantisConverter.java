@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import biz.futureware.mantis.rpc.soap.client.*;
 
@@ -113,6 +114,14 @@ public class MantisConverter {
                 monitors.add(convert(issueMonitor));
 
             ticket.setMonitors(monitors);
+        }
+        
+        if ( issue.getTags() != null ) {
+            List<MantisTag> tagIds = Lists.newArrayListWithExpectedSize(issue.getTags().length);
+            for ( ObjectRef tag : issue.getTags() )
+                tagIds.add(new MantisTag(tag.getName(), tag.getId().intValue()));
+            
+            ticket.setTags(tagIds);
         }
 
         MantisCorePlugin.getDefault().trace(TraceLocation.CONVERTER, "Converted IssueData to {0}.", ticket);
@@ -267,7 +276,8 @@ public class MantisConverter {
 
         setIssueMonitors(ticket, issue, cache, username);
         setCustomFields(ticket, project, issue, cache);
-
+        setTags(ticket, issue);
+        
         return issue;
     }
 
@@ -329,6 +339,18 @@ public class MantisConverter {
             customFieldValues.add(extractCustomFieldValue(project, entry, cache));
 
         issue.setCustom_fields(customFieldValues.toArray(new CustomFieldValueForIssueData[0]));
+    }
+    
+    private static void setTags(MantisTicket ticket, IssueData issue) {
+        
+        if ( ticket.getTags() == null )
+            return;
+        
+        List<ObjectRef> tagRefs = Lists.newArrayList();
+        for ( MantisTag tag : ticket.getTags() )
+            tagRefs.add(new ObjectRef(BigInteger.valueOf(tag.getValue()), tag.getName()));
+        
+        issue.setTags(tagRefs.toArray(new ObjectRef[tagRefs.size()]));
     }
 
     private static CustomFieldValueForIssueData extractCustomFieldValue(ObjectRef project, Map.Entry<String, String> entry, MantisCache cache) throws MantisException {
@@ -454,6 +476,19 @@ public class MantisConverter {
             users.add(convert(projectCustomField));
 
         return users;
+    }
+
+    /**
+     * @param allTags
+     * @return
+     */
+    public static List<MantisTag> convert(List<TagData> allTags) {
+
+        List<MantisTag> mantisTags = Lists.newArrayListWithExpectedSize(allTags.size());
+        for ( TagData tagData : allTags )
+            mantisTags.add(new MantisTag(tagData.getName(), tagData.getId().intValue()));
+        
+        return mantisTags;
     }
 
 }

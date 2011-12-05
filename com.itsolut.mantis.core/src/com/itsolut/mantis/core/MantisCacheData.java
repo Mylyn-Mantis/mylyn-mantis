@@ -17,6 +17,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
+import biz.futureware.mantis.rpc.soap.client.TagData;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -30,7 +32,7 @@ import com.itsolut.mantis.core.model.*;
 public class MantisCacheData implements Serializable {
 
     // increment when structure changes
-    private static final long serialVersionUID = 8L;
+    private static final long serialVersionUID = 9L;
     
     private long lastUpdate = 0;
 
@@ -85,6 +87,8 @@ public class MantisCacheData implements Serializable {
     private Map<MantisTicket.Key, Integer> defaultValuesForAttributes = new EnumMap<MantisTicket.Key, Integer>(MantisTicket.Key.class);
 
     private Map<MantisTicket.Key, String> defaultStringValuesForAttributes = new EnumMap<MantisTicket.Key, String>(MantisTicket.Key.class);
+    
+    private Map<Integer, MantisTag> tagsById;  
 
 	private int bugResolutionFixedThreshold;
 	
@@ -222,6 +226,21 @@ public class MantisCacheData implements Serializable {
             customFieldsByProjectId = ArrayListMultimapHolder.create();
         
         return customFieldsByProjectId.get();
+    }
+    
+    
+    public Map<Integer, MantisTag> getTagsById() {
+
+        return Collections.unmodifiableMap(tagsById);
+    }
+    
+    public void setTagsById(Map<Integer, MantisTag> tagsById ) {
+        
+        if ( this.tagsById == null )
+            this.tagsById = Maps.newHashMapWithExpectedSize(tagsById.size());
+        
+        this.tagsById.clear();
+        this.tagsById.putAll(tagsById);
     }
 
     /**

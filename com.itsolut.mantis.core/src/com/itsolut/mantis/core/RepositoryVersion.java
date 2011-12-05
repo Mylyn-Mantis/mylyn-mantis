@@ -58,15 +58,22 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, does not require
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_2_OR_HIGHER("1.2.2 or higher in the 1.2.x stream", EnumSet.allOf(RepositoryCapability.class)),
+    VERSION_1_2_2_OR_HIGHER("1.2.2 to 1.2.8 ", allExcept(RepositoryCapability.TAGS)),
+    
+    /**
+     * Versions 1.2.9 or newer.
+     * 
+     * <p>Supports target_version, task relations, does not require
+     * Base64-encoding of attachments, has due date support, supports tags.</p>
+     */
+    VERSION_1_2_9_OR_HIGHER("1.2.9 or higher in the 1.2.x stream", EnumSet.allOf(RepositoryCapability.class)),
     
     /**
      * Versions 1.3 or newer.
      * 
      * <p>Since this is a dev version, things might break.</p>
      * 
-     * <p>Supports target_version, task relations, requires
-     * Base64-encoding of attachments and has due date support.</p>
+     * <p>Assumed to have all capabilities</p>
      */
     VERSION_1_3_DEV("1.3.x development version", EnumSet.allOf(RepositoryCapability.class));
     
@@ -88,8 +95,10 @@ public enum RepositoryVersion {
         		int minorVersion = extractMantisMinorVersion(versionString);
         		if ( minorVersion < 2)
         			return VERSION_1_2_OR_HIGHER;
+        		else if ( minorVersion < 9)
+        		    return VERSION_1_2_2_OR_HIGHER;
         		else
-        			return VERSION_1_2_2_OR_HIGHER;
+        			return VERSION_1_2_9_OR_HIGHER;
         	}
         	
         	return VERSION_1_2_A3_OR_LOWER;
@@ -100,6 +109,15 @@ public enum RepositoryVersion {
             
         
         throw new MantisException("Unknown version " + versionString + " .");
+    }
+    
+    private static EnumSet<RepositoryCapability> allExcept(RepositoryCapability... missingCapabilities) {
+        
+        EnumSet<RepositoryCapability> capabilities = EnumSet.allOf(RepositoryCapability.class);
+        for ( RepositoryCapability missingCapability : missingCapabilities )
+            capabilities.remove(missingCapability);
+        
+        return capabilities;
     }
 
 	private static int extractMantisMinorVersion(String versionString) {
@@ -164,6 +182,11 @@ public enum RepositoryVersion {
     public boolean isHasTimeTrackingSupport() {
 
         return capabilities.contains(RepositoryCapability.TIME_TRACKING);
+    }
+    
+    public boolean isHasTagSupport() {
+        
+        return capabilities.contains(RepositoryCapability.TAGS);
     }
     
     public Set<RepositoryCapability> getMissingCapabilities() {

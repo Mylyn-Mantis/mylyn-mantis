@@ -23,6 +23,7 @@ package com.itsolut.mantis.core.model;
 
 import java.util.*;
 
+import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**
@@ -63,6 +64,7 @@ public class MantisTicket {
         VIEW_STATE("view_state"),
         FIXED_IN("fixed_in"),
         TARGET_VERSION("target_version"),
+        TAGS("tags"),
         DUE_DATE("due_date"),
         NEW_COMMENT("new_comment"),
         ATTACHID("attachid"),
@@ -120,7 +122,9 @@ public class MantisTicket {
     
     private List<MantisUser> monitors;
     
-    private Map<String, String> customFieldValues = new HashMap<String, String>(); 
+    private Map<String, String> customFieldValues = new HashMap<String, String>();
+
+    private List<MantisTag> tags; 
 
     public MantisTicket() {
 
@@ -291,6 +295,25 @@ public class MantisTicket {
         
         return monitors != null ? monitors.toArray(new MantisUser[monitors.size()]) : null; 
     }
+    
+    public void setTags(List<MantisTag> tagIds) {
+    
+        this.tags = Lists.newArrayList(tagIds);
+    }
+    
+    /**
+     * Returns the list of tags
+     * 
+     *  <p>If the list is <code>null</code>, the repository does not support getting and setting
+     *  tags. If the repository supports tags but the issue has none, the list
+     *  will be empty.</p> 
+     * @return the list of attached tags, possibly <code>null</code> 
+     */
+    public List<MantisTag> getTags() {
+
+        return tags;
+    }
+    
     
     @Override
     public String toString() {

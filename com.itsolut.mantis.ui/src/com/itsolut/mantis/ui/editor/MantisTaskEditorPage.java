@@ -3,11 +3,16 @@ package com.itsolut.mantis.ui.editor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.eclipse.mylyn.internal.tasks.ui.editors.CheckboxMultiSelectAttributeEditor;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
+import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 
+import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.MantisCorePlugin;
 
 public class MantisTaskEditorPage extends AbstractTaskEditorPage {
@@ -68,5 +73,21 @@ public class MantisTaskEditorPage extends AbstractTaskEditorPage {
 		    throw new IllegalArgumentException("Did not find a part with id " + insertAfterId + " to insert the newDescriptor after");
 		
 		return newDescriptors;
+	}
+	
+	@Override
+	protected AttributeEditorFactory createAttributeEditorFactory() {
+	
+	    return new AttributeEditorFactory(getModel(), getTaskRepository(), getEditorSite()) {
+	      
+	        @Override
+	        public AbstractAttributeEditor createEditor(String type, TaskAttribute taskAttribute) {
+	        
+	            if ( Attribute.TAGS.getKey().equals( taskAttribute.getId()) )
+	                return new CheckboxMultiSelectAttributeEditor(getModel(), taskAttribute);
+	            
+	            return super.createEditor(type, taskAttribute);
+	        }
+	    };
 	}
 }

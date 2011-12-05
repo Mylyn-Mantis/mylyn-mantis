@@ -14,6 +14,8 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 
@@ -27,11 +29,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.provisional.commons.soap.AbstractSoapClient;
 import org.xml.sax.SAXException;
 
 import biz.futureware.mantis.rpc.soap.client.*;
 
+import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.SourceForgeConstants;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
@@ -614,6 +618,52 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
                 return getSOAP().mc_project_get_versions(getUsername(), getPassword(), BigInteger.valueOf(projectId));
             }
         });
+    }
+    
+    public TagDataSearchResult getTags(final int pageNumber, final int perPage, IProgressMonitor monitor) throws MantisException {
+        
+        return call(monitor, new Callable<TagDataSearchResult>() {
+
+            public TagDataSearchResult call() throws Exception {
+
+                return getSOAP().mc_tag_get_all(getUsername(), getPassword(), BigInteger.valueOf(pageNumber), BigInteger.valueOf(perPage));
+            }}
+        );
+        
+    }
+    
+    /**
+     * Convenience method to retrieve all tags without needing to consider multiple pages
+     * 
+     * @param pageSize the number of tags to retrieve per individual call
+     * @param monitor the progress monitor, used only to check for cancellation
+     * @return all the tags
+     * @throws MantisException
+     */
+    public List<TagData> getAllTags(final int pageSize, IProgressMonitor monitor) throws MantisException {
+        
+        int page = 1;
+        
+        List<TagData> allTags = Lists.newArrayList();
+        
+        while ( true ) {
+            
+            TagDataSearchResult tagResult = getTags(page, pageSize, monitor);
+            
+            Policy.checkCanceled(monitor);
+            
+            if ( tagResult.getResults() == null || tagResult.getResults().length == 0 )
+                break;
+            
+            allTags.addAll(Arrays.asList(tagResult.getResults()));
+            
+            if ( allTags.size() >= tagResult.getTotal_results().intValue() )
+                break;
+            
+            page++;
+        }
+        
+        return allTags;
     }
 
 

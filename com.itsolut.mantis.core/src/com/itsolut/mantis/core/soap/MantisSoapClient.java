@@ -34,7 +34,10 @@ import biz.futureware.mantis.rpc.soap.client.AccountData;
 import biz.futureware.mantis.rpc.soap.client.IssueData;
 import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
 import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
+import biz.futureware.mantis.rpc.soap.client.TagData;
+import biz.futureware.mantis.rpc.soap.client.TagDataSearchResult;
 
+import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
@@ -332,7 +335,14 @@ public class MantisSoapClient implements IMantisClient {
 
                 int projectsToRefresh =  projectId == MantisProject.ALL_PROJECTS.getValue() ? cache.getCacheData().getProjects().size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 29);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 30);
+                
+                cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
+                Policy.advance(subMonitor, 1);
+                
+                if ( cache.getRepositoryVersion().isHasTagSupport() )
+                    cache.cacheTags(MantisConverter.convert(soapClient.getAllTags(50, subMonitor)));
+                Policy.advance(monitor, 1);
 
                 cache.cacheReporterThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD.getValue()), DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue()));
                 Policy.advance(subMonitor, 1);
@@ -412,9 +422,6 @@ public class MantisSoapClient implements IMantisClient {
                 }
 
                 cache.cacheResolvedStatus(soapClient.getStringConfiguration(monitor, RESOLVED_STATUS_THRESHOLD.getValue()));
-                Policy.advance(subMonitor, 1);
-                
-                cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
                 Policy.advance(subMonitor, 1);
                 
                 cache.cachePriorities(MantisConverter.convert( soapClient.getPriorities(monitor), MantisPriority.class));

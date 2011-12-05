@@ -19,6 +19,7 @@ import org.eclipse.mylyn.tasks.core.RepositoryResponse.ResponseKind;
 import org.eclipse.mylyn.tasks.core.data.*;
 import org.eclipse.osgi.util.NLS;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
@@ -225,6 +226,17 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 ticket.putValue(attribute.getId(), MantisUtils.toCsvString(originalMonitors));
                 continue;
             }
+            
+            if( attribute.getId().equals(Key.TAGS.getKey()) ) {
+            	
+            	List<String> tagIds = attribute.getValues();
+            	List<MantisTag> tags = Lists.newArrayList();
+            	
+            	for ( String tagId : tagIds )
+                    tags.add(new MantisTag(attribute.getOption(tagId), Integer.parseInt(tagId)));
+            	
+            	ticket.setTags(tags);
+            }
 
             if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly() || MantisOperation.isOperationRelated(attribute))
                 continue;
@@ -264,7 +276,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Date lastChanged = ticket.getLastChanged();
 
         copyValuesFromTicket(data, ticket);
-
+        addTags(data, ticket, client, monitor);
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket, client, monitor);
         addRelationships(data, ticket);
@@ -318,6 +330,23 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             }
         }
 	}
+	
+    private void addTags(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+
+        List<MantisTag> tags = ticket.getTags();
+        
+        if ( tags == null )
+            return;
+        
+        List<MantisTag> repositoryTags = client.getCache(monitor).getTags();
+        TaskAttribute attribute = createAttribute(data, Attribute.TAGS, repositoryTags.toArray(new MantisTag[repositoryTags.size()]));
+        
+        List<String> values = Lists.newArrayList();
+        for ( MantisTag tag : tags )
+        	values.add(String.valueOf(tag.getValue()));
+        
+        attribute.setValues(values);
+    }
 
     private void addOperation(TaskData data, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
 

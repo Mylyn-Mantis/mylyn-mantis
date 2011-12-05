@@ -129,7 +129,7 @@ public class TaskRelationshipChangeFinder {
         List<String> oldValues = oldAttribute.getValues();
         List<String> oldIds = fromCsvString(oldAttribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_RELATIONSHIP_IDS));
 
-        Assert.isTrue(oldValues.size() == oldIds.size(), NLS.bind("Inconsistency when reading old attribute values. oldValues: {0}, oldIds: {1}.", oldValues, oldIds));
+        Assert.isTrue(oldValues.size() == oldIds.size(), NLS.bind("Inconsistency when reading old attribute values for {0}. oldValues: {1}, oldIds: {2}.", new Object[] { oldAttribute.getId(), oldValues, oldIds }));
         
         Map<String,String> oldValuesById = new HashMap<String, String>();
         

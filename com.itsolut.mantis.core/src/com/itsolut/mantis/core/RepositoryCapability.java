@@ -20,7 +20,8 @@ public enum RepositoryCapability {
     TASK_RELATIONS("task relation are not displayed or editable"), 
     CORRECT_BASE64_ENCODING("attachments are incorrectly encoded and will be corrupted when downloaded from the web interface"), 
     DUE_DATE("the due_date field will not be available"), 
-    TIME_TRACKING("time tracking will not be supported");
+    TIME_TRACKING("time tracking will not be supported"),
+    TAGS("no support for tags");
     
     private String descriptionForMissingCapability;
 

@@ -109,6 +109,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         ATTACHID(Key.ATTACHID, "attachid", TaskAttribute.TYPE_SHORT_TEXT, false, false),
         ATTACHMENT(Key.ATTACHMENT, "attachment", TaskAttribute.TYPE_ATTACHMENT, false, false),
         DUE_DATE(Key.DUE_DATE, "Due date", TaskAttribute.TYPE_DATETIME, false, false),
+        TAGS(Key.TAGS, "Tags", TaskAttribute.TYPE_MULTI_SELECT, false, false),
         // task relations
         // read-only for existing tasks. see https://bugs.eclipse.org/bugs/show_bug.cgi?id=269407
         PARENT_OF(Key.PARENT_OF, "Parent of", TaskAttribute.TYPE_TASK_DEPENDENCY, false, ReadOnly.NEVER_READ_ONLY),
@@ -240,6 +241,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     	taskAttributeToMantisAttributes.put(TaskAttribute.SEVERITY, Attribute.SEVERITY);
     	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_DUE, Attribute.DUE_DATE);
     	taskAttributeToMantisAttributes.put(TaskAttribute.DATE_COMPLETION, Attribute.COMPLETION_DATE);
+    	taskAttributeToMantisAttributes.put(TaskAttribute.KEYWORDS, Attribute.TAGS);
     }
 
     @Override
