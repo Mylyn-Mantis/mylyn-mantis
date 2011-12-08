@@ -19,6 +19,7 @@ import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.PROJECTION
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.axis.encoding.Base64;
@@ -30,14 +31,8 @@ import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
 
-import biz.futureware.mantis.rpc.soap.client.AccountData;
-import biz.futureware.mantis.rpc.soap.client.IssueData;
-import biz.futureware.mantis.rpc.soap.client.IssueHeaderData;
-import biz.futureware.mantis.rpc.soap.client.IssueNoteData;
-import biz.futureware.mantis.rpc.soap.client.TagData;
-import biz.futureware.mantis.rpc.soap.client.TagDataSearchResult;
+import biz.futureware.mantis.rpc.soap.client.*;
 
-import com.google.common.collect.Lists;
 import com.itsolut.mantis.core.*;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
@@ -340,8 +335,9 @@ public class MantisSoapClient implements IMantisClient {
                 cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
                 Policy.advance(subMonitor, 1);
                 
-                if ( cache.getRepositoryVersion().isHasTagSupport() )
-                    cache.cacheTags(MantisConverter.convert(soapClient.getAllTags(50, subMonitor)));
+                List<TagData> tags  = cache.getRepositoryVersion().isHasTagSupport() ? 
+                        soapClient.getAllTags(50, subMonitor) : Collections. <TagData> emptyList();
+                cache.cacheTags(MantisConverter.convert(tags));
                 Policy.advance(monitor, 1);
 
                 cache.cacheReporterThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD.getValue()), DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue()));
