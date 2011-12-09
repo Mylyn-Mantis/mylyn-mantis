@@ -334,18 +334,14 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private void addTags(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
 
         List<MantisTag> tags = ticket.getTags();
-        
         if ( tags == null )
             return;
-        
-        List<MantisTag> repositoryTags = client.getCache(monitor).getTags();
-        TaskAttribute attribute = createAttribute(data, Attribute.TAGS, repositoryTags.toArray(new MantisTag[repositoryTags.size()]));
         
         List<String> values = Lists.newArrayList();
         for ( MantisTag tag : tags )
         	values.add(String.valueOf(tag.getValue()));
         
-        attribute.setValues(values);
+        data.getRoot().getAttribute(Attribute.TAGS.getKey()).setValues(values);
     }
 
     private void addOperation(TaskData data, MantisOperation operation, IMantisClient client, IProgressMonitor monitor) {
@@ -584,6 +580,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.DATE_SUBMITTED);
             createAttribute(data, MantisAttributeMapper.Attribute.LAST_UPDATED);
             createAttribute(data, MantisAttributeMapper.Attribute.COMPLETION_DATE);
+            
+            if ( client.getCache(monitor).getRepositoryVersion().isHasTagSupport() ) {
+                List<MantisTag> repositoryTags = client.getCache(monitor).getTags();
+                createAttribute(data, Attribute.TAGS, repositoryTags.toArray(new MantisTag[repositoryTags.size()]));
+            }
 
             // operations
             data.getRoot().createAttribute(TaskAttribute.OPERATION).getMetaData() .setType(TaskAttribute.TYPE_OPERATION);
