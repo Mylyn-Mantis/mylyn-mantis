@@ -543,12 +543,6 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
             createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
 
-            if ( cache.isEnableProfiles()) {
-                createAttribute(data, MantisAttributeMapper.Attribute.PLATFORM, null);
-                createAttribute(data, MantisAttributeMapper.Attribute.OS, null);
-                createAttribute(data, MantisAttributeMapper.Attribute.OS_BUILD, null);
-            }
-            
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             
@@ -558,6 +552,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             if ( cache.isEtaEnabled() )
             	createAttribute(data, MantisAttributeMapper.Attribute.ETA, cache.getETA(), 
             	        String.valueOf(cache.getDefaultEta().getValue()));
+            
+            if ( cache.isEnableProfiles()) {
+                createAttribute(data, MantisAttributeMapper.Attribute.PLATFORM, null);
+                createAttribute(data, MantisAttributeMapper.Attribute.OS, null);
+                createAttribute(data, MantisAttributeMapper.Attribute.OS_BUILD, null);
+            }
             
             if ( client.isDueDateEnabled(monitor))
                 createAttribute(data, MantisAttributeMapper.Attribute.DUE_DATE, null);
