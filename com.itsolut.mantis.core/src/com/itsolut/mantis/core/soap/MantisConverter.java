@@ -116,9 +116,10 @@ public class MantisConverter {
             ticket.setMonitors(monitors);
         }
         
-        if ( issue.getTags() != null ) {
-            List<MantisTag> tagIds = Lists.newArrayListWithExpectedSize(issue.getTags().length);
-            for ( ObjectRef tag : issue.getTags() )
+        if ( mantisClient.getCache(monitor).getRepositoryVersion().isHasTagSupport() ) {
+            ObjectRef[] tags = issue.getTags() != null ? issue.getTags() : new ObjectRef[0];
+            List<MantisTag> tagIds = Lists.newArrayListWithExpectedSize(tags.length);
+            for ( ObjectRef tag : tags )
                 tagIds.add(new MantisTag(tag.getName(), tag.getId().intValue()));
             
             ticket.setTags(tagIds);
