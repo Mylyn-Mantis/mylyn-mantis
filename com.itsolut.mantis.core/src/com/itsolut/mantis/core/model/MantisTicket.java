@@ -76,7 +76,10 @@ public class MantisTicket {
         RELATED_TO("related_to"), 
         TIME_SPENT("time_spent"), 
         TIME_SPENT_NEW("time_spent_new"),
-        COMPLETION_DATE("completion_date");
+        COMPLETION_DATE("completion_date"), 
+        PLATFORM("platform"),
+        OS("os"),
+        OS_BUILD("os_build");
 
 
         public static Key fromKey(String name) {
@@ -313,7 +316,6 @@ public class MantisTicket {
 
         return tags;
     }
-    
     
     @Override
     public String toString() {

@@ -17,8 +17,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
-import biz.futureware.mantis.rpc.soap.client.TagData;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -97,6 +95,8 @@ public class MantisCacheData implements Serializable {
 	private boolean projectionEnabled;
 	
 	Map<String, MantisUser> allUsers = new HashMap<String, MantisUser>();
+
+    private boolean enableProfiles;
 	
 	public boolean hasBeenRefreshed() {
 	    
@@ -302,5 +302,16 @@ public class MantisCacheData implements Serializable {
                 throw e2;
             }
         }
+    }
+
+
+    public void setEnableProfiles(boolean enableProfiles) {
+
+        this.enableProfiles = enableProfiles;
+    }
+    
+    public boolean isEnableProfiles() {
+
+        return enableProfiles;
     }
 }

@@ -542,6 +542,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     cache.getReproducibility(), String.valueOf(cache.getDefaultReproducibility().getValue()));
             createAttribute(data, MantisAttributeMapper.Attribute.VERSION, null);
             createAttribute(data, MantisAttributeMapper.Attribute.FIXED_IN, null);
+
+            if ( cache.isEnableProfiles()) {
+                createAttribute(data, MantisAttributeMapper.Attribute.PLATFORM, null);
+                createAttribute(data, MantisAttributeMapper.Attribute.OS, null);
+                createAttribute(data, MantisAttributeMapper.Attribute.OS_BUILD, null);
+            }
+            
             if ( client.getCache(monitor).getRepositoryVersion().isHasTargetVersionSupport())
                 createAttribute(data, MantisAttributeMapper.Attribute.TARGET_VERSION, null);
             

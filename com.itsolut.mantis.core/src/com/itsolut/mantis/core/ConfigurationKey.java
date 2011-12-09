@@ -19,6 +19,7 @@ package com.itsolut.mantis.core;
  */
 public enum ConfigurationKey {
     
+    ENABLE_PROFILES("enable_profiles"),
     RESOLVED_STATUS_THRESHOLD("bug_resolved_status_threshold"),
     REPORTER_THRESHOLD("report_bug_threshold"),
     DEVELOPER_THRESHOLD("update_bug_assign_threshold"),

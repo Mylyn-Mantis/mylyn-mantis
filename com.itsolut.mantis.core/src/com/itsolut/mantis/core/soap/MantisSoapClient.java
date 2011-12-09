@@ -330,7 +330,7 @@ public class MantisSoapClient implements IMantisClient {
 
                 int projectsToRefresh =  projectId == MantisProject.ALL_PROJECTS.getValue() ? cache.getCacheData().getProjects().size()  : 1 ;
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 30);
+                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 31);
                 
                 cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
                 Policy.advance(subMonitor, 1);
@@ -350,6 +350,9 @@ public class MantisSoapClient implements IMantisClient {
                 Policy.advance(subMonitor, 1);
 
                 cache.cacheSubmitStatus(safeGetInt(soapClient.getStringConfiguration(monitor, BUG_SUBMIT_STATUS.getValue()), DefaultConstantValues.Status.NEW.getValue()));
+                Policy.advance(subMonitor, 1);
+
+                cache.cacheEnableProfiles(safeGetBoolean(monitor, ENABLE_PROFILES.getValue(), DefaultConstantValues.Attribute.PROFILES_ENABLED));
                 Policy.advance(subMonitor, 1);
                 
                 try {
@@ -511,6 +514,9 @@ public class MantisSoapClient implements IMantisClient {
         
         try {
             int intValue = safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
+            
+            System.out.println("Value for " + configName + " is " + intValue);
+            
             return intValue == 1;
         } catch ( MantisException e ) {
             MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");

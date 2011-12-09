@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import biz.futureware.mantis.rpc.soap.client.TagData;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.exception.MantisException;
@@ -641,5 +639,16 @@ public class MantisCache {
     public List<MantisTag> getTags() {
         
         return Lists.newArrayList(cacheData.getTagsById().values());
+    }
+
+
+    public void cacheEnableProfiles(boolean enableProfiles) {
+
+        cacheData.setEnableProfiles(enableProfiles);
+    }
+    
+    public boolean isEnableProfiles() {
+        
+        return cacheData.isEnableProfiles();
     }
 }

@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 import biz.futureware.mantis.rpc.soap.client.*;
 
@@ -89,6 +88,12 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.REPORTER, issue.getReporter().getName());
         if (issue.getHandler() != null)
             ticket.putBuiltinValue(Key.ASSIGNED_TO, issue.getHandler().getName());
+        
+        if( mantisClient.getCache(monitor).isEnableProfiles() ) {
+            ticket.putBuiltinValue(Key.PLATFORM, issue.getPlatform());
+            ticket.putBuiltinValue(Key.OS, issue.getOs());
+            ticket.putBuiltinValue(Key.OS_BUILD, issue.getOs_build());
+        }
 
         boolean supportsTimeTracking = mantisClient.isTimeTrackingEnabled(monitor);
 
@@ -239,6 +244,12 @@ public class MantisConverter {
         if (cache.isEtaEnabled())
             issue.setEta(getValueAsObjectRef(ticket, Key.ETA));
         issue.setView_state(getValueAsObjectRef(ticket, Key.VIEW_STATE));
+        
+        if( cache.isEnableProfiles() ) {
+            issue.setPlatform(ticket.getValue(Key.PLATFORM));
+            issue.setOs(ticket.getValue(Key.OS));
+            issue.setOs_build(ticket.getValue(Key.OS_BUILD));
+        }
 
         issue.setProject(project);
         issue.setCategory(ticket.getValue(Key.CATEOGRY));
