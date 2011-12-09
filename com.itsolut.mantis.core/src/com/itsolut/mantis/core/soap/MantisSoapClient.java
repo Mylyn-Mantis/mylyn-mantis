@@ -513,11 +513,7 @@ public class MantisSoapClient implements IMantisClient {
     private boolean safeGetBoolean(IProgressMonitor monitor, String configName, DefaultConstantValues.Attribute attribute) {
         
         try {
-            int intValue = safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue());
-            
-            System.out.println("Value for " + configName + " is " + intValue);
-            
-            return intValue == 1;
+            return safeGetInt(soapClient.getStringConfiguration(monitor, configName), attribute.getValue()) == 1;
         } catch ( MantisException e ) {
             MantisCorePlugin.warn("Unable to retrieve configuration value '" + configName + "' . Using default value '" + attribute.getValue() + "'");
             return attribute.getValue() == 1;
