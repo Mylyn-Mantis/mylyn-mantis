@@ -276,7 +276,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Date lastChanged = ticket.getLastChanged();
 
         copyValuesFromTicket(data, ticket);
-        addTags(data, ticket, client, monitor);
+        addTags(data, ticket);
         addComments(data, ticket, client, monitor);
         addAttachments(repository, data, ticket, client, monitor);
         addRelationships(data, ticket);
@@ -331,7 +331,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         }
 	}
 	
-    private void addTags(TaskData data, MantisTicket ticket, IMantisClient client, IProgressMonitor monitor) throws MantisException {
+    private void addTags(TaskData data, MantisTicket ticket) throws MantisException {
 
         List<MantisTag> tags = ticket.getTags();
         if ( tags == null )
