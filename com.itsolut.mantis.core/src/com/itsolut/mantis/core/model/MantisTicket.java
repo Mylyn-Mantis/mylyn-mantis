@@ -24,7 +24,6 @@ package com.itsolut.mantis.core.model;
 import java.util.*;
 
 import com.google.common.collect.Lists;
-import com.itsolut.mantis.core.exception.InvalidTicketException;
 
 /**
  * Represents a Mantis ticket as it is retrieved from a Mantis repository.
@@ -204,8 +203,6 @@ public class MantisTicket {
     /**
      * Stores a value as it is retrieved from the repository.
      * 
-     * @throws InvalidTicketException
-     *             thrown if the type of <code>value</code> is not valid
      */
     public boolean putValue(String keyName, String value){
         Key key = Key.fromKey(keyName);

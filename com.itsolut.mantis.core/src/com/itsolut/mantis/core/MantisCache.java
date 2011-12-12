@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.*;
 import com.itsolut.mantis.core.model.MantisTicket.Key;
-import com.itsolut.mantis.core.soap.MantisSoapClient;
 
 /**
  * Holds the cached information for a complete Mantis installations.
@@ -414,7 +413,7 @@ public class MantisCache {
     }
 
     /**
-     * @param projectId the project id or {@link MantisSoapClient#ALL_PROJECTS}
+     * @param projectId the project id or {@link MantisProject#ALL_PROJECTS}
      */
     public List<MantisProjectFilter> getProjectFilters(int projectId) throws MantisException {
         
