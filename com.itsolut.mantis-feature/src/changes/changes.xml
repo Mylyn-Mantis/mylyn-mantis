@@ -2,17 +2,15 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.7.0" date="2011-10-08">
-			<action type="add" issue="234" dev="rombert">Comment position detected in hyperlinks is off by one</action>
-			<action type="add" issue="233" dev="rombert">NPE in MantisHyperlinkFinder.findHyperlinks</action>
-			<action type="add" issue="225" dev="rombert">Investigate enabling Tasktop's task associations</action>
-			<action type="add" issue="55" dev="rombert">Queries require selection of project</action>
-			<action type="add" issue="231" dev="rombert">The query page duplicates filters for the selected project</action>
-			<action type="add" issue="226" dev="rombert">When adding notes, use the 'notes' property of the IssueData</action>
-			<action type="add" issue="230" dev="rombert">Support TEXTAREA custom field types</action>
-			<action type="add" issue="229" dev="rombert">Display attachment authors</action>
-			<action type="add" issue="227" dev="rombert">Map category to component</action>
-			<action type="add" issue="49" dev="rombert">In Attach section you dont have a delete button</action>
+		<release version="3.8.0" date="2011-12-13">
+			<action type="add" issue="246" dev="rombert">Support profile fields</action>
+			<action type="add" issue="244" dev="rombert">Update SOAP stubs for 1.2.9</action>
+			<action type="add" issue="245" dev="rombert">Add support for tags</action>
+			<action type="add" issue="241" dev="rombert">Display date/times in the user's local timezone</action>
+			<action type="add" issue="235" dev="rombert">Use WikiText instead of HtmlText for the editors</action>
+			<action type="add" issue="240" dev="rombert">Custom date fields are serialised incorrectly</action>
+			<action type="add" issue="242" dev="rombert">Tasks are no longer marked as resolved in the task list</action>
+			<action type="add" issue="239" dev="rombert">Times are displayed with an incorrect time zone offset</action>
 		</release>
 	</body>
 </document>
