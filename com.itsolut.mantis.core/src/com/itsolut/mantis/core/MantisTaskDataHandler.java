@@ -815,6 +815,9 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     @Override
     public boolean canInitializeSubTaskData(TaskRepository taskRepository,
     		ITask task) {
+    	
+    	if( taskRepository == null )
+    		return false;
         
         return MantisRepositoryConfiguration.isSupportsSubTasks(taskRepository);
     }
