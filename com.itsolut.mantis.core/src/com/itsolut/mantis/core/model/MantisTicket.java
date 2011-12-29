@@ -141,6 +141,8 @@ public class MantisTicket {
      */
     public MantisTicket(int id) {
         this.id = id;
+        
+        updateTimeTrackingAttributes();
     }
 
     public int getId() {
@@ -246,10 +248,13 @@ public class MantisTicket {
 
         timeSpent += comment.getTimeTracking();
         
-        putValue(Key.TIME_SPENT.toString(), String.format("%d:%02d", timeSpent / 60, timeSpent % 60));
-        putValue(Key.TIME_SPENT_NEW.toString(), "");
-        
+        updateTimeTrackingAttributes();
     }
+
+	private void updateTimeTrackingAttributes() {
+		putValue(Key.TIME_SPENT.toString(), String.format("%d:%02d", timeSpent / 60, timeSpent % 60));
+        putValue(Key.TIME_SPENT_NEW.toString(), "");
+	}
     
     public MantisComment[] getComments() {
         return (comments != null) ? comments.toArray(new MantisComment[0]) : null;
