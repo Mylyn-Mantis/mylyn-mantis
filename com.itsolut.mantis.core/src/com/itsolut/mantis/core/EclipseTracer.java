@@ -22,17 +22,17 @@ import org.osgi.framework.BundleContext;
  * @author Robert Munteanu
  *
  */
-public class EclipseTracer implements Tracer {
+public class EclipseTracer implements Tracer, DebugOptionsListener {
     
-    private boolean warned = false;
-    
-    private DebugHelper debugHelper;
+    private boolean debugEnabled;
+    private DebugTrace trace;
     
     public void configure(BundleContext bundleContext) {
         
-        debugHelper = new DebugHelper(bundleContext);
+        Dictionary<String, String> properties = new Hashtable<String, String>(1);
+        properties.put(DebugOptions.LISTENER_SYMBOLICNAME, MantisCorePlugin.PLUGIN_ID);
         
-        System.err.println("Debug helper configured for " + this);
+        bundleContext.registerService(DebugOptionsListener.class.getName(), this, properties );
     }
 
     /**
@@ -47,47 +47,25 @@ public class EclipseTracer implements Tracer {
      */
     public void trace(TraceLocation location, String message, Object... arguments) {
         
-        // if we are unconfigured just fail silently
-        if ( debugHelper == null ) {
-            if ( !warned ) {
-                System.err.println("No debug helper is configured for " + this);
-                warned = true;
-            }
+        // if we are unconfigured or not enabled just skip silently
+        if ( trace == null || !debugEnabled)
             return;
-        }
 
         if ( arguments.length > 0 )
             message = NLS.bind(message, arguments);
         
-        debugHelper.trace(location, message);
+        trace(location, message);
         
     }
     
-    static class DebugHelper implements DebugOptionsListener {
+    public void optionsChanged(DebugOptions options) {
+
+        debugEnabled = options.getBooleanOption(MantisCorePlugin.PLUGIN_ID + "/debug", false);
+        trace = options.newDebugTrace(MantisCorePlugin.PLUGIN_ID, getClass());
+    }
+    
+    private void trace(TraceLocation traceLocation, String message) {
         
-        private boolean debugEnabled;
-        private DebugTrace trace;
-
-        public DebugHelper(BundleContext bundleContext) {
-
-            Dictionary<String, String> properties = new Hashtable<String, String>(1);
-            properties.put(DebugOptions.LISTENER_SYMBOLICNAME, MantisCorePlugin.PLUGIN_ID);
-            
-            bundleContext.registerService(DebugOptionsListener.class.getName(), this, properties );
-        }
-
-        public void optionsChanged(DebugOptions options) {
-
-            debugEnabled = options.getBooleanOption(MantisCorePlugin.PLUGIN_ID + "/debug", false);
-            trace = options.newDebugTrace(MantisCorePlugin.PLUGIN_ID);
-        }
-        
-        public void trace(TraceLocation traceLocation, String message) {
-            
-            if ( !debugEnabled )
-                return;
-            
-            trace.trace("/debug" + traceLocation.getPrefix(), message);
-        }
+        trace.trace("/debug" + traceLocation.getPrefix(), message);
     }
 }
