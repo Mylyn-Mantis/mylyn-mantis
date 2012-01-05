@@ -6,7 +6,7 @@ package com.itsolut.mantis.core;
  */
 public enum TraceLocation {
 
-    MAIN(""), CLIENT_MANAGER("/clientmanager"), CONVERTER("/converter"), CONFIG("/config"), SYNC("/sync");
+    MAIN(""), CLIENT_MANAGER("/clientmanager"), CONFIG("/config"), SYNC("/sync");
     
     private final String _prefix;
     

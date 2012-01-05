@@ -34,6 +34,7 @@ import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.NoOpTracer;
 import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.core.exception.MantisException;
 
@@ -53,7 +54,7 @@ public class MantisRepositoryAccessor {
 			
 			IMantisClient client = urlToClient.get(taskRepository.getUrl());
 			if ( client == null ) {
-				client = new MantisClientFactory(new TaskRepositoryLocationFactory()).createClient(taskRepository);
+				client = new MantisClientFactory(new TaskRepositoryLocationFactory(), new NoOpTracer()).createClient(taskRepository);
 				urlToClient.put(taskRepository.getUrl(), client);
 			}
 
@@ -75,7 +76,7 @@ public class MantisRepositoryAccessor {
 		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory, new MantisCommentMapper());
 		MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(clientManager, statusFactory);
 
-		connector = new MantisRepositoryConnector(clientManager, dataHandler, attachmentHandler, statusFactory);
+		connector = new MantisRepositoryConnector(clientManager, dataHandler, attachmentHandler, statusFactory, new NoOpTracer());
 		
 	}
 	

@@ -130,8 +130,6 @@ public class MantisConverter {
             ticket.setTags(tagIds);
         }
 
-        MantisCorePlugin.getDefault().trace(TraceLocation.CONVERTER, "Converted IssueData to {0}.", ticket);
-
         return ticket;
 
     }
@@ -219,8 +217,6 @@ public class MantisConverter {
         // to see if they have changed since the last synchronization.
         // This cuts down on the number of soap requests that need to be made to the server.
         ticket.setLastChanged(MantisUtils.transform(ihd.getLast_updated()));
-
-        MantisCorePlugin.getDefault().trace(TraceLocation.CONVERTER, "Converted IssueHeaderData to {0}.", ticket);
 
         return ticket;
     }

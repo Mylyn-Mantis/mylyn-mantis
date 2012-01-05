@@ -20,6 +20,7 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.MantisRepositoryConnector;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
 import com.itsolut.mantis.core.StatusFactory;
+import com.itsolut.mantis.core.Tracer;
 
 
 /**
@@ -39,6 +40,9 @@ class MantisUiPluginModule extends AbstractModule {
         MantisRepositoryConnector connector = (MantisRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(MantisCorePlugin.REPOSITORY_KIND);
         MantisTaskDataHandler taskDataHandler = (MantisTaskDataHandler) connector.getTaskDataHandler();
         
+        // tracer is post-configured by the MantisCore plugin so we need to retrieve the exact same instance
+        bind(Tracer.class).toInstance(MantisCorePlugin.getDefault().getTracer());
+        
         bind(StatusFactory.class);
         bind(IMantisClientManager.class).toInstance(connector.getClientManager());
         bind(MantisTaskDataHandler.class).toInstance(taskDataHandler);
@@ -46,6 +50,7 @@ class MantisUiPluginModule extends AbstractModule {
         bind(IRepositoryListener.class).toInstance(connector.getRepositoryListener());
         bind(MantisHyperlinkFinder.class);
         bind(MantisCommentMapper.class).toInstance(taskDataHandler.getCommentMapper());
+        
     }
 
 }

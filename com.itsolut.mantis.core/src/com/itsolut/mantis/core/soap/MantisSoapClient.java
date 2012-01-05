@@ -55,8 +55,11 @@ public class MantisSoapClient implements IMantisClient {
     
     private final NumberFormat formatter = new DecimalFormat("#.#");
 
-    public MantisSoapClient(AbstractWebLocation webLocation) throws MantisException {
+    private final Tracer tracer;
 
+    public MantisSoapClient(AbstractWebLocation webLocation, Tracer tracer) throws MantisException {
+
+        this.tracer = tracer;
         soapClient = new MantisAxis1SoapClient(webLocation);
         cache = new MantisCache();
         location = webLocation;
@@ -483,8 +486,7 @@ public class MantisSoapClient implements IMantisClient {
                 cache.getCacheData().setLastUpdate( System.currentTimeMillis() );
             } finally {
                 subMonitor.done();
-                MantisCorePlugin.getDefault().trace(TraceLocation.CONFIG, "Repository sync for {0} complete in {1} seconds.", repositoryUrl,
-                        format(start));
+                tracer.trace(TraceLocation.CONFIG, "Repository sync for {0} complete in {1} seconds.", repositoryUrl, format(start));
             }
         }
     }

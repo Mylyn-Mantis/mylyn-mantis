@@ -70,6 +70,9 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private MantisAttachmentHandler attachmentHandler;
     
     @Inject
+    private Tracer tracer;
+    
+    @Inject
     private StatusFactory statusFactory;
 
     public MantisRepositoryConnector() {
@@ -84,12 +87,13 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
      * <b>Visible for testing only</b>
      */
     public MantisRepositoryConnector(IMantisClientManager clientManager, MantisTaskDataHandler taskDataHandler,
-            MantisAttachmentHandler attachmentHandler, StatusFactory statusFactory) {
+            MantisAttachmentHandler attachmentHandler, StatusFactory statusFactory, Tracer tracer) {
         
         this.clientManager = clientManager;
         offlineTaskHandler = taskDataHandler;
         this.attachmentHandler = attachmentHandler;
         this.statusFactory = statusFactory;
+        this.tracer = tracer;
         
     }
 
@@ -227,7 +231,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     private List<Integer> getChangedTasksByQuery(IRepositoryQuery query, TaskRepository repository, Date since,
             IProgressMonitor monitor) throws CoreException {
 
-        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Looking for tasks changed in query {0} since {1} .", query.getSummary(), since);
+        tracer.trace(TraceLocation.SYNC, "Looking for tasks changed in query {0} since {1} .", query.getSummary(), since);
         
         final List<MantisTicket> tickets = new ArrayList<MantisTicket>();
         List<Integer> changedTickets = new ArrayList<Integer>();
@@ -245,7 +249,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
         
         
-        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Found {0} changed tickets.", changedTickets.size());
+        tracer.trace(TraceLocation.SYNC, "Found {0} changed tickets.", changedTickets.size());
         
         return changedTickets;
     }
@@ -305,7 +309,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         
         boolean hasChanged = lastChangeIsDifferent || !taskVersionIsCurrent;
         
-        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged);
+        tracer.trace(TraceLocation.SYNC, "Checking if task {0} has changed: {1}", task.getTaskId(), hasChanged);
         
         return hasChanged;
     }
@@ -403,7 +407,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
                         event.setNeedsPerformQueries(true);
                         event.markStale(task);
                         
-                        MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Marking task {0} as stale.", task);
+                        tracer.trace(TraceLocation.SYNC, "Marking task {0} as stale.", task);
                     }
                 }
             }
@@ -439,7 +443,7 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
             if (event.isFullSynchronization()) {
                 Date date = getSynchronizationTimestamp(event);
                 
-                MantisCorePlugin.getDefault().trace(TraceLocation.SYNC, "Synchronisation timestamp from event for {0} is {1} .", event.getTaskRepository(), date);
+                tracer.trace(TraceLocation.SYNC, "Synchronisation timestamp from event for {0} is {1} .", event.getTaskRepository(), date);
                 
                 if (date != null) {
                     event.getTaskRepository().setSynchronizationTimeStamp(MantisUtils.toMantisTime(date) + "");

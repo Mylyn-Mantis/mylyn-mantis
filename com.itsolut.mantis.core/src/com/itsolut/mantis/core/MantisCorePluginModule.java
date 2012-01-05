@@ -11,6 +11,7 @@ package com.itsolut.mantis.core;
 import org.eclipse.core.runtime.IPath;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 /**
  * @author Robert Munteanu
@@ -35,6 +36,7 @@ class MantisCorePluginModule extends AbstractModule {
         bind(MantisCommentMapper.class);
         bind(IPath.class).annotatedWith(RepositoryPersistencePath.class).toProvider(RepositoryPersistencePathProvider.class);
         bind(MantisRepositoryConnector.class).toInstance(mantisRepositoryConnector);
+        bind(Tracer.class).to(EclipseTracer.class).in(Singleton.class); // we need a single tracer which is post-configured by the core plugin
     }
 
 }

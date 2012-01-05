@@ -22,12 +22,23 @@
 
 package com.itsolut.mantis.core;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.mylyn.internal.tasks.core.*;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryChangeListener;
+import org.eclipse.mylyn.internal.tasks.core.IRepositoryConstants;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryChangeEvent;
+import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta;
 import org.eclipse.mylyn.internal.tasks.core.TaskRepositoryDelta.Type;
 import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -47,12 +58,14 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
     private Map<String, IMantisClient> clientByUrl = new HashMap<String, IMantisClient>();
     private final PersistedState state;
     private final MantisClientFactory clientFactory;
+    private final Tracer tracer;
 
     @Inject
-    public MantisClientManager(@RepositoryPersistencePath IPath repositoryPersistencePath, MantisClientFactory clientFactory) {
+    public MantisClientManager(@RepositoryPersistencePath IPath repositoryPersistencePath, MantisClientFactory clientFactory, Tracer tracer) {
 
         this.clientFactory = clientFactory;
         state = new PersistedState(repositoryPersistencePath.toFile());
+        this.tracer = tracer;
     }
 
     public synchronized void onShutdown() {
@@ -112,7 +125,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if (!MantisCorePlugin.REPOSITORY_KIND.equals(repository.getConnectorKind()))
             return;
         
-        MantisCorePlugin.getDefault().trace(TraceLocation.CLIENT_MANAGER, "repositoryChanged : {0} , {1} = {2} .",  repository.getUrl(), delta.getType(), delta.getKey());
+        tracer.trace(TraceLocation.CLIENT_MANAGER, "repositoryChanged : {0} , {1} = {2} .",  repository.getUrl(), delta.getType(), delta.getKey());
 
         boolean credentialsChanged = delta.getType() == Type.CREDENTIALS;
         boolean urlChanged = delta.getType() == Type.PROPERTY && delta.getKey().equals(IRepositoryConstants.PROPERTY_URL);
@@ -120,7 +133,7 @@ public class MantisClientManager implements IRepositoryListener, IRepositoryChan
         if ( !credentialsChanged && !urlChanged )
             return;
         
-        MantisCorePlugin.getDefault().trace(TraceLocation.CLIENT_MANAGER, "Clearing repository state; credentialsChanged: {0}, urlChanged: {1}", credentialsChanged, urlChanged);;
+        tracer.trace(TraceLocation.CLIENT_MANAGER, "Clearing repository state; credentialsChanged: {0}, urlChanged: {1}", credentialsChanged, urlChanged);;
         
         clientByUrl.remove(repository.getRepositoryUrl());
         state.remove(repository.getRepositoryUrl());

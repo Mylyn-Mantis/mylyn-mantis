@@ -36,16 +36,18 @@ import com.itsolut.mantis.core.soap.MantisSoapClient;
 public class MantisClientFactory {
 
     private final TaskRepositoryLocationFactory taskRepositoryLocationFactory;
+    private final Tracer tracer;
 
     @Inject
-    public MantisClientFactory(TaskRepositoryLocationFactory taskRepositoryLocationFactory) {
+    public MantisClientFactory(TaskRepositoryLocationFactory taskRepositoryLocationFactory, Tracer tracer) {
         
         this.taskRepositoryLocationFactory = taskRepositoryLocationFactory;
+        this.tracer = tracer;
     }
 
     public IMantisClient createClient(AbstractWebLocation webLocation) throws MantisException {
 
-        return new MantisSoapClient(webLocation);
+        return new MantisSoapClient(webLocation, tracer);
     }
     
     public IMantisClient createClient(TaskRepository taskRepository) throws MantisException {
