@@ -50,7 +50,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_OR_HIGHER("1.2.0 to 1.2.1", EnumSet.complementOf(EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING))),
+    VERSION_1_2_OR_HIGHER("1.2.0 to 1.2.1", EnumSet.complementOf(EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING, RepositoryCapability.TAGS))),
     
     /**
      * Versions 1.2.2 or newer.
