@@ -35,16 +35,6 @@ public enum RepositoryVersion {
     VERSION_1_1_7_OR_HIGHER("1.1.7 or higher in the 1.1.x stream", EnumSet.noneOf(RepositoryCapability.class)), 
 
     /**
-     * Version 1.2 alpha 3 or previous
-     */
-    VERSION_1_2_A3_OR_LOWER("1.2.0 alpha 3 or previous in the 1.2.x stream", EnumSet.of(RepositoryCapability.TARGET_VERSION, RepositoryCapability.TASK_RELATIONS, RepositoryCapability.CORRECT_BASE64_ENCODING)),
-    
-    /**
-     * Versions 1.2 rc1 or newwe
-     */
-    VERSION_1_2_RC1_OR_HIGHER("1.2.0 rc1 to 1.2.0 (not inclusive)", EnumSet.of(RepositoryCapability.TARGET_VERSION, RepositoryCapability.TASK_RELATIONS)),
-    
-    /**
      * Versions 1.2.0 or newer.
      * 
      * <p>Supports target_version, task relations, requires
@@ -85,23 +75,13 @@ public enum RepositoryVersion {
         
         if ( versionString.startsWith("1.2")) {
         	
-        	String qualifier = extractQualifierFor12x(versionString);
-        	
-        	if ( qualifier.startsWith("rc"))
-        		return VERSION_1_2_RC1_OR_HIGHER;
-        	
-        	if ( qualifier.length() == 0) {
-        		
-        		int minorVersion = extractMantisMinorVersion(versionString);
-        		if ( minorVersion < 2)
-        			return VERSION_1_2_OR_HIGHER;
-        		else if ( minorVersion < 9)
-        		    return VERSION_1_2_2_OR_HIGHER;
-        		else
-        			return VERSION_1_2_9_OR_HIGHER;
-        	}
-        	
-        	return VERSION_1_2_A3_OR_LOWER;
+    		int minorVersion = extractMantisMinorVersion(versionString);
+    		if ( minorVersion < 2)
+    			return VERSION_1_2_OR_HIGHER;
+    		else if ( minorVersion < 9)
+    		    return VERSION_1_2_2_OR_HIGHER;
+    		else
+    			return VERSION_1_2_9_OR_HIGHER;
         }
         
         if ( versionString.startsWith("1.3"))

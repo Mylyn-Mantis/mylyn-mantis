@@ -47,30 +47,6 @@ public class RepositoryVersionTest {
 	}
 
 	@Test
-	public void testVersion120CVSIsRecognized() throws MantisException {
-
-		assertEquals(RepositoryVersion.VERSION_1_2_A3_OR_LOWER, RepositoryVersion.fromVersionString("1.2.0-CVS"));
-	}
-
-	@Test
-	public void testVersion120a2IsRecognized() throws MantisException {
-
-		assertEquals(RepositoryVersion.VERSION_1_2_A3_OR_LOWER, RepositoryVersion.fromVersionString("1.2.0a2"));
-	}
-
-	@Test
-	public void testVersion120a3IsRecognized() throws MantisException {
-
-		assertEquals(RepositoryVersion.VERSION_1_2_A3_OR_LOWER, RepositoryVersion.fromVersionString("1.2.0a3"));
-	}
-
-	@Test
-	public void testVersion120rc1IsRecognized() throws MantisException {
-
-		assertEquals(RepositoryVersion.VERSION_1_2_RC1_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.0rc1"));
-	}
-
-	@Test
 	public void testVersion120IsRecognized() throws MantisException {
 
 		assertEquals(RepositoryVersion.VERSION_1_2_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.0"));
@@ -92,6 +68,12 @@ public class RepositoryVersionTest {
 	public void testVersion122IsRecognized() throws MantisException {
 
 		assertEquals(RepositoryVersion.VERSION_1_2_2_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.2"));
+	}
+	
+	@Test
+	public void testVersion1210IsRecognized() throws MantisException {
+		
+		assertEquals(RepositoryVersion.VERSION_1_2_9_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.10"));
 	}
 
 }
