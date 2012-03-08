@@ -117,6 +117,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     public RepositoryResponse postTaskData(TaskRepository repository,
             TaskData taskData, Set<TaskAttribute> oldAttributes,
             IProgressMonitor monitor) throws CoreException {
+    	
+    	// https://sourceforge.net/apps/mantisbt/mylyn-mantis/view.php?id=253
+		boolean receivedOldAttributes = oldAttributes != null;
+		
         try {
             IMantisClient client = clientManager.getRepository( repository);
 
@@ -146,7 +150,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                     }
                 }
                 
-                if ( submitTaskChanges)
+                if ( submitTaskChanges || !receivedOldAttributes )
                     client.updateTicket(ticket, note, changes, monitor);
                 else if ( note.hasContent() )
                     client.addIssueComment(ticket.getId(), note, monitor);
