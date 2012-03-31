@@ -275,11 +275,11 @@ public class MantisConverter {
         if (MantisUtils.isEmpty(ticket.getValue(Key.REPORTER))) {
             issue.setReporter(convert(username, cache));
         } else {
-            issue.setReporter(convertToAccountData(Integer.valueOf(ticket.getValue(Key.REPORTER))));
+            issue.setReporter(convert(ticket.getValue(Key.REPORTER), cache));
         }
 
         if (!MantisUtils.isEmpty(ticket.getValue(Key.ASSIGNED_TO)))
-            issue.setHandler(convertToAccountData(Integer.valueOf(ticket.getValue(Key.ASSIGNED_TO))));
+            issue.setHandler(convert(ticket.getValue(Key.ASSIGNED_TO), cache));
         issue.setLast_updated(MantisUtils.transform(new Date()));
 
         setIssueMonitors(ticket, issue, cache, username);
@@ -292,15 +292,6 @@ public class MantisConverter {
     private static ObjectRef getValueAsObjectRef(MantisTicket ticket, Key key) {
 
         return new ObjectRef(new BigInteger(ticket.getValue(key)), "");
-    }
-
-    public static AccountData convertToAccountData(Integer userId) {
-
-        AccountData accountData = new AccountData();
-        if (userId == null)
-            return accountData;
-
-        return new AccountData(BigInteger.valueOf(userId.intValue()), null, null, null);
     }
 
     public static AccountData convert(String userName, MantisCache cache) throws MantisException {

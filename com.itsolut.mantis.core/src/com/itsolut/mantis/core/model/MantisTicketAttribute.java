@@ -42,6 +42,11 @@ public class MantisTicketAttribute implements Comparable<MantisTicketAttribute>,
 		return value;
 	}
 
+	public String getKey() {
+		
+		return String.valueOf(getValue());
+	}
+	
 	@Override
 	public String toString() {
 		return name;

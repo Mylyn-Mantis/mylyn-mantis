@@ -35,4 +35,18 @@ public class MantisUser extends MantisTicketAttribute {
 
         return realName;
     }
+    
+    @Override
+    public String getKey() {
+    	
+    	return super.getName();
+    }
+    
+    @Override
+    public String getName() {
+    	if ( realName != null && realName.trim().length() != 0 )
+    		return realName;
+    	
+    	return super.getName();
+    }
 }

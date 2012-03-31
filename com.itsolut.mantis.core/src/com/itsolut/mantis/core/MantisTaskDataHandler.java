@@ -314,6 +314,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             // no options, just copy the value
             if ( attribute.getOptions().isEmpty() ) {
                 attribute.setValue(value);
+            } if ( TaskAttribute.TYPE_PERSON.equals(attribute.getMetaData().getType()) ) {
+            	attribute.setValue(value);
             } else {
 
                 // map string to ids
@@ -677,22 +679,21 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 targetVersionAttr.setValue("none");
     }
 
-    private TaskAttribute createAttribute(TaskData data,
-            MantisAttributeMapper.Attribute attribute, MantisTicketAttribute[] values,
-            boolean allowEmtpy) {
+    private TaskAttribute createAttribute(TaskData data, MantisAttributeMapper.Attribute attribute, 
+    		MantisTicketAttribute[] values, boolean allowEmpty) {
 
         boolean readOnly = data.isNew() ? attribute.isReadOnlyForNewTask() : attribute.isReadOnlyForExistingTask();
 
         TaskAttribute attr = data.getRoot().createAttribute(attribute.getKey());
 
-        attr.getMetaData().setReadOnly(readOnly).setLabel(
-                attribute.toString()).setKind(attribute.getKind()).setType(
-                        attribute.getType());
+        attr.getMetaData().setReadOnly(readOnly).setLabel(attribute.toString())
+        	.setKind(attribute.getKind()).setType( attribute.getType());
+        
         if (values != null && values.length > 0) {
-            if (allowEmtpy)
+            if (allowEmpty)
                 attr.putOption("", "");
             for (MantisTicketAttribute value : values)
-                attr.putOption(String.valueOf(value.getValue()), value.getName());
+				attr.putOption(value.getKey(), value.getName());
         }
         return attr;
     }

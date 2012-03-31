@@ -82,7 +82,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     public enum Attribute {
         ID(Key.ID, "<used by search engine>", MantisAttributeMapper.METADATA_SEARCH_ID, true),
         ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
-        ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
+        ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_PERSON, true, false),
         CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         DATE_SUBMITTED(Key.DATE_SUBMITTED, "Submitted:", TaskAttribute.TYPE_DATE, true, true),
         DESCRIPTION(Key.DESCRIPTION, "Description", TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
@@ -94,7 +94,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
         PRIORITY(Key.PRIORITY, "Priority:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
         PROJECT(Key.PROJECT, "Project:", TaskAttribute.TYPE_SINGLE_SELECT, false, true),
         PROJECTION(Key.PROJECTION, "Projection:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
-        REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_SINGLE_SELECT, true, false),
+        REPORTER(Key.REPORTER, "Reporter:", TaskAttribute.TYPE_PERSON, true, false),
         MONITORS(Key.MONITORS, "Monitors:\n(select to remove)", TaskAttribute.TYPE_MULTI_SELECT, true, false),
         ADD_SELF_TO_MONITORS(Key.ADD_SELF_TO_MONITORS, "Monitor issue", TaskAttribute.TYPE_BOOLEAN, true, false),
         REPRODUCIBILITY(Key.REPRODUCIBILITY, "Reproducibility:", TaskAttribute.TYPE_SINGLE_SELECT, false, false),
