@@ -9,7 +9,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
+import org.eclipse.mylyn.commons.workbench.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -27,7 +27,6 @@ import com.itsolut.mantis.ui.MantisUIPlugin;
  * @author Robert Munteanu
  * 
  */
-@SuppressWarnings("restriction")
 public class MantisUIUtil {
 
     public static void updateRepositoryConfiguration(IRunnableContext container, TaskRepository repository, IMantisClientManager clientManager) {

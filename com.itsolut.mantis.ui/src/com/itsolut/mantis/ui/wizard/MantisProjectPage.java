@@ -35,9 +35,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
-import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
-import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
+import org.eclipse.mylyn.commons.core.ICoreRunnable;
+import org.eclipse.mylyn.commons.ui.CommonUiUtil;
+import org.eclipse.mylyn.commons.workbench.EnhancedFilteredTree;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -61,7 +61,6 @@ import com.itsolut.mantis.ui.util.MantisUIUtil;
  * @author Chris Hane
  * @author Robert Munteanu
  */
-@SuppressWarnings("restriction")
 public class MantisProjectPage extends WizardPage {
 
     private TaskRepository taskRepository;

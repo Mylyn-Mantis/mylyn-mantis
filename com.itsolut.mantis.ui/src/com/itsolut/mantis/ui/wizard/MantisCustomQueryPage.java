@@ -17,43 +17,32 @@ package com.itsolut.mantis.ui.wizard;
 
 import static com.itsolut.mantis.ui.util.MantisUIUtil.newEnhancedFilteredTree;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
-import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonUiUtil;
-import org.eclipse.mylyn.internal.provisional.commons.ui.EnhancedFilteredTree;
-import org.eclipse.mylyn.internal.provisional.commons.ui.ICoreRunnable;
+import org.eclipse.mylyn.commons.workbench.EnhancedFilteredTree;
+import org.eclipse.mylyn.commons.workbench.forms.SectionComposite;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
+import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage2;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.IMantisClientManager;
@@ -64,7 +53,6 @@ import com.itsolut.mantis.core.model.MantisProjectFilter;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.util.MantisUtils;
 import com.itsolut.mantis.ui.MantisUIPlugin;
-import com.itsolut.mantis.ui.util.MantisUIUtil;
 
 /**
  * Mantis search page. Provides a form similar to the one the Bugzilla connector uses.
@@ -74,32 +62,21 @@ import com.itsolut.mantis.ui.util.MantisUIUtil;
  * 
  *         Dave Carver - 20070806 [ 1729675 ] Internal errors when project or filter not selected
  */
-@SuppressWarnings("restriction")
-public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
+public class MantisCustomQueryPage extends AbstractRepositoryQueryPage2 {
 
     private static final String NO_FILTERS_AVAILABLE = "No filters available for this project. Make sure they are created and that you have the right to access them.";
-
-    private static final String SELECT_FILTER_IN_PROJECT = "Select Filter in Project";
 
     private static final String TITLE = "Enter query parameters";
 
     private static final String DESCRIPTION = "Select a project and a filter to populate the task list. Custom filters can be created from the web interface.";
 
-    private static final String TITLE_QUERY_TITLE = "Query title";
-
-    private static final String MAX_SEARCH_RESULTS = "Result limit";
-
-    private IRepositoryQuery query;
-
-    private Text titleText;
+    private static final String MAX_SEARCH_RESULTS = "Maximum results";
 
     private Text searchLimit;
 
-    private TaskRepository repository = null;
+    private TaskRepository repository;
 
-    protected Combo filterCombo = null;
-
-    protected Button updateRepository;
+    protected List projectFilters;
 
     private EnhancedFilteredTree tree;
 
@@ -112,7 +89,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         super(TITLE, repository, query);
 
         this.repository = repository;
-        this.query = query;
         this.clientManager = clientManager;
 
         setTitle(TITLE);
@@ -124,118 +100,68 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         this(repository, null, clientManager);
     }
 
-    public void createControl(Composite parent) {
-
+    protected void createPageContent(SectionComposite sectionComposite) {
+    	
+    	Composite parent = sectionComposite.getContent();
+    	
         Composite control = new Composite(parent, SWT.NONE);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
         control.setLayoutData(gd);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(2, true);
         control.setLayout(layout);
 
-        createTitleGroup(control);
-
         Label projectLabel = new Label(control, SWT.NONE);
-        projectLabel.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
+        projectLabel.setLayoutData(new GridData(SWT.NONE, SWT.TOP, true, false));
         projectLabel.setText("Select project");
+        
+        Label comboLabel = new Label(control, SWT.NONE);
+        comboLabel.setLayoutData(new GridData(SWT.NONE, SWT.TOP, true, false));
+        comboLabel.setText("Select filter");
 
         createProjectTree(control);
 
-        try {
-            Label comboLabel = new Label(control, SWT.NONE);
-            comboLabel.setText("Select filter");
+        projectFilters = new List(control, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+        projectFilters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+        projectFilters.addSelectionListener(new SelectionAdapter() {
 
-            filterCombo = new Combo(control, SWT.READ_ONLY);
-            filterCombo.add(SELECT_FILTER_IN_PROJECT);
-            filterCombo.setText(filterCombo.getItem(0));
+            public void widgetSelected(SelectionEvent e) {
 
-            filterCombo.addSelectionListener(new SelectionListener() {
+                updateButtonsIfNeeded();
 
-                public void widgetSelected(SelectionEvent e) {
+                List combo = (List) e.getSource();
+                updateDescription(combo);
 
-                    updateButtonsIfNeeded();
+                String text = getSelected(combo);
+                
+                if ( text == null ) 
+                	return;
 
-                    Combo combo = (Combo) e.getSource();
-                    updateDescription(combo);
-
-                    // skip auto fill-in if we don't have results
-                    if (combo.getItemCount() <= 1)
-                        return;
-
-                    String text = combo.getText();
-
-                    // skip auto fill-in if this is the 'suggestion' text
-                    if (SELECT_FILTER_IN_PROJECT.equals(text))
-                        return;
-
-                    // set suggestion and select
-                    if (getSearchContainer() == null) {
-                        titleText.setText(text);
-                        titleText.selectAll();
-                    }
-                    updateButtonsIfNeeded();
-
-                }
-
-                private void updateDescription(Combo combo) {
-
-                    if (combo.getItemCount() > 1)
-                        setMessage(null, DialogPage.WARNING);
-                    else if (getSelectedProject() == null)
-                        setMessage(NO_FILTERS_AVAILABLE, DialogPage.WARNING);
-
-                }
-
-                public void widgetDefaultSelected(SelectionEvent e) {
-
-                    // nothing
-                }
-            });
-
-            Label titleLabel = new Label(control, SWT.NONE);
-            titleLabel.setText(MAX_SEARCH_RESULTS);
-
-            searchLimit = new Text(control, SWT.BORDER);
-            searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
-
-            updateRepository = new Button(control, SWT.PUSH);
-            GridData buttonGridData = new GridData(SWT.LEFT, SWT.NULL, false, false);
-            buttonGridData.horizontalSpan = 2;
-            updateRepository.setLayoutData(buttonGridData);
-            updateRepository.setText("Update Repository Configuration");
-            updateRepository.addSelectionListener(new SelectionListener() {
-
-                public void widgetDefaultSelected(SelectionEvent arg0) {
-
-                    // nothing
-                }
-
-                public void widgetSelected(SelectionEvent arg0) {
-
-                    MantisUIUtil.updateRepositoryConfiguration(getRunnableContext(), getRepository(), clientManager);
-                    refreshFilterCombo();
-
-                }
-
-            });
-
-            if (query != null) {
-                titleText.setText(query.getSummary());
-                restoreSearchFilterFromQuery(query);
+                // set suggestion
+                if (!inSearchContainer())
+					setQueryTitle(text);
+                
+                updateButtonsIfNeeded();
             }
-        } catch (Exception e1) {
 
-            // Axis does send very verbose errors which break the layout if
-            // displayed directly
-            String sanitizedString = String.valueOf(e1.getMessage());
+            private void updateDescription(List combo) {
 
-            if (sanitizedString.length() > 50)
-                sanitizedString = sanitizedString.substring(0, 47) + "...";
+                if (combo.getItemCount() > 1)
+                    setMessage(null, DialogPage.WARNING);
+                else if (getSelectedProject() == null)
+                    setMessage(NO_FILTERS_AVAILABLE, DialogPage.WARNING);
 
-            setMessage("Unable to build query page. Please check your repository settings.\nError details: "
-                    + sanitizedString, DialogPage.ERROR);
-        }
+            }
+        });
 
-        setControl(control);
+
+		Composite searchLimitComposite = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(searchLimitComposite);
+
+        Label titleLabel = new Label(searchLimitComposite, SWT.NONE);
+        titleLabel.setText(MAX_SEARCH_RESULTS);
+
+        searchLimit = new Text(searchLimitComposite, SWT.BORDER);
+        searchLimit.setText(MantisSearch.DEFAULT_SEARCH_LIMIT_STRING);
     }
 
     private IMantisClient getMantisClient() throws MantisException {
@@ -268,68 +194,29 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         });
 
-        refreshProjectTree(projectTreeViewer);
+        refreshProjectTree();
 
     }
 
-    private void refreshProjectTree(TreeViewer projectTreeViewer) {
+    private void refreshProjectTree() {
 
-        projectTreeViewer.setInput(getProjects());
-    }
-
-    /**
-     * @return a suitable, visible {@link IRunnableContext}
-     */
-    private IRunnableContext getRunnableContext() {
-
-        // we trust the search container to always have a runnable context
-        if (getSearchContainer() != null)
-            return getSearchContainer().getRunnableContext();
-
-        // task #155 : when 'New query' is invoked from the the repositories page the shell is not visible
-        final boolean[] shellVisibleHolder = new boolean[] { false };
-
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-
-                if (getShell() != null)
-                    shellVisibleHolder[0] = getShell().isVisible();
-            }
-        });
-
-        IRunnableContext container = getContainer();
-
-        // only get the platform service if the shell is invisible or the container is null
-        if (!shellVisibleHolder[0] || container == null)
-            container = PlatformUI.getWorkbench().getProgressService();
-
-        return container;
+        tree.getViewer().setInput(getProjects());
     }
 
     private MantisProject[] getProjects() {
 
-        final List<MantisProject> projects = new ArrayList<MantisProject>();
-        projects.add(MantisProject.ALL_PROJECTS);
-
         try {
-            
-            CommonUiUtil.run(getRunnableContext(), new ICoreRunnable() {
-
-                public void run(IProgressMonitor monitor) throws CoreException {
-
-                    try {
-                        projects.addAll(getMantisClient().getCache(monitor).getProjects());
-                    } catch (MantisException e) {
-                        throw new CoreException(new Status(Status.ERROR, MantisUIPlugin.PLUGIN_ID,
-                                "Failed getting projects : " + e.getMessage(), e));
-                    }
-                }
-            });
-        } catch (CoreException e) {
-            setMessage("Unable to load projects : " + e.getMessage() + " .", DialogPage.ERROR);
-        }
-
-        return projects.toArray(new MantisProject[0]);
+			final ArrayList<MantisProject> projects = new ArrayList<MantisProject>();
+			projects.add(MantisProject.ALL_PROJECTS);
+			projects.addAll(getMantisClient().getCache(new NullProgressMonitor()).getProjects());
+			
+			return projects.toArray(new MantisProject[projects.size()]);
+		} catch (MantisException e) {
+			String message = "Failed loading projects : " + e.getMessage();
+			MantisUIPlugin.handleError(e, message, false);
+			setErrorMessage(message);
+			return new MantisProject[0];
+		}
     }
 
     public MantisProject getSelectedProject() {
@@ -344,41 +231,19 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         return false;
     }
 
-    private void restoreSearchFilterFromQuery(IRepositoryQuery query) throws MalformedURLException, MantisException {
-
-        MantisCache cache = getMantisClient().getCache(new NullProgressMonitor());
-
-        MantisSearch search = MantisUtils.getMantisSearch(query);
-
-        tree.getViewer().setSelection(new StructuredSelection(cache.getProjectByName(search.getProjectName())));
-
-        filterCombo.setText(search.getFilterName());
-        searchLimit.setText(String.valueOf(search.getLimit()));
-
+    private static void select(org.eclipse.swt.widgets.List list, String text) {
+    	for ( int i = 0 ; i < list.getItemCount(); i++ )
+			if ( list.getItem(i).equals(text) )
+    			list.setSelection(i);
     }
-
-    private void createTitleGroup(Composite control) {
-
-        if (inSearchContainer())
-            return;
-
-        Label titleLabel = new Label(control, SWT.NONE);
-        titleLabel.setText(TITLE_QUERY_TITLE);
-
-        titleText = new Text(control, SWT.BORDER);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-        titleText.setLayoutData(gd);
-        titleText.addKeyListener(new KeyListener() {
-            public void keyPressed(KeyEvent e) {
-
-                // ignore
-            }
-
-            public void keyReleased(KeyEvent e) {
-
-                getContainer().updateButtons();
-            }
-        });
+    
+    private static String getSelected(org.eclipse.swt.widgets.List list) {
+    	
+    	String[] selection = list.getSelection();
+    	if ( selection.length == 0 )
+    		return null;
+    	
+    	return selection[0];
     }
 
     public TaskRepository getRepository() {
@@ -408,21 +273,19 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
     private boolean validate() {
 
-        boolean returnsw = true;
-
         if (getSearchContainer() == null) {
 
-            if (titleText == null)
+            if (getQueryTitle() == null)
                 return false;
 
-            if (titleText.getText().length() == 0)
+            if (getQueryTitle().length() == 0)
                 return false;
         }
 
         if (tree == null || getSelectedProject() == null)
             return false;
 
-        if (filterCombo != null && filterCombo.getText().contains(SELECT_FILTER_IN_PROJECT))
+        if (projectFilters == null || getSelected(projectFilters) == null )
             return false;
 
         try {
@@ -432,47 +295,38 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
             return false;
         }
 
-        return returnsw;
+        return true;
     }
 
     @Override
     public void applyTo(IRepositoryQuery query) {
 
         query.setSummary(getQueryTitle());
-        query.setUrl(filterKeyToUrl.get(new FilterKey(getSelectedProject().getValue(), filterCombo.getText()))); // possibly null
+        query.setUrl(filterKeyToUrl.get(new FilterKey(getSelectedProject().getValue(), getSelected(projectFilters)))); // possibly null
         query.setAttribute(IMantisClient.SEARCH_LIMIT, searchLimit.getText());
         query.setAttribute(IMantisClient.PROJECT_NAME, getSelectedProject().getName());
-        query.setAttribute(IMantisClient.FILTER_NAME, filterCombo.getText());
-    }
-
-    @Override
-    public String getQueryTitle() {
-
-        return (titleText != null) ? titleText.getText() : null;
+        query.setAttribute(IMantisClient.FILTER_NAME, getSelected(projectFilters));
     }
 
     private void refreshFilterCombo() {
 
         try {
             MantisCache cache = getMantisClient().getCache(new NullProgressMonitor());
-            String valueToSet = filterCombo.getText();
+            String valueToSet = getSelected(projectFilters);
 
-            filterCombo.remove(1, filterCombo.getItemCount() - 1);
+            projectFilters.removeAll();
 
             if (getSelectedProject() == null)
                 return;
 
             int selectedProjectId = getSelectedProject().getValue();
             for (MantisProjectFilter pd : cache.getProjectFilters(selectedProjectId)) {
-                filterCombo.add(pd.getName());
+                projectFilters.add(pd.getName());
                 filterKeyToUrl.put(new FilterKey(selectedProjectId, pd.getName()), pd.getUrl());
             }
 
             if (valueToSet != null)
-                filterCombo.setText(valueToSet);
-
-            if (filterCombo.getSelectionIndex() == -1)
-                filterCombo.setText(SELECT_FILTER_IN_PROJECT);
+                select(projectFilters, valueToSet);
 
         } catch (MantisException e) {
             setErrorMessage("Failed updating attributes " + e.getMessage() + " .");
@@ -481,6 +335,28 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         updateButtonsIfNeeded();
     }
 
+    @Override
+    protected boolean restoreState(IRepositoryQuery query) {
+    
+        try {
+			MantisCache cache = getMantisClient().getCache(new NullProgressMonitor());
+
+			MantisSearch search = MantisUtils.getMantisSearch(query);
+
+			tree.getViewer().setSelection(new StructuredSelection(cache.getProjectByName(search.getProjectName())));
+
+			select(projectFilters, search.getFilterName());
+			searchLimit.setText(String.valueOf(search.getLimit()));
+			
+			return true;
+			
+		} catch (MantisException e) {
+			MantisUIPlugin.handleError(e, "Failed restoring query page state from query " + query, false);
+		
+			return false;
+		}
+    }
+    
     private void updateButtonsIfNeeded() {
 
         if (getContainer() != null)
@@ -488,6 +364,24 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
 
         setPageComplete(isPageComplete());
     }
+    
+    
+	@Override
+	protected void doRefreshControls() {
+	
+		refreshProjectTree();
+		refreshFilterCombo();	
+	}
+
+	@Override
+	protected boolean hasRepositoryConfiguration() {
+		
+		try {
+			return getMantisClient().getCacheData().hasBeenRefreshed();
+		} catch (MantisException e) {
+			return false;
+		}
+	}
 
     private static final class FilterKey {
 
@@ -532,5 +426,4 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage {
         
         
     }
-
 }

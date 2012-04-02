@@ -24,7 +24,6 @@ package com.itsolut.mantis.ui.wizard;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
-import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
 import com.itsolut.mantis.core.IMantisClientManager;
@@ -35,34 +34,23 @@ import com.itsolut.mantis.core.IMantisClientManager;
  */
 public class NewMantisQueryWizard extends RepositoryQueryWizard {
 
-	private final TaskRepository repository;
 	private final IRepositoryQuery query;
-    private final IMantisClientManager clientManager;
-
 	
 	public NewMantisQueryWizard(TaskRepository repository, IRepositoryQuery queryToEdit, IMantisClientManager clientManager) {
 		super(repository);
-		this.repository = repository;
 		this.query = queryToEdit;
-        this.clientManager = clientManager;
         
 		setWindowTitle(query == null ? "Create Mantis Query" : "Edit Mantis Query");
 		setNeedsProgressMonitor(true);
 		setDefaultPageImageDescriptor(TasksUiImages.BANNER_REPOSITORY);
+		
+		MantisCustomQueryPage queryPage = query != null ? new MantisCustomQueryPage(repository, query, clientManager) : new MantisCustomQueryPage(repository, clientManager); 
+	    
+		addPage(queryPage);
 		
 	}
 
 	public NewMantisQueryWizard(TaskRepository repository, IMantisClientManager clientManager) {
 	    this(repository, null, clientManager);
 	}
-
-	@Override
-	public void addPages() {
-	    
-	    AbstractRepositoryQueryPage queryPage = query != null ? new MantisCustomQueryPage(repository, query, clientManager) : new MantisCustomQueryPage(repository, clientManager); 
-	    
-		queryPage.setWizard(this);
-		addPage(queryPage);
-	}
-    
 }
