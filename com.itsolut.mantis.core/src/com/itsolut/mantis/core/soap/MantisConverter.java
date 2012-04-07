@@ -306,7 +306,7 @@ public class MantisConverter {
             throw new MantisException("Could not find user for username " + userName);
 
         accountData.setId(BigInteger.valueOf(user.getValue()));
-        accountData.setName(user.getName());
+        accountData.setName(user.getKey());
         accountData.setEmail(user.getEmail());
         accountData.setReal_name(user.getRealName());
 

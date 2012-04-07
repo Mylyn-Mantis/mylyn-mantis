@@ -92,7 +92,7 @@ public class MantisCache {
     private void cacheUsers0(List<MantisUser> projectUsers) {
 
         for (MantisUser user : projectUsers)
-            cacheData.allUsers.put(user.getName(), user);
+            cacheData.allUsers.put(user.getKey(), user);
         
     }
 
@@ -474,7 +474,7 @@ public class MantisCache {
      * @return the matching user, possibly <code>null</code>
      */
     public MantisUser getUserByUsername(String userName) {
-        
+    	
         return cacheData.allUsers.get(userName);
     }
 
@@ -594,7 +594,7 @@ public class MantisCache {
         if ( user.getValue() == 0 )
             return;
         
-        cacheData.allUsers.put(user.getName(), user);
+        cacheData.allUsers.put(user.getKey(), user);
         
         if ( cacheData.getReportersByProjectId().containsEntry(projectId, user) )
             return;
@@ -621,7 +621,7 @@ public class MantisCache {
 
         for ( MantisUser user : cacheData.allUsers.values() )
             if ( user.getValue() == userId )
-                return user.getName();
+                return user.getKey();
                 
         return null;
     }
