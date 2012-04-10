@@ -311,10 +311,10 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 			
             TaskAttribute attribute = getAttribute(data, key);
        
+            boolean isPersonAttribute = TaskAttribute.TYPE_PERSON.equals(attribute.getMetaData().getType());
+            
             // no options, just copy the value
-            if ( attribute.getOptions().isEmpty() ) {
-                attribute.setValue(value);
-            } if ( TaskAttribute.TYPE_PERSON.equals(attribute.getMetaData().getType()) ) {
+            if ( attribute.getOptions().isEmpty() || isPersonAttribute) {
             	attribute.setValue(value);
             } else {
 
