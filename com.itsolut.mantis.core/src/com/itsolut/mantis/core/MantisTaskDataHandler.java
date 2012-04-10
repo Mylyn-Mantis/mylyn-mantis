@@ -440,7 +440,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         List<String> originalValues = new ArrayList<String>();
         
         for ( MantisUser issueMonitor: ticket.getMonitors() ) {
-            IRepositoryPerson person = newPerson(repository, issueMonitor.getName() , client, monitor);
+            IRepositoryPerson person = newPerson(repository, issueMonitor.getKey() , client, monitor);
             attribute.putOption(person.getPersonId(), person.toString());
             originalValues.add(person.getPersonId());
         }
