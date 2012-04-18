@@ -7,7 +7,7 @@
  *******************************************************************************/
 package com.itsolut.mantis.ui.editor;
 
-import org.eclipse.mylyn.internal.provisional.commons.ui.CommonImages;
+import org.eclipse.mylyn.commons.ui.CommonImages;
 import org.eclipse.mylyn.tasks.ui.ITasksUiConstants;
 import org.eclipse.mylyn.tasks.ui.TasksUiImages;
 import org.eclipse.mylyn.tasks.ui.TasksUiUtil;
@@ -22,7 +22,6 @@ import com.itsolut.mantis.core.MantisCorePlugin;
 /**
  * @author Steffen Pingel
  */
-@SuppressWarnings("restriction")
 public class MantisTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 
 	@Override
