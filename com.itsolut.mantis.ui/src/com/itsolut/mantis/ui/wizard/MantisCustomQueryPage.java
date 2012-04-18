@@ -193,9 +193,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage2 {
             }
 
         });
-
-        refreshProjectTree();
-
     }
 
     private void refreshProjectTree() {
@@ -364,7 +361,6 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage2 {
 
         setPageComplete(isPageComplete());
     }
-    
     
 	@Override
 	protected void doRefreshControls() {
