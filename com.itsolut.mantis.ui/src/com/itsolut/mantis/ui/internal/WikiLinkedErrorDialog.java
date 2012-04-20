@@ -3,7 +3,7 @@ package com.itsolut.mantis.ui.internal;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.mylyn.internal.provisional.commons.ui.WorkbenchUtil;
+import org.eclipse.mylyn.commons.workbench.browser.BrowserUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -42,7 +42,7 @@ public class WikiLinkedErrorDialog extends ErrorDialog {
 
             public void linkActivated(HyperlinkEvent e) {
 
-                WorkbenchUtil.openUrl(
+                BrowserUtil.openUrl(
                         "https://sourceforge.net/apps/mediawiki/mylyn-mantis/index.php?title=Troubleshooting",
                         IWorkbenchBrowserSupport.AS_EXTERNAL);
 
