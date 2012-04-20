@@ -125,11 +125,6 @@ public enum RepositoryVersion {
 		return Integer.parseInt(builder.toString());
 	}
 	
-	private static String extractQualifierFor12x(String versionString) {
-		
-		return versionString.substring("1.2.".length()+1);
-	}
-
 	private final EnumSet<RepositoryCapability> capabilities;
 	private final String description;
     
