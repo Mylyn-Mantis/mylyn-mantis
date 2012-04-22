@@ -76,7 +76,7 @@ public class MantisUIUtil {
         
         EnhancedFilteredTree tree = new EnhancedFilteredTree(control, SWT.SINGLE | SWT.BORDER, new PatternFilter());
         
-        GridDataFactory.defaultsFor(tree).align(SWT.FILL, SWT.FILL).grab(true, true).hint( SWT.DEFAULT, 130).applyTo(tree);
+        GridDataFactory.defaultsFor(tree).align(SWT.FILL, SWT.FILL).grab(true, true).hint(200, 130).applyTo(tree);
         
         return tree;
     }
