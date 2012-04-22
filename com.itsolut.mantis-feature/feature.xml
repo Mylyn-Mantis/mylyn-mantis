@@ -214,10 +214,10 @@ litigation.
    </url>
 
    <requires>
-      <import feature="org.eclipse.mylyn_feature" version="3.6.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.commons.net" version="3.6.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.commons.soap" version="3.6.0" match="compatible"/>
-      <import plugin="org.eclipse.mylyn.commons.ui" version="3.6.0" match="compatible"/>
+      <import feature="org.eclipse.mylyn_feature" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.net" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.soap" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.ui" version="3.7.0" match="compatible"/>
    </requires>
 
    <plugin
