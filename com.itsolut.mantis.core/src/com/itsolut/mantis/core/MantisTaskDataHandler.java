@@ -40,6 +40,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private final IMantisClientManager clientManager;
     private final StatusFactory statusFactory;
     private final MantisCommentMapper commentMapper;
+    private final MantisTaskDataMigrator migrator = new MantisTaskDataMigrator();
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -530,6 +531,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
         // The order here is important as it controls how it appears in the Editor
 
+    	data.setVersion(String.valueOf(migrator.getCurrent().getValue()));
+    	
         try {
             MantisCache cache = client.getCache(monitor);
             
@@ -951,4 +954,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         
     }
 
+    @Override
+    public void migrateTaskData(TaskRepository repository, TaskData taskData) {
+    	
+    	try {
+			migrator.migrateTaskData(repository, taskData, clientManager.getRepository(repository));
+		} catch (Exception e) {
+			MantisCorePlugin.error("Failed getting a client for repository " + repository, e);
+		}
+    }
 }
