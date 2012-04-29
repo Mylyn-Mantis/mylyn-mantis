@@ -25,6 +25,7 @@ import java.util.*;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
+import com.google.common.base.Joiner;
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.MantisCorePlugin;
 import com.itsolut.mantis.core.model.MantisSearch;
@@ -170,6 +171,10 @@ public class MantisUtils {
         }
     }
 
+    /**
+     * @deprecated Use {@link Joiner#join(Iterable)}
+     */
+    @Deprecated
     public static String toCsvString(List<String> values) {
         
         if ( values == null || values.isEmpty() )

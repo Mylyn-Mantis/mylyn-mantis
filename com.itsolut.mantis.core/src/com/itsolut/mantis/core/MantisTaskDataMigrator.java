@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2012 Robert Munteanu <robert.munteanu@gmail.com>
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package com.itsolut.mantis.core;
 
 import java.util.ArrayList;
@@ -11,9 +19,11 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
+import com.google.common.base.Joiner;
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisUser;
+import com.itsolut.mantis.core.util.MantisUtils;
 
 public class MantisTaskDataMigrator {
 	
@@ -37,9 +47,29 @@ public class MantisTaskDataMigrator {
 					migratePersonAttribute(taskData, MantisAttributeMapper.Attribute.REPORTER, mantisClient);
 					migratePersonAttribute(taskData, MantisAttributeMapper.Attribute.ASSIGNED_TO, mantisClient);
 					migratePersonAttribute(taskData, MantisAttributeMapper.Attribute.MONITORS, mantisClient);
+					refreshOldMonitors(taskData, mantisClient);
+					
 				} catch (MantisException e) {
 					MantisCorePlugin.warn("Failed migrating TaskData " + taskData.getTaskId() + " for repository " + taskData.getRepositoryUrl(), e);
 				}
+			}
+
+			private void refreshOldMonitors(TaskData taskData, IMantisClient mantisClient) throws MantisException {
+				
+				TaskAttribute attribute = taskData.getRoot().getAttribute(MantisAttributeMapper.Attribute.MONITORS.getKey());
+				if ( attribute == null )
+					return;
+				
+				if ( attribute.getValue().isEmpty() )
+					return;
+				
+				String oldValue = attribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS);
+				
+				List<String> monitorNames = userIdsToUserNames(mantisClient, new NullProgressMonitor(), MantisUtils.fromCsvString(oldValue));
+				
+				String originalValues = Joiner.on(',').join(monitorNames);
+				
+				attribute.getMetaData().putValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS, originalValues);
 			}
 
 			private void migratePersonAttribute(TaskData taskData, Attribute attributeKey, IMantisClient mantisClient) throws MantisException {
@@ -99,8 +129,12 @@ public class MantisTaskDataMigrator {
 
 			private List<String> getNewValues(IMantisClient mantisClient, TaskAttribute attribute, NullProgressMonitor progressMonitor) throws MantisException {
 				
-				
-				List<String> userIds = attribute.getValues();
+				return userIdsToUserNames(mantisClient, progressMonitor, attribute.getValues());
+			}
+
+			private List<String> userIdsToUserNames(IMantisClient mantisClient,
+					NullProgressMonitor progressMonitor, List<String> userIds)
+					throws MantisException {
 				// no values
 				if ( userIds == null || userIds.isEmpty() )
 					return Collections.emptyList();
@@ -139,7 +173,6 @@ public class MantisTaskDataMigrator {
 		
 			return value;
 		}
-		
 		
 		public abstract void migrateTaskData(TaskRepository repository, TaskData taskData, IMantisClient mantisClient);
 	}
