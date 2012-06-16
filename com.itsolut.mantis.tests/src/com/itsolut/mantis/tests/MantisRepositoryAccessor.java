@@ -73,7 +73,7 @@ public class MantisRepositoryAccessor {
 	static {
 		
 		StatusFactory statusFactory = new StatusFactory();
-		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory, new MantisCommentMapper());
+		MantisTaskDataHandler dataHandler = new MantisTaskDataHandler(clientManager, statusFactory, new MantisCommentMapper(), new NoOpTracer());
 		MantisAttachmentHandler attachmentHandler = new MantisAttachmentHandler(clientManager, statusFactory);
 
 		connector = new MantisRepositoryConnector(clientManager, dataHandler, attachmentHandler, statusFactory, new NoOpTracer());

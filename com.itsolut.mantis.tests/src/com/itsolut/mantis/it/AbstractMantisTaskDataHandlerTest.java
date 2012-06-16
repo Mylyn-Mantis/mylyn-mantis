@@ -35,6 +35,7 @@ import com.itsolut.mantis.core.DefaultConstantValues;
 import com.itsolut.mantis.core.MantisCommentMapper;
 import com.itsolut.mantis.core.MantisRepositoryConfiguration;
 import com.itsolut.mantis.core.MantisTaskDataHandler;
+import com.itsolut.mantis.core.NoOpTracer;
 import com.itsolut.mantis.core.StatusFactory;
 import com.itsolut.mantis.tests.MantisRepositoryAccessor;
 
@@ -49,7 +50,7 @@ public abstract class AbstractMantisTaskDataHandlerTest extends AbstractIntegrat
 	}
 
 	private MantisTaskDataHandler newTaskDataHandler() {
-		return new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory(), new MantisCommentMapper());
+		return new MantisTaskDataHandler(MantisRepositoryAccessor.clientManager, new StatusFactory(), new MantisCommentMapper(), new NoOpTracer());
 	}
 	
 	@Test

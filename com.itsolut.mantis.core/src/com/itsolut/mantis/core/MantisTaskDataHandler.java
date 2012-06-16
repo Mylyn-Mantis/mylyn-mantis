@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     David Carver - STAR - adapted from Bugzilla mylyn 3.0 implementation.
+ *     Robert Munteanu - various fixes and improvements
  *******************************************************************************/
 
 package com.itsolut.mantis.core;
@@ -41,6 +42,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     private final StatusFactory statusFactory;
     private final MantisCommentMapper commentMapper;
     private final MantisTaskDataMigrator migrator = new MantisTaskDataMigrator();
+	private final Tracer tracer;
 
     private static final String CONTEXT_ATTACHMENT_FILENAME = "mylyn-context.zip";
 
@@ -83,10 +85,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     }
     
     @Inject
-    public MantisTaskDataHandler(IMantisClientManager clientManager, StatusFactory statusFactory, MantisCommentMapper commentMapper) {
+    public MantisTaskDataHandler(IMantisClientManager clientManager, StatusFactory statusFactory, MantisCommentMapper commentMapper, Tracer tracer) {
         this.clientManager = clientManager;
         this.statusFactory = statusFactory;
         this.commentMapper = commentMapper;
+        this.tracer = tracer;
     }
 
     @Override
@@ -226,9 +229,13 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
                 List<String> monitorsToRemove = new ArrayList<String>(attribute.getValues());
                 List<String> originalMonitors = MantisUtils.fromCsvString(attribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS));
                 
+                tracer.trace(TraceLocation.MAIN, "Original monitors : {0},  to remove: {1}", originalMonitors, monitorsToRemove );
+
                 originalMonitors.removeAll(monitorsToRemove);
                 
                 ticket.putValue(attribute.getId(), MantisUtils.toCsvString(originalMonitors));
+                
+                
                 continue;
             }
             
