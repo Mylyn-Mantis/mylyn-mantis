@@ -2,15 +2,17 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.8.0" date="2011-12-13">
-			<action type="add" issue="246" dev="rombert">Support profile fields</action>
-			<action type="add" issue="244" dev="rombert">Update SOAP stubs for 1.2.9</action>
-			<action type="add" issue="245" dev="rombert">Add support for tags</action>
-			<action type="add" issue="241" dev="rombert">Display date/times in the user's local timezone</action>
-			<action type="add" issue="235" dev="rombert">Use WikiText instead of HtmlText for the editors</action>
-			<action type="add" issue="240" dev="rombert">Custom date fields are serialised incorrectly</action>
-			<action type="add" issue="242" dev="rombert">Tasks are no longer marked as resolved in the task list</action>
-			<action type="add" issue="239" dev="rombert">Times are displayed with an incorrect time zone offset</action>
+		<release version="3.9.0" date="2012-06-25">
+			<action type="add" issue="258" dev="rombert">Use a text field for person attributes</action>
+			<action type="add" issue="228" dev="rombert">Inherit layout of query page from improved Mylyn support class</action>
+			<action type="add" issue="257" dev="rombert">Use in-line completion for person fields</action>
+			<action type="add" issue="247" dev="rombert">Ensure compatibility with Mylyn 3.7.0</action>
+			<action type="add" issue="255" dev="rombert">Upgrade to tycho 0.14.1</action>
+			<action type="add" issue="253" dev="rombert">Regression - Comment required for updating issues?</action>
+			<action type="add" issue="256" dev="rombert">Tags not displayed for Mantis 1.2.10</action>
+			<action type="add" issue="251" dev="rombert">Unable to select project with older MantisBT installation: Operation 'mc_tag_get_all' is not defined</action>
+			<action type="add" issue="250" dev="rombert">Make tracing calls non-OSGi friendly</action>
+			<action type="add" issue="249" dev="rombert">First note causes the 'Time tracked' attribute to change from empty to '0:00'</action>
 		</release>
 	</body>
 </document>
