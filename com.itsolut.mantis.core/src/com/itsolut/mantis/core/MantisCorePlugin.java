@@ -59,9 +59,14 @@ public class MantisCorePlugin extends Plugin {
 
     public static String getVersionString() {
         
-        Version version = getDefault().getBundle().getVersion();
-
-        return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
+    	if ( getDefault() != null ) {
+    	
+	        Version version = getDefault().getBundle().getVersion();
+	
+	        return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
+    	} else { // not running in an OSGi container
+    		return "Version n/a";
+    	}
     }
     
     @Override
@@ -117,7 +122,10 @@ public class MantisCorePlugin extends Plugin {
 
     private static void log(IStatus status) {
 
-        getDefault().getLog().log(status);
+    	if ( getDefault() != null )
+    		getDefault().getLog().log(status);
+    	else // not running in an OSGi environment
+    		System.err.println(status.getMessage());
     }
     
     public static void error(String message, Throwable t) {

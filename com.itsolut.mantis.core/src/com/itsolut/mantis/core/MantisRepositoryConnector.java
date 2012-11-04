@@ -43,6 +43,7 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.util.MantisUtils;
@@ -81,6 +82,10 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         
         injector.injectMembers(this);
         injector.injectMembers(MantisCorePlugin.getDefault());
+    }
+
+    protected MantisRepositoryConnector(final Module dummy) {
+    	
     }
     
     /**
