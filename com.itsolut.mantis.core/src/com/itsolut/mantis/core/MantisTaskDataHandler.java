@@ -71,7 +71,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
     
     private final static Map<MantisCustomFieldType, String> customFieldTypeToTaskType = new EnumMap<MantisCustomFieldType, String>(MantisCustomFieldType.class);
     {
-        customFieldTypeToTaskType.put(MantisCustomFieldType.CHECKBOX, TaskAttribute.TYPE_BOOLEAN);
+        customFieldTypeToTaskType.put(MantisCustomFieldType.CHECKBOX, TaskAttribute.TYPE_MULTI_SELECT);
         customFieldTypeToTaskType.put(MantisCustomFieldType.DATE, TaskAttribute.TYPE_DATE);
         customFieldTypeToTaskType.put(MantisCustomFieldType.EMAIL, TaskAttribute.TYPE_SHORT_TEXT);
         customFieldTypeToTaskType.put(MantisCustomFieldType.ENUM, TaskAttribute.TYPE_SINGLE_SELECT);
