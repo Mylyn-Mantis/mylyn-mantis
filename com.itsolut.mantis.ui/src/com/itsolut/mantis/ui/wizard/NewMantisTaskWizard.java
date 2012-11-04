@@ -13,6 +13,8 @@ package com.itsolut.mantis.ui.wizard;
 
 import static com.itsolut.mantis.core.MantisAttributeMapper.Attribute.PROJECT;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.mylyn.tasks.core.*;
@@ -22,6 +24,8 @@ import org.eclipse.ui.INewWizard;
 
 import com.itsolut.mantis.core.IMantisClient;
 import com.itsolut.mantis.core.IMantisClientManager;
+import com.itsolut.mantis.core.MantisCacheData;
+import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.model.MantisProject;
 import com.itsolut.mantis.ui.util.MantisUIUtil;
 
@@ -77,8 +81,18 @@ public class NewMantisTaskWizard extends NewTaskWizard implements INewWizard {
              }
              
              if ( projectName != null && ! MantisProject.ALL_PROJECTS.getName().equals(projectName) ) {
-                 mapping = new ProductOnlyTaskMapping(projectName);
-                 return;
+            	 
+				try {
+					MantisCacheData cacheData = clientManager.getRepository( taskRepository).getCacheData();
+					for (MantisProject project : cacheData.getProjects()) {
+						if (project.getName().equals(projectName)) {
+							mapping = new ProductOnlyTaskMapping(projectName);
+							return;
+						}
+					}
+				} catch (MantisException e) {
+					// ignore the attempt and fall back to using a project page
+				}
              }
          }
          
