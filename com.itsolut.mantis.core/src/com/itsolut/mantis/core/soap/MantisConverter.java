@@ -37,7 +37,7 @@ public class MantisConverter {
         customField.setName(customFieldData.getField().getName());
         customField.setType(MantisCustomFieldType.fromMantisConstant(customFieldData.getType().intValue()));
         customField.setDefaultValue(customFieldData.getDefault_value());
-        if (customFieldData.getPossible_values() != null)
+        if (customFieldData.getPossible_values() != null && customFieldData.getPossible_values().trim().length() > 0)
             customField.setPossibleValues(customFieldData.getPossible_values().split("\\|"));
 
         return customField;

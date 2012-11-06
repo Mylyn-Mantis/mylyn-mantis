@@ -110,7 +110,12 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             
 			createDefaultAttributes(data, client, initializationData.getProduct(), monitor, false);
             createProjectSpecificAttributes(data, client, monitor);
-            createCustomFieldAttributes(data, client, new DefaultCustomFieldValueSource(), monitor);
+            CustomFieldValueSource customFieldValueSource;
+            if ( initializationData instanceof MantisTaskMapper)
+            	customFieldValueSource = new TaskDataCustomFieldValueSource(initializationData.getTaskData());
+            else
+            	customFieldValueSource = new DefaultCustomFieldValueSource();
+            createCustomFieldAttributes(data, client, customFieldValueSource, monitor);
             return true;
         } catch (MantisException e) {
             throw new CoreException(statusFactory.toStatus(null, e, repository));
