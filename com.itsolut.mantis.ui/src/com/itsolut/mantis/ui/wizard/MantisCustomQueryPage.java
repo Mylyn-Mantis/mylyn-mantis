@@ -105,7 +105,7 @@ public class MantisCustomQueryPage extends AbstractRepositoryQueryPage2 {
     	Composite parent = sectionComposite.getContent();
     	
         Composite control = new Composite(parent, SWT.NONE);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         control.setLayoutData(gd);
         GridLayout layout = new GridLayout(2, true);
         control.setLayout(layout);
