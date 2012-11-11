@@ -19,6 +19,7 @@ import static com.itsolut.mantis.core.DefaultConstantValues.Attribute.PROJECTION
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +45,7 @@ import com.itsolut.mantis.core.model.MantisTicket.Key;
  * @author Robert Munteanu
  */
 public class MantisSoapClient implements IMantisClient {
-
+	
     private final MantisAxis1SoapClient soapClient;
 
     private final MantisCache cache;
@@ -56,7 +57,236 @@ public class MantisSoapClient implements IMantisClient {
     private final NumberFormat formatter = new DecimalFormat("#.#");
 
     private final Tracer tracer;
+    
+    private final List<RunnableWithProgress> globalRefreshRunnables = new ArrayList<RunnableWithProgress>();
+    {
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+			public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+				cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
+			}
+		});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                List<TagData> tags  = cache.getRepositoryVersion().isHasTagSupport() ? 
+                        soapClient.getAllTags(50, monitor) : Collections. <TagData> emptyList();
+                cache.cacheTags(MantisConverter.convert(tags));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheReporterThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD.getValue()), 
+    					DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue()));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheDeveloperThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD.getValue()), 
+                		DefaultConstantValues.Threshold.UPDATE_BUG_ASSIGN_THRESHOLD.getValue()));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheAssignedStatus(safeGetInt(soapClient.getStringConfiguration(monitor, BUG_ASSIGNED_STATUS.getValue()), 
+    					DefaultConstantValues.Status.ASSIGNED.getValue()));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheSubmitStatus(safeGetInt(soapClient.getStringConfiguration(monitor, BUG_SUBMIT_STATUS.getValue()), 
+    					DefaultConstantValues.Status.NEW.getValue()));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheEnableProfiles(safeGetBoolean(monitor, ENABLE_PROFILES.getValue(), 
+    					DefaultConstantValues.Attribute.PROFILES_ENABLED));
+    		}
+    	});
 
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                try {
+                    cache.cacheDueDateViewThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD.getValue()), 
+                    		DefaultConstantValues.Role.NOBODY.getValue()));
+                } catch (MantisException e) {
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
+                    cache.cacheDueDateViewThreshold(DefaultConstantValues.Role.NOBODY.getValue());
+                } 
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                try {
+                    String mantisValue = soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD.getValue());
+                    cache.cacheDueDateUpdateThreshold(safeGetInt(mantisValue,DefaultConstantValues.Role.NOBODY.getValue()));
+                } catch (MantisException e) {
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
+                    cache.cacheDueDateUpdateThreshold(DefaultConstantValues.Role.NOBODY.getValue());
+                } 
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                try {
+                    cache.cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED.getValue()));
+                } catch (MantisException e) {
+                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
+                    cache.cacheTimeTrackingEnabled(Boolean.FALSE.toString());
+                }
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheResolvedStatus(soapClient.getStringConfiguration(monitor, RESOLVED_STATUS_THRESHOLD.getValue()));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cachePriorities(MantisConverter.convert( soapClient.getPriorities(monitor), MantisPriority.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheStatuses(MantisConverter.convert(soapClient.getStatuses(monitor), MantisTicketStatus.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheSeverities(MantisConverter.convert(soapClient.getSeverities(monitor), MantisSeverity.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheResolutions(MantisConverter.convert(soapClient.getResolutions(monitor), MantisResolution.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheReproducibilites(MantisConverter.convert(soapClient.getReproducibilities(monitor), MantisReproducibility.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheProjections(MantisConverter.convert(soapClient.getProjections(monitor), MantisProjection.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheEtas(MantisConverter.convert(soapClient.getEtas(monitor), MantisETA.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheViewStates(MantisConverter.convert(soapClient.getViewStates(monitor), MantisViewState.class));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.SEVERITY, safeGetThreshold(monitor, "default_bug_severity", DefaultConstantValues.Attribute.BUG_SEVERITY));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.PRIORITY, safeGetThreshold(monitor, "default_bug_priority", DefaultConstantValues.Attribute.BUG_PRIORITY));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.ETA, safeGetThreshold(monitor, "default_bug_eta", DefaultConstantValues.Attribute.BUG_ETA));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheDefaultAttributeValue(Key.REPRODUCIBILITY, safeGetThreshold(monitor, "default_bug_reproducibility", DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.RESOLUTION, safeGetThreshold(monitor, "default_bug_resolution", DefaultConstantValues.Attribute.BUG_RESOLUTION));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.PROJECTION, safeGetThreshold(monitor, "default_bug_projection", DefaultConstantValues.Attribute.BUG_PROJECTION));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheDefaultAttributeValue(Key.VIEW_STATE, safeGetThreshold(monitor, "default_bug_view_status", DefaultConstantValues.Attribute.BUG_VIEW_STATUS));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.getCacheData().putDefaultValueForStringAttribute(Key.STEPS_TO_REPRODUCE, soapClient.getStringConfiguration(monitor, "default_bug_steps_to_reproduce"));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.getCacheData().putDefaultValueForStringAttribute(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.getCacheData().setBugResolutionFixedThreshold(safeGetThreshold(monitor, "bug_resolution_fixed_threshold", DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.getCacheData().setEtaEnabled(safeGetBoolean(monitor, "enable_eta", ETA_ENABLED ));
+    		}
+    	});
+    	globalRefreshRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.getCacheData().setProjectionEnabled(safeGetBoolean(monitor, "enable_projection", PROJECTION_ENABLED ));
+    		}
+    	});
+    }
+    
+    private final List<RunnableWithProgress> projectSpecificRunnables = new ArrayList<RunnableWithProgress>();
+    {
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+    			cache.cacheFilters(project.getValue(), MantisConverter.convert(soapClient.getProjectFilters(project.getValue(), monitor)));
+    		}
+    	});
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheProjectCustomFields(project.getValue(), MantisConverter.convert(soapClient.getProjectCustomFields(project.getValue(),
+                        monitor)));
+    		}
+    	});
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheProjectCategories(project.getValue(), soapClient.getProjectCategories(project.getValue(), monitor));
+    		}
+    	});
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheProjectDevelopers(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
+                        cache.getCacheData().getDeveloperThreshold(), monitor)));
+    		}
+    	});
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                try {
+                    cache.cacheProjectReporters(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
+                            cache.getCacheData().getReporterThreshold(), monitor)));
+                } catch (MantisException e) {
+                    if ( cache.getCacheData().getReportersByProjectId().containsKey(project.getValue()) ) {
+                        MantisCorePlugin.warn("Failed retrieving reporter information, using previously loaded values.", e);
+                    } else {
+                        cache.copyReportersFromDevelopers(project.getValue());
+                        MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
+                    }
+                }
+    		}
+    	});
+    	projectSpecificRunnables.add(new RunnableWithProgress() {
+    		public void run(IProgressMonitor monitor, MantisProject project) throws MantisException {
+                cache.cacheProjectVersions(project.getValue(), MantisConverter.convert(soapClient.getProjectVersions(project.getValue(), monitor)));
+    		}
+    	});
+    }
     public MantisSoapClient(AbstractWebLocation webLocation, Tracer tracer) throws MantisException {
 
         this.tracer = tracer;
@@ -318,174 +548,44 @@ public class MantisSoapClient implements IMantisClient {
 
         refresh0(monitor, repositoryUrl, MantisProject.ALL_PROJECTS.getValue());
     }
-
+    
     private void refresh0(IProgressMonitor monitor, String repositoryUrl, int projectId) throws MantisException {
         
         synchronized (sync) {
 
             long start = System.currentTimeMillis();
 
-            SubMonitor subMonitor = SubMonitor.convert(monitor);
-
+            // set up an initial estimate of needed work
+            SubMonitor subMonitor = SubMonitor.convert(monitor, "Refreshing repository configuration", 100);
+            
             try {
-                // TODO: recursive
-                cache.cacheProjects(MantisConverter.convert(soapClient.getProjectData(monitor)));
+                cache.cacheProjects(MantisConverter.convert(soapClient.getProjectData(subMonitor.newChild(10))));
 
                 int projectsToRefresh =  projectId == MantisProject.ALL_PROJECTS.getValue() ? cache.getCacheData().getProjects().size()  : 1 ;
+                int progressTicks = projectsToRefresh * projectSpecificRunnables.size() + globalRefreshRunnables.size();
                 
-                subMonitor.beginTask("Refreshing repository configuration", projectsToRefresh * 6 + 31);
+                tracer.trace(TraceLocation.SYNC, "Refreshing {0} projects, {1} progress ticks, passed in monitor is {2}", projectsToRefresh, progressTicks, monitor);
                 
-                cache.cacheRepositoryVersion(soapClient.getVersion(monitor));
-                Policy.advance(subMonitor, 1);
+                // set up the real estimate for needed work
+                subMonitor.setWorkRemaining(progressTicks);
                 
-                List<TagData> tags  = cache.getRepositoryVersion().isHasTagSupport() ? 
-                        soapClient.getAllTags(50, subMonitor) : Collections. <TagData> emptyList();
-                cache.cacheTags(MantisConverter.convert(tags));
-                Policy.advance(monitor, 1);
-
-                cache.cacheReporterThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, REPORTER_THRESHOLD.getValue()), DefaultConstantValues.Threshold.REPORT_BUG_THRESHOLD.getValue()));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDeveloperThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, DEVELOPER_THRESHOLD.getValue()), DefaultConstantValues.Threshold.UPDATE_BUG_ASSIGN_THRESHOLD.getValue()));
-                Policy.advance(subMonitor, 1);
-                
-                cache.cacheAssignedStatus(safeGetInt(soapClient.getStringConfiguration(monitor, BUG_ASSIGNED_STATUS.getValue()), DefaultConstantValues.Status.ASSIGNED.getValue()));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheSubmitStatus(safeGetInt(soapClient.getStringConfiguration(monitor, BUG_SUBMIT_STATUS.getValue()), DefaultConstantValues.Status.NEW.getValue()));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheEnableProfiles(safeGetBoolean(monitor, ENABLE_PROFILES.getValue(), DefaultConstantValues.Attribute.PROFILES_ENABLED));
-                Policy.advance(subMonitor, 1);
-                
-                try {
-                    cache.cacheDueDateViewThreshold(safeGetInt(soapClient.getStringConfiguration(monitor, DUE_DATE_VIEW_THRESOLD.getValue()), DefaultConstantValues.Role.NOBODY.getValue()));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cache.cacheDueDateViewThreshold(DefaultConstantValues.Role.NOBODY.getValue());
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
-
-                try {
-                    String mantisValue = soapClient.getStringConfiguration(monitor, DUE_DATE_UPDATE_THRESOLD.getValue());
-                    cache.cacheDueDateUpdateThreshold(safeGetInt(mantisValue,DefaultConstantValues.Role.NOBODY.getValue()));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cache.cacheDueDateUpdateThreshold(DefaultConstantValues.Role.NOBODY.getValue());
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
-
-                try {
-                    cache.cacheTimeTrackingEnabled(soapClient.getStringConfiguration(monitor, TIME_TRACKING_ENABLED.getValue()));
-                } catch (MantisException e) {
-                    MantisCorePlugin.warn("Failed retrieving configuration value: " + e.getMessage() + " . Using default value.");
-                    cache.cacheTimeTrackingEnabled(Boolean.FALSE.toString());
-                } finally {
-                    Policy.advance(subMonitor, 1);
-                }
+                for ( RunnableWithProgress runnable : globalRefreshRunnables )
+					runnable.run(subMonitor.newChild(1), null);
                 
                 for (MantisProject project : cache.getProjects()) {
                     
                     if ( projectId != MantisProject.ALL_PROJECTS.getValue() && projectId != project.getValue() )
                         continue;
                     
-                    cache.cacheFilters(project.getValue(), MantisConverter.convert(soapClient.getProjectFilters(project.getValue(), monitor)));
-                    Policy.advance(subMonitor, 1);
-
-                    cache.cacheProjectCustomFields(project.getValue(), MantisConverter.convert(soapClient.getProjectCustomFields(project.getValue(),
-                            monitor)));
-                    Policy.advance(subMonitor, 1);
-
-                    cache.cacheProjectCategories(project.getValue(), soapClient.getProjectCategories(project.getValue(),
-                            monitor));
-                    Policy.advance(subMonitor, 1);
-
-                    cache.cacheProjectDevelopers(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
-                            cache.getCacheData().getDeveloperThreshold(), monitor)));
-                    Policy.advance(subMonitor, 1);
-
-                    try {
-                        cache.cacheProjectReporters(project.getValue(), MantisConverter.convert(soapClient.getProjectUsers(project.getValue(),
-                                cache.getCacheData().getReporterThreshold(), monitor)));
-                    } catch (MantisException e) {
-                        if ( cache.getCacheData().getReportersByProjectId().containsKey(project.getValue()) ) {
-                            MantisCorePlugin.warn("Failed retrieving reporter information, using previously loaded values.", e);
-                        } else {
-                            cache.copyReportersFromDevelopers(project.getValue());
-                            MantisCorePlugin.warn("Failed retrieving reporter information, using developers list for reporters.", e);
-                        }
-                    }
-                    Policy.advance(subMonitor, 1);
-
-                    cache.cacheProjectVersions(project.getValue(), MantisConverter.convert(soapClient.getProjectVersions(project.getValue(), monitor)));
-                    Policy.advance(subMonitor, 1);
+                    subMonitor.setTaskName("Refreshing configuration for project " + project.getName());
+                    tracer.trace(TraceLocation.SYNC, "Refreshing configuration for project {0}", project.getName());
+                    
+                    for ( RunnableWithProgress runnable : projectSpecificRunnables )
+						runnable.run(subMonitor.newChild(1), project);
                 }
 
-                cache.cacheResolvedStatus(soapClient.getStringConfiguration(monitor, RESOLVED_STATUS_THRESHOLD.getValue()));
-                Policy.advance(subMonitor, 1);
-                
-                cache.cachePriorities(MantisConverter.convert( soapClient.getPriorities(monitor), MantisPriority.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheStatuses(MantisConverter.convert(soapClient.getStatuses(monitor), MantisTicketStatus.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheSeverities(MantisConverter.convert(soapClient.getSeverities(monitor), MantisSeverity.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheResolutions(MantisConverter.convert(soapClient.getResolutions(monitor), MantisResolution.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheReproducibilites(MantisConverter.convert(soapClient.getReproducibilities(monitor), MantisReproducibility.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheProjections(MantisConverter.convert(soapClient.getProjections(monitor), MantisProjection.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheEtas(MantisConverter.convert(soapClient.getEtas(monitor), MantisETA.class));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheViewStates(MantisConverter.convert(soapClient.getViewStates(monitor), MantisViewState.class));
-                Policy.advance(subMonitor, 1);
-                
-                cache.cacheDefaultAttributeValue(Key.SEVERITY, safeGetThreshold(monitor, "default_bug_severity", DefaultConstantValues.Attribute.BUG_SEVERITY));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDefaultAttributeValue(Key.PRIORITY, safeGetThreshold(monitor, "default_bug_priority", DefaultConstantValues.Attribute.BUG_PRIORITY));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDefaultAttributeValue(Key.ETA, safeGetThreshold(monitor, "default_bug_eta", DefaultConstantValues.Attribute.BUG_ETA));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDefaultAttributeValue(Key.REPRODUCIBILITY, safeGetThreshold(monitor, "default_bug_reproducibility", DefaultConstantValues.Attribute.BUG_REPRODUCIBILITY));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDefaultAttributeValue(Key.RESOLUTION, safeGetThreshold(monitor, "default_bug_resolution", DefaultConstantValues.Attribute.BUG_RESOLUTION));
-                Policy.advance(subMonitor, 1);
-
-                cache.cacheDefaultAttributeValue(Key.PROJECTION, safeGetThreshold(monitor, "default_bug_projection", DefaultConstantValues.Attribute.BUG_PROJECTION));
-                Policy.advance(subMonitor, 1);
-                
-                cache.cacheDefaultAttributeValue(Key.VIEW_STATE, safeGetThreshold(monitor, "default_bug_view_status", DefaultConstantValues.Attribute.BUG_VIEW_STATUS));
-                Policy.advance(subMonitor, 1);
-                
-                cache.getCacheData().putDefaultValueForStringAttribute(Key.STEPS_TO_REPRODUCE, soapClient.getStringConfiguration(monitor, "default_bug_steps_to_reproduce"));
-                Policy.advance(subMonitor, 1);
-                
-                cache.getCacheData().putDefaultValueForStringAttribute(Key.ADDITIONAL_INFO, soapClient.getStringConfiguration(monitor, "default_bug_additional_info"));
-                Policy.advance(subMonitor, 1);
-                
-                cache.getCacheData().setBugResolutionFixedThreshold(safeGetThreshold(monitor, "bug_resolution_fixed_threshold", DefaultConstantValues.Attribute.BUG_RESOLUTION_FIXED_THRESHOLD));
-                
-                cache.getCacheData().setEtaEnabled(safeGetBoolean(subMonitor, "enable_eta", ETA_ENABLED ));
-                
-                cache.getCacheData().setProjectionEnabled(safeGetBoolean(subMonitor, "enable_projection", PROJECTION_ENABLED ));
-                
                 cache.getCacheData().setLastUpdate( System.currentTimeMillis() );
             } finally {
-                subMonitor.done();
                 tracer.trace(TraceLocation.CONFIG, "Repository sync for {0} complete in {1} seconds.", repositoryUrl, format(start));
             }
         }
@@ -538,4 +638,8 @@ public class MantisSoapClient implements IMantisClient {
         
         soapClient.deleteIssue(ticketId, monitor);
     };
+    
+	private static interface RunnableWithProgress {
+    	void run(IProgressMonitor monitor, MantisProject project) throws MantisException;
+    }
 }
