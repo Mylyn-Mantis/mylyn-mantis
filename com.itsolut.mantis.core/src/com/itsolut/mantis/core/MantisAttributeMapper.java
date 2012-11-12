@@ -261,7 +261,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
 
         super.updateTaskAttachment(taskAttachment, taskAttribute);
 
-        if (taskAttachment.getFileName().startsWith(MantisAttachmentHandler.CONTEXT_DESCRIPTION))
+        if ( taskAttachment.getFileName() != null && taskAttachment.getFileName().startsWith(MantisAttachmentHandler.CONTEXT_DESCRIPTION))
             taskAttachment.setDescription(MantisAttachmentHandler.CONTEXT_DESCRIPTION);
 
     }
