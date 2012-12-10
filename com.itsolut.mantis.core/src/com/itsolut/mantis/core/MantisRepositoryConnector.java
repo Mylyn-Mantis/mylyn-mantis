@@ -275,6 +275,11 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
     @Override
     public void updateRepositoryConfiguration(TaskRepository taskRepository, ITask task, IProgressMonitor monitor) throws CoreException {
 
+    	if ( task == null ) {
+    		updateRepositoryConfiguration(taskRepository, monitor);
+    		return;
+    	}
+    	
         try {
             clientManager.getRepository(taskRepository).updateAttributesForTask(monitor, Integer.valueOf(task.getTaskId()));
         } catch (MantisException e) {
