@@ -11,19 +11,37 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	</parent>
 
 	<artifactId>com.itsolut.mantis-site</artifactId>
-	<packaging>eclipse-update-site</packaging>
+	<packaging>eclipse-repository</packaging>
 	<name>Mylyn Mantis Connector update site</name>
+	<description>Mylyn Mantis Connector update site</description>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-packaging-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<archiveSite>true</archiveSite>
-				</configuration>
-			</plugin>
+		        <groupId>org.jboss.tools.tycho-plugins</groupId>
+		        <artifactId>repository-utils</artifactId>
+		        <version>0.16.0-SNAPSHOT</version>
+		        <executions>
+		           <execution>
+		              <id>generate-facade</id>
+		              <phase>package</phase>
+		              <goals>
+		                 <goal>generate-repository-facade</goal>
+		              </goals>
+		              <configuration>
+		                  <!-- Symbols are used while expanding index.html template -->
+		                  <symbols>
+		                      <update.site.name>${project.name}</update.site.name>
+		                      <update.site.description>${project.description}</update.site.description>
+		                 </symbols>
+		                 <p2StatsUrl>http://mylyn-mantis.sourceforge.net/p2-stats-recorder/index.php/</p2StatsUrl>
+		                 <associateSites>
+		                   <site>http://download.eclipse.org/mylyn/releases/latest</site>
+		                 </associateSites>
+		            </configuration>
+		          </execution>
+		       </executions>
+		     </plugin>			
 		</plugins>
 	</build>
 </project>

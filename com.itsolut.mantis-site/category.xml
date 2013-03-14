@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site
-      associateSitesURL="http://mylyn-mantis.sourceforge.net/eclipse/associate-sites.xml">
+<site>
    <description url="http://mylyn-mantis.sourceforge.net/eclipse/update">
       The Mylyn connector for MantisBT allows you to manage your bugs straight from Eclipse. Supported features include creating and updating tasks, synchronizing tasks, commenting and uploading and downloading attachments.
    </description>
