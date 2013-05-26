@@ -511,37 +511,79 @@ public class MantisCache {
 
     public MantisSeverity getDefaultSeverity() throws MantisException {
         
-        return getSeverity(cacheData.getDefaultValueForAttribute(Key.SEVERITY));
+        try {
+            return getSeverity(cacheData.getDefaultValueForAttribute(Key.SEVERITY));
+        } catch (MantisException e) {
+            if ( cacheData.severities.size() > 0 )
+                return cacheData.severities.get(0);
+            return null;
+        }
     }
     
     public MantisPriority getDefaultPriority() throws MantisException {
         
-        return getPriority(cacheData.getDefaultValueForAttribute(Key.PRIORITY));
+        try {
+            return getPriority(cacheData.getDefaultValueForAttribute(Key.PRIORITY));
+        } catch (MantisException e) {
+            if ( cacheData.priorities.size() > 0 )
+                return cacheData.priorities.get(0);
+            return null;
+        }
     }
     
     public MantisETA getDefaultEta() throws MantisException {
         
-        return getETA(cacheData.getDefaultValueForAttribute(Key.ETA));
+        try {
+            return getETA(cacheData.getDefaultValueForAttribute(Key.ETA));
+        } catch (MantisException e) {
+            if ( cacheData.etas.size() > 0 )
+                return cacheData.etas.get(0);
+            return null;
+        }
     }
 
     public MantisProjection getDefaultProjection() throws MantisException {
 
-        return getProjection(cacheData.getDefaultValueForAttribute(Key.PROJECTION));
+        try {
+            return getProjection(cacheData.getDefaultValueForAttribute(Key.PROJECTION));
+        } catch (MantisException e) {
+            if ( cacheData.projections.size() > 0 )
+                return cacheData.projections.get(0);
+            return null;
+        }
     }
     
     public MantisResolution getDefaultResolution() throws MantisException {
         
-        return getResolution(cacheData.getDefaultValueForAttribute(Key.RESOLUTION));
+        try {
+            return getResolution(cacheData.getDefaultValueForAttribute(Key.RESOLUTION));
+        } catch (MantisException e) {
+            if ( cacheData.resolutions.size() > 0 )
+                return cacheData.resolutions.get(0);
+            return null;
+        }
     }
     
     public MantisReproducibility getDefaultReproducibility() throws MantisException {
         
-        return getReproducibility(cacheData.getDefaultValueForAttribute(Key.REPRODUCIBILITY));
+        try {
+            return getReproducibility(cacheData.getDefaultValueForAttribute(Key.REPRODUCIBILITY));
+        } catch (MantisException e) {
+            if ( cacheData.reproducibilities.size() > 0 )
+                return cacheData.reproducibilities.get(0);
+            return null;
+        }
     }
     
     public MantisViewState getDefaultViewState() throws MantisException {
         
-        return getViewState(cacheData.getDefaultValueForAttribute(Key.VIEW_STATE));
+        try {
+            return getViewState(cacheData.getDefaultValueForAttribute(Key.VIEW_STATE));
+        } catch (MantisException e) {
+            if ( cacheData.viewStates.size() > 0 )
+                return cacheData.viewStates.get(0);
+            return null;
+        }
     }
     
     public String getDefaultStepsToReproduce() {
