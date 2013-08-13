@@ -24,7 +24,7 @@ You might want to download and install a version with recent changes before it i
 Contributing
 ---
 
-There are many ways in which you can contribute to our project - whether you're a developer, designer of just a happy user. See [Contributing](http://sourceforge.net/apps/mediawiki/mylyn-mantis/index.php?title=Contributing) to get started. 
+There are many ways in which you can contribute to our project - whether you're a developer, designer of just a happy user. See [Contributing](wiki/Contributing) to get started. 
 
 Support
 ---
