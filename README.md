@@ -29,7 +29,7 @@ There are many ways in which you can contribute to our project - whether you're 
 Support
 ---
 
-Our [Troubleshooting page](http://sourceforge.net/apps/mediawiki/mylyn-mantis/index.php?title=Troubleshooting) lists common errors which occur and possible solutions. If you do not find a solution , please use the [forums](http://www.mantisbt.org/forums/viewforum.php?f=14) to ask questions or the [bug tracker](http://www.mantisbt.org/bugs/view_all_bug_page.php?project_id=20) to report problems.
+Our [Troubleshooting page](wiki/User-guide#troubleshooting) lists common errors which occur and possible solutions. If you do not find a solution , please use the [forums](http://www.mantisbt.org/forums/viewforum.php?f=14) to ask questions or the [bug tracker](http://www.mantisbt.org/bugs/view_all_bug_page.php?project_id=20) to report problems.
 
 Supporters
 ---
