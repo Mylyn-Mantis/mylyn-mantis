@@ -16,19 +16,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<module>com.itsolut.mantis-site</module>
 	</modules>
 	
-	<repositories>
-		<repository>
-			<id>eclipse</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/eclipse/updates/3.5</url>
-		</repository>
-		<repository>
-			<id>mylyn</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/mylyn/drops/3.6.0/v20110608-1400/</url>
-		</repository>
-	</repositories>
-	
 	<pluginRepositories>
 	  <pluginRepository>
 	    <id>jboss-public-repository-group</id>
