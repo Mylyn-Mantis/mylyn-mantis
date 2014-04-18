@@ -60,7 +60,7 @@ public class MantisTaskDataMigrator {
 				if ( attribute == null )
 					return;
 				
-				if ( attribute.getValue().isEmpty() )
+                if (attribute.getValue().length() == 0)
 					return;
 				
 				String oldValue = attribute.getMetaData().getValue(MantisAttributeMapper.TASK_ATTRIBUTE_ORIGINAL_MONITORS);
