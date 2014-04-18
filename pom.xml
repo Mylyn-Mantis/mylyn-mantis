@@ -10,9 +10,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<modules>
 		<module>com.itsolut.mantis.core</module>
 		<module>com.itsolut.mantis.ui</module>
+		<module>com.itsolut.mantis.wikitext</module>
 		<module>com.itsolut.mantis.eclemma</module>
 		<module>com.itsolut.mantis.tests</module>
 		<module>com.itsolut.mantis-feature</module>
+		<module>com.itsolut.mantis.wikitext-feature</module>
 		<module>com.itsolut.mantis-site</module>
 	</modules>
 

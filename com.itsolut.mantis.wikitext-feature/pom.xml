@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.itsolut.mantis</groupId>
+		<artifactId>com.itsolut.mantis.parent</artifactId>
+		<version>3.10.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>com.itsolut.mantis.wikitext_feature</artifactId>
+	<packaging>eclipse-feature</packaging>
+	<name>Mylyn Mantis Connector WikiText feature</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+					<execution>
+						<id>generate-changes</id>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<transformationSets>
+					
+						<!-- Is there a more compact way generate the release notes without copying the 
+							same transformationSet over and over and then changing the stylesheet and outputDir value ? -->
+						<transformationSet>
+							<dir>src/changes</dir>
+							<stylesheet>src/xsl/changes-to-mediawiki.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/mediawiki</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
+							<outputProperties>
+								<outputProperty>
+									<name>omit-xml-declaration</name>
+									<value>yes</value>
+								</outputProperty>
+							</outputProperties>
+						</transformationSet>
+						
+						<transformationSet>
+							<dir>src/changes</dir>
+							<stylesheet>src/xsl/changes-to-phpbb.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/phpbb</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
+							<outputProperties>
+								<outputProperty>
+									<name>omit-xml-declaration</name>
+									<value>yes</value>
+								</outputProperty>
+							</outputProperties>
+						</transformationSet>
+						
+						<transformationSet>
+							<dir>src/changes</dir>
+							<stylesheet>src/xsl/changes-to-text.xsl</stylesheet>
+							<outputDir>${project.build.directory}/release-notes/text</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.txt</targetExtension>
+								</fileMapper>
+							</fileMappers>
+							<outputProperties>
+								<outputProperty>
+									<name>omit-xml-declaration</name>
+									<value>yes</value>
+								</outputProperty>
+							</outputProperties>
+						</transformationSet>						
+					</transformationSets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+

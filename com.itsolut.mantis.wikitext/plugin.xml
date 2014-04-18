@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.mylyn.wikitext.core.markupLanguage">
+      <language
+            class="com.itsolut.mantis.ui.internal.wikitext.MantisHtmlMarkupLanguage"
+            name="%wikitext.languageName">
+      </language>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.tasks.ui.taskEditorExtensions">
+         <taskEditorExtension
+               class="com.itsolut.mantis.ui.internal.wikitext.MantisHtmlMarkupTaskEditorExtension"
+               id="com.itsolut.mantis.ui.wikitext.mantisHtmlTaskEditorExtension"
+               name="%wikitext.languageName"/>
+         <repositoryAssociation
+               connectorKind="mantis"
+               taskEditorExtension="com.itsolut.mantis.ui.wikitext.mantisHtmlTaskEditorExtension">
+         </repositoryAssociation>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.wikitext.ui.contentAssist">
+      <templates markupLanguage="Mantis HTML">
+         <template description="Preformatted text" name="pre" content="&lt;pre&gt;${text}&lt;/pre&gt;"/>
+         <template description="Italic text" name="em" content="&lt;em&gt;${text}&lt;/em&gt;"/>
+         <template description="Bold text" name="strong" content="&lt;strong&gt;${text}&lt;/strong&gt;"/>
+         <template description="Ordered list" name="ol" content="&lt;ol&gt;&lt;li&gt;${text}&lt;/li&gt;&lt;li&gt;&lt;/li&gt;&lt;/ol&gt;"/>
+         <template description="Unordered list" name="ul" content="&lt;ul&gt;&lt;li&gt;${text}&lt;/li&gt;&lt;li&gt;&lt;/li&gt;&lt;/ul&gt;"/>
+      </templates>
+   </extension>
+</plugin>
