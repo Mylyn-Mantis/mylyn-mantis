@@ -3,10 +3,10 @@
    <description url="http://mylyn-mantis.sourceforge.net/eclipse/update">
       The Mylyn connector for MantisBT allows you to manage your bugs straight from Eclipse. Supported features include creating and updating tasks, synchronizing tasks, commenting and uploading and downloading attachments.
    </description>
-   <feature url="features/com.itsolut.mantis_feature_3.10.0.qualifier" id="com.itsolut.mantis_feature" version="3.10.0.qualifier">
+   <feature url="features/com.itsolut.mantis_feature_3.10.1.qualifier" id="com.itsolut.mantis_feature" version="3.10.1.qualifier">
       <category name="Mylyn-Mantis connector"/>
    </feature>
-   <feature url="features/com.itsolut.mantis.wikitext_feature_3.10.0.qualifier.jar" id="com.itsolut.mantis.wikitext_feature" version="3.10.0.qualifier">
+   <feature url="features/com.itsolut.mantis.wikitext_feature_3.10.1.qualifier.jar" id="com.itsolut.mantis.wikitext_feature" version="3.10.1.qualifier">
       <category name="Mylyn-Mantis connector"/>
    </feature>
    <category-def name="Mylyn-Mantis connector" label="Mylyn-Mantis connector"/>
