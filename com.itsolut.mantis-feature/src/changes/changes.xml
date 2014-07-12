@@ -2,18 +2,9 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.10.0" date="2013-11-08">
-			<action type="add" issue="15726" dev="rombert">Synchronizing Issues fails on missing severity ID</action>
-			<action type="add" issue="15864" dev="rombert">Synchronization fails if no issue with ID 1 exists (No reproducibility with id 1)</action>
-			<action type="add" issue="11527" dev="rombert">Mylyn 3.9 - NullPointerException when updating repository attributes from Task List</action>
-			<action type="add" issue="11445" dev="rombert">Logged error related to attachments</action>
-			<action type="add" issue="14663" dev="rombert">Query page controls should take up all available space</action>
-			<action type="add" issue="14914" dev="rombert">Incorrect progress reporting when first refreshing a repository</action>
-			<action type="add" issue="14919" dev="rombert">Clone task does not copy custom field values</action>
-			<action type="add" issue="14915" dev="rombert">Patch to support embedded/standalone execution of the mantis connector outside of an OSGI container</action>
-			<action type="add" issue="14903" dev="rombert">Custom checkbox fields are mapped as boolean while actually being of type multiSelect</action>
-			<action type="add" issue="14912" dev="rombert">Error when creating new task in a repository when task of another repository is selected</action>
-			<action type="add" issue="16599" dev="rombert">Installation conflict with WikiText 2.0</action>
+		<release version="3.10.1" date="2014-07-13">
+			<action type="add" issue="17116" dev="rombert">Adjust to SOAP transport removal from Mylyn 3.11</action>
+			<action type="add" issue="17167" dev="rombert">Task editor does not work (with WikiText 2.0?)</action>
 		</release>
 	</body>
 </document>
