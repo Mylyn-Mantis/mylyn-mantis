@@ -17,14 +17,14 @@ package com.itsolut.mantis.core;
  */
 public class RepositoryValidationResult {
 
-	private final RepositoryVersion version;
+	private final String version;
 
-	public RepositoryValidationResult(RepositoryVersion version) {
+	public RepositoryValidationResult(String version) {
 
 		this.version = version;
 	}
 
-	public RepositoryVersion getVersion() {
+	public String getVersion() {
 
 		return version;
 	}

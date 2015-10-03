@@ -494,7 +494,6 @@ public class MantisSoapClient implements IMantisClient {
 
             // get and validate remote version
             String remoteVersion = soapClient.getVersion(monitor);
-            RepositoryVersion version = RepositoryVersion.fromVersionString(remoteVersion);
             Policy.advance(monitor, 1);
 
             // test to see if the current user has proper access privileges,
@@ -502,7 +501,7 @@ public class MantisSoapClient implements IMantisClient {
             soapClient.getProjectData(monitor);
             Policy.advance(monitor, 1);
             
-            return new RepositoryValidationResult(version);
+            return new RepositoryValidationResult(remoteVersion);
             
         } finally {
 

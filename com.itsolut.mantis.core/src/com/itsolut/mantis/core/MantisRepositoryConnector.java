@@ -542,4 +542,31 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
         }
         
     }
+    
+    @Override
+    public RepositoryInfo validateRepository(TaskRepository repository, IProgressMonitor monitor) throws CoreException {
+    	
+    	try {
+			IMantisClient client = clientManager.getRepository(repository);
+			
+			RepositoryValidationResult result = client.validate(monitor);
+			
+			RepositoryVersion version = RepositoryVersion.fromVersionString(result.getVersion());
+			
+			if ( !version.getMissingCapabilities().isEmpty() ) {
+				StringBuilder message = new StringBuilder();
+				message.append("You are using a version in the range ").append(version.getDescription()).append(" which has known problems : ");
+				for ( RepositoryCapability capability : version.getMissingCapabilities() )
+					message.append(capability.getDescriptionForMissingCapability()).append(" ,");
+				message.deleteCharAt(message.length() -1);
+				message.append(". Please consider upgrading to the latest stable version.");
+				
+				throw new CoreException(RepositoryStatus.createStatus(repository.getRepositoryUrl(), IStatus.WARNING, MantisCorePlugin.PLUGIN_ID, message.toString()));
+			}
+			
+			return new RepositoryInfo(new org.eclipse.mylyn.tasks.core.RepositoryVersion(result.getVersion()));
+		} catch (MantisException e) {
+			throw new CoreException(statusFactory.toStatus("Failed validating connection to the task repository : " + e.getMessage(), e, repository));
+		}
+    }
 }
