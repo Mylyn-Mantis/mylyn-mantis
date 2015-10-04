@@ -41,6 +41,8 @@ import com.itsolut.mantis.core.exception.MantisException;
 import com.itsolut.mantis.core.exception.MantisLocalException;
 import com.itsolut.mantis.core.exception.MantisRemoteException;
 import com.itsolut.mantis.core.exception.TicketNotFoundException;
+import com.itsolut.mantis.core.model.MantisIssueHistory;
+import com.itsolut.mantis.core.model.MantisIssueHistoryEntry;
 
 /**
  * Represents a Mantis repository that is accessed through the MantisConnect SOAP Interface.
@@ -665,6 +667,15 @@ public class MantisAxis1SoapClient extends AbstractSoapClient {
         
         return allTags;
     }
+    
+    public HistoryData[] getHistory(final int issueId, IProgressMonitor monitor) throws MantisException {
+    	
+    	return call(monitor, new Callable<HistoryData[]>() {
 
-
+			public HistoryData[] call() throws Exception {
+				
+				return getSOAP().mc_issue_get_history(getUsername(), getPassword(), BigInteger.valueOf(issueId));
+			}
+    	});
+    }
 }

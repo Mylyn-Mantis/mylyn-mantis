@@ -11,6 +11,10 @@
 
 package com.itsolut.mantis.core;
 
+import static com.itsolut.mantis.core.RepositoryCapability.CORRECT_BASE64_ENCODING;
+import static com.itsolut.mantis.core.RepositoryCapability.ISSUE_HISTORY;
+import static com.itsolut.mantis.core.RepositoryCapability.TAGS;
+
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -40,7 +44,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, requires
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_OR_HIGHER("1.2.0 to 1.2.1", EnumSet.complementOf(EnumSet.of(RepositoryCapability.CORRECT_BASE64_ENCODING, RepositoryCapability.TAGS))),
+    VERSION_1_2_OR_HIGHER("1.2.0 to 1.2.1", EnumSet.complementOf(EnumSet.of(CORRECT_BASE64_ENCODING, TAGS, ISSUE_HISTORY))),
     
     /**
      * Versions 1.2.2 or newer.
@@ -48,7 +52,17 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, does not require
      * Base64-encoding of attachments and has due date support.</p>
      */
-    VERSION_1_2_2_OR_HIGHER("1.2.2 to 1.2.8 ", allExcept(RepositoryCapability.TAGS)),
+    VERSION_1_2_2_OR_HIGHER("1.2.2 to 1.2.8 ", allExcept(TAGS, ISSUE_HISTORY)),
+    
+    /**
+     * Versions 1.2.9 or newer.
+     * 
+     * <p>Supports target_version, task relations, does not require
+     * Base64-encoding of attachments, has due date support, supports tags.</p>
+     * 
+     * <p>However, it does not support history retrieval</p>
+     */
+    VERSION_1_2_9_OR_HIGHER("1.2.9 to 1.2.15", allExcept(ISSUE_HISTORY)),
     
     /**
      * Versions 1.2.9 or newer.
@@ -56,7 +70,7 @@ public enum RepositoryVersion {
      * <p>Supports target_version, task relations, does not require
      * Base64-encoding of attachments, has due date support, supports tags.</p>
      */
-    VERSION_1_2_9_OR_HIGHER("1.2.9 or higher in the 1.2.x stream", EnumSet.allOf(RepositoryCapability.class)),
+    VERSION_1_2_16_OR_HIGHER("1.2.16 or higher in the 1.2.x stream", EnumSet.allOf(RepositoryCapability.class)),
     
     /**
      * Versions 1.3 or newer.
@@ -80,8 +94,10 @@ public enum RepositoryVersion {
     			return VERSION_1_2_OR_HIGHER;
     		else if ( minorVersion < 9)
     		    return VERSION_1_2_2_OR_HIGHER;
-    		else
+    		else if ( minorVersion < 16)
     			return VERSION_1_2_9_OR_HIGHER;
+    		else
+    			return VERSION_1_2_16_OR_HIGHER;
         }
         
         if ( versionString.startsWith("1.3"))
@@ -162,6 +178,11 @@ public enum RepositoryVersion {
     public boolean isHasTagSupport() {
         
         return capabilities.contains(RepositoryCapability.TAGS);
+    }
+    
+    public boolean isHasIssueHistorySupport() {
+    	
+    	return capabilities.contains(RepositoryCapability.ISSUE_HISTORY);
     }
     
     public Set<RepositoryCapability> getMissingCapabilities() {

@@ -636,7 +636,24 @@ public class MantisSoapClient implements IMantisClient {
     public void deleteTicket(int ticketId, IProgressMonitor monitor) throws MantisException {
         
         soapClient.deleteIssue(ticketId, monitor);
-    };
+    }
+    
+    public MantisIssueHistory getHistory(final int issueId, IProgressMonitor monitor) throws MantisException {
+    	
+    	HistoryData[] historyData = soapClient.getHistory(issueId, monitor);
+		MantisIssueHistory history = new MantisIssueHistory(issueId);
+		
+		if ( historyData != null ) {
+			for ( HistoryData entry : historyData) {
+				MantisIssueHistoryEntry result = MantisConverter.convert(entry);
+				if ( result != null ) {
+					history.addEntry(result);
+				}
+			}
+		}
+		
+		return history;
+    }
     
 	private static interface RunnableWithProgress {
     	void run(IProgressMonitor monitor, MantisProject project) throws MantisException;

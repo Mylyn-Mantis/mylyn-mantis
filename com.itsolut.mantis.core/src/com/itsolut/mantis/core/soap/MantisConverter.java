@@ -490,4 +490,12 @@ public class MantisConverter {
         return mantisTags;
     }
 
+	public static MantisIssueHistoryEntry convert(HistoryData entry) {
+		if ( entry.getField().isEmpty()  ) {
+			return null;
+		}
+		return new MantisIssueHistoryEntry(MantisUtils.parseDate(entry.getDate().longValue() * 1000), entry.getField(), entry.getUsername(), 
+				entry.getOld_value(), entry.getNew_value());
+	}
+
 }

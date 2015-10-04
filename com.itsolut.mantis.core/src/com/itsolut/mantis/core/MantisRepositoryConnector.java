@@ -38,6 +38,7 @@ import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.internal.tasks.ui.util.TasksUiInternal;
 import org.eclipse.mylyn.tasks.core.*;
 import org.eclipse.mylyn.tasks.core.data.*;
+import org.eclipse.mylyn.tasks.core.data.TaskRevision.Change;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 import com.google.inject.Guice;
@@ -45,7 +46,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisIssueHistory;
+import com.itsolut.mantis.core.model.MantisIssueHistoryEntry;
 import com.itsolut.mantis.core.model.MantisTicket;
+import com.itsolut.mantis.core.model.MantisUser;
 import com.itsolut.mantis.core.util.MantisUtils;
 
 /**
@@ -567,6 +571,59 @@ public class MantisRepositoryConnector extends AbstractRepositoryConnector {
 			return new RepositoryInfo(new org.eclipse.mylyn.tasks.core.RepositoryVersion(result.getVersion()));
 		} catch (MantisException e) {
 			throw new CoreException(statusFactory.toStatus("Failed validating connection to the task repository : " + e.getMessage(), e, repository));
+		}
+    }
+    
+    @Override
+    public boolean canGetTaskHistory(TaskRepository repository, ITask task) {
+    	
+    	try {
+			IMantisClient client = clientManager.getRepository(repository);
+			// use the quick/unsafe version since we can't block the UI at this point
+			MantisCacheData cacheData = client.getCacheData();
+			if ( cacheData == null ) {
+				return false;
+			}
+			
+			RepositoryVersion version = cacheData.repositoryVersion;
+			
+			return version.isHasIssueHistorySupport();
+		} catch (MantisException e) {
+			MantisCorePlugin.getDefault().getLog().log(statusFactory.toStatus("Error while trying running 'canGetTaskHistory'", e, repository));
+			return false;
+		}
+    }
+    
+    @Override
+    public TaskHistory getTaskHistory(TaskRepository repository, ITask task,
+    		IProgressMonitor monitor) throws CoreException {
+    	
+    	try {
+    		
+			IMantisClient client = clientManager.getRepository(repository);
+			
+			MantisIssueHistory mantisHistory = client.getHistory(Integer.parseInt(task.getTaskId()), monitor);
+			
+			TaskHistory history = new TaskHistory(repository, task);
+			for ( int i = 0 ; i < mantisHistory.getEntries().size(); i++) {
+				
+				MantisIssueHistoryEntry historyEntry = mantisHistory.getEntries().get(i);
+				IRepositoryPerson author = repository.createPerson(historyEntry.getAuthor());
+				MantisUser mantisUser = client.getCache(monitor).getUserByUsername(author.getPersonId());
+				if ( mantisUser != null ) {
+					author.setName(mantisUser.getRealName());
+				}
+				TaskRevision rev = new TaskRevision(String.valueOf(i), historyEntry.getDate(), author);
+				
+				// TODO - proper label
+				rev.add(new Change(historyEntry.getField(), historyEntry.getField(), historyEntry.getOldValue(), historyEntry.getNewValue()));
+				
+				history.add(rev);
+			}
+			
+			return history;
+		} catch (MantisException e) {
+			throw new CoreException(statusFactory.toStatus("Failed retrieving issue history: " + e.getMessage(), e, repository));
 		}
     }
 }

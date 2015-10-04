@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.itsolut.mantis.core.exception.MantisException;
+import com.itsolut.mantis.core.model.MantisIssueHistory;
 import com.itsolut.mantis.core.model.MantisSearch;
 import com.itsolut.mantis.core.model.MantisTicket;
 import com.itsolut.mantis.core.model.MantisTicketComment;
@@ -141,4 +142,12 @@ public interface IMantisClient {
      * @param monitor
      */
     void deleteTicket(int ticketId, IProgressMonitor monitor) throws MantisException;
+    
+    /**
+     * @param issueId
+     * @param monitor
+     * @return the history data, never <code>null</code>
+     * @throws MantisException
+     */
+    MantisIssueHistory getHistory(final int issueId, IProgressMonitor monitor) throws MantisException;
 }
