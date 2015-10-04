@@ -38,6 +38,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		                 <associateSites>
 		                   <site>http://download.eclipse.org/mylyn/releases/latest</site>
 		                 </associateSites>
+                         <siteTemplateFolder>siteTemplate</siteTemplateFolder>
+                        <symbols>
+                          <update.site.name>${project.name}</update.site.name>
+                          <target.eclipse.version>Kepler or newer</target.eclipse.version>
+                        </symbols>
 		            </configuration>
 		          </execution>
 		       </executions>
