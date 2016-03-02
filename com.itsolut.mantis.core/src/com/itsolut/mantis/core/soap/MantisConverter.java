@@ -47,7 +47,8 @@ public class MantisConverter {
 
         MantisVersion version = new MantisVersion(versionData.getName());
         version.setDescription(versionData.getDescription());
-        version.setTime(MantisUtils.transform(versionData.getDate_order()));
+        if ( versionData.getDate_order() != null)
+        	version.setTime(MantisUtils.transform(versionData.getDate_order()));
         version.setReleased(versionData.getReleased());
 
         return version;
