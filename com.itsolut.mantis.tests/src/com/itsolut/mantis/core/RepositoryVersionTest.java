@@ -82,4 +82,9 @@ public class RepositoryVersionTest {
 		assertEquals(RepositoryVersion.VERSION_1_2_16_OR_HIGHER, RepositoryVersion.fromVersionString("1.2.16"));
 	}
 
+	@Test
+	public void testVersion20DevIsRecognized() throws MantisException {
+		
+		assertEquals(RepositoryVersion.VERSION_2_0_DEV, RepositoryVersion.fromVersionString("2.0.0-beta.1-dev"));
+	}
 }
