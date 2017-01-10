@@ -84,12 +84,9 @@ public enum RepositoryVersion {
     /**
      * Versions 2.0 or newer.
      * 
-     * <p>Since this is a dev version, things might break.</p>
-     * 
      * <p>Assumed to have all capabilities</p>
      */
-    VERSION_2_0_DEV("2.0.x development version", EnumSet.allOf(RepositoryCapability.class));
-    
+    VERSION_2_0("2.0.x version", EnumSet.allOf(RepositoryCapability.class));
     
     public static RepositoryVersion fromVersionString(String versionString) throws MantisException{
         
@@ -113,8 +110,7 @@ public enum RepositoryVersion {
             return VERSION_1_3_DEV;
         
         if ( versionString.startsWith("2.0"))
-        	return VERSION_2_0_DEV;
-            
+        	return VERSION_2_0;
         
         throw new MantisException("Unknown version " + versionString + " .");
     }
