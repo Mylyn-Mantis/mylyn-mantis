@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.itsolut.mantis.core
-Bundle-Version: 3.11.0.qualifier
+Bundle-Version: 3.12.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.tasks.core;bundle-version="[3.7.0,4.0.0)",
@@ -15,11 +15,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.collect;bundle-version="[1.0.0,2.0.0)"
 Eclipse-RegisterBuddy: org.apache.axis
 Bundle-ActivationPolicy: lazy
-Export-Package: 
- com.itsolut.mantis.core,
- com.itsolut.mantis.core.exception,
- com.itsolut.mantis.core.model,
- com.itsolut.mantis.core.util
+Export-Package: com.itsolut.mantis.core,com.itsolut.mantis.core.except
+ ion,com.itsolut.mantis.core.model,com.itsolut.mantis.core.util
 Bundle-Activator: com.itsolut.mantis.core.MantisCorePlugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .,

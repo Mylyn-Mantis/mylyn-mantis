@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<parent>
 		<groupId>com.itsolut.mantis</groupId>
 		<artifactId>com.itsolut.mantis.parent</artifactId>
-		<version>3.11.0-SNAPSHOT</version>
+		<version>3.12.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 

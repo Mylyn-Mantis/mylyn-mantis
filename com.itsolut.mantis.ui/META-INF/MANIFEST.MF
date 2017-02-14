@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.itsolut.mantis.ui;singleton:=true
-Bundle-Version: 3.11.0.qualifier
+Bundle-Version: 3.12.0.qualifier
 Bundle-Activator: com.itsolut.mantis.ui.MantisUIPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
@@ -19,9 +19,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.itsolut.mantis.core,
  com.google.inject;bundle-version="[2.0.0,3.0.0)"
 Bundle-ActivationPolicy: lazy
-Export-Package: com.itsolut.mantis.ui,
- com.itsolut.mantis.ui.editor,
- com.itsolut.mantis.ui.internal;x-internal:=true,
- com.itsolut.mantis.ui.tasklist,
- com.itsolut.mantis.ui.wizard
+Export-Package: com.itsolut.mantis.ui,com.itsolut.mantis.ui.editor,com
+ .itsolut.mantis.ui.internal;x-internal:=true,com.itsolut.mantis.ui.ta
+ sklist,com.itsolut.mantis.ui.wizard
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
