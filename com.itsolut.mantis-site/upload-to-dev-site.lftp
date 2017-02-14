@@ -1,4 +1,4 @@
-open sftp://rombert,mylyn-mantis@web.sf.net
-cd htdocs/eclipse/update-dev
+open sftp://rombert@web.sourceforge.net
+cd /home/project-web/mylyn-mantis/htdocs/eclipse/update-dev
 mirror -eR target/repository .
 
