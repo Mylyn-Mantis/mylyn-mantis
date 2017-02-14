@@ -2,9 +2,13 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<body>
-		<release version="3.10.1" date="2014-07-13">
-			<action type="add" issue="17116" dev="rombert">Adjust to SOAP transport removal from Mylyn 3.11</action>
-			<action type="add" issue="17167" dev="rombert">Task editor does not work (with WikiText 2.0?)</action>
+		<release version="3.11.0" date="2017-02-14">
+			<action type="add" issue="22375" dev="rombert">Consider all versions older than 2.0 as valid</action>
+			<action type="add" issue="22159" dev="rombert">Add support for MantisBT 2.0</action>
+			<action type="add" issue="21211" dev="rombert">Add support for MantisBT version 2.0</action>
+			<action type="add" issue="19947" dev="rombert">Current version 3.10.1 cannot be installed with Eclipse Mars (4.5) Build id: 20150621-1200</action>
+			<action type="add" issue="16600" dev="rombert">Remove references to JBoss Tools from the update site</action>
+			<action type="add" issue="17140" dev="rombert">Investigate implementing new repository validation API for Mylyn >= 3.11</action>
 		</release>
 	</body>
 </document>
