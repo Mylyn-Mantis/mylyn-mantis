@@ -75,19 +75,10 @@ public enum RepositoryVersion {
     /**
      * Versions 1.3 or newer.
      * 
-     * <p>Since this is a dev version, things might break.</p>
-     * 
      * <p>Assumed to have all capabilities</p>
      */
-    VERSION_1_3_DEV("1.3.x development version", EnumSet.allOf(RepositoryCapability.class)),
-    
-    /**
-     * Versions 2.0 or newer.
-     * 
-     * <p>Assumed to have all capabilities</p>
-     */
-    VERSION_2_0("2.0.x version", EnumSet.allOf(RepositoryCapability.class));
-    
+    VERSION_1_3_OR_HIGHER("1.3.x or higher", EnumSet.allOf(RepositoryCapability.class));
+       
     public static RepositoryVersion fromVersionString(String versionString) throws MantisException{
         
         if ( versionString.startsWith("1.1"))
@@ -106,11 +97,15 @@ public enum RepositoryVersion {
     			return VERSION_1_2_16_OR_HIGHER;
         }
         
-        if ( versionString.startsWith("1.3"))
-            return VERSION_1_3_DEV;
+        if ( versionString.startsWith("1.3")) {
+        	return VERSION_1_3_OR_HIGHER;
+        }
         
-        if ( versionString.startsWith("2.0"))
-        	return VERSION_2_0;
+        int major = extractMantisMajorVersion(versionString);
+        
+        if ( major > 1 ) {
+        	return VERSION_1_3_OR_HIGHER;
+        }
         
         throw new MantisException("Unknown version " + versionString + " .");
     }
@@ -122,6 +117,13 @@ public enum RepositoryVersion {
             capabilities.remove(missingCapability);
         
         return capabilities;
+    }
+    
+    private static int extractMantisMajorVersion(String versionString) {
+    	
+    	int majorVersionIndex= versionString.indexOf(".");
+    	
+    	return Integer.parseInt(versionString.substring(0, majorVersionIndex));
     }
 
 	private static int extractMantisMinorVersion(String versionString) {

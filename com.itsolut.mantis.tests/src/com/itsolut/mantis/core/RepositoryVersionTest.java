@@ -61,7 +61,7 @@ public class RepositoryVersionTest {
 	@Test
 	public void testVersion13DevisRecognized() throws MantisException {
 		
-		assertEquals(RepositoryVersion.VERSION_1_3_DEV, RepositoryVersion.fromVersionString("1.3dev"));
+		assertEquals(RepositoryVersion.VERSION_1_3_OR_HIGHER, RepositoryVersion.fromVersionString("1.3dev"));
 	}
 	
 	@Test
@@ -85,13 +85,19 @@ public class RepositoryVersionTest {
 	@Test
 	public void testVersion20DevIsRecognized() throws MantisException {
 		
-		assertEquals(RepositoryVersion.VERSION_2_0, RepositoryVersion.fromVersionString("2.0.0-beta.1-dev"));
+		assertEquals(RepositoryVersion.VERSION_1_3_OR_HIGHER, RepositoryVersion.fromVersionString("2.0.0-beta.1-dev"));
 	}
 	
 	@Test
 	public void testVersion200IsRecognized() throws MantisException {
 		
-		assertEquals(RepositoryVersion.VERSION_2_0, RepositoryVersion.fromVersionString("2.0.0"));
+		assertEquals(RepositoryVersion.VERSION_1_3_OR_HIGHER, RepositoryVersion.fromVersionString("2.0.0"));
 	}
+	
+	@Test
+	public void testFarFutureVersionIsRecognized() throws MantisException {
+		
+		assertEquals(RepositoryVersion.VERSION_1_3_OR_HIGHER, RepositoryVersion.fromVersionString("14.5.11"));
+	}	
 
 }
