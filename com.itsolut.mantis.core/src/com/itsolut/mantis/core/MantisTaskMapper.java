@@ -10,12 +10,13 @@
  *******************************************************************************/
 package com.itsolut.mantis.core;
 
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 
 import com.itsolut.mantis.core.MantisAttributeMapper.Attribute;
-
 
 final class MantisTaskMapper extends TaskMapper {
 
@@ -29,6 +30,17 @@ final class MantisTaskMapper extends TaskMapper {
 
         // ignore, set during task data initialization
     }
+	
+	@Override
+	public boolean applyTo(ITask task) {
+		
+		// cleanup old tasks with missing keys
+		if ( task.getTaskKey() == null ) {
+			task.setTaskKey(getTaskData().getRoot().getAttribute(TaskAttribute.TASK_KEY).getValue());
+		}
+		
+		return super.applyTo(task);
+	}
 
     @Override
     public PriorityLevel getPriorityLevel() {

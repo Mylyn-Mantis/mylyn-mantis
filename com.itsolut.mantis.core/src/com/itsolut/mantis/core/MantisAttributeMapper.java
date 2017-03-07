@@ -80,7 +80,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
      *
      */
     public enum Attribute {
-        ID(Key.ID, "<used by search engine>", MantisAttributeMapper.METADATA_SEARCH_ID, true),
+        ID(Key.ID, "Id", TaskAttribute.TYPE_SHORT_TEXT, true),
         ADDITIONAL_INFO(Key.ADDITIONAL_INFO, "Additional Information",	TaskAttribute.TYPE_LONG_RICH_TEXT, true, false),
         ASSIGNED_TO(Key.ASSIGNED_TO, "Assigned To:", TaskAttribute.TYPE_PERSON, true, false),
         CATEGORY(Key.CATEOGRY, "Category:",	TaskAttribute.TYPE_SINGLE_SELECT, false, false),
@@ -249,7 +249,7 @@ public class MantisAttributeMapper extends TaskAttributeMapper {
     @Override
     public String mapToRepositoryKey(TaskAttribute parent, String key) {
     	
-    	Attribute mapped = taskAttributeToMantisAttributes.get(key);
+    	Attribute mapped = taskAttributeToMantisAttributes.get(key);    	
     	if ( mapped != null)
     		return mapped.getKey();
     	

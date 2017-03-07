@@ -801,7 +801,11 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
 
     private TaskData newTaskData(TaskRepository repository, MantisTicket ticket) {
 
-        return new TaskData(getAttributeMapper(repository), MantisCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), String.valueOf(ticket.getId()));
+        TaskData taskData = new TaskData(getAttributeMapper(repository), MantisCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), String.valueOf(ticket.getId()));
+		// explicitly set the task key from the id
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=497412
+        getAttribute(taskData, TaskAttribute.TASK_KEY).setValue(taskData.getTaskId());
+		return taskData;
     }
 
     /**
