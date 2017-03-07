@@ -223,7 +223,7 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
         Collection<TaskAttribute> attributes = data.getRoot().getAttributes().values();
 
         for (TaskAttribute attribute : attributes) {
-            
+        	
             if ( attribute.getId().equals("project")) {
                 ticket.putValue(attribute.getId(), attribute.getValue());
                 continue;
@@ -255,7 +255,8 @@ public class MantisTaskDataHandler extends AbstractTaskDataHandler {
             	ticket.setTags(tags);
             }
 
-            if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getMetaData().isReadOnly() || MantisOperation.isOperationRelated(attribute))
+            if (attribute.getId().equals(TaskAttribute.OPERATION) || attribute.getId().equals(TaskAttribute.TASK_KEY) ||
+            		attribute.getMetaData().isReadOnly() || MantisOperation.isOperationRelated(attribute))
                 continue;
 
             ticket.putValue(attribute.getId(), attribute.getValue());
