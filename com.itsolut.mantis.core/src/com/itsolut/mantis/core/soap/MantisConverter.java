@@ -70,8 +70,10 @@ public class MantisConverter {
         ticket.putBuiltinValue(Key.SEVERITY, issue.getSeverity().getName());
         ticket.putBuiltinValue(Key.PRIORITY, issue.getPriority().getName());
         ticket.putBuiltinValue(Key.REPRODUCIBILITY, issue.getReproducibility().getName());
-        ticket.putBuiltinValue(Key.PROJECTION, issue.getProjection().getName());
-        ticket.putBuiltinValue(Key.ETA, issue.getEta().getName());
+        if ( issue.getProjection() != null )
+        	ticket.putBuiltinValue(Key.PROJECTION, issue.getProjection().getName());
+        if ( issue.getEta() != null )
+        	ticket.putBuiltinValue(Key.ETA, issue.getEta().getName());
         ticket.putBuiltinValue(Key.VIEW_STATE, issue.getView_state().getName());
         ticket.putBuiltinValue(Key.STATUS, issue.getStatus().getName());
         ticket.putBuiltinValue(Key.VERSION, issue.getVersion());
