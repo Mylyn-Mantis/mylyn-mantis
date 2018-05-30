@@ -3,7 +3,7 @@ Export-Package: com.vladium.emma.rt
 Bundle-Vendor: Mountainminds GmbH & Co. KG
 Fragment-Host: org.eclipse.osgi;bundle-version="[3.5.0,4.0.0)"
 Bundle-ClassPath: .,emma.jar
-Bundle-Version: 3.12.0.qualifier
+Bundle-Version: 3.12.0
 Bundle-Name: Emma Runtime Instrumentation for Equinox
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.itsolut.mantis.eclemma
