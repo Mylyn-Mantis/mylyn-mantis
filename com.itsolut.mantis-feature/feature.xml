@@ -2,7 +2,7 @@
 <feature
       id="com.itsolut.mantis_feature"
       label="Mylyn Tasks Connector: Mantis"
-      version="3.12.0"
+      version="3.13.0.qualifier"
       provider-name="ITSOLUT"
       plugin="com.itsolut.mantis.ui">
 
