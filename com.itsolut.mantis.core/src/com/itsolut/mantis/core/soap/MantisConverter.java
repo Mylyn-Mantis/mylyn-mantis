@@ -62,6 +62,8 @@ public class MantisConverter {
 
         ticket.putBuiltinValue(Key.PROJECT, issue.getProject().getName());
 
+	ticket.putBuiltinValue(Key.ID, issue.getId().intValue());
+
         ticket.putBuiltinValue(Key.SUMMARY, issue.getSummary());
         ticket.putBuiltinValue(Key.DESCRIPTION, issue.getDescription());
         ticket.putBuiltinValue(Key.CATEOGRY, issue.getCategory());
